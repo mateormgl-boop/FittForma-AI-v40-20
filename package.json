@@ -1,0 +1,14 @@
+{
+  "name": "fittforma-ai",
+  "version": "0.40.2",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node backend/server.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "description": "FittForma AI: mobile-first fitness app with optional online fitness community, profiles, transformations and social interactions"
+}
