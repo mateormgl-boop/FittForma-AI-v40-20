@@ -31,7 +31,7 @@ const APP_VERSION = (await (await fetch(APP + '/api/public-config')).json()).ver
 sql(`insert into auth.users(id,email) values('aaaaaaaa-0000-0000-0000-000000000001','alice@example.test'),('bbbbbbbb-0000-0000-0000-000000000002','bob@example.test') on conflict do nothing`);
 sql(`insert into community_profiles(user_id,username,display_name,visibility) values('aaaaaaaa-0000-0000-0000-000000000001','alicia_fit','Alicia','public'),('bbbbbbbb-0000-0000-0000-000000000002','bruno_fit','Bruno Fit','public') on conflict (user_id) do update set visibility='public'`);
 sql(`insert into community_follows(follower_id,following_id,status) values('aaaaaaaa-0000-0000-0000-000000000001','bbbbbbbb-0000-0000-0000-000000000002','accepted'),('bbbbbbbb-0000-0000-0000-000000000002','aaaaaaaa-0000-0000-0000-000000000001','accepted') on conflict do nothing`);
-sql(`delete from community_messages; delete from community_reports; delete from community_posts; delete from community_moderators;`);
+sql(`delete from user_app_data where user_id='aaaaaaaa-0000-0000-0000-000000000001'; delete from community_messages; delete from community_reports; delete from community_posts; delete from community_moderators;`);
 sql(`insert into community_posts(id,user_id,post_kind,description,visibility) values('b0000000-0000-0000-0000-0000000000b1','bbbbbbbb-0000-0000-0000-000000000002','text','Primera semana completa de entrenamientos','public')`);
 sql(`set request.jwt.claim.sub='bbbbbbbb-0000-0000-0000-000000000002'; insert into community_messages(sender_id,recipient_id,body) values('bbbbbbbb-0000-0000-0000-000000000002','aaaaaaaa-0000-0000-0000-000000000001','¡Hola Alicia! ¿Entrenamos el sábado?')`);
 
@@ -155,9 +155,18 @@ step('Descartar denuncia guarda estado y quién resolvió', sql(`select status, 
 await page.click(`#communityReportsList [data-report-remove="${achId}"]`); await page.waitForTimeout(1200);
 step('Moderador elimina la publicación denunciada', sql(`select count(*) from community_posts where id='${achId}'`) === '0');
 
-// Eliminar la propia cuenta (v43): confirmación escrita "ELIMINAR".
+// Copia en la nube (user_app_data real vía PostgREST): guardar, borrar local y volver a cargar.
 await page.click('.mobile-nav-item[data-mobile-view="profile"]'); await page.waitForTimeout(600);
 await page.evaluate(() => { const d = document.getElementById('cloudAccountCard')?.closest('details'); if (d) d.open = true; });
+const localBadges = () => page.evaluate(() => (JSON.parse(localStorage.getItem('fittforma-ai-v4') || '{}').badgeRecords || []).length);
+await page.click('#cloudUpload'); await page.waitForTimeout(1200);
+step('Guardar en la nube crea la copia de A', sql(`select jsonb_array_length(data->'badgeRecords') from user_app_data where user_id='aaaaaaaa-0000-0000-0000-000000000001'`) === '1');
+await page.evaluate(() => document.getElementById('clearData').click()); await page.waitForTimeout(400);
+step('Borrar datos locales', (await localBadges()) === 0);
+await page.click('#cloudDownload'); await page.waitForTimeout(1200);
+step('Cargar desde la nube recupera los datos', (await localBadges()) === 1);
+
+// Eliminar la propia cuenta (v43): confirmación escrita "ELIMINAR".
 step('Botón de eliminar cuenta visible con sesión', await page.isVisible('#deleteCloudAccount'));
 await page.click('#deleteCloudAccount'); await page.waitForTimeout(1800);
 step('Cuenta y datos en cascada eliminados', sql(`select (select count(*) from auth.users where id='aaaaaaaa-0000-0000-0000-000000000001')||'|'||(select count(*) from community_profiles where user_id='aaaaaaaa-0000-0000-0000-000000000001')||'|'||(select count(*) from community_messages where sender_id='aaaaaaaa-0000-0000-0000-000000000001')`) === '0|0|0');

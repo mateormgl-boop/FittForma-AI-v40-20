@@ -254,6 +254,8 @@
   const labels={es:'Español',en:'English',pt:'Português',fr:'Français',it:'Italiano',de:'Deutsch'};
   const langs=["es", "en", "pt", "fr", "it", "de"];
   const maps={es:new Map(),en:new Map(),pt:new Map(),fr:new Map(),it:new Map(),de:new Map()};
+  // v45: traducciones de la Etapa 7 (textos que seguían en español), en i18n-extra.js.
+  for(const row of (Array.isArray(window.FittFormaI18nExtra)?window.FittFormaI18nExtra:[]))if(Array.isArray(row)&&row.length===6&&row.every(x=>typeof x==='string'&&x))languageRows.push(row);
   for(const row of languageRows){ for(let i=0;i<langs.length;i++){if(row[i]!==row[0])maps[langs[i]].set(row[0],row[i]);} }
   const partialRows=[
     ['GPS activo · precisión ±',['GPS active · accuracy ±','GPS ativo · precisão ±','GPS actif · précision ±','GPS attivo · precisione ±','GPS aktiv · Genauigkeit ±']],

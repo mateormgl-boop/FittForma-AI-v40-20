@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node backend/server.mjs",
     "test": "node --test",
-    "test:sql": "bash supabase/tests/run.sh"
+    "test:sql": "bash supabase/tests/run.sh",
+    "test:e2e": "node tests/e2e/integration.e2e.mjs && node tests/e2e/flows.e2e.mjs"
   },
   "engines": {
     "node": ">=20"
