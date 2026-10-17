@@ -1258,6 +1258,154 @@
     .btn.secondary,button.secondary{background:rgba(26,167,255,.10)!important;border:1px solid rgba(26,167,255,.40)!important;color:#bfe3ff!important;box-shadow:none!important}
     .quick-prompts .btn.secondary{background:transparent!important}
     @media(prefers-reduced-motion:reduce){.home-bar i,.home-ring .fg,.nutri-ring .fg{transition:none}}
+
+    /* =====================================================================
+       v41.0 — capa final del sistema de diseño. Tokens únicos + componentes
+       reutilizables (segmentados, chips, listas, medallas por rango) y
+       estructura de navegación: 5 destinos en móvil, barra lateral en escritorio.
+       ===================================================================== */
+    :root{
+      --ff-s1:4px;--ff-s2:8px;--ff-s3:12px;--ff-s4:16px;--ff-s5:24px;--ff-s6:32px;
+      --ff-r-sm:10px;--ff-r-md:14px;--ff-r-lg:20px;--ff-r-pill:999px;
+      --ff-fs-xs:12px;--ff-fs-sm:13px;--ff-fs-md:15px;--ff-fs-lg:18px;--ff-fs-xl:24px;
+      --ff-surface:#0d1730;--ff-surface-2:#142246;--ff-surface-3:#1b2c55;
+      --ff-focus:#f2a33a;--ff-ok:#18c28f;--ff-danger:#ff8f86;
+      --rank-bronze-a:#f0b27a;--rank-bronze-b:#9a5a2c;
+      --rank-silver-a:#eef3fb;--rank-silver-b:#8796ad;
+      --rank-gold-a:#ffe08a;--rank-gold-b:#c98a0c;
+      --rank-diamond-a:#b8f1ff;--rank-diamond-b:#2f8fe0;
+      --ff-sidebar:248px;
+    }
+    .pill{display:none}
+    .link-btn{border:0;background:none;padding:0;color:#8fd3ff;font:inherit;text-decoration:underline;cursor:pointer}
+    .btn-sm{min-height:36px!important;padding:6px 12px!important;font-size:var(--ff-fs-sm)!important}
+    .empty svg.ff-medal{display:block;margin:0 auto var(--ff-s2)}
+    .empty .btn{margin-top:var(--ff-s3)}
+    :where(button,a,input,select,textarea,[tabindex]):focus-visible{outline:3px solid var(--ff-focus);outline-offset:2px}
+
+    /* Control segmentado (subsecciones) */
+    .ff-segmented{display:flex;gap:4px;padding:4px;margin:0 0 var(--ff-s4);border:1px solid var(--ff-line);border-radius:var(--ff-r-md);background:rgba(6,11,23,.7);overflow-x:auto;scrollbar-width:none}
+    .ff-segmented::-webkit-scrollbar{display:none}
+    .ff-seg{flex:1 0 auto;min-height:42px;padding:0 14px;border:0;border-radius:var(--ff-r-sm);background:transparent;color:#a9bbdc;font-weight:650;font-size:var(--ff-fs-sm)}
+    .ff-seg.active{background:linear-gradient(135deg,var(--ff-btn-a),var(--ff-btn-b));color:#fff;box-shadow:0 4px 14px rgba(18,80,214,.3)}
+    .progress-panel{display:flex;flex-direction:column;gap:0}
+    .progress-panel[hidden]{display:none}
+
+    /* Chips de filtro */
+    .ff-chips{display:flex;gap:var(--ff-s2);overflow-x:auto;padding:2px 0 var(--ff-s3);scrollbar-width:none}
+    .ff-chips::-webkit-scrollbar{display:none}
+    .ff-chip{flex:none;min-height:38px;padding:0 14px;border-radius:var(--ff-r-pill);border:1.5px solid var(--ff-line);background:transparent;color:#a9bbdc;font-weight:600;font-size:var(--ff-fs-sm)}
+    .ff-chip.active{background:rgba(26,167,255,.16);border-color:var(--ff-cyan);color:#dff3ff}
+
+    /* Listas con acciones */
+    .ff-list{list-style:none;margin:0;padding:0}
+    .ff-list-row{display:flex;align-items:center;justify-content:space-between;gap:var(--ff-s3);padding:var(--ff-s3) 0;border-bottom:1px solid var(--ff-line)}
+    .ff-list-row:last-child{border-bottom:0}
+    .ff-list-row strong{display:block;font-size:var(--ff-fs-md)}
+    .ff-list-row small{color:var(--ff-muted);font-size:var(--ff-fs-xs)}
+
+    /* Medallas por rango (SVG generado en achievements.js) */
+    .ff-medal{flex:none;display:inline-block;overflow:visible}
+    .ff-medal-shape{stroke-width:1.5}
+    .ff-medal-inner{fill:rgba(4,12,28,.28);stroke:rgba(255,255,255,.35);stroke-width:.8}
+    .ff-medal-glyph{fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;opacity:.95}
+    .ff-medal-num{fill:#fff;font:800 6.5px/1 system-ui,sans-serif;letter-spacing:.3px}
+    .ff-medal--bronze .ff-medal-shape{fill:var(--rank-bronze-b);stroke:var(--rank-bronze-a)}
+    .ff-medal--silver .ff-medal-shape{fill:var(--rank-silver-b);stroke:var(--rank-silver-a)}
+    .ff-medal--gold .ff-medal-shape{fill:var(--rank-gold-b);stroke:var(--rank-gold-a)}
+    .ff-medal--diamond .ff-medal-shape{fill:var(--rank-diamond-b);stroke:var(--rank-diamond-a)}
+    .ff-medal--bronze .ff-medal-inner{fill:color-mix(in srgb,var(--rank-bronze-a) 35%,transparent)}
+    .ff-medal--silver .ff-medal-inner{fill:color-mix(in srgb,var(--rank-silver-a) 25%,transparent)}
+    .ff-medal--gold .ff-medal-inner{fill:color-mix(in srgb,var(--rank-gold-a) 30%,transparent)}
+    .ff-medal--diamond .ff-medal-inner{fill:color-mix(in srgb,var(--rank-diamond-a) 30%,transparent)}
+    .ff-medal.is-locked .ff-medal-shape{fill:#16223f;stroke:#33476e}
+    .ff-medal.is-locked .ff-medal-inner{fill:transparent;stroke:#2a3c62}
+    .ff-medal.is-locked .ff-medal-glyph{stroke:#5b6f96}
+    .ff-medal.is-locked .ff-medal-num{fill:#5b6f96}
+
+    /* Estado de evidencia */
+    .ff-evidence{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;margin-left:8px;border-radius:var(--ff-r-pill);border:1px solid rgba(147,161,194,.45);color:#c5d3ee;font-size:11px;font-weight:700;letter-spacing:.02em;vertical-align:middle;white-space:nowrap}
+    .ff-evidence.is-gps{border-color:rgba(24,194,143,.6);color:#7ff0cd;background:rgba(24,194,143,.10)}
+    .ff-evidence-legend{margin-top:var(--ff-s4);padding:var(--ff-s3) var(--ff-s4);border-radius:var(--ff-r-md);border:1px dashed var(--ff-line);font-size:var(--ff-fs-sm);color:#c5d3ee}
+    .ff-evidence-legend p{margin:6px 0}
+    .ff-evidence-legend .ff-evidence{margin:0 6px 0 0}
+
+    /* Galería y detalle de insignias */
+    .badge-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:var(--ff-s2);margin-bottom:var(--ff-s4)}
+    .badge-gallery .ff-empty-wide{grid-column:1/-1}
+    .badge-tile{display:flex;align-items:center;gap:var(--ff-s3);width:100%;padding:var(--ff-s3);border-radius:var(--ff-r-md);border:1px solid var(--ff-line);background:linear-gradient(160deg,var(--ff-surface-2),var(--ff-surface));color:var(--ff-text);text-align:left;transition:border-color .15s,transform .15s}
+    .badge-tile:hover{border-color:rgba(26,167,255,.55)}
+    .badge-tile:active{transform:scale(.99)}
+    .badge-tile-copy{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+    .badge-tile-copy strong{font-size:var(--ff-fs-md);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .badge-tile-copy small{font-size:var(--ff-fs-xs);color:var(--ff-muted)}
+    .badge-tile-bar{display:block;height:5px;border-radius:9px;background:#1b2a50;overflow:hidden;margin:4px 0 2px}
+    .badge-tile-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ff-royal),var(--ff-cyan));border-radius:9px}
+    .badge-tile-next{color:#b9cbe8!important}
+    .achievement-title-row{display:flex;align-items:center;gap:var(--ff-s4)}
+    .achievement-title-row h3{margin:2px 0}
+    .achievement-value{margin:2px 0;font-size:var(--ff-fs-md)}
+    .achievement-milestones{list-style:none;padding:0;margin:var(--ff-s3) 0 0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--ff-s2)}
+    .achievement-milestone{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;padding:10px 4px;border-radius:var(--ff-r-md);border:1px solid var(--ff-line);background:rgba(6,11,23,.35)}
+    .achievement-milestone.unlocked{border-color:rgba(26,167,255,.45);background:rgba(26,167,255,.07)}
+    .achievement-milestone strong{font-size:12px}
+    .achievement-milestone small{font-size:11px;color:var(--ff-muted)}
+    .achievement-milestone .achievement-status{font-size:11px;color:#a9bbdc;line-height:1.25}
+    .achievement-milestone .achievement-status.verified{color:#7ff0cd}
+    .achievement-milestone .medal-core{display:none}
+    .achievement-rule{margin:var(--ff-s3) 0 0}
+    .achievement-panel h4{margin:0 0 2px}
+    @media(max-width:560px){.achievement-milestones{grid-template-columns:repeat(3,minmax(0,1fr))}.badge-gallery{grid-template-columns:1fr}}
+
+    /* Inicio: próxima insignia */
+    .home-badge-medal{background:none!important;width:auto;height:auto;border-radius:0}
+    .home-kicker{display:block;color:var(--ff-muted);font-size:var(--ff-fs-xs);font-weight:650;text-transform:uppercase;letter-spacing:.06em}
+    .home-badge-bar{height:6px;border-radius:9px;background:#1b2a50;overflow:hidden;margin-top:8px}
+    .home-badge-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ff-royal),var(--ff-cyan));border-radius:9px;transition:width .4s}
+    .profile-badge-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--ff-s2)}
+    .profile-badge-chip{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--ff-r-md);border:1px solid var(--ff-line);background:rgba(6,11,23,.35)}
+    .profile-badge-chip small{display:block;color:var(--ff-muted);font-size:11px}
+
+    /* Navegación: iconos en pestañas y menú Más */
+    .tab{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+    .tab svg{width:19px;height:19px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .tabs .tab-group-label{display:none}
+    .mobile-more-menu .mobile-more-link + .mobile-more-link{margin-top:2px}
+    .more-desc{display:block;margin-top:1px;font-size:11px;font-weight:500;color:var(--ff-muted)}
+    .mobile-more-trigger.active{border-color:var(--ff-cyan);color:#dff3ff}
+    @media(max-width:760px){
+      .mobile-app-nav{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+    }
+    @media(min-width:761px) and (max-width:1023px){
+      .tabs{grid-template-columns:repeat(7,minmax(0,1fr))}
+      .tab{flex-direction:column;gap:3px;font-size:12px}
+    }
+
+    /* Escritorio: barra lateral fija + área central amplia */
+    @media(min-width:1024px){
+      .app{display:grid;grid-template-columns:var(--ff-sidebar) minmax(0,1fr);grid-template-areas:"brand top" "nav main" "nav foot";column-gap:var(--ff-s6);max-width:1320px;padding:0 32px 48px}
+      .app>header{display:contents}
+      .app>header .brand{grid-area:brand;padding:24px 0 18px}
+      .app>header .header-actions{grid-area:top;justify-self:end;align-self:center;padding:20px 0 14px}
+      .app>.tabs{grid-area:nav;align-self:start;position:sticky;top:20px;display:flex;flex-direction:column;gap:4px;padding:10px;margin:0;border-radius:var(--ff-r-lg)}
+      .app>.tabs .tab{justify-content:flex-start;min-height:48px;padding:0 14px;font-size:var(--ff-fs-md);font-weight:650;gap:12px}
+      .app>.tabs .tab-group-label{display:block;margin:12px 14px 4px;color:var(--ff-muted);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+      .app>main{grid-area:main;min-width:0}
+      .app>.footer{grid-area:foot}
+      .home-dash{max-width:none;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:var(--ff-s4);align-items:start}
+      .home-dash>*{grid-column:1}
+      .home-dash>.home-top,.home-dash>.home-goal,.home-dash>.home-week{grid-column:1/-1}
+      .home-dash>.home-hero{grid-column:1}
+      .home-dash>.home-badges{grid-column:2;grid-row:4;flex-wrap:wrap}
+      .home-dash>.home-badges .home-link{width:100%}
+      .home-dash>.home-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .home-dash>.home-habits{grid-column:2;grid-row:5 / span 3}
+      .home-dash>.ad-slot{grid-column:1/-1}
+      #view-progress .progress-panel[data-progress-panel="summary"]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 var(--ff-s4);align-items:start}
+      #view-progress .progress-panel[data-progress-panel="summary"][hidden]{display:none}
+      #view-progress .progress-panel[data-progress-panel="summary"]>.progress-overview-card{grid-column:1/-1}
+    }
+    @media(prefers-reduced-motion:reduce){.badge-tile,.home-badge-bar i{transition:none}}
   </style>
 </head>
 <body>
@@ -1269,23 +1417,24 @@
         <option value="es">Español</option><option value="en">English</option><option value="pt">Português</option><option value="fr">Français</option><option value="it">Italiano</option><option value="de">Deutsch</option>
       </select></label>
       <button class="mobile-more-trigger" id="mobileMoreToggle" type="button" aria-label="Abrir más secciones" aria-expanded="false" aria-controls="mobileMoreMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg><span>Más</span></button>
-      <span class="pill">VERSIÓN 40.21 · COMUNIDAD FITNESS ONLINE</span>
-    </div>
+          </div>
   </header>
   <nav class="tabs" aria-label="Navegación principal">
-    <button type="button" class="tab active" data-view="plan">Inicio</button>
-    <button type="button" class="tab" data-view="train">Entrenar</button>
-    <button type="button" class="tab" data-view="nutrition">Nutrición</button>
-    <button type="button" class="tab" data-view="progress">Progreso</button>
-    <button type="button" class="tab" data-view="community">Comunidad</button>
-    <button type="button" class="tab" data-view="profile">Perfil</button>
-</nav>
+    <button type="button" class="tab active" data-view="plan" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Inicio</span></button>
+    <button type="button" class="tab" data-view="train"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg><span>Entrenar</span></button>
+    <button type="button" class="tab" data-view="progress"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M7 15l4-4 3 2 5-6"/></svg><span>Progreso</span></button>
+    <button type="button" class="tab" data-view="community"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M15 15a5 5 0 0 1 6 5"/></svg><span>Comunidad</span></button>
+    <button type="button" class="tab" data-view="profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Perfil</span></button>
+    <span class="tab-group-label" aria-hidden="true">Herramientas</span>
+    <button type="button" class="tab" data-view="nutrition"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M17 21V3c-2 1-3 4-3 8h3"/></svg><span>Nutrición</span></button>
+    <button type="button" class="tab" data-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>Coach IA</span></button>
+  </nav>
 
   <main>
     <section class="view active" id="view-plan">
   <div class="home-dash">
     <div class="home-top">
-      <div><h1 id="homeGreeting">Hola 👋</h1><p>Hoy es un buen día para avanzar</p></div>
+      <div><h1 id="homeGreeting">Hola</h1><p>Hoy es un buen día para avanzar</p></div>
       <button class="home-avatar" type="button" data-shortcut-view="profile" aria-label="Abrir mi perfil"><span id="homeInitial">F</span></button>
     </div>
     <section class="home-card home-goal" aria-label="Tu objetivo">
@@ -1304,6 +1453,11 @@
       <div class="home-meta" id="homeTodayMeta"></div>
       <button class="home-cta" id="homeStartBtn" type="button" data-home-action="view:routines">Crear mi rutina</button>
     </section>
+    <section class="home-card home-badges" aria-labelledby="homeBadgeTitle">
+      <div class="home-badge-medal" id="homeBadgeMedal" aria-hidden="true"></div>
+      <div class="home-badge-copy"><small class="home-kicker">Próxima insignia</small><strong id="homeBadgeTitle">Tu primera insignia te espera</strong><p id="homeBadgeText">Registrá tu mejor serie para empezar.</p><div class="home-badge-bar" id="homeBadgeBar" role="progressbar" aria-label="Avance hacia el próximo nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden><i></i></div></div>
+      <button class="home-link" id="homeBadgeBtn" type="button" data-show-badges>Ver desafíos</button>
+    </section>
     <p class="home-empty" id="homeEmpty" hidden>Cuando registres entrenamientos, comidas o agua, acá vas a ver tu avance real.</p>
     <div class="home-tiles" aria-label="Accesos rápidos">
       <button class="home-tile t-blue" type="button" data-shortcut-view="train"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg><b>Entrenar</b><span>Sesión, ejercicios y rutinas</span></button>
@@ -1320,11 +1474,6 @@
     <section class="home-card home-habits" aria-labelledby="homeHabitsTitle">
       <div class="home-card-head"><h3 id="homeHabitsTitle">Hábitos de hoy</h3><span id="homeHabitsCount">0 de 5</span></div>
       <div id="homeHabits" class="home-habit-list"></div>
-    </section>
-    <section class="home-card home-badges" aria-labelledby="homeBadgeTitle">
-      <div class="home-badge-medal" id="homeBadgeMedal" aria-hidden="true">🏅</div>
-      <div class="home-badge-copy"><strong id="homeBadgeTitle">Todavía no desbloqueaste insignias</strong><p id="homeBadgeText">Sumá marcas en ejercicios medibles o registrá actividad para empezar.</p></div>
-      <button class="home-link" id="homeBadgeBtn" type="button" data-shortcut-view="progress">Ver desafíos</button>
     </section>
     <h2 class="home-h">Tu constancia</h2>
   <section class="stats">
@@ -1500,35 +1649,50 @@
     </section>
 
     <section class="view" id="view-progress">
-      <div class="section-head"><div><h2>Tu progreso</h2><p>La constancia también cuenta.</p></div></div>
-      <div class="card progress-overview-card"><div class="eyebrow">Resumen</div><div id="progressSummary"></div></div>
-      <div class="card daily-habits-card"><div class="section-head"><div><h3>Hábitos de hoy</h3><p class="muted small">Marcá lo que hiciste. Se guarda en este dispositivo y podés desmarcarlo cuando quieras.</p></div><span class="tag" id="habitTodayDate">Hoy</span></div><div id="habitTodaySummary" class="habit-today-summary"></div><div id="habitChecklist" class="habit-checklist"></div><div class="habit-week-heading"><strong>Últimos 7 días</strong><span class="muted small" id="habitWeekSummary"></span></div><div id="habitWeekHistory" class="habit-week-history"></div><p class="muted small">El registro es personal y subjetivo; no verifica automáticamente tus hábitos ni reemplaza orientación profesional.</p></div>
-      <div class="card"><div class="section-head"><div><h3>Tu actividad de la semana</h3><p class="muted small">Minutos registrados por día, combinando rutinas y actividad al aire libre.</p></div><span class="tag">Últimos 7 días</span></div><div id="weeklyActivityChart" class="weekly-activity-chart"></div></div>
-      <div class="card"><div class="section-head"><div><h3>Retos de constancia</h3><p class="muted small">Pequeñas metas para mantener el hábito, ajustadas según lo que registres.</p></div><span class="tag">Esta semana</span></div><div id="consistencyChallenges" class="progress-insight-grid"></div><p class="muted small">El avance se calcula con rutinas y actividades anotadas en este dispositivo. No es un registro médico ni una verificación automática del ejercicio realizado.</p></div>
-      <div class="card"><div class="section-head"><div><h3>Comparación semanal</h3><p class="muted small">Últimos 7 días frente a los 7 días anteriores. Los cambios se calculan solo con tus registros.</p></div></div><div id="weeklyComparison" class="progress-insight-grid"></div></div>
-      <div class="card"><div class="section-head"><div><h3>Récords personales registrados</h3><p class="muted small">Mejor carga y mayor número de repeticiones que anotaste por ejercicio. No son pruebas máximas supervisadas.</p></div></div><div id="personalRecords"></div></div>
+      <div class="section-head"><div><h2>Tu progreso</h2><p>Evolución, marcas e insignias, con tus datos reales.</p></div></div>
+      <nav class="ff-segmented progress-subnav" role="tablist" aria-label="Secciones de Progreso">
+        <button type="button" role="tab" class="ff-seg active" id="progressTabSummary" data-progress-tab="summary" aria-controls="progressPanelSummary" aria-selected="true">Resumen</button>
+        <button type="button" role="tab" class="ff-seg" id="progressTabBadges" data-progress-tab="badges" aria-controls="progressPanelBadges" aria-selected="false" tabindex="-1">Insignias</button>
+        <button type="button" role="tab" class="ff-seg" id="progressTabHistory" data-progress-tab="history" aria-controls="progressPanelHistory" aria-selected="false" tabindex="-1">Historial</button>
+        <button type="button" role="tab" class="ff-seg" id="progressTabBody" data-progress-tab="body" aria-controls="progressPanelBody" aria-selected="false" tabindex="-1">Peso</button>
+      </nav>
+      <div class="progress-panel" id="progressPanelSummary" role="tabpanel" aria-labelledby="progressTabSummary" data-progress-panel="summary">
+      <div class="card progress-overview-card"><div class="eyebrow">Resumen</div><div id="progressSummary"></div></div>      <div class="card"><div class="section-head"><div><h3>Tu actividad de la semana</h3><p class="muted small">Minutos registrados por día, combinando rutinas y actividad al aire libre.</p></div><span class="tag">Últimos 7 días</span></div><div id="weeklyActivityChart" class="weekly-activity-chart"></div></div>      <div class="card"><div class="section-head"><div><h3>Retos de constancia</h3><p class="muted small">Pequeñas metas para mantener el hábito, ajustadas según lo que registres.</p></div><span class="tag">Esta semana</span></div><div id="consistencyChallenges" class="progress-insight-grid"></div><p class="muted small">El avance se calcula con rutinas y actividades anotadas en este dispositivo. No es un registro médico ni una verificación automática del ejercicio realizado.</p></div>      <div class="card"><div class="section-head"><div><h3>Comparación semanal</h3><p class="muted small">Últimos 7 días frente a los 7 días anteriores. Los cambios se calculan solo con tus registros.</p></div></div><div id="weeklyComparison" class="progress-insight-grid"></div></div>      <div class="card"><div class="section-head"><div><h3>Resumen del mes</h3><p class="muted small">Actividad registrada durante el mes actual.</p></div><span id="monthlySummaryLabel" class="tag">Este mes</span></div><div id="monthlySummary" class="progress-insight-grid"></div></div>      <div class="card daily-habits-card"><div class="section-head"><div><h3>Hábitos de hoy</h3><p class="muted small">Marcá lo que hiciste. Se guarda en este dispositivo y podés desmarcarlo cuando quieras.</p></div><span class="tag" id="habitTodayDate">Hoy</span></div><div id="habitTodaySummary" class="habit-today-summary"></div><div id="habitChecklist" class="habit-checklist"></div><div class="habit-week-heading"><strong>Últimos 7 días</strong><span class="muted small" id="habitWeekSummary"></span></div><div id="habitWeekHistory" class="habit-week-history"></div><p class="muted small">El registro es personal y subjetivo; no verifica automáticamente tus hábitos ni reemplaza orientación profesional.</p></div>      </div>
+      <div class="progress-panel" id="progressPanelBadges" role="tabpanel" aria-labelledby="progressTabBadges" data-progress-panel="badges" hidden>
       <div class="card achievement-center" id="achievementCenter">
-        <div class="section-head"><div><div class="eyebrow">LOGROS PERSONALES</div><h3>Insignias y desafíos</h3><p class="muted small achievement-intro">Sumá marcas en ejercicios medibles, actividad al aire libre y constancia. Cada desafío tiene 12 niveles: Bronce I–III, Plata I–III, Oro I–III y Diamante I–III.</p></div><span class="tag">12 niveles</span></div>
-        <div class="achievement-summary" id="achievementSummary"><div class="stat"><strong>0</strong><small>Desbloqueadas</small></div><div class="stat"><strong>0</strong><small>Verificadas por GPS</small></div><div class="stat"><strong>0%</strong><small>Catálogo completado</small></div></div>
+        <div class="section-head"><div><div class="eyebrow">Logros personales</div><h3>Insignias y desafíos</h3><p class="muted small achievement-intro">Cada desafío tiene 12 niveles: Bronce, Plata, Oro y Diamante, con tres niveles cada uno. Cada actividad usa su propia métrica.</p></div></div>
+        <div class="achievement-summary" id="achievementSummary"><div class="stat"><strong>0</strong><small>Insignias obtenidas</small></div><div class="stat"><strong>0</strong><small>Con ruta GPS</small></div><div class="stat"><strong>0</strong><small>Desafíos iniciados</small></div></div>
+        <div class="ff-chips" id="badgeGalleryFilters" role="group" aria-label="Filtrar desafíos"></div>
+        <div id="badgeGallery" class="badge-gallery" aria-live="polite"></div>
         <div class="achievement-filter-grid">
-          <div class="field"><label for="badgeCategoryFilter">Tipo de desafío</label><select id="badgeCategoryFilter"><option value="all">Todos los desafíos</option><option value="strength">Fuerza y repeticiones</option><option value="core">Core e isometrías</option><option value="cardio">Cardio y máquinas</option><option value="outdoor">Correr, caminar y ciclismo</option><option value="consistency">Constancia</option><option value="custom">Mis ejercicios personalizados</option></select></div>
-          <div class="field"><label for="badgeExerciseSelect">Elegí una actividad</label><select id="badgeExerciseSelect"><option value="exercise-flexiones">Flexiones</option></select></div>
+          <div class="field"><label for="badgeCategoryFilter">Categoría</label><select id="badgeCategoryFilter"><option value="all">Todas las categorías</option></select></div>
+          <div class="field"><label for="badgeExerciseSelect">Desafío</label><select id="badgeExerciseSelect"><option value="exercise-flexiones">Flexiones</option></select></div>
         </div>
         <div id="badgeDetail" class="achievement-panel" aria-live="polite"></div>
-        <form id="badgeRecordForm" class="achievement-panel">
-          <div class="section-head"><div><div class="eyebrow">REGISTRAR UNA MARCA</div><h3>¿Cuál es tu mejor serie?</h3><p class="muted small">Anotá el máximo de repeticiones seguidas o la duración de una serie, no la suma de varias series. Se guardará como marca personal declarada.</p></div></div>
+        <form id="badgeRecordForm" class="achievement-panel" novalidate>
+          <div class="section-head"><div><div class="eyebrow">Registrar una marca</div><h3>¿Cuál fue tu mejor serie?</h3><p class="muted small">Anotá el máximo de repeticiones seguidas o el tiempo sostenido en una sola serie, no la suma de varias.</p></div></div>
           <div class="achievement-form-grid achievement-manual-fields" id="badgeManualFields">
-            <div class="field"><label for="badgeMetricValue" id="badgeMetricLabel">Repeticiones seguidas</label><input id="badgeMetricValue" type="number" min="1" max="10000" step="1" inputmode="numeric" placeholder="Ej. 15" required></div>
+            <div class="field"><label for="badgeMetricValue" id="badgeMetricLabel">Repeticiones seguidas en una serie</label><input id="badgeMetricValue" type="number" min="1" max="250" step="1" inputmode="numeric" placeholder="Ej. 15" required></div>
             <div class="field achievement-custom-field" id="badgeCustomField" hidden><label for="badgeCustomName">Nombre del ejercicio</label><input id="badgeCustomName" type="text" maxlength="72" placeholder="Ej. escaladores"></div>
           </div>
-          <div class="achievement-auto-note" id="badgeAutomaticNote" hidden><p class="muted small">Este desafío se actualiza automáticamente cuando registrás una actividad o rutina. Para que una insignia de distancia figure como verificada por GPS, iniciá la actividad desde la sección Correr y usá el registro GPS.</p></div>
-          <p class="achievement-note">Las marcas manuales y las series guardadas en una rutina no se verifican por sí solas. El GPS comprueba la ruta registrada y aplica controles básicos de plausibilidad, pero no elimina todo posible fraude.</p>
-          <button class="btn full" id="badgeSaveRecord" type="submit">Guardar marca personal</button>
+          <div class="achievement-auto-note" id="badgeAutomaticNote" hidden></div>
+          <button class="btn full" id="badgeSaveRecord" type="submit">Guardar marca</button>
           <p class="muted small" id="badgeRecordStatus" role="status" aria-live="polite"></p>
         </form>
+        <div id="badgeRecordList" class="achievement-panel" hidden></div>
+        <div class="ff-evidence-legend" aria-label="Qué significa cada estado">
+          <p><span class="ff-evidence">Declarada</span> Marca que anotaste vos (manual o en una sesión). Cuenta para tu progreso personal; nadie la comprobó.</p>
+          <p><span class="ff-evidence is-gps">Con ruta GPS</span> Distancia registrada con GPS que pasó controles básicos en tu dispositivo (precisión, velocidad, saltos). Aporta evidencia, pero no es una verificación independiente.</p>
+          <p class="muted small">FittForma todavía no verifica marcas en el servidor; por eso ninguna insignia se muestra como “verificada”.</p>
+        </div>
       </div>
-      <div class="card"><div class="section-head"><div><h3>Resumen del mes</h3><p class="muted small">Actividad registrada durante el mes actual.</p></div><span id="monthlySummaryLabel" class="tag">Este mes</span></div><div id="monthlySummary" class="progress-insight-grid"></div></div>
-      <div class="card"><h3>Seguimiento de peso</h3><form id="weightForm" class="chat-form"><label class="sr-only" for="weightInput">Peso en kg</label><input id="weightInput" type="number" min="20" max="350" step="0.1" placeholder="Peso actual en kg" required><button class="btn" type="submit">Registrar</button></form><div id="weightChart" class="weight-chart"></div><div id="weightHistory"></div><p class="muted small">El peso puede fluctuar por hidratación, comidas y otros factores; mirá tendencias, no un único dato.</p></div><div class="card"><h3>Historial de sesiones</h3><div id="historyList"></div><div class="btn-row"><button type="button" class="btn ghost" id="exportData">Exportar mis datos</button><button type="button" class="btn secondary" id="importData">Importar copia</button><input id="importDataFile" type="file" accept="application/json,.json" hidden><button type="button" class="btn danger" id="clearData">Borrar todos los datos</button></div><p class="muted small">Exportá tus datos antes de cambiar de dispositivo. La importación reemplaza los datos locales actuales con la copia elegida.</p></div>
+      </div>
+      <div class="progress-panel" id="progressPanelHistory" role="tabpanel" aria-labelledby="progressTabHistory" data-progress-panel="history" hidden>
+      <div class="card"><div class="section-head"><div><h3>Récords personales registrados</h3><p class="muted small">Mejor carga y mayor número de repeticiones que anotaste por ejercicio. No son pruebas máximas supervisadas.</p></div></div><div id="personalRecords"></div></div>      <div class="card"><h3>Historial de sesiones</h3><div id="historyList"></div><div class="btn-row"><button type="button" class="btn ghost" id="exportData">Exportar mis datos</button><button type="button" class="btn secondary" id="importData">Importar copia</button><input id="importDataFile" type="file" accept="application/json,.json" hidden><button type="button" class="btn danger" id="clearData">Borrar todos los datos</button></div><p class="muted small">Exportá tus datos antes de cambiar de dispositivo. La importación reemplaza los datos locales actuales con la copia elegida.</p></div>
+      </div>
+      <div class="progress-panel" id="progressPanelBody" role="tabpanel" aria-labelledby="progressTabBody" data-progress-panel="body" hidden>
+      <div class="card"><h3>Seguimiento de peso</h3><form id="weightForm" class="chat-form"><label class="sr-only" for="weightInput">Peso en kg</label><input id="weightInput" type="number" min="20" max="350" step="0.1" placeholder="Peso actual en kg" required><button class="btn" type="submit">Registrar</button></form><div id="weightChart" class="weight-chart"></div><div id="weightHistory"></div><p class="muted small">El peso puede fluctuar por hidratación, comidas y otros factores; mirá tendencias, no un único dato.</p></div>
+      </div>
     </section>
 
     <section class="view" id="view-community">
@@ -1719,9 +1883,6 @@
   <button class="mobile-nav-item" type="button" data-mobile-view="train" aria-label="Entrenar">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg><span>Entrenar</span>
   </button>
-  <button class="mobile-nav-item" type="button" data-mobile-view="nutrition" aria-label="Nutrición">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M6 10a6 6 0 0 0 12 0M12 4v2M4 10v1a8 8 0 0 0 16 0v-1M7 19h10"/></svg><span>Nutrición</span>
-  </button>
   <button class="mobile-nav-item" type="button" data-mobile-view="progress" aria-label="Progreso">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M7 15l4-4 3 2 5-6"/></svg><span>Progreso</span>
   </button>
@@ -1733,6 +1894,9 @@
   </button>
 </nav>
 <div class="mobile-more-menu" id="mobileMoreMenu" hidden aria-label="Más secciones">
+  <button class="mobile-more-link" type="button" data-mobile-view="nutrition"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M17 21V3c-2 1-3 4-3 8h3"/></svg><span>Nutrición<small class="more-desc">Comidas, agua y objetivos</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
+  <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>Coach IA<small class="more-desc">Planes y orientación</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
+  <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow">›</span></button>
   <p class="mobile-menu-footnote">FITTFORMA AI · V40.21</p>
 </div>
@@ -2885,39 +3049,19 @@ function findCatalogExercise(name){
     root.innerHTML=challenges.map(c=>{const pct=Math.min(100,Math.round(c.value/c.target*100));return `<div class="progress-insight-metric"><span class="metric-label">${c.label}</span><strong>${Math.min(c.value,c.target)} / ${c.target}</strong><small>${c.value>=c.target?'Reto completado':`${c.value} ${c.unit} registrados`} · ${c.detail}</small><div role="progressbar" aria-label="${c.label}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" style="height:6px;background:var(--surface-strong,#dce3e8);border-radius:99px;overflow:hidden;margin-top:8px"><div style="height:100%;width:${pct}%;background:var(--accent,#2d8a70);border-radius:99px"></div></div></div>`;}).join('');
   }
   const BadgeEngine=window.FittFormaBadgeEngine;
-  const CORE_BADGE_EXERCISES=[
-    {id:'exercise-flexiones',name:'Flexiones',group:'Pecho',category:'strength',measure:'reps',thresholds:[5,10,15,20,25,30,35,40,50,60,75,100]},
-    {id:'exercise-dominadas',name:'Dominadas',group:'Espalda',category:'strength',measure:'reps',thresholds:[1,2,3,4,5,6,8,10,12,15,18,20]},
-    {id:'exercise-sentadillas',name:'Sentadillas',group:'Piernas',category:'strength',measure:'reps',thresholds:[10,20,30,40,50,60,80,100,120,150,200,250]},
-    {id:'exercise-abdominales',name:'Abdominales',group:'Core',category:'core',measure:'reps',thresholds:[10,20,30,40,50,60,80,100,120,150,200,250]},
-    {id:'exercise-fondos',name:'Fondos en paralelas',group:'Brazos',category:'strength',measure:'reps',thresholds:[3,5,8,10,12,15,20,25,30,40,50,60]},
-    {id:'exercise-burpees',name:'Burpees',group:'Cardio',category:'cardio',measure:'reps',thresholds:[3,5,8,10,15,20,25,30,40,50,60,75]},
-    {id:'exercise-zancadas',name:'Zancadas',group:'Piernas',category:'strength',measure:'reps',thresholds:[10,20,30,40,50,60,80,100,120,150,200,250]},
-    {id:'exercise-elevacion-talones',name:'Elevación de talones',group:'Piernas',category:'strength',measure:'reps',thresholds:[15,25,35,45,60,75,100,125,150,200,250,300]},
-    {id:'exercise-jumping-jacks',name:'Jumping jacks',group:'Cardio',category:'cardio',measure:'reps',thresholds:[20,40,60,80,100,120,150,200,250,300,400,500]},
-    {id:'exercise-escaladores',name:'Escaladores',group:'Core',category:'core',measure:'reps',thresholds:[10,20,30,40,50,60,80,100,120,150,200,250]},
-    {id:'exercise-plancha-frontal',name:'Plancha frontal',group:'Core',category:'core',measure:'seconds',thresholds:[15,30,45,60,75,90,120,150,180,240,300,360]},
-    {id:'exercise-plancha-lateral',name:'Plancha lateral',group:'Core',category:'core',measure:'seconds',thresholds:[10,20,30,45,60,75,90,120,150,180,240,300]},
-    {id:'exercise-sentadilla-isometrica-pared',name:'Sentadilla isométrica en pared',group:'Piernas',category:'core',measure:'seconds',thresholds:[15,30,45,60,75,90,120,150,180,240,300,360]},
-    {id:'exercise-equilibrio-pierna',name:'Equilibrio a una pierna',group:'Core',category:'core',measure:'seconds',thresholds:[10,20,30,45,60,75,90,120,150,180,240,300]}
-  ];
-  const BADGE_ACTIVITY_EXERCISES=[
-    {id:'activity-running',name:'Running · distancia',group:'Running',category:'outdoor',measure:'km',activityType:'Correr',thresholds:BadgeEngine.RUN_DISTANCE_TARGETS},
-    {id:'activity-walking',name:'Caminata · distancia',group:'Caminata',category:'outdoor',measure:'km',activityType:'Caminar',thresholds:BadgeEngine.WALK_DISTANCE_TARGETS},
-    {id:'activity-cycling',name:'Ciclismo · distancia',group:'Ciclismo',category:'outdoor',measure:'km',activityType:'Bicicleta',thresholds:BadgeEngine.BIKE_DISTANCE_TARGETS},
-    {id:'consistency-active-days',name:'Días con actividad registrada',group:'Constancia',category:'consistency',measure:'days',thresholds:BadgeEngine.ACTIVE_DAY_TARGETS}
-  ];
+  // Todas las reglas (umbrales, categorías, topes y mensajes) viven en achievements.js.
+  const CORE_BADGE_EXERCISES=BadgeEngine.CORE_EXERCISES;
+  const BADGE_ACTIVITY_EXERCISES=BadgeEngine.ACTIVITY_CHALLENGES;
   const CUSTOM_BADGE_OPTION={id:'custom-exercise',name:'Otro ejercicio…',group:'Personalizados',category:'custom',measure:'reps',thresholds:BadgeEngine.GENERIC_REP_TARGETS,customPlaceholder:true};
+  let badgeGalleryFilter='started';
   function getBadgeCatalog(){
     const catalog=[...CORE_BADGE_EXERCISES];
     const seen=new Set(catalog.map(item=>BadgeEngine.normalizeName(item.name)));
     for(const exercise of Object.values(library).flat()){
       const name=String(exercise?.name||'').trim();if(!name)continue;
       const normalized=BadgeEngine.normalizeName(name);if(!normalized||seen.has(normalized))continue;seen.add(normalized);
-      const measure=/plancha|isometr|equilibrio|superman estatico|mantener la posicion|aguante/i.test(normalized)?'seconds':exercise.kind==='cardio'?'minutes':'reps';
-      const group=String(exercise.group||'Otros');
-      const category=measure==='seconds'||/core/i.test(group)?'core':exercise.kind==='cardio'?'cardio':'strength';
-      catalog.push({id:'exercise-'+BadgeEngine.slug(name),name,group,category,measure,kind:'exercise',thresholds:BadgeEngine.thresholdsForExercise({measure})});
+      const measure=BadgeEngine.measureForLibraryExercise(exercise);
+      catalog.push({id:'exercise-'+BadgeEngine.slug(name),name,group:String(exercise.group||'Otros'),category:BadgeEngine.categoryForLibraryExercise(exercise,measure),measure,kind:'exercise',library:true,thresholds:BadgeEngine.thresholdsForExercise({measure})});
     }
     const knownIds=new Set(catalog.map(item=>item.id));
     for(const record of (state.badgeRecords||[])){
@@ -2928,24 +3072,26 @@ function findCatalogExercise(name){
     catalog.push(...BADGE_ACTIVITY_EXERCISES,CUSTOM_BADGE_OPTION);
     return catalog;
   }
-  function badgeUnitLabel(measure,short=false){return ({reps:short?'reps':'repeticiones',seconds:short?'seg':'segundos',minutes:short?'min':'minutos',km:'km',days:short?'días':'días activos'})[measure]||'repeticiones';}
-  function formatBadgeValue(value,measure){const n=Number(value)||0;return measure==='km'?n.toLocaleString('es-UY',{minimumFractionDigits:2,maximumFractionDigits:2})+' km':Math.round(n)+' '+badgeUnitLabel(measure);}
+  function badgeUnitLabel(measure,short=false){return BadgeEngine.unitLabel(measure,2,short);}
+  function formatBadgeValue(value,measure){return BadgeEngine.formatValue(value,measure);}
   function badgeIdFor(item,index){return item.id+':'+(index+1);}
   function matchesActivityType(activity,type){return BadgeEngine.normalizeName(activity?.type)===BadgeEngine.normalizeName(type);}
+  function hasGpsEvidence(entry){return Boolean(entry&&(entry.evidence==='gps_device'||(entry.verified&&entry.source==='gps')));}
   function getBadgeMetric(item){
     if(item.activityType){
-      const entries=(state.activities||[]).filter(a=>matchesActivityType(a,item.activityType));
+      const entries=(state.activities||[]).filter(a=>matchesActivityType(a,item.activityType)&&Number(a.distance)<=BadgeEngine.maxPlausible(item));
       const best=entries.reduce((current,a)=>Number(a.distance)>Number(current?.distance||0)?a:current,null);
-      const verified=entries.filter(a=>BadgeEngine.validGpsActivity(a,item.activityType)).reduce((max,a)=>Math.max(max,Number(a.distance)||0),0);
-      return {value:Math.max(0,Number(best?.distance)||0),verifiedValue:verified,source:best?.source==='gps'&&BadgeEngine.validGpsActivity(best,item.activityType)?'gps':'activity',date:best?.date||dateKey()};
+      const gps=entries.filter(a=>BadgeEngine.validGpsActivity(a,item.activityType)).reduce((max,a)=>Math.max(max,Number(a.distance)||0),0);
+      const bestIsGps=Boolean(best&&best.source==='gps'&&BadgeEngine.validGpsActivity(best,item.activityType));
+      return {value:Math.max(0,Number(best?.distance)||0),gpsValue:gps,source:bestIsGps?'gps':'activity',evidence:bestIsGps?'gps_device':'declared',date:best?.date||dateKey()};
     }
     if(item.measure==='days'){
       const dates=new Set();
       for(const entry of [...(state.sessions||[]),...(state.activities||[])]){const date=String(entry?.date||'').slice(0,10);if(/^\d{4}-\d{2}-\d{2}$/.test(date))dates.add(date);}
-      return {value:dates.size,verifiedValue:0,source:'consistency',date:dateKey()};
+      return {value:dates.size,gpsValue:0,source:'consistency',evidence:'declared',date:dateKey()};
     }
-    const exact=BadgeEngine.normalizeName(item.name);
-    const recorded=(state.badgeRecords||[]).filter(record=>String(record?.exerciseId||'')===item.id||((String(record?.exerciseId||'').startsWith('custom-'))&&item.category==='custom'&&BadgeEngine.normalizeName(record.exerciseName)===exact));
+    const exact=BadgeEngine.normalizeName(item.name),cap=BadgeEngine.maxPlausible(item);
+    const recorded=(state.badgeRecords||[]).filter(record=>(String(record?.exerciseId||'')===item.id||((String(record?.exerciseId||'').startsWith('custom-'))&&item.category==='custom'&&BadgeEngine.normalizeName(record.exerciseName)===exact))&&Number(record.value)<=cap);
     const recordBest=recorded.reduce((best,record)=>Number(record.value)>Number(best?.value||0)?record:best,null);
     let sessionBest={value:0,date:'',source:'session'};
     for(const session of (state.sessions||[])){
@@ -2953,37 +3099,46 @@ function findCatalogExercise(name){
         if(BadgeEngine.normalizeName(exercise?.name)!==exact)continue;
         for(const entry of (Array.isArray(exercise?.entries)?exercise.entries:[])){
           if(entry?.done===false)continue;
-          const raw=String(entry?.reps??'').trim().replace(',','.');const match=raw.match(/^(\d+(?:\.\d+)?)\s*(s|sec|seg|segundos?|min|minutos?)?$/i);let value=match?Number(match[1]):Number(raw);const unit=(match?.[2]||'').toLowerCase();if(Number.isFinite(value)){if(item.measure==='seconds'&&/^min/.test(unit))value*=60;else if(item.measure==='minutes'&&/^(s|sec|seg)/.test(unit))value/=60;}if(Number.isFinite(value)&&value>Number(sessionBest.value||0))sessionBest={value,date:session.date||dateKey(),source:'session'};
+          const raw=String(entry?.reps??'').trim().replace(',','.');const match=raw.match(/^(\d+(?:\.\d+)?)\s*(s|sec|seg|segundos?|min|minutos?)?$/i);let value=match?Number(match[1]):Number(raw);const unit=(match?.[2]||'').toLowerCase();if(Number.isFinite(value)){if(item.measure==='seconds'&&/^min/.test(unit))value*=60;else if(item.measure==='minutes'&&/^(s|sec|seg)/.test(unit))value/=60;}if(Number.isFinite(value)&&value<=cap&&value>Number(sessionBest.value||0))sessionBest={value,date:session.date||dateKey(),source:'session'};
         }
       }
     }
     const manualValue=Number(recordBest?.value)||0,fromSession=Number(sessionBest.value)||0;
     const isManual=manualValue>=fromSession&&manualValue>0;
-    return {value:Math.max(manualValue,fromSession),verifiedValue:0,source:isManual?'manual':fromSession?'session':'none',date:isManual?(recordBest.date||dateKey()):(sessionBest.date||dateKey())};
+    return {value:Math.max(manualValue,fromSession),gpsValue:0,source:isManual?'manual':fromSession?'session':'none',evidence:'declared',date:isManual?(recordBest.date||dateKey()):(sessionBest.date||dateKey())};
   }
-  function syncBadgeUnlocks(){
-    const catalog=getBadgeCatalog(),unlocks=state.badgeUnlocks&&typeof state.badgeUnlocks==='object'&&!Array.isArray(state.badgeUnlocks)?{...state.badgeUnlocks}:{},newlyUnlocked=[],upgraded=[];
+  // revokeIds: desafíos cuyas insignias se recalculan desde cero (p. ej. tras borrar una marca).
+  // Para el resto, las insignias obtenidas se conservan aunque registros antiguos se recorten.
+  function syncBadgeUnlocks(revokeIds=[]){
+    const catalog=getBadgeCatalog(),unlocks=state.badgeUnlocks&&typeof state.badgeUnlocks==='object'&&!Array.isArray(state.badgeUnlocks)?{...state.badgeUnlocks}:{},newlyUnlocked=[],upgraded=[],revoked=[];
+    const revokeSet=new Set(revokeIds);
     for(const item of catalog){
       if(item.customPlaceholder)continue;
       const metric=getBadgeMetric(item),thresholds=BadgeEngine.thresholdsForExercise(item);
       thresholds.forEach((threshold,index)=>{
-        if(Number(metric.value)<Number(threshold))return;
-        const badgeId=badgeIdFor(item,index),previous=unlocks[badgeId],verified=Number(metric.verifiedValue)>=Number(threshold);
-        const candidate={id:badgeId,exerciseId:item.id,exerciseName:item.name,level:index+1,rank:BadgeEngine.rankForLevel(index).name,threshold,measure:item.measure,verified,source:verified?'gps':metric.source,earnedAt:previous?.earnedAt||metric.date||dateKey()};
+        const badgeId=badgeIdFor(item,index),previous=unlocks[badgeId];
+        if(Number(metric.value)<Number(threshold)){if(previous&&revokeSet.has(item.id)){delete unlocks[badgeId];revoked.push(previous);}return;}
+        const gps=Number(metric.gpsValue)>=Number(threshold);
+        const candidate={id:badgeId,exerciseId:item.id,exerciseName:item.name,level:index+1,rank:BadgeEngine.rankForLevel(index).name,threshold,measure:item.measure,evidence:gps?'gps_device':'declared',source:gps?'gps':metric.source,earnedAt:previous?.earnedAt||metric.date||dateKey()};
         if(!previous){unlocks[badgeId]=candidate;newlyUnlocked.push(candidate);}
-        else if(verified&&!previous.verified){unlocks[badgeId]={...previous,...candidate,earnedAt:previous.earnedAt||candidate.earnedAt};upgraded.push(unlocks[badgeId]);}
+        else if(gps&&!hasGpsEvidence(previous)){unlocks[badgeId]={...previous,...candidate,earnedAt:previous.earnedAt||candidate.earnedAt};upgraded.push(unlocks[badgeId]);}
+        else if(revokeSet.has(item.id)&&!gps&&hasGpsEvidence(previous)){const {verified,...rest}=previous;unlocks[badgeId]={...rest,evidence:'declared',source:metric.source};}
       });
     }
     const changed=JSON.stringify(unlocks)!==JSON.stringify(state.badgeUnlocks||{});state.badgeUnlocks=unlocks;
-    return {changed,newlyUnlocked,upgraded,catalog};
+    return {changed,newlyUnlocked,upgraded,revoked,catalog};
+  }
+  function badgeCategoryMatches(item,category){
+    if(category==='all')return true;
+    if(category==='custom')return item.category==='custom'||String(item.id).startsWith('custom-');
+    return item.category===category;
   }
   function renderBadgeSelector(preferredId){
     const select=$('badgeExerciseSelect'),filter=$('badgeCategoryFilter');if(!select||!filter)return;
     const previous=preferredId||select.value||'exercise-flexiones';
     const catalog=getBadgeCatalog(),category=filter.value||'all';
-    const filtered=catalog.filter(item=>category==='all'||(category==='custom'?item.category==='custom'||String(item.id).startsWith('custom-'):item.category===category));
-    const groupLabels={strength:'Fuerza y repeticiones',core:'Core e isometrías',cardio:'Cardio y máquinas',outdoor:'Aire libre',consistency:'Constancia',custom:'Personalizados'};
-    const buckets=new Map();for(const item of filtered){const label=groupLabels[item.category]||'Otros';if(!buckets.has(label))buckets.set(label,[]);buckets.get(label).push(item);}
+    const filtered=catalog.filter(item=>badgeCategoryMatches(item,category));
+    const buckets=new Map();for(const item of filtered){const label=item.customPlaceholder?'Nuevo':BadgeEngine.categoryLabel(item.category);if(!buckets.has(label))buckets.set(label,[]);buckets.get(label).push(item);}
     select.innerHTML=[...buckets.entries()].map(([label,items])=>`<optgroup label="${esc(label)}">${items.map(item=>`<option value="${esc(item.id)}">${esc(item.name)}</option>`).join('')}</optgroup>`).join('');
     if(filtered.some(item=>item.id===previous))select.value=previous;else if(filtered.length)select.value=filtered[0].id;
     renderBadgeControl();
@@ -2991,69 +3146,148 @@ function findCatalogExercise(name){
   function renderBadgeControl(){
     const select=$('badgeExerciseSelect'),manual=$('badgeManualFields'),autoNote=$('badgeAutomaticNote'),submit=$('badgeSaveRecord'),customField=$('badgeCustomField'),label=$('badgeMetricLabel'),input=$('badgeMetricValue');if(!select)return;
     const item=getBadgeCatalog().find(entry=>entry.id===select.value);if(!item)return;
-    const auto=Boolean(item.activityType)||item.measure==='days'||item.customPlaceholder;
-    if(manual)manual.hidden=Boolean(item.activityType)||item.measure==='days';
-    if(autoNote){autoNote.hidden=!(Boolean(item.activityType)||item.measure==='days');if(item.measure==='days')autoNote.innerHTML='<p class="muted small">La constancia avanza automáticamente con las fechas de tus rutinas, actividades y marcas personales registradas.</p>';else if(item.activityType)autoNote.innerHTML=`<p class="muted small">Este desafío se actualiza al guardar actividades de tipo ${esc(item.activityType)}. Las distancias ingresadas manualmente sirven para el progreso personal, pero solo una ruta GPS que pase los controles de plausibilidad puede marcarse como verificada por GPS.</p>`;}
+    const automatic=Boolean(item.activityType)||item.measure==='days';
+    if(manual)manual.hidden=automatic;
+    if(autoNote){autoNote.hidden=!automatic;if(item.measure==='days')autoNote.innerHTML='<p class="muted small">La constancia avanza sola: cuenta los días distintos en los que guardaste una rutina o una actividad.</p>';else if(item.activityType)autoNote.innerHTML=`<p class="muted small">Este desafío avanza al guardar actividades de tipo ${esc(item.activityType)} en <button type="button" class="link-btn" data-goto-view="running">Correr</button>. Cada nivel mide la distancia de una sola actividad. Las distancias manuales cuentan como declaradas; una ruta GPS que pasa los controles básicos se marca como “Con ruta GPS”.</p>`;}
     if(customField)customField.hidden=item.id!=='custom-exercise';
-    if(label)label.textContent=item.measure==='seconds'?'Duración de una serie (segundos)':item.measure==='minutes'?'Tiempo de una serie (minutos)':'Repeticiones en una serie';
-    if(input){input.min='1';input.max=item.measure==='seconds'?'7200':item.measure==='minutes'?'360':'10000';input.step=item.measure==='km'?'0.01':'1';input.placeholder=item.measure==='seconds'?'Ej. 60':item.measure==='minutes'?'Ej. 20':'Ej. 15';input.disabled=Boolean(item.activityType)||item.measure==='days';}
-    if(submit){submit.disabled=Boolean(item.activityType)||item.measure==='days';submit.hidden=Boolean(item.activityType)||item.measure==='days';}
+    if(label)label.textContent=item.measure==='seconds'?'Segundos sostenidos en una serie':item.measure==='minutes'?'Minutos continuos':'Repeticiones seguidas en una serie';
+    const max=BadgeEngine.maxPlausible(item);
+    if(input){input.min='1';input.max=String(max);input.step='1';input.placeholder=item.measure==='seconds'?'Ej. 60':item.measure==='minutes'?'Ej. 20':'Ej. 15';input.disabled=automatic;}
+    if(submit){submit.disabled=automatic;submit.hidden=automatic;}
     renderBadgeDetail(item);
+    renderBadgeRecords(item);
+  }
+  function badgeMedalFor(item,levelIndex,opts={}){
+    const rank=levelIndex>=0?BadgeEngine.rankForLevel(levelIndex):null;
+    return BadgeEngine.medalSvg({rankKey:rank?rank.key:'bronze',numeral:rank?rank.numeral:'',glyph:BadgeEngine.glyphFor(item),locked:!rank,size:opts.size||48,title:opts.title||''});
   }
   function renderBadgeDetail(item){
     const root=$('badgeDetail');if(!root||!item)return;
-    if(item.customPlaceholder){root.innerHTML='<div class="empty"><div class="emoji">✍️</div><strong>Creá un desafío para otro ejercicio</strong><p>Escribí el nombre, elegí la mejor serie y empezá a seguir sus 12 niveles.</p></div>';return;}
+    if(item.customPlaceholder){root.innerHTML=`<div class="empty">${BadgeEngine.medalSvg({glyph:'star',locked:true,size:56})}<strong>Creá un desafío para otro ejercicio</strong><p>Escribí el nombre y tu mejor serie. Vas a seguir sus 12 niveles con los umbrales genéricos por repeticiones.</p></div>`;return;}
     const metric=getBadgeMetric(item),thresholds=BadgeEngine.thresholdsForExercise(item),progress=BadgeEngine.progressForValue(metric.value,thresholds),unlocks=state.badgeUnlocks||{};
     const rank=progress.highest>=0?BadgeEngine.rankForLevel(progress.highest):null;
-    const status=progress.complete?'Completaste los 12 niveles':progress.nextTarget===null?'Completado':`Próxima meta: ${progress.nextTarget} ${badgeUnitLabel(item.measure)}`;
     const valueLabel=metric.value>0?formatBadgeValue(metric.value,item.measure):'Todavía sin marca';
-    root.innerHTML=`<div class="achievement-title-row"><div><div class="eyebrow">${esc(item.group||'Desafío personal')}</div><h3>${esc(item.name)}</h3><p class="muted small">${esc(valueLabel)} · ${rank?`Rango actual: ${esc(rank.name)} ${rank.numeral}`:'Empezá con tu primera marca'}</p></div><div class="achievement-medallion" aria-hidden="true">${item.measure==='km'?'🏃':item.measure==='days'?'📅':item.measure==='seconds'?'⏱️':item.measure==='minutes'?'🚴':'🏅'}</div></div>
-      <div class="achievement-progress-head"><span>${esc(status)}</span><strong>${progress.complete?'12/12':`${Math.max(0,progress.highest+1)}/12 niveles`}</strong></div><div class="achievement-progress" role="progressbar" aria-label="Progreso de ${esc(item.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.pct}"><span style="width:${progress.pct}%"></span></div>
-      <div class="achievement-milestones">${thresholds.map((threshold,index)=>{const rankInfo=BadgeEngine.rankForLevel(index),id=badgeIdFor(item,index),unlocked=Boolean(unlocks[id]),entry=unlocks[id],ver=isBadgeVerified(entry);return `<div class="achievement-milestone rank-${rankInfo.key} ${unlocked?'unlocked':'locked'}" title="${esc(rankInfo.label)} · ${esc(formatBadgeValue(threshold,item.measure))}"><span class="medal-core" aria-hidden="true">${unlocked?'✓':index+1}</span><strong>${esc(rankInfo.label)}</strong><small>${esc(formatBadgeValue(threshold,item.measure))}</small><span class="achievement-status ${ver?'verified':''}">${unlocked?(ver?'✓ GPS':'✓ Personal'):'Bloqueada'}</span></div>`;}).join('')}</div>
-      <p class="muted small" style="margin:12px 0 0">${item.measure==='km'?'Cada nivel representa la distancia de una sola actividad. Los registros manuales son personales; el GPS válido se distingue visualmente.':item.measure==='days'?'Se cuentan días diferentes con actividad registrada, no el número total de ejercicios.':item.measure==='seconds'?'Registrá el tiempo que sostenés la posición en una única serie.':'Se cuenta la mejor serie de un mismo movimiento, no la suma de repeticiones de varias series.'}</p>`;
+    const evidence=metric.value>0&&item.measure!=='days'?`<span class="ff-evidence ${metric.evidence==='gps_device'?'is-gps':''}">${esc(BadgeEngine.evidenceLabel(metric.evidence))}</span>`:'';
+    root.innerHTML=`<div class="achievement-title-row"><div class="achievement-hero-medal">${badgeMedalFor(item,progress.highest,{size:64})}</div><div><div class="eyebrow">${esc(BadgeEngine.categoryLabel(item.category))}</div><h3>${esc(item.name)}</h3><p class="achievement-value"><strong>${esc(valueLabel)}</strong>${evidence}</p><p class="muted small">${rank?`Rango actual: ${esc(rank.label)}`:'Sin rango todavía'}</p></div></div>
+      <div class="achievement-progress-head"><span>${esc(BadgeEngine.nextStepMessage(metric.value,thresholds,item.measure))}</span><strong>${Math.max(0,progress.highest+1)}/12</strong></div><div class="achievement-progress" role="progressbar" aria-label="Avance hacia el próximo nivel de ${esc(item.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.pct}"><span style="width:${progress.pct}%"></span></div>
+      <ol class="achievement-milestones" aria-label="Niveles del desafío">${thresholds.map((threshold,index)=>{const rankInfo=BadgeEngine.rankForLevel(index),entry=unlocks[badgeIdFor(item,index)],unlocked=Boolean(entry),gps=hasGpsEvidence(entry);return `<li class="achievement-milestone rank-${rankInfo.key} ${unlocked?'unlocked':'locked'}">${BadgeEngine.medalSvg({rankKey:rankInfo.key,numeral:rankInfo.numeral,glyph:BadgeEngine.glyphFor(item),locked:!unlocked,size:34})}<strong>${esc(rankInfo.label)}</strong><small>${esc(formatBadgeValue(threshold,item.measure))}</small><span class="achievement-status ${gps?'verified':''}">${unlocked?`${gps?'Con ruta GPS':'Declarada'} · ${esc(prettyDate(entry.earnedAt))}`:'Bloqueada'}</span></li>`;}).join('')}</ol>
+      <p class="muted small achievement-rule">${item.measure==='km'?'Cada nivel mide la distancia de una sola actividad, no la suma de varias.':item.measure==='days'?'Se cuentan días distintos con actividad registrada, no la cantidad de ejercicios.':item.measure==='seconds'?'Se cuenta el tiempo sostenido en una única serie.':'Se cuenta la mejor serie de un mismo movimiento, no la suma de varias series.'} Máximo admitido por serie: ${esc(formatBadgeValue(BadgeEngine.maxPlausible(item),item.measure))}.</p>`;
   }
-  function isBadgeVerified(entry){return Boolean(entry?.verified&&entry?.source==='gps');}
+  function renderBadgeRecords(item){
+    const root=$('badgeRecordList');if(!root)return;
+    if(!item||item.customPlaceholder||item.activityType||item.measure==='days'){root.hidden=true;root.innerHTML='';return;}
+    const records=(state.badgeRecords||[]).filter(r=>r&&String(r.exerciseId)===item.id).sort((a,b)=>String(b.date).localeCompare(String(a.date))||(Number(b.id)||0)-(Number(a.id)||0));
+    root.hidden=false;
+    root.innerHTML=`<div class="section-head"><div><h4>Mis marcas declaradas</h4><p class="muted small">También cuentan las series que guardás en una sesión de entrenamiento.</p></div></div>${records.length?`<ul class="ff-list">${records.slice(0,20).map(r=>`<li class="ff-list-row"><div><strong>${esc(formatBadgeValue(r.value,r.measure||item.measure))}</strong><small>${esc(prettyDate(r.date))} · Declarada</small></div><button class="btn ghost btn-sm" type="button" data-delete-badge-record="${esc(String(r.id))}" aria-label="Eliminar marca de ${esc(formatBadgeValue(r.value,r.measure||item.measure))} del ${esc(prettyDate(r.date))}">Eliminar</button></li>`).join('')}</ul>`:'<p class="muted small">Todavía no declaraste marcas para este desafío.</p>'}`;
+  }
+  function renderBadgeGallery(){
+    const root=$('badgeGallery');if(!root)return;
+    const catalog=getBadgeCatalog().filter(item=>!item.customPlaceholder),filter=badgeGalleryFilter;
+    const withMetric=catalog.map(item=>{const metric=getBadgeMetric(item),thresholds=BadgeEngine.thresholdsForExercise(item);return {item,metric,thresholds,progress:BadgeEngine.progressForValue(metric.value,thresholds)};});
+    let shown=withMetric.filter(x=>filter==='started'?x.metric.value>0:filter==='all'?(!x.item.library||x.metric.value>0):badgeCategoryMatches(x.item,filter)&&(!x.item.library||x.metric.value>0));
+    if(filter==='started')shown.sort((a,b)=>(b.progress.highest-a.progress.highest)||(b.progress.pct-a.progress.pct));
+    document.querySelectorAll('[data-badge-filter]').forEach(b=>{const on=b.dataset.badgeFilter===filter;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});
+    if(!shown.length){root.innerHTML=filter==='started'?`<div class="empty ff-empty-wide">${BadgeEngine.medalSvg({glyph:'star',locked:true,size:56})}<strong>Todavía no empezaste ningún desafío</strong><p>Registrá tu mejor serie de flexiones, una plancha o una carrera para ganar tu primer Bronce I.</p><button class="btn" type="button" data-badge-filter-go="all">Ver todos los desafíos</button></div>`:'<div class="empty"><strong>No hay desafíos en esta categoría</strong><p>Probá con otra categoría.</p></div>';return;}
+    root.innerHTML=shown.map(({item,metric,thresholds,progress})=>{const rank=progress.highest>=0?BadgeEngine.rankForLevel(progress.highest):null;return `<button type="button" class="badge-tile rank-${rank?rank.key:'none'}" data-badge-open="${esc(item.id)}">${badgeMedalFor(item,progress.highest,{size:46})}<span class="badge-tile-copy"><strong>${esc(item.name)}</strong><small>${rank?esc(rank.label):'Sin marca'}${metric.value>0&&metric.evidence==='gps_device'?' · GPS':''}</small><span class="badge-tile-bar" aria-hidden="true"><i style="width:${progress.pct}%"></i></span><small class="badge-tile-next">${esc(BadgeEngine.nextStepMessage(metric.value,thresholds,item.measure))}</small></span></button>`;}).join('');
+  }
+  function openBadge(id){
+    const select=$('badgeExerciseSelect'),filter=$('badgeCategoryFilter');if(!select||!filter)return;
+    const item=getBadgeCatalog().find(entry=>entry.id===id);if(!item)return;
+    if(![...select.options].some(o=>o.value===id)){filter.value='all';renderBadgeSelector(id);}else{select.value=id;renderBadgeControl();}
+    $('badgeDetail')?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+  }
   function renderBadgeCenter(){
     const root=$('achievementCenter');if(!root)return;
     const result=syncBadgeUnlocks();if(result.changed)save();
-    const catalog=result.catalog.filter(item=>!item.customPlaceholder),total=catalog.reduce((sum,item)=>sum+BadgeEngine.thresholdsForExercise(item).length,0),unlocked=catalog.reduce((sum,item)=>sum+BadgeEngine.thresholdsForExercise(item).filter((_,i)=>state.badgeUnlocks[badgeIdFor(item,i)]).length,0),verified=catalog.reduce((sum,item)=>sum+BadgeEngine.thresholdsForExercise(item).filter((_,i)=>isBadgeVerified(state.badgeUnlocks[badgeIdFor(item,i)])).length,0),pct=total?Math.round(unlocked/total*100):0;
-    $('achievementSummary').innerHTML=`<div class="stat"><strong>${unlocked}</strong><small>Insignias desbloqueadas</small></div><div class="stat"><strong>${verified}</strong><small>Registros GPS válidos</small></div><div class="stat"><strong>${pct}%</strong><small>Catálogo completado</small></div>`;
-    renderBadgeDetail(result.catalog.find(item=>item.id===$('badgeExerciseSelect')?.value)||CORE_BADGE_EXERCISES[0]);
+    const entries=Object.values(state.badgeUnlocks||{}).filter(entry=>result.catalog.some(item=>!item.customPlaceholder&&item.id===entry.exerciseId));
+    const started=result.catalog.filter(item=>!item.customPlaceholder&&getBadgeMetric(item).value>0).length;
+    $('achievementSummary').innerHTML=`<div class="stat"><strong>${entries.length}</strong><small>Insignias obtenidas</small></div><div class="stat"><strong>${entries.filter(hasGpsEvidence).length}</strong><small>Con ruta GPS</small></div><div class="stat"><strong>${started}</strong><small>Desafíos iniciados</small></div>`;
+    renderBadgeGallery();
+    const current=result.catalog.find(item=>item.id===$('badgeExerciseSelect')?.value)||CORE_BADGE_EXERCISES[0];
+    renderBadgeDetail(current);renderBadgeRecords(current);
   }
   function renderProfileBadgesPreview(){
     const root=$('profileBadgeChips');if(!root)return;
-    const catalog=getBadgeCatalog(),valid=Object.values(state.badgeUnlocks||{}).filter(entry=>catalog.some(item=>!item.customPlaceholder&&item.id===entry.exerciseId)).sort((a,b)=>String(b.earnedAt||'').localeCompare(String(a.earnedAt||''))).slice(0,4);
-    if(!valid.length){root.innerHTML='<span class="muted small">Todavía no desbloqueaste insignias. Andá a Progreso para empezar.</span>';return;}
-    root.innerHTML=valid.map(entry=>{const rank=BadgeEngine.rankForLevel((Number(entry.level)||1)-1);return `<div class="profile-badge-chip"><span class="mini-medal" aria-hidden="true">${rank.key==='diamond'?'💎':rank.key==='gold'?'🥇':rank.key==='silver'?'🥈':'🥉'}</span><span>${esc(entry.exerciseName)}<small>${esc(rank.label)}${isBadgeVerified(entry)?' · GPS':''}</small></span></div>`;}).join('');
+    const catalog=getBadgeCatalog(),valid=Object.values(state.badgeUnlocks||{}).filter(entry=>catalog.some(item=>!item.customPlaceholder&&item.id===entry.exerciseId)).sort((a,b)=>(Number(b.level)||0)-(Number(a.level)||0)||String(b.earnedAt||'').localeCompare(String(a.earnedAt||'')));
+    const best=new Map();for(const entry of valid)if(!best.has(entry.exerciseId))best.set(entry.exerciseId,entry);
+    const top=[...best.values()].slice(0,6);
+    if(!top.length){root.innerHTML='<span class="muted small">Todavía no obtuviste insignias. Registrá una marca en Progreso › Insignias.</span>';return;}
+    root.innerHTML=top.map(entry=>{const rank=BadgeEngine.rankForLevel((Number(entry.level)||1)-1),item=catalog.find(x=>x.id===entry.exerciseId)||{};return `<div class="profile-badge-chip">${BadgeEngine.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:BadgeEngine.glyphFor(item),size:36})}<span>${esc(entry.exerciseName)}<small>${esc(rank.label)} · ${hasGpsEvidence(entry)?'Con ruta GPS':'Declarada'}</small></span></div>`;}).join('');
+  }
+  // La insignia más cercana a subir de nivel, para Inicio.
+  function closestNextBadge(){
+    let best=null;
+    for(const item of getBadgeCatalog()){
+      if(item.customPlaceholder)continue;
+      const metric=getBadgeMetric(item);if(!(metric.value>0))continue;
+      const thresholds=BadgeEngine.thresholdsForExercise(item),progress=BadgeEngine.progressForValue(metric.value,thresholds);if(progress.complete)continue;
+      if(!best||progress.pct>best.progress.pct)best={item,metric,thresholds,progress};
+    }
+    return best;
   }
   function initBadgeCenter(){
     const filter=$('badgeCategoryFilter'),select=$('badgeExerciseSelect'),form=$('badgeRecordForm');if(!filter||!select||!form)return;
+    filter.innerHTML='<option value="all">Todas las categorías</option>'+BadgeEngine.CATEGORIES.map(c=>`<option value="${c.key}">${esc(c.label)}</option>`).join('');
+    const chips=$('badgeGalleryFilters');
+    if(chips){chips.innerHTML=[['started','En progreso'],['all','Todos'],...BadgeEngine.CATEGORIES.filter(c=>c.key!=='custom').map(c=>[c.key,c.label])].map(([key,label])=>`<button type="button" class="ff-chip" data-badge-filter="${key}" aria-pressed="false">${esc(label)}</button>`).join('');}
     renderBadgeSelector('exercise-flexiones');filter.addEventListener('change',()=>renderBadgeSelector());select.addEventListener('change',renderBadgeControl);
+    $('achievementCenter').addEventListener('click',event=>{
+      const chip=event.target.closest('[data-badge-filter],[data-badge-filter-go]');if(chip){badgeGalleryFilter=chip.dataset.badgeFilter||chip.dataset.badgeFilterGo;renderBadgeGallery();return;}
+      const open=event.target.closest('[data-badge-open]');if(open){openBadge(open.dataset.badgeOpen);return;}
+      const goto=event.target.closest('[data-goto-view]');if(goto){switchView(goto.dataset.gotoView);return;}
+      const del=event.target.closest('[data-delete-badge-record]');
+      if(del){
+        const id=del.dataset.deleteBadgeRecord,record=(state.badgeRecords||[]).find(r=>String(r.id)===id);if(!record)return;
+        if(!confirm(`¿Eliminar la marca de ${formatBadgeValue(record.value,record.measure)} del ${prettyDate(record.date)}? Las insignias que dependían solo de esta marca se quitarán.`))return;
+        state.badgeRecords=state.badgeRecords.filter(r=>String(r.id)!==id);
+        const delta=syncBadgeUnlocks([record.exerciseId]);save();renderBadgeCenter();renderProfileBadgesPreview();renderBadgeControl();
+        toast(delta.revoked.length?`Marca eliminada · se quitaron ${delta.revoked.length} insignia(s).`:'Marca eliminada.');
+      }
+    });
     form.addEventListener('submit',event=>{
       event.preventDefault();let item=getBadgeCatalog().find(entry=>entry.id===select.value);if(!item||item.activityType||item.measure==='days')return;
-      let exerciseName=item.name,exerciseId=item.id;
-      if(item.customPlaceholder){exerciseName=String($('badgeCustomName').value||'').trim().slice(0,72);if(exerciseName.length<2){$('badgeRecordStatus').textContent='Escribí un nombre de al menos 2 caracteres.';$('badgeCustomName').focus();return;}exerciseId='custom-'+BadgeEngine.slug(exerciseName);item={id:exerciseId,name:exerciseName,group:'Personalizados',category:'custom',measure:'reps',thresholds:BadgeEngine.GENERIC_REP_TARGETS};}
-      const value=Number($('badgeMetricValue').value),max=item.measure==='seconds'?7200:item.measure==='minutes'?360:10000;
-      if(!Number.isFinite(value)||value<1||value>max||(item.measure!=='km'&&!Number.isInteger(value))){$('badgeRecordStatus').textContent=`Ingresá un valor válido entre 1 y ${max}.`;$('badgeMetricValue').focus();return;}
-      state.badgeRecords=Array.isArray(state.badgeRecords)?state.badgeRecords:[];state.badgeRecords.push({id:Date.now(),exerciseId,exerciseName,measure:item.measure,value:Math.round(value),unit:item.measure,date:dateKey(),source:'manual',verified:false});state.badgeRecords=state.badgeRecords.slice(-500);
-      const delta=syncBadgeUnlocks();save();renderBadgeSelector(item.id);renderBadgeCenter();renderProfileBadgesPreview();form.reset();$('badgeRecordStatus').textContent=delta.newlyUnlocked.length?`Marca guardada. Desbloqueaste ${delta.newlyUnlocked.length} insignia(s).`:'Marca guardada como personal. No se verificó automáticamente.';toast(delta.newlyUnlocked.length?`¡Marca guardada! +${delta.newlyUnlocked.length} insignia(s).`:'Marca personal guardada.');
+      if(item.customPlaceholder){const exerciseName=String($('badgeCustomName').value||'').trim().slice(0,72);if(exerciseName.length<2){$('badgeRecordStatus').textContent='Escribí un nombre de al menos 2 caracteres.';$('badgeCustomName').focus();return;}item={id:'custom-'+BadgeEngine.slug(exerciseName),name:exerciseName,group:'Personalizados',category:'custom',measure:'reps',thresholds:BadgeEngine.GENERIC_REP_TARGETS};}
+      const today=dateKey(),check=BadgeEngine.validateRecord(item,$('badgeMetricValue').value,state.badgeRecords,today);
+      if(!check.ok){$('badgeRecordStatus').textContent=check.reason;$('badgeMetricValue').focus();return;}
+      const before=getBadgeMetric(item).value;
+      state.badgeRecords=Array.isArray(state.badgeRecords)?state.badgeRecords:[];state.badgeRecords.push({id:Date.now(),exerciseId:item.id,exerciseName:item.name,measure:item.measure,value:check.value,unit:item.measure,date:today,source:'manual',evidence:'declared'});state.badgeRecords=state.badgeRecords.slice(-500);
+      const delta=syncBadgeUnlocks();save();renderBadgeSelector(item.id);renderBadgeCenter();renderProfileBadgesPreview();form.reset();
+      const improved=check.value>before&&before>0;
+      const message=delta.newlyUnlocked.length?`Marca guardada. Obtuviste ${BadgeEngine.rankForLevel(delta.newlyUnlocked[delta.newlyUnlocked.length-1].level-1).label}${delta.newlyUnlocked.length>1?` y ${delta.newlyUnlocked.length-1} nivel(es) más`:''}.`:improved?'Tu mejor marca personal mejoró.':'Marca guardada como declarada.';
+      $('badgeRecordStatus').textContent=message;toast(message);
     });
-    $('profileViewBadges')?.addEventListener('click',()=>{switchView('progress');$('achievementCenter')?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});});
+    $('profileViewBadges')?.addEventListener('click',()=>showBadges());
   }
+  function showBadges(){switchView('progress');showProgressTab('badges');}
   function notifyBadgeChanges(delta,baseMessage){
     if(!delta)return;
     const count=delta.newlyUnlocked.length,upgraded=delta.upgraded.length;
-    const suffix=[count?`+${count} insignia(s) desbloqueada(s)`:'',upgraded?`${upgraded} insignia(s) de distancia ahora figuran con GPS`:''].filter(Boolean).join(' · ');
+    const suffix=[count?`+${count} insignia(s)`:'',upgraded?`${upgraded} insignia(s) ahora con ruta GPS`:''].filter(Boolean).join(' · ');
     toast(suffix?`${baseMessage} · ${suffix}`:baseMessage);
+  }
+  function showProgressTab(name,focus=false){
+    const tabs=[...document.querySelectorAll('[data-progress-tab]')];if(!tabs.some(t=>t.dataset.progressTab===name))name='summary';
+    tabs.forEach(t=>{const on=t.dataset.progressTab===name;t.classList.toggle('active',on);t.setAttribute('aria-selected',String(on));t.tabIndex=on?0:-1;if(on&&focus)t.focus();});
+    document.querySelectorAll('[data-progress-panel]').forEach(p=>{p.hidden=p.dataset.progressPanel!==name;});
+    if(name==='body'&&typeof renderWeights==='function')renderWeights();
+  }
+  function initProgressTabs(){
+    const tabs=[...document.querySelectorAll('[data-progress-tab]')];
+    tabs.forEach((t,i)=>{
+      t.addEventListener('click',()=>showProgressTab(t.dataset.progressTab));
+      t.addEventListener('keydown',e=>{const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(!d)return;e.preventDefault();showProgressTab(tabs[(i+d+tabs.length)%tabs.length].dataset.progressTab,true);});
+    });
+    $('view-progress')?.addEventListener('click',e=>{const g=e.target.closest('[data-goto-view]');if(g&&!e.target.closest('#achievementCenter'))switchView(g.dataset.gotoView);});
   }
   function renderProgress(){
     const total=state.sessions.length, mins=Math.round(state.sessions.reduce((a,s)=>a+(Number(s.minutes)||0),0)+state.activities.reduce((a,activity)=>a+(Number(activity.minutes)||0),0));
     const activeDays=new Set([...state.sessions.map(s=>s.date),...state.activities.map(a=>a.date)]).size;
-    const totalSets=state.sessions.reduce((a,s)=>a+s.exercises.reduce((b,e)=>b+e.entries.length,0),0);
+    const setsOf=s=>(Array.isArray(s?.exercises)?s.exercises:[]).reduce((b,e)=>b+(Array.isArray(e?.entries)?e.entries.length:0),0);
+    const totalSets=state.sessions.reduce((a,s)=>a+setsOf(s),0);
     const physical=state.profile||{},currentKg=Number(physical.currentWeightKg),targetKg=Number(physical.targetWeightKg);
     const weightGoalHtml=Number.isFinite(currentKg)&&currentKg>0&&Number.isFinite(targetKg)&&targetKg>0?`<div class="notice"><strong>Tu objetivo de peso:</strong> ${currentKg.toFixed(1)} kg actuales → ${targetKg.toFixed(1)} kg objetivo. ${Math.abs(targetKg-currentKg)<0.1?'Estás en el peso que definiste como meta.':`Diferencia: ${Math.abs(targetKg-currentKg).toFixed(1)} kg ${targetKg>currentKg?'por ganar para la meta':'por bajar para la meta'}.`} El peso diario puede fluctuar; mirá la tendencia a lo largo de las semanas.</div>`:'';
     $('progressSummary').innerHTML=`<div class="stats" style="margin:12px 0 0"><div class="stat"><strong>${total}</strong><small>Rutinas completadas</small></div><div class="stat"><strong>${activeDays}</strong><small>Días activos</small></div><div class="stat"><strong>${totalSets}</strong><small>Registros de series</small></div></div>${weightGoalHtml}<p class="muted small">Tiempo total registrado: ${mins} minutos entre rutinas y actividades al aire libre. El tiempo de las rutinas se estima desde que abriste la sesión hasta que la guardaste.</p>`;
-    $('historyList').innerHTML=state.sessions.length?state.sessions.slice(0,30).map(s=>`<div class="history-item"><div><strong>${esc(s.title)}</strong><small>${prettyDate(s.date)} · ${s.exercises.length} ejercicios · ${s.minutes} min</small>${s.notes?`<div class="muted small">${esc(s.notes)}</div>`:''}</div><span class="tag">${s.exercises.reduce((a,e)=>a+e.entries.length,0)} series</span></div>`).join(''):'<div class="empty"><div class="emoji">📈</div><strong>Todavía no hay sesiones</strong><p>Cuando guardes tu primer entrenamiento, aparecerá acá.</p></div>';
+    $('historyList').innerHTML=state.sessions.length?state.sessions.slice(0,30).map(s=>`<div class="history-item"><div><strong>${esc(s.title)}</strong><small>${prettyDate(s.date)} · ${Array.isArray(s.exercises)?s.exercises.length:0} ejercicios · ${Number(s.minutes)||0} min</small>${s.notes?`<div class="muted small">${esc(s.notes)}</div>`:''}</div><span class="tag">${setsOf(s)} series</span></div>`).join(''):'<div class="empty"><strong>Todavía no hay sesiones</strong><p>Cuando guardes tu primer entrenamiento, aparecerá acá.</p><button class="btn" type="button" data-goto-view="train">Empezar un entrenamiento</button></div>';
     renderWeeklyActivityChart();
     renderConsistencyChallenges();
     renderTrainingInsights();
@@ -3774,7 +4008,7 @@ function findCatalogExercise(name){
     const arc=(id,fraction)=>{const el=$(id);if(el)el.style.strokeDashoffset=String(251.2*(1-Math.max(0,Math.min(1,fraction||0))));};
     const sessions=Array.isArray(state.sessions)?state.sessions:[],activities=Array.isArray(state.activities)?state.activities:[],planned=Array.isArray(state.plannedActivities)?state.plannedActivities:[];
     const profile=state.profile||{},name=String(profile.name||'').trim();
-    set('homeGreeting',name?'Hola, '+name+' 👋':'Hola 👋');
+    set('homeGreeting',name?'Hola, '+name:'Hola');
     set('homeInitial',(name||'F').charAt(0).toUpperCase());
     set('homeGoalTitle',typeof goalText==='function'&&profile.goal?goalText(profile.goal):'Ponerme en forma');
     const now=new Date();now.setHours(12,0,0,0);
@@ -3847,28 +4081,43 @@ function findCatalogExercise(name){
       });
       set('homeHabitsCount',marked+' de '+dailyHabitDefinitions.length);
     }
-    // Insignias reales (mismo origen que el resumen de Perfil)
+    // Insignias reales: la más cercana a subir de nivel, con el mismo motor que Progreso.
     let unlocked=[];
     try{
       const catalog=typeof getBadgeCatalog==='function'?getBadgeCatalog():[];
       unlocked=Object.values(state.badgeUnlocks||{}).filter(entry=>catalog.some(item=>!item.customPlaceholder&&item.id===entry.exerciseId)).sort((a,b)=>String(b.earnedAt||'').localeCompare(String(a.earnedAt||'')));
-      if(unlocked.length&&window.FittFormaBadgeEngine){
-        const last=unlocked[0],rank=window.FittFormaBadgeEngine.rankForLevel((Number(last.level)||1)-1),item=catalog.find(x=>x.id===last.exerciseId);
-        set('homeBadgeMedal',rank.key==='diamond'?'💎':rank.key==='gold'?'🥇':rank.key==='silver'?'🥈':'🥉');
-        set('homeBadgeTitle',unlocked.length+(unlocked.length===1?' insignia desbloqueada':' insignias desbloqueadas'));
-        set('homeBadgeText','Última: '+(item?item.name:'logro')+' · '+rank.label);
+      const medal=$('homeBadgeMedal'),next=typeof closestNextBadge==='function'?closestNextBadge():null,E=window.FittFormaBadgeEngine;
+      if(next&&E){
+        const rank=next.progress.highest>=0?E.rankForLevel(next.progress.highest):null;
+        if(medal)medal.innerHTML=E.medalSvg({rankKey:rank?rank.key:'bronze',numeral:rank?rank.numeral:'',glyph:E.glyphFor(next.item),locked:!rank,size:52});
+        set('homeBadgeTitle',next.item.name+(rank?' · '+rank.label:''));
+        set('homeBadgeText',E.nextStepMessage(next.metric.value,next.thresholds,next.item.measure));
+        const bar=$('homeBadgeBar');if(bar){bar.hidden=false;bar.firstElementChild.style.width=next.progress.pct+'%';bar.setAttribute('aria-valuenow',String(next.progress.pct));}
+        set('homeBadgeBtn',unlocked.length?'Ver mis '+unlocked.length+' insignias':'Ver desafíos');
+      }else if(unlocked.length&&E){
+        const last=unlocked[0],rank=E.rankForLevel((Number(last.level)||1)-1),item=catalog.find(x=>x.id===last.exerciseId)||{};
+        if(medal)medal.innerHTML=E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor(item),size:52});
+        set('homeBadgeTitle',unlocked.length+(unlocked.length===1?' insignia obtenida':' insignias obtenidas'));
+        set('homeBadgeText','Última: '+(item.name||'logro')+' · '+rank.label);
+        const bar=$('homeBadgeBar');if(bar)bar.hidden=true;
         set('homeBadgeBtn','Ver todas');
       }else{
-        set('homeBadgeMedal','🏅');set('homeBadgeTitle','Todavía no desbloqueaste insignias');
-        set('homeBadgeText','Sumá marcas en ejercicios medibles o registrá actividad para empezar.');set('homeBadgeBtn','Ver desafíos');
+        if(medal&&E)medal.innerHTML=E.medalSvg({glyph:'pushup',locked:true,size:52});
+        set('homeBadgeTitle','Tu primera insignia te espera');
+        set('homeBadgeText','Registrá tu mejor serie de flexiones o una plancha: 5 flexiones o 15 segundos desbloquean Bronce I.');
+        const bar=$('homeBadgeBar');if(bar)bar.hidden=true;
+        set('homeBadgeBtn','Registrar una marca');
       }
-    }catch(error){unlocked=[];}
+    }catch(error){console.error('No se pudo calcular la insignia de Inicio:',error);unlocked=[];}
     const empty=$('homeEmpty');if(empty)empty.hidden=!!(sessions.length||activities.length||meals.length||water||unlocked.length);
   }
   function renderAll(){renderAllBase();renderHome();}
   function renderAllBase(){renderStats();renderPlan();renderProgress();renderProfile();renderNutrition();renderCoach();renderWeights();renderActivities();renderRunningPlan();renderRunningHistory();renderPlanner();}
   function switchView(name){
-    const navName=['exercises','routines','running','coach'].includes(name)?'train':name;
+    const trainViews=['exercises','routines','running','coach'];
+    const hasTab=[...document.querySelectorAll('.tab')].some(b=>b.dataset.view===name);
+    const navName=hasTab?name:(trainViews.includes(name)?'train':name);
+    const mobileName=trainViews.includes(name)?'train':name;
     document.querySelectorAll('.tab').forEach(b=>{const active=b.dataset.view===navName;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
     document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));
     if(name==='plan')renderHome();
@@ -3880,9 +4129,9 @@ function findCatalogExercise(name){
     if(name==='community')window.FittFormaCommunity?.refresh?.();
     document.querySelectorAll('.subnav-item[data-subview]').forEach(b=>{const on=b.dataset.subview===name;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
     {const strip=document.querySelector('.view.active .train-subnav'),current=strip&&strip.querySelector('.subnav-item.active');if(strip&&current)strip.scrollLeft=Math.max(0,current.offsetLeft-(strip.clientWidth-current.offsetWidth)/2);}
-    document.querySelectorAll('.mobile-nav-item[data-mobile-view]').forEach(b=>{const active=b.dataset.mobileView===navName;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+    document.querySelectorAll('.mobile-nav-item[data-mobile-view]').forEach(b=>{const active=b.dataset.mobileView===mobileName;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
     const moreToggle=$('mobileMoreToggle');
-    const inMoreMenu=false;
+    const inMoreMenu=name==='nutrition';
     moreToggle.classList.toggle('active',inMoreMenu);moreToggle.setAttribute('aria-expanded','false');
     document.querySelectorAll('.mobile-more-link[data-mobile-view]').forEach(b=>b.classList.toggle('active',b.dataset.mobileView===name));
     $('mobileMoreMenu').hidden=true;
@@ -4130,7 +4379,7 @@ function findCatalogExercise(name){
   document.querySelectorAll('[data-library-mode]').forEach(b=>b.addEventListener('click',()=>{libraryMode=b.dataset.libraryMode;renderExerciseLibrary();}));
   document.querySelectorAll('.addMealIdea').forEach(b=>b.addEventListener('click',()=>{switchView('nutrition');$('mealName').value=b.dataset.name;$('mealCalories').value=b.dataset.cal;$('mealProtein').value=b.dataset.pro;$('mealCarbs').value=b.dataset.carbs||'';$('mealFat').value=b.dataset.fat||'';$('mealType').value='Almuerzo';$('mealName').focus();}));
   $('exerciseSearch').addEventListener('input',renderExerciseLibrary);$('exerciseGroupFilter').addEventListener('change',renderExerciseLibrary);$('exerciseFavoritesOnly').addEventListener('click',()=>{exerciseFavoritesOnly=!exerciseFavoritesOnly;renderExerciseLibrary();});
-  initBadgeCenter();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
+  initBadgeCenter();initProgressTabs();document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();});syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
   setTimeout(()=>checkWorkoutReminders(),1200);setInterval(()=>{if(document.visibilityState==='visible')checkWorkoutReminders();},30000);window.addEventListener('focus',()=>{renderReminderSettings();checkWorkoutReminders();});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){renderReminderSettings();checkWorkoutReminders();}});
   document.addEventListener('visibilitychange',()=>{if(!activeSession)return;if(document.visibilityState==='hidden'&&!activeSession.pausedAt){activeSession.elapsedMs=activeSessionElapsedMs(activeSession);activeSession.segmentStartedAt=Date.now();activeSession.pausedAt=Date.now();activeSession.pauseReason='background';persistActiveSessionDraft();}else if(document.visibilityState==='visible'&&activeSession.pausedAt&&activeSession.pauseReason==='background'){activeSession.pausedAt=0;activeSession.pauseReason='';activeSession.segmentStartedAt=Date.now();persistActiveSessionDraft();updateWorkoutClock();}});
   window.addEventListener('pagehide',()=>{if(activeSession)persistActiveSessionDraft();});

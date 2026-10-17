@@ -28,11 +28,12 @@ test('v40.21: Entrenar agrupa Sesión, Ejercicios, Rutinas, Correr y Coach y la 
   const html = await read('index.html');
   assert.equal((html.match(/<nav class="train-subnav"/g) || []).length, 5, 'las cinco vistas de Entrenar llevan la fila de subpestañas');
   assert.deepEqual([...new Set([...html.matchAll(/data-subview="([^"]+)"/g)].map(m => m[1]))], ['train', 'exercises', 'routines', 'running', 'coach']);
-  assert.match(html, /const navName=\['exercises','routines','running','coach'\]\.includes\(name\)\?'train':name;/);
+  assert.match(html, /const trainViews=\['exercises','routines','running','coach'\];/);
+  assert.match(html, /const mobileName=trainViews\.includes\(name\)\?'train':name;/);
   assert.match(html, /if\(name==='plan'\)renderHome\(\);/);
   assert.match(html, /function renderAll\(\)\{renderAllBase\(\);renderHome\(\);\}/);
   const menu = html.match(/<div class="mobile-more-menu" id="mobileMoreMenu"[\s\S]*?<\/div>/)?.[0] || '';
-  assert.doesNotMatch(menu, /data-mobile-view="(coach|running)"/);
+  for (const view of ['nutrition', 'coach', 'running']) assert.match(menu, new RegExp(`data-mobile-view="${view}"`), `${view} accesible desde Más`);
   assert.match(html, /\.mobile-app-nav \.mobile-nav-item\{min-height:58px;font-size:11px/);
 });
 

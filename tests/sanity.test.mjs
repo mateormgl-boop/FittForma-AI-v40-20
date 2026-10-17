@@ -89,15 +89,15 @@ test('versiones visibles del pie de página y traducciones están alineadas', ()
 
 
 
-test('v40.21 presenta seis destinos móviles, acceso directo a la IA y Coach/Correr dentro de Entrenar', () => {
+test('v41 presenta cinco destinos móviles; Nutrición, Coach y Correr quedan en Más y en Entrenar', () => {
   const nav = html.match(/<nav class="mobile-app-nav"[\s\S]*?<\/nav>/)?.[0] || '';
   const destinations = [...nav.matchAll(/data-mobile-view="([^"]+)"/g)].map(m => m[1]);
-  assert.deepEqual(destinations, ['plan', 'train', 'nutrition', 'progress', 'community', 'profile']);
+  assert.deepEqual(destinations, ['plan', 'train', 'progress', 'community', 'profile']);
   assert.match(html, /id="mobileMoreToggle"[\s\S]*?aria-controls="mobileMoreMenu"/);
   const menu = html.match(/<div class="mobile-more-menu" id="mobileMoreMenu"[\s\S]*?<\/div>/)?.[0] || '';
-  for (const view of ['coach', 'running', 'nutrition']) assert.doesNotMatch(menu, new RegExp(`data-mobile-view="${view}"`), `${view} ya no va en Más`);
+  for (const view of ['coach', 'running', 'nutrition']) assert.match(menu, new RegExp(`data-mobile-view="${view}"`), `${view} debe estar en Más`);
   assert.match(html, /data-shortcut-view="coach" aria-label="Consultar a la IA"/);
-  assert.match(html, /grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/);
+  assert.match(html, /\.mobile-app-nav\{grid-template-columns:repeat\(5,minmax\(0,1fr\)\)!important\}/);
   assert.match(html, /id="installBtn"/);
   assert.match(html, /env\(safe-area-inset-bottom/);
   const planStart = html.indexOf('<section class="view active" id="view-plan">');
