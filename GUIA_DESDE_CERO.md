@@ -1,18 +1,21 @@
-# Guía rápida — FittForma AI v40.2
+# Guía rápida de FittForma AI — v40.19
 
-## Desplegar o actualizar
-1. Descomprimí el ZIP y subí su contenido a la raíz del repositorio de GitHub conectado a Render.
-2. Conservá las variables de entorno actuales, especialmente `GEMINI_API_KEY` y `GEMINI_MODEL`.
-3. En Render, mantené `npm install`, `npm start` y el health check `/healthz`.
-4. En `/healthz` se espera `{"ok":true,"service":"fittforma-ai"}`. Probá también entrenador IA, nutrición, historial y navegación desde el teléfono.
-5. El backend no debe exponer por URL archivos como `/package.json`, `/README.md`, `/tests/runtime.test.mjs` ni `/supabase/community.sql`; deberían devolver 404.
+Para una descripción completa del producto, sus módulos, instrucciones de prueba en PC/iPhone, checklist manual, configuración y hoja de ruta, consultar `GUIA_COMPLETA_PROYECTO.md`.
 
-## Activar comunidad online
-1. Creá un proyecto Supabase y ejecutá `supabase/schema.sql` si querés habilitar sincronización del estado local.
-2. Ejecutá el archivo completo `supabase/community.sql` desde SQL Editor. En actualizaciones, volvé a ejecutar este archivo para aplicar funciones de bloqueo, límites del chat y el ranking.
-3. En `supabase-config.js`, completá `url` y la clave pública `anon`/`publishable`. Nunca uses `service_role` en el navegador.
-4. En Supabase Auth, habilitá Email y, si vas a usarlo, Google OAuth. Añadí el dominio real de Render en Site URL/Redirect URLs y completá credenciales del proveedor.
-5. Probá con dos cuentas públicas y privadas: seguir/aceptar, subir fotos, reaccionar, comentar, bloquear/desbloquear, enviar mensajes, eliminar conversación y comprobar límites.
+## Arranque local
 
-## Antes de publicar
-La comunidad aún no tiene panel de revisión de denuncias. Los reportes se guardan, pero una persona responsable debe poder revisarlos y resolverlos antes de abrir el servicio. Tampoco están integrados recuperación de contraseña personalizada, borrado/exportación completa de cuenta online, pagos Pro ni publicidad real. Los retos de constancia son locales al dispositivo. La suite automática no sustituye pruebas reales en Supabase ni en iPhone/Android.
+Requiere Node.js 20 o superior. En la raíz del proyecto:
+
+```bash
+npm test
+npm start
+```
+
+Abrí en el navegador la dirección y el puerto que indique el servidor (por defecto es `http://localhost:8787`). Para acceder desde un teléfono, la PC y el teléfono deben estar en la misma Wi-Fi y el servidor debe escuchar en una interfaz accesible de la LAN; usar la IP local de la PC, no `localhost` en el teléfono.
+
+Para el seguimiento de nutrición y hábitos, probá Nutrición → tendencia semanal, sumá/restá vasos de agua y comprobá que la hidratación anterior no desaparezca al cambiar de fecha. En Progreso, marcá algunos hábitos y recargá la app para confirmar que se conserven. Los datos locales se quedan en ese navegador.
+
+Las integraciones con Gemini y Supabase necesitan configuración por entorno. En Render, configurá `SUPABASE_URL` y `SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`, más `GEMINI_API_KEY`. Después de publicar, Comunidad tiene el botón “Comprobar conexión” y cinco secciones internas para repetir la inicialización y probar una lectura sin modificar datos. No expongas claves privadas ni uses la clave `service_role` en el frontend.
+
+
+Para programar recordatorios aunque cierres FittForma, guardá los recordatorios en Perfil, descargá el `.ics` e importalo en tu calendario. Para revisar rutas, exportá GPX solo si querés compartir las coordenadas exactas. Los cobros Pro continúan desactivados.

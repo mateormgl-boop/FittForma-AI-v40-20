@@ -24,3 +24,28 @@
 ## Recomendación
 
 Mantener la comunidad como beta limitada hasta validar Supabase real y disponer de un flujo de moderación operativo. No guardar nunca una clave `service_role` en GitHub, el frontend o `supabase-config.js`; la clave de cliente `anon`/publishable es pública por diseño y debe estar protegida por políticas RLS adecuadas.
+
+
+## Actualización v40.14 — configuración pública de Supabase
+
+- `GET /api/public-config` es la única respuesta del backend que entrega configuración del cliente; no devuelve `process.env` ni una lista de variables con valores.
+- Solo devuelve la URL https de un proyecto `*.supabase.co` y una clave `sb_publishable_...` o un JWT cuyo claim `role` sea `anon`.
+- Las claves `sb_secret_...` y JWT con roles distintos de `anon` son rechazadas antes de enviarse al navegador.
+- Mantener `SUPABASE_ANON_KEY` configurada únicamente con la clave pública `anon`/publishable. Aunque el endpoint valida, no debe guardarse una clave privilegiada en ese campo.
+- Las pruebas locales no sustituyen una comprobación de RLS y Storage con dos cuentas en el proyecto real.
+
+
+## Revisión v40.16 — alcance y pendientes
+
+- 121 tests locales aprobados, incluida la comprobación HTTP del endpoint público de configuración de Supabase y el rechazo de claves de servidor.
+- El endpoint público solo entrega URL y clave publishable/anon aceptadas por su validador; no serializa `process.env`.
+- `GEMINI_API_KEY`, las claves de servicio y las credenciales privadas no deben estar en archivos estáticos, ZIP público ni repositorio.
+- Esta es una revisión estática + pruebas automáticas, no un pentest. Sigue pendiente probar RLS/Storage con dos cuentas en el proyecto real, verificar las políticas de privacidad, límites de mensajes, borrado de cuenta/conversación y probar una llamada real a Gemini en Render.
+
+
+## Revisión v40.17 — comprobaciones adicionales
+- La validación pública de Supabase está alineada entre navegador y backend: HTTPS, hostname de proyecto `*.supabase.co`, sin credenciales ni query/hash/ruta adicional; acepta solo publishable o JWT `anon`.
+- Se rechazan placeholders, `sb_secret_` y JWT con rol distinto de `anon`. El endpoint público no expone la clave de Gemini ni valores generales del entorno.
+- El diagnóstico de Comunidad hace lecturas de solo lectura a cinco tablas y dos funciones RPC; con sesión autentificada también comprueba mensajes, bloqueos y `user_app_data`.
+- Suite automatizada: 130 pruebas aprobadas, 0 fallidas; no equivale a pentest ni a validación de Supabase real.
+- Siguen pendientes las pruebas RLS/Storage con cuentas distintas, el flujo administrativo de denuncias, la validación de credenciales Gemini/Render y las comprobaciones en teléfonos físicos.

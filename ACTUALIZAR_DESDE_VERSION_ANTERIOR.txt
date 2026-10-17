@@ -1,22 +1,14 @@
-FittForma AI v40.1 — auditoría y mejoras de comunidad.
+ACTUALIZAR FITTFORMA AI A LA V40.21
 
-ACTUALIZACIÓN
-1. Descomprimí el ZIP y subí todo el contenido directamente a la raíz del repositorio GitHub conectado a Render.
-2. Conservá las variables privadas existentes en Render, sobre todo GEMINI_API_KEY y GEMINI_MODEL.
-3. En Supabase SQL Editor, ejecutá el archivo completo `supabase/community.sql` de esta versión. Añade controles de bloqueo, un registro interno para límites de mensajes y un ranking equilibrado. La función SQL de ranking se reemplaza.
-4. No subas ninguna clave `service_role` a GitHub o al frontend. Si `supabase-config.js` se sobrescribe con la plantilla vacía, volvé a cargar URL y clave pública `anon`/`publishable`.
+1. Hacé una copia de seguridad del repositorio y la carpeta local.
+2. Descomprimí este ZIP y copiá su contenido a la raíz del repositorio existente. Conservá la estructura de carpetas y no borres `.git`.
+3. Conservá cualquier configuración personalizada de `supabase-config.js`; esta versión puede leer la URL y la clave pública desde Render.
+4. En Render → Environment, comprobá `SUPABASE_URL`, una clave pública (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`), `GEMINI_API_KEY` y `GEMINI_MODEL`. No uses `service_role` ni `sb_secret_` en el frontend.
+5. Hacé commit y push a GitHub; esperá que Render muestre `Live`.
+6. Verificá `https://TU-APP.onrender.com/api/status` y que la versión sea `0.40.21`.
+7. Si ves una versión antigua, en Perfil tocá «Buscar actualización». Si no está disponible, recargá con Ctrl+F5 o borrá los datos del sitio y volvé a abrir la app instalada.
+8. Entrá a Comunidad. Las secciones Feed, Explorar, Publicar, Mensajes y Mi perfil aparecen como pestañas internas. En Feed, probá actualizar las publicaciones.
+9. Si aparece PGRST201, guardá el mensaje y los detalles completos; no vuelvas a ejecutar los SQL a ciegas. El feed y los comentarios usan relaciones explícitas y recuperación por consultas separadas, pero la FK real puede requerir revisión.
+10. Esta versión no cambia el esquema de Supabase; no vuelvas a ejecutar `supabase/schema.sql` ni `supabase/community.sql`.
 
-CAMBIOS IMPORTANTES
-- Feed orgánico: actividad en 30 días, días activos, interacciones con topes, recencia, una bonificación chica de descubrimiento y diversificación para que un autor no domine el feed.
-- Pro solo se muestra como distintivo; ya no tiene prioridad automática sobre el ranking orgánico.
-- Bloquear usuario: elimina el seguimiento mutuo y las políticas de base de datos ocultan entre ambas cuentas perfiles, publicaciones, reacciones/comentarios, fotos y chat.
-- Mensajes: límite de servidor de 10 por minuto y 100 por día por cuenta, además de eliminación de conversación para ambas personas.
-- Feed indica que la información compartida por usuarios no está verificada automáticamente.
-- Retos personales semanales calculados desde el registro de este dispositivo.
-- Corregidos textos de versión y caché PWA a v40.1.
-
-PRUEBAS REQUERIDAS
-La suite local valida la estructura y las pruebas automatizadas. Antes de hacer pública la comunidad, probá con dos cuentas reales que el bloqueo funcione en ambos sentidos, que los perfiles privados sigan ocultos, que chat y eliminación de conversación respeten RLS y que el contador del servidor rechace exceso de mensajes. Las denuncias todavía no tienen panel administrativo y los pagos Pro no están conectados.
-
-
-Cambios técnicos de v40.1: recuperación del estado local si la clave principal está corrupta, manejo de fallas de red en sincronización, identificación de IP por proxy de Render (configurable) y caché PWA renovada.
+La suite local valida el código; las credenciales, RLS, OAuth y acceso real a Storage se deben confirmar en el entorno desplegado.

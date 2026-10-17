@@ -1,23 +1,26 @@
-/* FittForma AI v40 — comunidad online, privacidad, bloqueos y ranking orgánico. Requiere supabase/community.sql. */
+/* FittForma AI v40.21 — comunidad online, privacidad, bloqueos y ranking orgánico. Requiere supabase/community.sql. */
 (()=>{
   'use strict';
   const $=id=>document.getElementById(id);
   const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  let client=null,user=null,searchTerm='',loading=false;
+  let client=null,user=null,searchTerm='',loading=false,feedSort='activity',connectionMessage='',currentSubView='feed';
   const messageAttempts=[];
   const bucket='community-media';
+  const localDateKey=(date=new Date())=>`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
   const setStatus=(id,msg)=>{const el=$(id);if(el)el.textContent=msg;};
   const initials=name=>String(name||'FF').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'FF';
   const dateLabel=value=>{if(!value)return '';const d=new Date(value+'T12:00:00');return Number.isNaN(d.getTime())?value:d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});};
-  function status(message){setStatus('communityFeedStatus',message);}
+  function status(message){const target=currentSubView==='explore'?'communityExploreStatus':currentSubView==='publish'?'communityPostStatus':currentSubView==='messages'?'communityChatStatus':currentSubView==='profile'?'communityProfileStatus':'communityFeedStatus';setStatus(target,message);}
+  function connectionStatus(message){setStatus('communityConnectionStatus',message);}
   function authReady(){return !!client&&!!user;}
-  function authHint(){return client?'Iniciá sesión desde Perfil para publicar, comentar o seguir personas.':'La comunidad requiere configurar Supabase y aplicar supabase/community.sql.';}
+  function authHint(){return client?'Iniciá sesión desde Perfil para publicar, comentar o seguir personas.':(connectionMessage||'No se conectó Supabase. Tocá “Comprobar conexión” para revisar la configuración.');}
+  function friendlySupabaseError(error,context='la comunidad'){const code=String(error?.code||''),message=String(error?.message||'Error desconocido');if(code==='PGRST201'||/more than one relationship was found/i.test(message))return `Supabase encontró más de una relación posible al ${context}. Esta versión identifica la clave foránea explícita; si el error continúa, revisá el nombre de la relación en los detalles. Detalle: ${message}`;if(code==='PGRST202'||/could not find the function|function .* does not exist|schema cache.*function/i.test(message))return `Supabase respondió, pero falta o no está publicada una función necesaria para ${context}. Revisá la versión de community.sql aplicada en este proyecto y los permisos EXECUTE. Detalle: ${message}`;if(code==='42P01'||code==='PGRST205'||/relation .* does not exist|could not find the table/i.test(message))return `Supabase respondió, pero falta una tabla necesaria para ${context}. Revisá que community.sql se haya ejecutado completamente en este mismo proyecto. Detalle: ${message}`;if(code==='42501'||/row-level security|permission denied|not allowed/i.test(message))return `Supabase está conectado, pero las políticas/permisos RLS impiden ${context}. No vuelvas a ejecutar SQL a ciegas; revisá el código ${code||'de permisos'} y el detalle: ${message}`;if(/failed to fetch|network|fetcherror|load failed/i.test(message))return `No se pudo llegar a Supabase desde el navegador. Revisá conexión, URL del proyecto y consola del navegador. Detalle: ${message}`;return `No se pudo completar ${context}.${code?` Código ${code}.`:''} Detalle: ${message}`;}
   function setControls(){
     const ready=!!client,logged=!!user;
     ['communityProfileForm','communityPostForm'].forEach(id=>{const form=$(id);if(form)form.querySelectorAll('input,textarea,select,button').forEach(el=>{if(id==='communityPostForm'&&el.id==='communityPublish')el.disabled=!logged;});});
     if($('communityGoogleLogin'))$('communityGoogleLogin').disabled=!ready||logged;
     if($('communitySignOut'))$('communitySignOut').hidden=!logged;
-    if(!ready){status('Sin conexión configurada. Aplicá el esquema y configurá Supabase para activar la comunidad.');setStatus('communityProfileStatus',authHint());}
+    if(!ready){status(authHint());setStatus('communityProfileStatus',authHint());}
     else if(!logged){setStatus('communityProfileStatus','Iniciá sesión por correo en Perfil o usá Google para crear tu perfil comunitario.');}
     else setStatus('communityProfileStatus','Sesión online: '+(user.email||'cuenta conectada')+'.');
   }
@@ -46,20 +49,57 @@
   async function loadFeed(){
     if(loading)return;loading=true;
     try{
-      if(!client){status('Configurá Supabase para ver publicaciones compartidas.');return;}
+      if(!client){status(authHint());return;}
       status('Cargando transformaciones…');
-      const selectPosts='id,user_id,description,exercises_text,nutrition_text,running_text,start_date,end_date,before_path,after_path,visibility,created_at,community_profiles!inner(user_id,display_name,username,bio,visibility)';
+      const selectPosts='id,user_id,description,exercises_text,nutrition_text,running_text,start_date,end_date,before_path,after_path,visibility,created_at,community_profiles!community_posts_user_id_fkey!inner(user_id,display_name,username,bio,visibility)';
       let rankByPost={},rankedIds=[];
       try{const ranked=await client.rpc('community_ranked_post_ids');if(!ranked.error&&ranked.data){ranked.data.forEach((r,index)=>{rankByPost[r.post_id]={index,isPro:!!r.is_pro,followerCount:Number(r.follower_count)||0,activityScore:Number(r.activity_score)||0};});rankedIds=ranked.data.map(r=>r.post_id);}}catch{}
       let query=client.from('community_posts').select(selectPosts);
       if(searchTerm){const term=searchTerm.replace(/^@/,'').replace(/[,%()]/g,'');query=query.ilike('community_profiles.username',`%${term}%`).order('created_at',{ascending:false}).limit(20);}
       else if(rankedIds.length)query=query.in('id',rankedIds.slice(0,30));
       else query=query.order('created_at',{ascending:false}).limit(30);
-      const {data,error}=await query;if(error)throw error;
-      let posts=data||[];posts.sort((a,b)=>(rankByPost[a.id]?.index??9999)-(rankByPost[b.id]?.index??9999));
+      let {data,error}=await query;
+      // En proyectos donde el esquema haya quedado con una FK adicional o un nombre distinto,
+      // evitamos depender del embed ambiguo: consultamos posts y perfiles por separado, bajo RLS.
+      if(error&&(error.code==='PGRST201'||error.code==='PGRST200')){
+        let fallbackQuery=client.from('community_posts').select('id,user_id,description,exercises_text,nutrition_text,running_text,start_date,end_date,before_path,after_path,visibility,created_at');
+        if(searchTerm){
+          const term=searchTerm.replace(/^@/,'').replace(/[,%()]/g,'');
+          const profileResult=await client.from('community_profiles').select('user_id').ilike('username',`%${term}%`).limit(30);
+          if(profileResult.error)throw profileResult.error;
+          const matchingUsers=(profileResult.data||[]).map(row=>row.user_id);
+          if(!matchingUsers.length){data=[];error=null;}
+          else fallbackQuery=fallbackQuery.in('user_id',matchingUsers).order('created_at',{ascending:false}).limit(20);
+        }else if(rankedIds.length)fallbackQuery=fallbackQuery.in('id',rankedIds.slice(0,30));
+        else fallbackQuery=fallbackQuery.order('created_at',{ascending:false}).limit(30);
+        if(error){const fallback=await fallbackQuery;if(fallback.error)throw fallback.error;data=fallback.data||[];const authorIds=[...new Set(data.map(row=>row.user_id))];if(authorIds.length){const profileResult=await client.from('community_profiles').select('user_id,display_name,username,bio,visibility').in('user_id',authorIds);if(profileResult.error)throw profileResult.error;const byUser=new Map((profileResult.data||[]).map(profile=>[profile.user_id,profile]));data=data.filter(post=>byUser.has(post.user_id)).map(post=>({...post,community_profiles:byUser.get(post.user_id)}));}else data=[];error=null;}
+      }
+      if(error)throw error;
+      let posts=data||[];
+      if(feedSort==='recent')posts.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+      else if(feedSort==='likes'){const counts={};(await client.from('community_likes').select('post_id').in('post_id',posts.map(p=>p.id))).data?.forEach(x=>counts[x.post_id]=(counts[x.post_id]||0)+1);posts.sort((a,b)=>(counts[b.id]||0)-(counts[a.id]||0)||String(b.created_at||'').localeCompare(String(a.created_at||'')));}
+      else posts.sort((a,b)=>(rankByPost[a.id]?.index??9999)-(rankByPost[b.id]?.index??9999));
       const ids=posts.map(p=>p.id);
       let likes=[],comments=[],following=[];
-      if(ids.length){const requests=[client.from('community_likes').select('post_id,user_id').in('post_id',ids),client.from('community_comments').select('id,post_id,user_id,body,created_at,community_profiles(display_name,username)').in('post_id',ids).order('created_at',{ascending:true})];if(user)requests.push(client.from('community_follows').select('following_id,status').eq('follower_id',user.id));const results=await Promise.all(requests);if(!results[0].error)likes=results[0].data||[];if(!results[1].error)comments=results[1].data||[];if(user&&!results[2].error)following=results[2].data||[];}
+      if(ids.length){
+        const requests=[client.from('community_likes').select('post_id,user_id').in('post_id',ids),client.from('community_comments').select('id,post_id,user_id,body,created_at,community_profiles!community_comments_user_id_fkey(display_name,username)').in('post_id',ids).order('created_at',{ascending:true})];
+        if(user)requests.push(client.from('community_follows').select('following_id,status').eq('follower_id',user.id));
+        const results=await Promise.all(requests);
+        if(!results[0].error)likes=results[0].data||[];
+        if(!results[1].error)comments=results[1].data||[];
+        else if(results[1].error.code==='PGRST201'||results[1].error.code==='PGRST200'){
+          // Recuperación para comentarios si la FK también es ambigua en un esquema antiguo.
+          const plainComments=await client.from('community_comments').select('id,post_id,user_id,body,created_at').in('post_id',ids).order('created_at',{ascending:true});
+          if(!plainComments.error){
+            const commentAuthors=[...new Set((plainComments.data||[]).map(comment=>comment.user_id))];
+            let commentProfiles=[];
+            if(commentAuthors.length){const profileResult=await client.from('community_profiles').select('user_id,display_name,username').in('user_id',commentAuthors);if(!profileResult.error)commentProfiles=profileResult.data||[];}
+            const profilesByUser=new Map(commentProfiles.map(profile=>[profile.user_id,profile]));
+            comments=(plainComments.data||[]).map(comment=>({...comment,community_profiles:profilesByUser.get(comment.user_id)||null}));
+          }else console.warn('No se pudieron cargar comentarios de Comunidad:',plainComments.error.message);
+        }else console.warn('No se pudieron cargar comentarios de Comunidad:',results[1].error.message);
+        if(user&&results[2]&&!results[2].error)following=results[2].data||[];
+      }
       const likedSet=new Set(likes.filter(x=>x.user_id===user?.id).map(x=>x.post_id));
       const followStatus=new Map(following.map(x=>[x.following_id,x.status]));
       const countBy={};likes.forEach(x=>countBy[x.post_id]=(countBy[x.post_id]||0)+1);
@@ -79,9 +119,10 @@
         const rank=rankByPost[p.id]||{isPro:false,followerCount:0,activityScore:0};
         markup.push(`<article class="card community-post" data-community-post="${esc(p.id)}"><div class="community-post-head"><div class="community-avatar">${esc(initials(profileName))}</div><div class="community-author"><strong>${esc(profileName)} ${rank.isPro?'<span class="community-pro-badge">PRO</span>':''} <span class="muted">@${esc(profile?.username||'usuario')}</span></strong><small>${esc(duration)}${p.visibility==='followers'?' · Seguidores':''}<span class="community-follower-count">· ${rank.followerCount} seguidores</span></small></div>${owner?'':`${user?`<button class="btn ghost" type="button" data-community-follow="${esc(p.user_id)}" data-following="${isFollowing?'yes':isPending?'pending':'no'}">${isFollowing?'Siguiendo':isPending?'Solicitud enviada':'Seguir'}</button><button class="btn ghost" type="button" data-community-block="${esc(p.user_id)}">Bloquear</button>`:''}`}</div><div class="community-photos">${before?`<div class="community-photo"><img loading="lazy" src="${esc(before)}" alt="Foto de antes"><span>ANTES</span></div>`:'<div class="community-photo"><span>ANTES · imagen no disponible</span></div>'}${after?`<div class="community-photo"><img loading="lazy" src="${esc(after)}" alt="Foto de después"><span>DESPUÉS</span></div>`:'<div class="community-photo"><span>DESPUÉS · imagen no disponible</span></div>'}</div><div class="community-post-body">${p.description?`<p>${esc(p.description)}</p>`:''}${tags.length?`<div class="community-tags">${tags.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}<p class="muted small">Información compartida por el usuario; no está verificada automáticamente por FittForma.</p></div><div class="community-actions"><button class="btn ${likedSet.has(p.id)?'':'secondary'}" type="button" data-community-like="${esc(p.id)}">♥ ${likedSet.has(p.id)?'Te gusta':'Me gusta'} · ${countBy[p.id]||0}</button>${owner?'':`<button class="btn ghost" type="button" data-community-report="${esc(p.id)}">Denunciar</button>`}${owner?`<button class="btn ghost" type="button" data-community-delete-post="${esc(p.id)}">Eliminar publicación</button>`:''}</div><div class="community-comments"><strong>Comentarios (${postComments.length})</strong>${commentHtml||'<p class="muted small">Todavía no hay comentarios.</p>'}${user?`<form class="community-comment-form" data-community-comment-form="${esc(p.id)}"><input name="body" maxlength="500" required placeholder="Escribí un comentario…" aria-label="Escribí un comentario"><button class="btn secondary" type="submit">Enviar</button></form>`:`<p class="muted small">Iniciá sesión para comentar.</p>`}</div></article>`);
       }
-      $('communityFeed').innerHTML=markup.join('')||'<div class="empty"><strong>No hay transformaciones para mostrar</strong><p>Probá otra búsqueda o publicá la primera transformación.</p></div>';
-      status(`${posts.length} publicación(es) cargadas.`);bindFeedActions();
-    }catch(error){status(`No se pudo cargar el feed: ${error.message||'revisá el esquema de Supabase y sus permisos.'}`);}
+      const outputRoot=searchTerm&&$('communitySearchPosts')?$('communitySearchPosts'):$('communityFeed');
+      if(outputRoot)outputRoot.innerHTML=markup.join('')||'<div class="empty"><strong>No hay transformaciones para mostrar</strong><p>Probá otra búsqueda o seguí explorando perfiles.</p></div>';
+      status(`${posts.length} publicación(es) cargadas.`);connectionStatus('Supabase responde correctamente: el feed de Comunidad se pudo consultar.');bindFeedActions(outputRoot||$('communityFeed'));
+    }catch(error){const message=friendlySupabaseError(error,'cargar el feed de la comunidad');status(message);connectionStatus(message);}
     finally{loading=false;}
   }
   async function saveProfile(e){e.preventDefault();if(!authReady()){setStatus('communityProfileStatus',authHint());return;}
@@ -105,13 +146,13 @@
   async function createPost(e){e.preventDefault();if(!authReady()){setStatus('communityPostStatus',authHint());return;}
     const beforeFile=$('communityBeforePhoto').files?.[0],afterFile=$('communityAfterPhoto').files?.[0],start=$('communityStartDate').value,end=$('communityEndDate').value;
     if(!beforeFile||!afterFile){setStatus('communityPostStatus','Elegí una foto de antes y una de después.');return;}
-    if(!start||!end||end<start||end>new Date().toISOString().slice(0,10)){setStatus('communityPostStatus','Revisá las fechas: la final debe ser igual o posterior a la inicial y no futura.');return;}
+    if(!start||!end||end<start||end>localDateKey()){setStatus('communityPostStatus','Revisá las fechas: la final debe ser igual o posterior a la inicial y no futura.');return;}
     const btn=$('communityPublish');btn.disabled=true;setStatus('communityPostStatus','Subiendo fotos…');let beforePath='',afterPath='';
     try{
       const postId=crypto.randomUUID();beforePath=await uploadImage(beforeFile,`${user.id}/${postId}/before.jpg`);afterPath=await uploadImage(afterFile,`${user.id}/${postId}/after.jpg`);
       const profile=await ensureProfile();const visibility=profile.visibility==='public'&&$('communityPostPublic').checked?'public':'followers';
       const {error}=await client.from('community_posts').insert({id:postId,user_id:user.id,description:$('communityPostDescription').value.trim(),exercises_text:$('communityPostExercises').value.trim(),nutrition_text:$('communityPostNutrition').value.trim(),running_text:$('communityPostRunning').value.trim(),start_date:start,end_date:end,before_path:beforePath,after_path:afterPath,visibility});
-      if(error)throw error;$('communityPostForm').reset();setStatus('communityPostStatus','¡Transformación publicada!');await loadFeed();
+      if(error)throw error;$('communityPostForm').reset();setStatus('communityPostStatus','¡Transformación publicada!');showCommunitySubView('feed');await loadFeed();
     }catch(error){if(beforePath||afterPath){try{await client.storage.from(bucket).remove([beforePath,afterPath].filter(Boolean));}catch{}}setStatus('communityPostStatus',`No se pudo publicar: ${error.message||'revisá las políticas de Supabase.'}`);}
     finally{btn.disabled=false;}
   }
@@ -156,14 +197,15 @@
     async function deletePost(id){if(!confirm('¿Eliminar esta publicación y sus fotos?'))return;const {data,error}=await client.from('community_posts').select('before_path,after_path').eq('id',id).eq('user_id',user.id).maybeSingle();if(error||!data){status(error?.message||'No se encontró la publicación.');return;}const {error:delError}=await client.from('community_posts').delete().eq('id',id).eq('user_id',user.id);if(delError){status(delError.message);return;}await client.storage.from(bucket).remove([data.before_path,data.after_path].filter(Boolean));await loadFeed();}
   async function reportPost(id){if(!authReady())return alert(authHint());const reason=prompt('Motivo de la denuncia (spam, acoso, contenido inapropiado, otro):');if(!reason)return;const {error}=await client.from('community_reports').insert({reporter_id:user.id,post_id:id,reason:reason.trim().slice(0,300)});if(error)status(error.code==='23505'?'Ya enviaste una denuncia por esta publicación.':`No se pudo enviar la denuncia: ${error.message}`);else status('Denuncia enviada. Gracias por ayudar a cuidar la comunidad.');}
   async function deleteComment(id){if(!confirm('¿Borrar tu comentario?'))return;const {error}=await client.from('community_comments').delete().eq('id',id).eq('user_id',user.id);if(error)status(error.message);else await loadFeed();}
-  function bindFeedActions(){
-    $('communityFeed').querySelectorAll('[data-community-like]').forEach(b=>b.addEventListener('click',()=>toggleLike(b.dataset.communityLike)));
-    $('communityFeed').querySelectorAll('[data-community-follow]').forEach(b=>b.addEventListener('click',()=>toggleFollow(b.dataset.communityFollow,b)));
-    $('communityFeed').querySelectorAll('[data-community-block]').forEach(b=>b.addEventListener('click',()=>blockUser(b.dataset.communityBlock)));
-    $('communityFeed').querySelectorAll('[data-community-delete-post]').forEach(b=>b.addEventListener('click',()=>deletePost(b.dataset.communityDeletePost)));
-    $('communityFeed').querySelectorAll('[data-community-report]').forEach(b=>b.addEventListener('click',()=>reportPost(b.dataset.communityReport)));
-    $('communityFeed').querySelectorAll('[data-community-delete-comment]').forEach(b=>b.addEventListener('click',()=>deleteComment(b.dataset.communityDeleteComment)));
-    $('communityFeed').querySelectorAll('[data-community-comment-form]').forEach(form=>form.addEventListener('submit',e=>{e.preventDefault();const input=form.elements.body;addComment(form.dataset.communityCommentForm,input.value);}));
+  function bindFeedActions(root=$('communityFeed')){
+    if(!root)return;
+    root.querySelectorAll('[data-community-like]').forEach(b=>b.addEventListener('click',()=>toggleLike(b.dataset.communityLike)));
+    root.querySelectorAll('[data-community-follow]').forEach(b=>b.addEventListener('click',()=>toggleFollow(b.dataset.communityFollow,b)));
+    root.querySelectorAll('[data-community-block]').forEach(b=>b.addEventListener('click',()=>blockUser(b.dataset.communityBlock)));
+    root.querySelectorAll('[data-community-delete-post]').forEach(b=>b.addEventListener('click',()=>deletePost(b.dataset.communityDeletePost)));
+    root.querySelectorAll('[data-community-report]').forEach(b=>b.addEventListener('click',()=>reportPost(b.dataset.communityReport)));
+    root.querySelectorAll('[data-community-delete-comment]').forEach(b=>b.addEventListener('click',()=>deleteComment(b.dataset.communityDeleteComment)));
+    root.querySelectorAll('[data-community-comment-form]').forEach(form=>form.addEventListener('submit',e=>{e.preventDefault();const input=form.elements.body;addComment(form.dataset.communityCommentForm,input.value);}));
   }
   async function loadChatContacts(){
     const select=$('communityChatContact');if(!select)return;
@@ -199,17 +241,77 @@
     if(error){setStatus('communityChatStatus','No se pudo enviar. Revisá el seguimiento mutuo y los límites de mensajes. '+error.message);return;}
     messageAttempts.push(now);$('communityChatText').value='';setStatus('communityChatStatus','Mensaje enviado.');await loadMessages();
   }
-  async function searchUsers(e){e.preventDefault();searchTerm=$('communitySearch').value.trim();if(!client){status(authHint());return;}const root=$('communitySearchResults');root.innerHTML='';if(searchTerm){const term=searchTerm.replace(/^@/,'').replace(/[,%()]/g,'');const {data,error}=await client.rpc('search_community_profiles',{search_term:term});if(error){status(`No se pudo buscar: ${error.message}`);return;}if(!data?.length){status('No se encontraron perfiles públicos coincidentes.');searchTerm='';await loadFeed();return;}root.innerHTML=data.map(p=>`<article class="card"><div class="community-profile-top"><div class="community-avatar">${esc(initials(p.display_name))}</div><div style="flex:1;min-width:0"><strong>${esc(p.display_name)}</strong><div class="muted small">@${esc(p.username)}</div><p>${esc(p.bio||(p.visibility==='private'?'Perfil privado · su contenido requiere aprobación para verlo.':'Sin descripción todavía.'))}</p></div>${user&&user.id!==p.user_id?`<div class="btn-row"><button class="btn secondary" type="button" data-community-search-follow="${esc(p.user_id)}">${p.visibility==='private'?'Solicitar seguir':'Seguir'}</button><button class="btn ghost" type="button" data-community-search-block="${esc(p.user_id)}">Bloquear</button></div>`:''}</div></article>`).join('');root.querySelectorAll('[data-community-search-follow]').forEach(b=>b.addEventListener('click',()=>toggleFollow(b.dataset.communitySearchFollow,b)));root.querySelectorAll('[data-community-search-block]').forEach(b=>b.addEventListener('click',()=>blockUser(b.dataset.communitySearchBlock)));status(`Perfiles encontrados: ${data.length}. Los perfiles privados muestran solo datos básicos y requieren aprobación para ver su contenido.`);}await loadFeed();}
+  async function searchUsers(e){e.preventDefault();searchTerm=$('communitySearch').value.trim();if(!client){status(authHint());return;}const root=$('communitySearchResults'),postRoot=$('communitySearchPosts');root.innerHTML='';if(postRoot)postRoot.innerHTML='';if(!searchTerm){status('Escribí un nombre o @usuario para explorar perfiles y publicaciones.');return;}const term=searchTerm.replace(/^@/,'').replace(/[,%()]/g,'');const {data,error}=await client.rpc('search_community_profiles',{search_term:term});if(error){status(friendlySupabaseError(error,'buscar perfiles'));return;}if(!data?.length){root.innerHTML='<div class="empty"><strong>No encontramos perfiles</strong><p>Probá con otro apodo o nombre de usuario.</p></div>';status('No se encontraron perfiles públicos coincidentes.');await loadFeed();return;}root.innerHTML=data.map(p=>`<article class="card community-search-person"><div class="community-profile-top"><div class="community-avatar">${esc(initials(p.display_name))}</div><div style="flex:1;min-width:0"><strong>${esc(p.display_name)}</strong><div class="muted small">@${esc(p.username)}</div><p>${esc(p.bio||(p.visibility==='private'?'Perfil privado · su contenido requiere aprobación para verlo.':'Sin descripción todavía.'))}</p></div>${user&&user.id!==p.user_id?`<div class="btn-row"><button class="btn secondary" type="button" data-community-search-follow="${esc(p.user_id)}">${p.visibility==='private'?'Solicitar seguir':'Seguir'}</button><button class="btn ghost" type="button" data-community-search-block="${esc(p.user_id)}">Bloquear</button></div>`:''}</div></article>`).join('');root.querySelectorAll('[data-community-search-follow]').forEach(b=>b.addEventListener('click',()=>toggleFollow(b.dataset.communitySearchFollow,b)));root.querySelectorAll('[data-community-search-block]').forEach(b=>b.addEventListener('click',()=>blockUser(b.dataset.communitySearchBlock)));status(`Perfiles encontrados: ${data.length}. Los perfiles privados muestran solo datos básicos y requieren aprobación para ver su contenido.`);await loadFeed();}
   async function emailLogin(e){e.preventDefault();if(!client)return setStatus('communityEmailStatus',authHint());const email=$('communityEmail').value.trim(),password=$('communityPassword').value;const {error}=await client.auth.signInWithPassword({email,password});if(error){setStatus('communityEmailStatus',`No se pudo iniciar sesión: ${error.message}`);return;}$('communityPassword').value='';setStatus('communityEmailStatus','Sesión iniciada.');}
   async function emailRegister(){if(!client)return setStatus('communityEmailStatus',authHint());const email=$('communityEmail').value.trim(),password=$('communityPassword').value;if(!email||password.length<8)return setStatus('communityEmailStatus','Ingresá un correo válido y una contraseña de al menos 8 caracteres.');const {data,error}=await client.auth.signUp({email,password});if(error){setStatus('communityEmailStatus',`No se pudo crear la cuenta: ${error.message}`);return;}if(data.session)setStatus('communityEmailStatus','Cuenta creada y sesión iniciada.');else setStatus('communityEmailStatus','Cuenta creada. Revisá tu correo para confirmar la dirección antes de iniciar sesión.');}
   async function googleLogin(){if(!client)return setStatus('communityProfileStatus',authHint());const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href.split('#')[0]}});if(error)setStatus('communityProfileStatus',`No se pudo iniciar con Google: ${error.message}`);}
   async function refresh(){if(!client){setControls();return;}if(user){try{await ensureProfile();await loadFollowRequests();}catch(e){setStatus('communityProfileStatus',`No se pudo preparar el perfil: ${e.message}`);}}setControls();await loadFeed();await loadChatContacts();await loadBlockedUsers();}
-  function init(supabase,userSession){client=supabase||null;user=userSession||null;setControls();if(client)refresh();else loadFeed();}
+  function init(supabase,userSession,diagnostic=''){client=supabase||null;user=userSession||null;connectionMessage=client?'':String(diagnostic||connectionMessage||'');connectionStatus(client?'Cliente de Supabase inicializado. Comprobando tablas y permisos de Comunidad…':(diagnostic||'Supabase todavía no está conectado.'));setControls();if(client)return refresh();return loadFeed();}
+  async function testConnection(){
+    if(!client)return {ok:false,stage:'config',message:authHint()};
+    const coreChecks=[['community_profiles','user_id'],['community_posts','id'],['community_follows','follower_id'],['community_likes','post_id'],['community_comments','id']];
+    try{
+      const coreResults=await Promise.all(coreChecks.map(async([table,column])=>({table,...await client.from(table).select(column,{head:true,count:'exact'}).limit(1)})));
+      const failed=coreResults.find(r=>r.error);
+      if(failed)return {ok:false,stage:'database',message:friendlySupabaseError(failed.error,`comprobar la tabla ${failed.table}`),table:failed.table};
+      // Verify the two read-only RPCs that power discovery/search and feed ranking.
+      const functionChecks=await Promise.all([
+        {name:'search_community_profiles',run:()=>client.rpc('search_community_profiles',{search_term:'ff'})},
+        {name:'community_ranked_post_ids',run:()=>client.rpc('community_ranked_post_ids')}
+      ].map(async check=>({name:check.name,...await check.run()})));
+      const failedFunction=functionChecks.find(result=>result.error);
+      if(failedFunction)return {ok:false,stage:'functions',message:friendlySupabaseError(failedFunction.error,`comprobar la función ${failedFunction.name}`),function:failedFunction.name};
+      const warnings=[];
+      if(authReady()){
+        const optionalChecks=[
+          ['community_messages',q=>q.or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)],
+          ['community_blocks',q=>q.eq('blocker_id',user.id)],
+          ['user_app_data',q=>q.eq('user_id',user.id)]
+        ];
+        const optionalResults=await Promise.all(optionalChecks.map(async([table,filter])=>{let query=client.from(table).select(table==='community_messages'?'id':table==='community_blocks'?'blocker_id':'user_id',{head:true,count:'exact'});query=filter(query);return {table,...await query.limit(1)};}));
+        for(const result of optionalResults)if(result.error)warnings.push(friendlySupabaseError(result.error,`comprobar la tabla opcional ${result.table}`));
+      }
+      const coreMessage='Conexión correcta: URL, clave pública, 5 tablas principales y 2 funciones de búsqueda/ordenamiento de Comunidad responden a consultas de solo lectura.';
+      if(warnings.length)return {ok:true,stage:'database',message:coreMessage+' Hay funciones adicionales que requieren revisión: '+warnings.join(' | '),warnings};
+      return {ok:true,stage:'database',message:coreMessage+(authReady()?' También se comprobaron chat, bloqueos y sincronización de la cuenta.':' Iniciá sesión para comprobar además chat, bloqueos y sincronización de la cuenta.')};
+    }catch(error){return {ok:false,stage:'network',message:friendlySupabaseError(error,'comprobar la conexión con Supabase')};}
+  }
   function setSession(supabase,userSession){client=supabase||client;user=userSession||null;if(!user){if($('communityDisplayName'))$('communityDisplayName').value='';if($('communityUsername'))$('communityUsername').value='';if($('communityBio'))$('communityBio').value='';if($('communityVisibility'))$('communityVisibility').value='private';if($('communityOwnName'))$('communityOwnName').textContent='Tu perfil';if($('communityOwnAvatar'))$('communityOwnAvatar').textContent='FF';if($('communityOwnStats'))$('communityOwnStats').textContent='0 publicaciones · 0 seguidores';if($('communityFollowRequests'))$('communityFollowRequests').textContent='Iniciá sesión para administrar solicitudes.';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communityBlockedList'))$('communityBlockedList').textContent='Iniciá sesión para administrar los bloqueos.';}setControls();if(client)Promise.resolve().then(()=>refresh());else loadFeed();}
+  const communityViews=['feed','explore','publish','messages','profile'];
+  function showCommunitySubView(name,focusTab=false){
+    if(!communityViews.includes(name))name='feed';
+    const previous=currentSubView;currentSubView=name;
+    document.querySelectorAll('[data-community-tab]').forEach(button=>{
+      const selected=button.dataset.communityTab===name;
+      button.setAttribute('aria-selected',selected?'true':'false');button.tabIndex=selected?0:-1;
+      button.classList.toggle('is-active',selected);if(selected&&focusTab)button.focus();
+    });
+    document.querySelectorAll('[data-community-panel]').forEach(panel=>{
+      const active=panel.dataset.communityPanel===name;panel.hidden=!active;panel.classList.toggle('is-active',active);
+    });
+    if(name==='feed'&&previous!=='feed'){
+      searchTerm='';if($('communitySearch'))$('communitySearch').value='';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communitySearchPosts'))$('communitySearchPosts').innerHTML='';
+      if(client)loadFeed();
+    }else if(name==='messages'&&client){loadChatContacts();}
+    else if(name==='profile'&&authReady()){loadFollowRequests();loadBlockedUsers();}
+  }
+  function bindCommunitySubnavigation(){
+    document.querySelectorAll('[data-community-tab]').forEach((button,index)=>{
+      button.addEventListener('click',()=>showCommunitySubView(button.dataset.communityTab));
+      button.addEventListener('keydown',event=>{
+        if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();
+        const tabs=[...document.querySelectorAll('[data-community-tab]')];let next=index;
+        if(event.key==='ArrowLeft')next=(index-1+tabs.length)%tabs.length;else if(event.key==='ArrowRight')next=(index+1)%tabs.length;else if(event.key==='Home')next=0;else next=tabs.length-1;
+        showCommunitySubView(tabs[next].dataset.communityTab,true);
+      });
+    });
+    showCommunitySubView('feed');
+  }
   function bind(){
-    $('communityProfileForm')?.addEventListener('submit',saveProfile);$('communityPostForm')?.addEventListener('submit',createPost);$('communityRefresh')?.addEventListener('click',()=>loadFeed());$('communitySearchForm')?.addEventListener('submit',searchUsers);$('communityClearSearch')?.addEventListener('click',()=>{searchTerm='';$('communitySearch').value='';$('communitySearchResults').innerHTML='';loadFeed();});$('communityGoogleLogin')?.addEventListener('click',googleLogin);$('communityEmailAuthForm')?.addEventListener('submit',emailLogin);$('communityEmailRegister')?.addEventListener('click',emailRegister);$('communityChatContact')?.addEventListener('change',loadMessages);$('communityChatForm')?.addEventListener('submit',sendMessage);$('communityChatRefresh')?.addEventListener('click',loadChatContacts);$('communityChatDeleteConversation')?.addEventListener('click',deleteConversation);$('communityChatBlockContact')?.addEventListener('click',()=>blockUser($('communityChatContact')?.value));$('communitySignOut')?.addEventListener('click',async()=>{if(client){const {error}=await client.auth.signOut();if(error)setStatus('communityProfileStatus',error.message);}});
-    const today=new Date().toISOString().slice(0,10);if($('communityEndDate'))$('communityEndDate').value=today;if($('communityStartDate'))$('communityStartDate').value=today;
+    bindCommunitySubnavigation();
+    $('communityRetryConnection')?.addEventListener('click',async()=>{const button=$('communityRetryConnection');if(button)button.disabled=true;connectionStatus('Revisando la configuración y la conexión…');try{if(typeof window.FittFormaRetrySupabase==='function'){const result=await window.FittFormaRetrySupabase();if(!result?.ok&&result?.message)connectionStatus(result.message);else if(result?.ok){const check=await testConnection();connectionStatus(check.message);if(check.ok)await loadFeed();}}else connectionStatus('La función de comprobación no está disponible. Publicá la última versión y recargá la página.');}catch(error){connectionStatus(`Falló la comprobación: ${error.message||'error desconocido'}`);}finally{if(button)button.disabled=false;}});$('communityFeedSort')?.addEventListener('change',e=>{feedSort=e.target.value;loadFeed();});$('communityProfileForm')?.addEventListener('submit',saveProfile);$('communityPostForm')?.addEventListener('submit',createPost);$('communityRefresh')?.addEventListener('click',()=>loadFeed());$('communitySearchForm')?.addEventListener('submit',searchUsers);$('communityClearSearch')?.addEventListener('click',()=>{searchTerm='';$('communitySearch').value='';$('communitySearchResults').innerHTML='';if($('communitySearchPosts'))$('communitySearchPosts').innerHTML='<div class="empty"><p>Los resultados aparecerán acá después de buscar.</p></div>';status('Escribí un nombre o @usuario para explorar perfiles y publicaciones.');});$('communityGoogleLogin')?.addEventListener('click',googleLogin);$('communityEmailAuthForm')?.addEventListener('submit',emailLogin);$('communityEmailRegister')?.addEventListener('click',emailRegister);$('communityChatContact')?.addEventListener('change',loadMessages);$('communityChatForm')?.addEventListener('submit',sendMessage);$('communityChatRefresh')?.addEventListener('click',loadChatContacts);$('communityChatDeleteConversation')?.addEventListener('click',deleteConversation);$('communityChatBlockContact')?.addEventListener('click',()=>blockUser($('communityChatContact')?.value));$('communitySignOut')?.addEventListener('click',async()=>{if(client){const {error}=await client.auth.signOut();if(error)setStatus('communityProfileStatus',error.message);}});
+    const today=localDateKey();if($('communityEndDate'))$('communityEndDate').value=today;if($('communityStartDate'))$('communityStartDate').value=today;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
-  window.FittFormaCommunity={init,setSession,refresh,loadChatContacts,loadMessages,loadBlockedUsers};
+  window.FittFormaCommunity={init,setSession,refresh,loadChatContacts,loadMessages,loadBlockedUsers,testConnection};
 })();

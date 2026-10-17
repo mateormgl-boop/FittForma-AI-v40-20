@@ -72,9 +72,16 @@ test('el backend comprueba origen, limita solicitudes y no incluye una clave pri
   assert.doesNotMatch(server, /AIza[0-9A-Za-z_-]{30,}/);
 });
 
+test('todos los botones estáticos y de plantillas declaran su tipo para no enviar formularios por accidente', async () => {
+  const html=await read('index.html');
+  const buttons=[...html.matchAll(/<button\b((?:(?!>).)*)>/gis)];
+  const missing=buttons.filter(match=>! /\btype\s*=/.test(match[1]));
+  assert.deepEqual(missing.map(m=>m[0]),[],'Cada botón debe declarar type=button o type=submit explícitamente');
+});
+
 test('versiones visibles del pie de página y traducciones están alineadas', () => {
-  assert.match(html, /Versión 40\.2/);
-  assert.match(i18n, /VERSION 40\.2 · ONLINE FITNESS COMMUNITY/);
+  assert.match(html, /Versión 40\.21/);
+  assert.match(i18n, /VERSION 40\.21 · ONLINE FITNESS COMMUNITY/);
   assert.doesNotMatch(html, /Versión 26\.0|Versión 25\.0|Versión 24\.0|Versión 23\.0/);
   assert.doesNotMatch(i18n, /Version 23\.0|Versão 23\.0|Versione 23\.0/);
 });
@@ -82,15 +89,21 @@ test('versiones visibles del pie de página y traducciones están alineadas', ()
 
 
 
-test('v40.2 presenta cinco destinos principales móviles y mantiene las funciones secundarias accesibles en Más', () => {
+test('v40.21 presenta seis destinos móviles, acceso directo a la IA y Coach/Correr dentro de Entrenar', () => {
   const nav = html.match(/<nav class="mobile-app-nav"[\s\S]*?<\/nav>/)?.[0] || '';
   const destinations = [...nav.matchAll(/data-mobile-view="([^"]+)"/g)].map(m => m[1]);
-  assert.deepEqual(destinations, ['plan', 'train', 'progress', 'community', 'profile']);
+  assert.deepEqual(destinations, ['plan', 'train', 'nutrition', 'progress', 'community', 'profile']);
   assert.match(html, /id="mobileMoreToggle"[\s\S]*?aria-controls="mobileMoreMenu"/);
   const menu = html.match(/<div class="mobile-more-menu" id="mobileMoreMenu"[\s\S]*?<\/div>/)?.[0] || '';
-  for (const view of ['coach', 'running', 'nutrition']) assert.match(menu, new RegExp(`data-mobile-view="${view}"`));
+  for (const view of ['coach', 'running', 'nutrition']) assert.doesNotMatch(menu, new RegExp(`data-mobile-view="${view}"`), `${view} ya no va en Más`);
+  assert.match(html, /data-shortcut-view="coach" aria-label="Consultar a la IA"/);
+  assert.match(html, /grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/);
   assert.match(html, /id="installBtn"/);
   assert.match(html, /env\(safe-area-inset-bottom/);
+  const planStart = html.indexOf('<section class="view active" id="view-plan">');
+  const exercisesStart = html.indexOf('<section class="view" id="view-exercises">');
+  assert.ok(planStart >= 0 && exercisesStart > planStart);
+  assert.ok(html.indexOf('class="home-dash"', planStart) < exercisesStart, 'El panel debe quedar dentro de Inicio');
 });
 
 test('v28 GPS mantiene fresca la marca temporal sin sumar jitter de menos de 2 m', () => {
@@ -136,21 +149,22 @@ test('las fichas de ejercicio muestran una secuencia visual de tres etapas', () 
 });
 
 
-test('cada ejercicio tiene una ilustración SVG individual disponible como alternativa', async () => {
+test('v40.7: los SVG generados que no demuestran de forma fiable la biomecánica están en cuarentena y no se usan ni se precargan', async () => {
   const start = html.indexOf('const library = {');
   const end = html.indexOf('\n  };', start);
   const source = html.slice(start, end);
   const names = [...source.matchAll(/\{name\s*:\s*(['\"])(.*?)\1\s*,group\s*:/g)].map(m => m[2]);
   const slug = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,70) || 'ejercicio';
-  for (const name of new Set(names)) await access(path.join(root, 'assets/exercises/generated', `${slug(name)}.svg`));
-  assert.ok(names.length >= 150);
-  assert.match(html, /personalized-reference/);
+  for (const name of new Set(names)) await access(path.join(root, 'assets/exercises/unverified-generated', `${slug(name)}.svg`));
+  assert.equal(new Set(names.map(n=>n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim())).size,180);
+  assert.doesNotMatch(html, /assets\/exercises\/unverified-generated/);
+  assert.doesNotMatch(sw, /assets\/exercises\/unverified-generated/);
+  assert.match(html, /no se presentan como si mostraran el gesto exacto/);
 });
-
 
 test('la PWA tolera recursos estáticos opcionales no disponibles durante la instalación', () => {
   assert.match(sw, /Promise\.allSettled\(ASSETS\.map\(asset=>cache\.add\(asset\)\)\)/);
-  assert.match(sw, /fittforma-ai-static-v40-2/);
+  assert.match(sw, /fittforma-ai-static-v40-21/);
 });
 
 test('los estilos móviles protegen desbordamientos y el scroll de menús/modales', () => {
@@ -180,7 +194,7 @@ test('v27 recupera una rutina activa tras recargar y guarda los borradores en el
   assert.match(html, /session\.pausedAt\)return base/);
   assert.match(html, /window\.addEventListener\('pagehide'/);
   assert.match(html, /restoreActiveSessionDraft\(\);[\s\S]*?\}\)\(\);/);
-  assert.match(html, /clearActiveSessionDraft\(\);resetRestTimer\(\);save\(\);renderAll\(\)/);
+  assert.match(html, /clearActiveSessionDraft\(\);resetRestTimer\(\);lastWorkoutSummary=null/);
 });
 
 test('v27 muestra referencias de rendimiento anterior y progresión prudente por ejercicio', () => {
@@ -323,14 +337,14 @@ test('v36.1 mantiene válidos los metadatos y las traducciones del perfil/Pro', 
   const manifest = JSON.parse(await read('manifest.json'));
   const rootPackage = JSON.parse(await read('package.json'));
   const backendPackage = JSON.parse(await read('backend/package.json'));
-  assert.equal(rootPackage.version, '0.40.2');
-  assert.equal(backendPackage.version, '0.40.2');
+  assert.equal(rootPackage.version, '0.40.21');
+  assert.equal(backendPackage.version, '0.40.21');
   assert.equal(manifest.theme_color, '#080d18');
   assert.equal(manifest.background_color, '#080d18');
-  assert.match(i18n, /VERSION 40\.2 · ONLINE FITNESS COMMUNITY/i);
+  assert.match(i18n, /VERSION 40\.21 · ONLINE FITNESS COMMUNITY/i);
   assert.match(server, /GEMINI_MODEL\|\|'gemini-3\.8-flash'/);
   assert.match(await read('render.yaml'), /value: gemini-3\.8-flash/);
-  assert.match(sw, /const CACHE = 'fittforma-ai-static-v40-2'/);
+  assert.match(sw, /const CACHE = 'fittforma-ai-static-v40-21'/);
 });
 
 
@@ -344,7 +358,7 @@ test('el esquema base de Supabase puede volver a aplicarse sin fallar por polít
   assert.match(schema, /auth\.uid\(\) = user_id/i);
 });
 
-test('v40.2 recupera estados guardados anteriores si la clave actual está corrupta y no deja la nube sin manejo de errores', () => {
+test('v40.7 recupera estados guardados anteriores si la clave actual está corrupta y no deja la nube sin manejo de errores', () => {
   assert.match(html, /for\(const storageKey of candidates\)/);
   assert.match(html, /if\(storageKey!==STORAGE\)[\s\S]*?localStorage\.setItem\(STORAGE,JSON\.stringify\(restored\)\)/);
   assert.match(html, /No se pudieron guardar los datos por un problema de conexión/);
@@ -358,7 +372,7 @@ test('v36.1 conserva identidad visual propia y perfil local editable', () => {
   assert.match(html, /identityForm/);
   assert.match(html, /displayName/);
   assert.match(html, /focusGoal/);
-  assert.match(sw, /fittforma-ai-static-v40-2/);
+  assert.match(sw, /fittforma-ai-static-v40-21/);
 });
 
 
@@ -375,7 +389,7 @@ test('v36.1 incluye preferencias completas de recordatorios y estado de permisos
   assert.match(html, /Notification\.requestPermission\(\)/);
   assert.match(html, /registration\.showNotification/);
   assert.match(sw, /notificationclick/);
-  assert.match(sw, /fittforma-ai-static-v40-2/);
+  assert.match(sw, /fittforma-ai-static-v40-21/);
 });
 
 test('v36.1 evita avisos duplicados y no marca entrenamientos como pendientes si hubo actividad', () => {

@@ -1,6 +1,6 @@
 {
   "name": "fittforma-ai-backend",
-  "version": "0.40.2",
+  "version": "0.40.21",
   "private": true,
   "type": "module",
   "scripts": {
