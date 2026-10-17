@@ -14,8 +14,9 @@ migración. No se conecta a Supabase, Gemini ni Render.
 `supabase/tests/run.sh` crea una base temporal en un PostgreSQL **de pruebas**, carga un stub mínimo de
 Supabase (`auth.uid()`, roles `anon`/`authenticated`, `storage`), aplica `schema.sql`,
 `community.sql` y cada migración **dos veces** (para comprobar que es re-ejecutable), verifica que una
-publicación anterior a la migración siga siendo válida y ejecuta `rls_v41_test.sql` (44 comprobaciones:
-suplantación, privacidad, bloqueo, mensajes, no leídos, Pro, storage, datos de la app, evidencia de logros).
+publicación anterior a la migración siga siendo válida y ejecuta `rls_v41_test.sql` y `rls_v43_test.sql` (64 comprobaciones:
+suplantación, privacidad, bloqueo, mensajes, no leídos, Pro, storage, datos de la app, evidencia de logros,
+moderación de denuncias y eliminación de la propia cuenta).
 
 ```bash
 PGHOST=localhost PGPORT=5432 PGUSER=postgres npm run test:sql
@@ -30,15 +31,16 @@ Las pruebas con dos cuentas en un proyecto Supabase de pruebas siguen siendo nec
 ## 3. Comunidad de extremo a extremo (navegador + PostgREST)
 
 `tests/e2e/community.e2e.mjs` usa Chromium (Playwright), supabase-js real y PostgREST real sobre la
-base de datos local; solo `/auth/v1` y `/storage/v1` se simulan en el navegador. Recorre 22 pasos:
+base de datos local; solo `/auth/v1` y `/storage/v1` se simulan en el navegador. Recorre 31 pasos:
 feed anónimo, inicio de sesión, no leídos, publicar texto con foto (con y sin consentimiento),
-compartir un logro, me gusta sin duplicar, comentar, editar, mensajes y eliminar.
+compartir un logro, me gusta sin duplicar, comentar, editar, mensajes, eliminar, moderar denuncias y eliminar la propia cuenta. El script recrea
+sus usuarios, perfiles y seguimientos en cada ejecución.
 
 Preparación (resumen):
 
 1. Base `ff_e2e` con `supabase/tests/supabase_stub.sql`, `schema.sql`, `community.sql` y la migración;
    rol `authenticator` (`login noinherit`) con `grant anon, authenticated to authenticator`;
-   usuarios `alice@example.test`/`bob@example.test` con perfiles públicos y seguimiento mutuo.
+   migraciones v41 y v43 aplicadas (el script crea los usuarios de prueba).
 2. PostgREST 12 con `db-anon-role = "anon"` y un `jwt-secret` guardado en un archivo.
 3. `npm start` en otra terminal.
 4. Ejecutar:

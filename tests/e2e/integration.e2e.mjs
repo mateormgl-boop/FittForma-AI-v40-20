@@ -11,12 +11,26 @@ const step = (name, ok, detail = '') => { console.log(`${ok ? 'PASA' : 'FALLA'} 
 const browser = await chromium.launch();
 for (const [w, h, label] of [[390, 844, 'móvil'], [1366, 900, 'escritorio']]) {
   console.log(`\n== ${label} ${w}px`);
+
+  if (w < 761) {
+    const fresh = await browser.newPage({ viewport: { width: w, height: h } });
+    await fresh.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
+    await fresh.goto(APP + '/'); await fresh.evaluate(() => { localStorage.clear(); }); await fresh.reload(); await fresh.waitForTimeout(500);
+    step('Bienvenida visible en el primer uso', await fresh.isVisible('#welcomeScreen'));
+    await fresh.click('#welcomeStart'); await fresh.fill('#welcomeName', 'Lucía'); await fresh.selectOption('#welcomeDays', '4'); await fresh.click('#welcomeSubmit'); await fresh.waitForTimeout(300);
+    const fs = await fresh.evaluate(k => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
+    step('Bienvenida guarda nombre y días', fs.profile?.displayName === 'Lucía' && String(fs.profile?.days) === '4' && !(await fresh.isVisible('#welcomeScreen')));
+    await fresh.reload(); await fresh.waitForTimeout(400);
+    step('La bienvenida no vuelve a aparecer', !(await fresh.isVisible('#welcomeScreen')));
+    await fresh.close();
+  }
   const page = await browser.newPage({ viewport: { width: w, height: h } });
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
-  page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|leaflet|unpkg|jsdelivr/i.test(m.text())) errors.push(m.text()); });
+  page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|leaflet|unpkg|jsdelivr/i.test(m.text()) && !(/status of 503/.test(m.text()) && /\/api\/coach/.test(m.location()?.url || ''))) errors.push(m.text()); });
   page.on('dialog', d => d.accept());
   await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
+  await page.addInitScript(() => localStorage.setItem('fittforma-welcome-v1', '1'));
   await page.goto(APP + '/'); await page.evaluate(k => localStorage.removeItem(k), KEY); await page.reload(); await page.waitForTimeout(500);
   const st = () => page.evaluate(k => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
   const go = async view => { const sel = w < 761 ? `.mobile-nav-item[data-mobile-view="${view}"]` : `.tab[data-view="${view}"]`; await page.click(sel); await page.waitForTimeout(200); };
@@ -147,6 +161,47 @@ for (const [w, h, label] of [[390, 844, 'móvil'], [1366, 900, 'escritorio']]) {
   const noData = coachBodies[1] || {};
   step('Sin permiso FittAI solo recibe el mensaje', noData.shareData === false && !('profile' in noData) && !('sessions' in noData) && !('nutrition' in noData));
   await page.unroute('**/api/coach');
+
+  // v43: diseño, foto de perfil, botón +, FittAI navegador, recetas y plan, traducción dinámica
+  await go('profile');
+  await page.setInputFiles('#avatarInput', { name: 'a.png', mimeType: 'image/png', buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64') });
+  await page.waitForTimeout(500); s = await st();
+  step('Foto de perfil guardada (JPEG 256 px)', String(s.profile?.avatar || '').startsWith('data:image/jpeg;base64,'));
+  step('Foto visible en Perfil e Inicio', await page.evaluate(() => [...document.querySelectorAll('[data-avatar]')].every(e => e.classList.contains('has-photo'))));
+  if (w < 761) {
+    await go('plan'); const before = Number((await st()).waterLogs?.[key]) || 0;
+    await page.click('#quickAddFab'); await page.click('[data-quick-add="water"]'); s = await st();
+    step('Botón + registra agua', Number(s.waterLogs?.[key]) === before + 1);
+    await page.click('#quickAddFab'); await page.click('[data-quick-add="routine"]'); await page.waitForTimeout(200);
+    step('Botón + abre nueva rutina', await page.isVisible('#routineName'));
+    await page.click('#routineCancel');
+  }
+  await go('train'); await page.click('.view.active [data-subview="coach"]');
+  await page.fill('#coachInput', '¿Dónde registro una comida?'); await page.click('#coachForm button[type=submit]'); await page.waitForTimeout(500);
+  const guideBtn = await page.$('#coachMessages .bubble:last-child [data-ai-go="nutrition:registrar"]');
+  step('FittAI (guía local sin IA) ofrece ir a Registrar comida', Boolean(guideBtn));
+  if (guideBtn) { await guideBtn.click(); await page.waitForTimeout(250); }
+  step('El botón lleva a Nutrición › Registrar', await page.isVisible('#mealName'));
+  await page.route('**/api/coach', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ reply: 'Mirá tus insignias.', proposal: null, actions: [{ label: 'Ver insignias', target: 'progress:badges' }, { label: 'Malicioso', target: 'javascript:alert(1)' }] }) }));
+  await go('train'); await page.click('.view.active [data-subview="coach"]');
+  await page.fill('#coachInput', 'insignias'); await page.click('#coachForm button[type=submit]'); await page.waitForTimeout(400);
+  const acts = await page.$$eval('#coachMessages .bubble:last-child [data-ai-go]', b => b.map(x => x.dataset.aiGo));
+  step('Solo se muestran destinos permitidos', acts.length === 1 && acts[0] === 'progress:badges', acts.join(','));
+  await page.click('#coachMessages .bubble:last-child [data-ai-go]'); await page.waitForTimeout(250);
+  step('FittAI navega a Progreso › Insignias', await page.isVisible('#badgeGallery'));
+  await page.unroute('**/api/coach');
+  await go('nutrition'); await page.click('[data-view-tab="plan"]');
+  await page.click('#recipeList details:first-child summary'); await page.click('#recipeList details:first-child [data-recipe-plan]'); s = await st();
+  const planCount = Object.values(s.mealPlan || {}).flat().length;
+  step('Receta agregada al plan semanal', planCount === 1);
+  await page.click('#recipeList details:first-child [data-recipe-plan]'); s = await st();
+  step('Plan sin duplicados', Object.values(s.mealPlan || {}).flat().length === 1);
+  await page.click('#recipeList details:first-child [data-recipe-log]'); await page.waitForTimeout(200);
+  step('Receta cargada en el formulario (sin registrar sola)', (await page.inputValue('#mealName')).length > 3 && (await st()).meals.length === s.meals.length);
+  await page.evaluate(() => window.FittFormaI18n?.setLanguage('en')); await go('progress'); await page.click('#progressTabBadges'); await page.waitForTimeout(300);
+  const galleryText = await text('#badgeGallery');
+  step('Mensajes dinámicos traducidos al inglés', /to (Bronze|Silver|Gold|Diamond)/.test(galleryText) && !/Te faltan/.test(galleryText), galleryText.slice(0, 120));
+  await page.evaluate(() => window.FittFormaI18n?.setLanguage('es'));
 
   step('Sin errores de JavaScript', errors.length === 0, errors.slice(0, 3).join(' | '));
   await page.close();

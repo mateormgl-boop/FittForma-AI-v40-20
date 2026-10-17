@@ -27,7 +27,11 @@ const uploaded = [];
 const APP_VERSION = (await (await fetch(APP + '/api/public-config')).json()).version;
 
 // Datos externos: B publica un texto y le escribe a A (con auth.uid() de B para pasar el trigger anti-spam).
-sql(`delete from community_messages; delete from community_posts;`);
+// Fixture propio (el último paso elimina la cuenta de A, así que se recrea en cada ejecución).
+sql(`insert into auth.users(id,email) values('aaaaaaaa-0000-0000-0000-000000000001','alice@example.test'),('bbbbbbbb-0000-0000-0000-000000000002','bob@example.test') on conflict do nothing`);
+sql(`insert into community_profiles(user_id,username,display_name,visibility) values('aaaaaaaa-0000-0000-0000-000000000001','alicia_fit','Alicia','public'),('bbbbbbbb-0000-0000-0000-000000000002','bruno_fit','Bruno Fit','public') on conflict (user_id) do update set visibility='public'`);
+sql(`insert into community_follows(follower_id,following_id,status) values('aaaaaaaa-0000-0000-0000-000000000001','bbbbbbbb-0000-0000-0000-000000000002','accepted'),('bbbbbbbb-0000-0000-0000-000000000002','aaaaaaaa-0000-0000-0000-000000000001','accepted') on conflict do nothing`);
+sql(`delete from community_messages; delete from community_posts; delete from community_moderators;`);
 sql(`insert into community_posts(id,user_id,post_kind,description,visibility) values('b0000000-0000-0000-0000-0000000000b1','bbbbbbbb-0000-0000-0000-000000000002','text','Primera semana completa de entrenamientos','public')`);
 sql(`set request.jwt.claim.sub='bbbbbbbb-0000-0000-0000-000000000002'; insert into community_messages(sender_id,recipient_id,body) values('bbbbbbbb-0000-0000-0000-000000000002','aaaaaaaa-0000-0000-0000-000000000001','¡Hola Alicia! ¿Entrenamos el sábado?')`);
 
@@ -36,9 +40,10 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 const errors = []; page.on('pageerror', e => errors.push('PAGEERR ' + e.message));
 page.on('console', m => { if (m.type() === 'error' && !/leaflet|ERR_FAILED|unpkg/i.test(m.text())) errors.push(m.text()); });
-page.on('dialog', d => d.accept());
+page.on('dialog', d => d.type() === 'prompt' ? d.accept('ELIMINAR') : /dispositivo/.test(d.message()) ? d.dismiss() : d.accept());
 await page.addInitScript(s => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('fittforma-ai-v4', s); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(seed));
 await page.route(/unpkg\.com/, r => r.abort());
+await page.addInitScript(() => localStorage.setItem('fittforma-welcome-v1', '1'));
 await page.route(/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js/, r => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(process.env.SUPABASE_UMD) }));
 await page.route('**/api/public-config', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ version: APP_VERSION, supabase: { configured: true, url: SUPA, anonKey: ANON, keyType: 'legacy_anon' }, missing: [], issue: null }) }));
 await page.route(`${SUPA}/rest/v1/**`, async route => {
@@ -138,5 +143,25 @@ step('Mensaje enviado y persistido', sql(`select count(*) from community_message
 await page.click('#communityTabFeed'); await page.waitForTimeout(900);
 await page.click(`[data-community-post="${textPostId}"] [data-community-delete-post]`); await page.waitForTimeout(1200);
 step('Eliminar publicación propia', sql(`select count(*) from community_posts where id='${textPostId}'`) === '0');
+// Moderación (v43): solo una cuenta agregada por SQL ve las denuncias.
+await page.click('#communityTabProfile'); await page.waitForTimeout(900);
+step('Sin rol de moderación no se ve la tarjeta', !(await page.isVisible('#communityModerationCard')));
+const achId = sql(`select id from community_posts where post_kind='achievement' and user_id='aaaaaaaa-0000-0000-0000-000000000001'`);
+sql(`insert into community_moderators(user_id) values('aaaaaaaa-0000-0000-0000-000000000001'); insert into community_reports(reporter_id,post_id,reason) values('bbbbbbbb-0000-0000-0000-000000000002','b0000000-0000-0000-0000-0000000000b1','Prueba descartar'),('bbbbbbbb-0000-0000-0000-000000000002','${achId}','Prueba eliminar')`);
+await page.click('#communityTabFeed'); await page.waitForTimeout(500); await page.click('#communityTabProfile'); await page.waitForTimeout(1200);
+step('Moderador ve las denuncias abiertas', await page.isVisible('#communityModerationCard') && /Prueba descartar/.test(await page.textContent('#communityReportsList')));
+await page.click('#communityReportsList [data-report-dismiss]'); await page.waitForTimeout(1200);
+step('Descartar denuncia guarda estado y quién resolvió', sql(`select status, resolved_by is not null from community_reports where reason='Prueba descartar'`) === 'dismissed|t');
+await page.click(`#communityReportsList [data-report-remove="${achId}"]`); await page.waitForTimeout(1200);
+step('Moderador elimina la publicación denunciada', sql(`select count(*) from community_posts where id='${achId}'`) === '0');
+
+// Eliminar la propia cuenta (v43): confirmación escrita "ELIMINAR".
+await page.click('.mobile-nav-item[data-mobile-view="profile"]'); await page.waitForTimeout(600);
+await page.evaluate(() => { const d = document.getElementById('cloudAccountCard')?.closest('details'); if (d) d.open = true; });
+step('Botón de eliminar cuenta visible con sesión', await page.isVisible('#deleteCloudAccount'));
+await page.click('#deleteCloudAccount'); await page.waitForTimeout(1800);
+step('Cuenta y datos en cascada eliminados', sql(`select (select count(*) from auth.users where id='aaaaaaaa-0000-0000-0000-000000000001')||'|'||(select count(*) from community_profiles where user_id='aaaaaaaa-0000-0000-0000-000000000001')||'|'||(select count(*) from community_messages where sender_id='aaaaaaaa-0000-0000-0000-000000000001')`) === '0|0|0');
+step('La otra cuenta no se toca', sql(`select count(*) from auth.users where id='bbbbbbbb-0000-0000-0000-000000000002'`) === '1');
+step('Datos locales del dispositivo se conservan', await page.evaluate(() => Boolean(localStorage.getItem('fittforma-ai-v4'))));
 step('Sin errores de página', errors.length === 0, errors.slice(0, 4).join(' || '));
 await browser.close();

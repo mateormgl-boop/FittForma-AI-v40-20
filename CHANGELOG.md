@@ -1,5 +1,17 @@
 # FittForma AI — Registro de cambios
 
+## v43.0 — Diseño según referencias, FittAI que guía por la app y etapa 5 (18 de octubre de 2026)
+
+- Diseño: acento degradado azul-violeta, tarjetas con ilustración en Entrenar, Nutrición y Comunidad, tarjeta del plan actual, fichas de variación en Progreso (4 semanas vs. 4 previas), indicadores de la semana en Inicio, botón «+» con registro rápido y pantalla de bienvenida solo la primera vez.
+- Perfil: foto de perfil (JPG/PNG/WebP, recorte cuadrado de 256 px, guardada en el perfil local) y nivel por XP con fórmula pública basada en registros reales.
+- FittAI conoce todas las secciones y ofrece botones «Ir a…» hacia destinos permitidos (lista blanca compartida entre app y servidor, máx. 3). Sin IA configurada responde una guía local que se identifica como tal.
+- Nutrición «Plan y recetas»: plan semanal de comidas y 8 recetas con macros estimados; cargar una receta en el formulario de registro.
+- Comunidad: moderación de denuncias (descartar o eliminar publicación) solo para cuentas agregadas por SQL a `community_moderators`.
+- Cuenta: eliminar la cuenta en la nube con confirmación escrita «ELIMINAR» (borra archivos de Storage y, en cascada, todos los datos de la base); los datos del dispositivo se conservan salvo que se pida lo contrario.
+- Traducción de mensajes dinámicos (saludo, faltantes para insignias, niveles, actividad semanal).
+- Migración aditiva `supabase/migrations/2026-10-18_v43_moderation_account_deletion.sql`.
+- Pruebas: 185 automáticas, 107 comprobaciones de integración en navegador (móvil y escritorio), 64 SQL/RLS y 31 E2E de Comunidad (incluye moderación y eliminación de cuenta).
+
 ## v42.1 — Períodos, cuerpo, notificaciones y FittAI con contexto (17 de octubre de 2026)
 
 - Progreso: actividad por 7 días, 4 o 12 semanas con comparación contra el período anterior equivalente (running manual vs GPS); peso por 1/3/6 meses o todo.
