@@ -1,3 +1,21 @@
+## v47.0 — Estado (rediseño completo y Etapa 9)
+
+**Verificado en este entorno**
+- `npm test`: 200 pruebas, 0 fallidas. Integración en Chromium: 115/115. Flujos críticos: 22/22. Comunidad E2E con PostgREST: 33/33. SQL/RLS: 91 comprobaciones.
+- Contraste WCAG AA medido en el navegador, tema claro y oscuro, a 390 y 1366 px: sin fallas.
+- Barrido de desbordes en español y alemán de 360 a 1366 px: sin problemas.
+- Arranque como en Render (`npm start`): `/healthz` informa 0.47.0, no se sirven archivos privados y un POST desde otro origen se rechaza.
+- Revisión final con impeccable (revisor independiente) y arreglos aplicados.
+
+**No verificado (requiere tu entorno)**
+- Supabase real, Gemini con clave, el servicio de Render, GPS/cámara y la PWA instalada en un teléfono.
+
+**Pendientes y límites conocidos**
+- El logo es una recreación en vector (`assets/brand/logo-mark.svg`); falta el archivo original.
+- Los rótulos chicos sobre los títulos (por ejemplo «NUTRICIÓN» sobre «Tu alimentación») se mantienen porque están en las referencias; impeccable recomienda quitarlos. Decisión del dueño.
+- Las ilustraciones de los tipos de comida en «Plan y recetas» son dibujos genéricos; no hay fotos propias de comidas.
+- El CSS conserva capas históricas debajo de `design.css`; conviene consolidarlas más adelante.
+
 ## v42.0 — Estado
 
 Ver `docs/AUDITORIA_v42.md` (matriz completa). Verificado: 175 pruebas automáticas, 55 comprobaciones de integración en Chromium (móvil y escritorio), 44 SQL/RLS locales, 22 pasos E2E de Comunidad y barrido visual sin desbordes ni errores.

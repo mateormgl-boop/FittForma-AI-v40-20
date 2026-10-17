@@ -357,3 +357,12 @@ body{font-feature-settings:"cv11","ss01"}
 .community-status[data-state="warn"] details p{margin:6px 0 0;color:var(--text-2);font-size:12px}
 /* Room under the last content so the + button never covers a primary action */
 @media (max-width:899px){main,.app-main,#app{padding-bottom:calc(150px + env(safe-area-inset-bottom))!important}}
+/* Progreso tiles: each tint is the colour of the section its data comes from */
+.t-strength{background:linear-gradient(150deg,rgba(10,104,214,.16),var(--ff-card))!important}.t-strength span{color:var(--t-blue)!important}
+.t-endurance{--teal-ink:#07705f;background:linear-gradient(150deg,rgba(8,120,106,.16),var(--ff-card))!important}.t-endurance span{color:var(--teal-ink)!important}
+:root:not([data-theme="light"]) .t-endurance{--teal-ink:#6fe0cc}
+.t-habits{background:var(--ff-panel-2)!important}.t-habits span{color:var(--text-2)!important}
+.t-consistency{background:linear-gradient(150deg,rgba(106,76,242,.18),var(--ff-card))!important}.t-consistency span{color:var(--t-violet)!important}
+/* Comunidad tabs on phones: labels only, and a fade that shows the row scrolls */
+@media (max-width:599px){.community-subtab-icon{display:none!important}.community-subtab{padding:8px 12px!important}.community-subnav{-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent);padding-right:28px!important}}
+.hero-progress,.hero-profile,.hero-coach{min-height:0!important}

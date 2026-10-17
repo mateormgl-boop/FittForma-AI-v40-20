@@ -1856,7 +1856,7 @@
     <button type="button" class="subnav-item" data-subview="running">Correr</button>
     <button type="button" class="subnav-item" data-subview="coach">FittAI</button>
   </nav>
-      <div class="section-hero hero-coach"><div><small>Asistente</small><h2>FittAI</h2><p>Tu asistente de entrenamiento, running, nutrición y progreso. Las propuestas solo se aplican si las aprobás.</p></div></div>
+      <div class="section-hero hero-coach"><div><h2>FittAI</h2><p>Tu asistente de entrenamiento, running, nutrición y progreso. Las propuestas solo se aplican si las aprobás.</p></div></div>
       <div class="notice"><strong>Estado del entrenador:</strong> <span id="coachConnection" role="status">Comprobando conexión…</span><br><span class="small">La IA real requiere el backend y una clave privada configurada en el servidor. Nunca la pegues acá en el chat ni en la página.</span></div>
       <div class="card"><label class="reminder-pref-row coach-share"><input id="coachShareData" type="checkbox" checked><span><strong>Usar mis registros en las respuestas</strong><br><span class="muted small">Perfil, objetivos, plan, rutinas, últimas sesiones y carreras, peso, resumen nutricional, agua e insignias. Si lo desactivás, FittAI solo recibe tu mensaje.</span></span></label><div id="coachMessages" class="chat-log" aria-live="polite"></div><div class="quick-prompts"><button type="button" class="btn secondary quickPrompt" data-prompt="¿Qué puedo hacer en la app y dónde está cada cosa?">¿Qué puedo hacer?</button><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero ajustar mi rutina a mi tiempo disponible.">Ajustar rutina</button><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero mejorar mi alimentación para mi objetivo.">Mejorar alimentación</button><button type="button" class="btn secondary quickPrompt" data-prompt="Esta semana tengo menos energía.">Tengo menos energía</button><button type="button" class="btn secondary quickPrompt" data-prompt="Analizá mi progreso reciente y sugerime el próximo paso seguro, usando solo los datos que tengo registrados.">Analizar mi progreso</button></div><form id="coachForm" class="chat-form"><label class="sr-only" for="coachInput">Mensaje para el entrenador</label><input id="coachInput" maxlength="500" placeholder="Contale qué necesitás…" autocomplete="off"><button class="btn" type="submit">Enviar</button></form><div class="coach-usage" id="coachUsage" aria-live="polite"><p id="coachUsageText">La opción de anuncios todavía no está configurada.</p><button class="btn secondary" id="watchRewardedAd" type="button" hidden>Ver anuncio y obtener 3 consultas</button></div></div>
       <div id="proposalArea"></div>
@@ -1966,7 +1966,7 @@
     </section>
 
     <section class="view" id="view-progress">
-      <div class="section-hero hero-progress"><div><small>Progreso</small><h2>Tu progreso</h2><p>Evolución, marcas e insignias, con tus datos reales.</p></div></div>
+      <div class="section-hero hero-progress"><div><h2>Tu progreso</h2><p>Evolución, marcas e insignias, con tus datos reales.</p></div></div>
       <nav class="ff-segmented progress-subnav" role="tablist" aria-label="Secciones de Progreso">
         <button type="button" role="tab" class="ff-seg active" id="progressTabSummary" data-progress-tab="summary" aria-controls="progressPanelSummary" aria-selected="true">Resumen</button>
         <button type="button" role="tab" class="ff-seg" id="progressTabBadges" data-progress-tab="badges" aria-controls="progressPanelBadges" aria-selected="false" tabindex="-1">Insignias</button>
@@ -2117,7 +2117,7 @@
       </section>
     </section>
     <section class="view" id="view-profile">
-      <div class="section-hero hero-profile"><div><small>Perfil</small><h2>Tu perfil</h2><p>Tus datos, objetivos y configuración.</p></div></div>
+      <div class="section-hero hero-profile"><div><h2>Tu perfil</h2><p>Tus datos, objetivos y configuración.</p></div></div>
       <div class="card" id="profileIdentityCard">
         <div class="profile-identity-row"><div class="profile-avatar-wrap"><div class="profile-avatar" id="profileAvatar" aria-hidden="true" data-avatar>FF</div><label class="avatar-edit" for="avatarInput" title="Cambiar foto de perfil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span class="sr-only">Cambiar foto de perfil</span></label><input id="avatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden></div><div class="profile-identity-copy"><h3 id="profileDisplayName">Tu perfil FittForma</h3><p class="muted small" id="profileDisplayGoal">Tu progreso, a tu manera</p></div></div>
         <div class="profile-level" id="profileLevel"></div>
