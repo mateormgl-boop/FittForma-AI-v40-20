@@ -39,6 +39,7 @@ page.on('console', m => { if (m.type() === 'error' && !/leaflet|ERR_FAILED|unpkg
 page.on('dialog', d => d.accept());
 await page.addInitScript(s => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('fittforma-ai-v4', s); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(seed));
 await page.route(/unpkg\.com/, r => r.abort());
+await page.addInitScript(() => localStorage.setItem('fittforma-welcome-v1', '1'));
 await page.route(/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js/, r => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(process.env.SUPABASE_UMD) }));
 await page.route('**/api/public-config', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ version: APP_VERSION, supabase: { configured: true, url: SUPA, anonKey: ANON, keyType: 'legacy_anon' }, missing: [], issue: null }) }));
 await page.route(`${SUPA}/rest/v1/**`, async route => {

@@ -17,6 +17,7 @@ for (const [w, h, label] of [[390, 844, 'móvil'], [1366, 900, 'escritorio']]) {
   page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|leaflet|unpkg|jsdelivr/i.test(m.text())) errors.push(m.text()); });
   page.on('dialog', d => d.accept());
   await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
+  await page.addInitScript(() => localStorage.setItem('fittforma-welcome-v1', '1'));
   await page.goto(APP + '/'); await page.evaluate(k => localStorage.removeItem(k), KEY); await page.reload(); await page.waitForTimeout(500);
   const st = () => page.evaluate(k => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
   const go = async view => { const sel = w < 761 ? `.mobile-nav-item[data-mobile-view="${view}"]` : `.tab[data-view="${view}"]`; await page.click(sel); await page.waitForTimeout(200); };
