@@ -80,8 +80,8 @@ test('todos los botones estáticos y de plantillas declaran su tipo para no envi
 });
 
 test('versiones visibles del pie de página y traducciones están alineadas', () => {
-  assert.match(html, /Versión 45\.0/);
-  assert.match(i18n, /VERSION 45\.0 · ONLINE FITNESS COMMUNITY/);
+  assert.match(html, /Versión 46\.0/);
+  assert.match(i18n, /VERSION 46\.0 · ONLINE FITNESS COMMUNITY/);
   assert.doesNotMatch(html, /Versión 26\.0|Versión 25\.0|Versión 24\.0|Versión 23\.0/);
   assert.doesNotMatch(i18n, /Version 23\.0|Versão 23\.0|Versione 23\.0/);
 });
@@ -164,7 +164,7 @@ test('v40.7: los SVG generados que no demuestran de forma fiable la biomecánica
 
 test('la PWA tolera recursos estáticos opcionales no disponibles durante la instalación', () => {
   assert.match(sw, /Promise\.allSettled\(ASSETS\.map\(asset=>cache\.add\(asset\)\)\)/);
-  assert.match(sw, /fittforma-ai-static-v45-0/);
+  assert.match(sw, /fittforma-ai-static-v46-0/);
 });
 
 test('los estilos móviles protegen desbordamientos y el scroll de menús/modales', () => {
@@ -337,14 +337,14 @@ test('v36.1 mantiene válidos los metadatos y las traducciones del perfil/Pro', 
   const manifest = JSON.parse(await read('manifest.json'));
   const rootPackage = JSON.parse(await read('package.json'));
   const backendPackage = JSON.parse(await read('backend/package.json'));
-  assert.equal(rootPackage.version, '0.45.0');
-  assert.equal(backendPackage.version, '0.45.0');
+  assert.equal(rootPackage.version, '0.46.0');
+  assert.equal(backendPackage.version, '0.46.0');
   assert.equal(manifest.theme_color, '#080d18');
   assert.equal(manifest.background_color, '#080d18');
-  assert.match(i18n, /VERSION 45\.0 · ONLINE FITNESS COMMUNITY/i);
+  assert.match(i18n, /VERSION 46\.0 · ONLINE FITNESS COMMUNITY/i);
   assert.match(server, /GEMINI_MODEL\|\|'gemini-3\.8-flash'/);
   assert.match(await read('render.yaml'), /value: gemini-3\.8-flash/);
-  assert.match(sw, /const CACHE = 'fittforma-ai-static-v45-0'/);
+  assert.match(sw, /const CACHE = 'fittforma-ai-static-v46-0'/);
 });
 
 
@@ -372,7 +372,7 @@ test('v36.1 conserva identidad visual propia y perfil local editable', () => {
   assert.match(html, /identityForm/);
   assert.match(html, /displayName/);
   assert.match(html, /focusGoal/);
-  assert.match(sw, /fittforma-ai-static-v45-0/);
+  assert.match(sw, /fittforma-ai-static-v46-0/);
 });
 
 
@@ -389,7 +389,7 @@ test('v36.1 incluye preferencias completas de recordatorios y estado de permisos
   assert.match(html, /Notification\.requestPermission\(\)/);
   assert.match(html, /registration\.showNotification/);
   assert.match(sw, /notificationclick/);
-  assert.match(sw, /fittforma-ai-static-v45-0/);
+  assert.match(sw, /fittforma-ai-static-v46-0/);
 });
 
 test('v36.1 evita avisos duplicados y no marca entrenamientos como pendientes si hubo actividad', () => {

@@ -1,5 +1,16 @@
 # FittForma AI — Registro de cambios
 
+## v46.0 — Etapa 8: ajustes de diseño (17 de octubre de 2026)
+
+- Pulido con la skill *impeccable* (`audit` + `polish`), conservando el diseño de las referencias.
+- Contraste: el degradado de acento se oscurece un paso para que el texto blanco pase 4.5:1 (antes 4.43:1); insignia de nivel, placeholders (4.2 → 5.6:1) y días del calendario corregidos.
+- Tamaño mínimo de 11 px para rótulos que estaban entre 8 y 10,5 px (barra inferior, calendario, métricas, Progreso, Correr); pie de página a 12 px.
+- Profundidad con sombras desplazadas en vez de halos de color; sin texto con degradado.
+- Superficies del navegador con la paleta: selección de texto, cursor, foco visible, barra de desplazamiento y números tabulares.
+- Detector de impeccable: de 143 a menos de 90 avisos; los restantes son reglas antiguas ya reemplazadas en pantalla o decisiones del diseño de referencia (rótulos sobre los títulos).
+- `.claude/settings.json` registra el marketplace `pbakaus/impeccable` y activa el plugin para las próximas sesiones.
+- Pruebas: 200 automáticas, 115 integración, 22 flujos críticos, 91 SQL/RLS y 33 Comunidad; barrido visual en español y alemán de 360 a 1366 px.
+
 ## v45.0 — Etapa 7: pruebas (17 de octubre de 2026)
 
 - Nueva prueba de flujos críticos (`tests/e2e/flows.e2e.mjs`): generar plan, propuesta de FittAI (aprobar, deshacer, rechazar), GPS simulado, foto de comida, hábitos, exportar → borrar → importar, idiomas, fechas localizadas y uso sin conexión.

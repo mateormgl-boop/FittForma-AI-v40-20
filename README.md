@@ -1,8 +1,13 @@
-# FittForma AI — v45.0
+# FittForma AI — v46.0
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v46.0
+
+- Etapa 8, ajustes de diseño con la skill *impeccable*: mejor contraste, textos legibles (mínimo 11 px) y profundidad sin halos, con el mismo diseño.
+- La skill queda configurada en `.claude/settings.json` (marketplace `pbakaus/impeccable`).
 
 ## Novedades v45.0
 
@@ -67,7 +72,7 @@ Pruebas en navegador (con `npm start` en otra terminal): `npm run test:e2e` (int
    `insert into public.community_moderators(user_id) values ('UUID-DEL-USUARIO');`
 2. **Render**: variables `GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL` y una clave pública
    (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`). Nunca `service_role`/`sb_secret_`.
-3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v45-0`
+3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v46-0`
    y la app ofrece actualizar.
 
 ## Documentación
