@@ -319,6 +319,36 @@
     if(error&&!isMissingColumn(error))console.warn('No se pudieron marcar los mensajes como leídos:',error.message);
     await loadUnread();
   }
+  // v43: moderación. Solo visible si la base confirma que la cuenta es moderadora (RLS en el servidor).
+  async function loadModeration(){
+    const card=$('communityModerationCard'),root=$('communityReportsList');if(!card||!root)return;
+    if(!authReady()){card.hidden=true;return;}
+    const check=await client.rpc('community_is_moderator');
+    if(check.error||check.data!==true){card.hidden=true;if(check.error&&!/community_is_moderator|PGRST202|42883/i.test(String(check.error.message)+String(check.error.code)))console.warn('No se pudo comprobar el rol de moderación:',check.error.message);return;}
+    card.hidden=false;root.textContent='Cargando denuncias…';
+    const {data:reports,error}=await client.from('community_reports').select('id,post_id,reason,created_at,status').eq('status','open').order('created_at',{ascending:true}).limit(50);
+    if(error){root.textContent=friendlySupabaseError(error,'cargar las denuncias');return;}
+    if(!reports?.length){root.textContent='No hay denuncias abiertas.';return;}
+    const ids=[...new Set(reports.map(r=>r.post_id))];
+    const posts=await client.from('community_posts').select('id,user_id,description,post_kind,created_at').in('id',ids);
+    const byId=new Map((posts.data||[]).map(p=>[p.id,p]));
+    const authors=[...new Set((posts.data||[]).map(p=>p.user_id))];
+    const profs=authors.length?await client.from('community_profiles').select('user_id,username,display_name').in('user_id',authors):{data:[]};
+    const who=new Map((profs.data||[]).map(p=>[p.user_id,p]));
+    root.innerHTML=reports.map(r=>{const post=byId.get(r.post_id),a=post?who.get(post.user_id):null;return `<div class="community-report"><strong>${esc(r.reason)}</strong><div class="muted small">${esc(dateLabel(String(r.created_at).slice(0,10)))} · ${post?`${esc(post.post_kind||'transformation')} de @${esc(a?.username||'usuario')}`:'publicación no disponible'}</div>${post?.description?`<p>${esc(post.description.slice(0,280))}</p>`:''}<div class="btn-row"><button class="btn ghost btn-sm" type="button" data-report-dismiss="${esc(r.id)}">Descartar</button>${post?`<button class="btn danger btn-sm" type="button" data-report-remove="${esc(post.id)}">Eliminar publicación</button>`:''}</div></div>`;}).join('');
+  }
+  async function moderationAction(e){
+    const b=e.target.closest('button');if(!b)return;
+    if(b.dataset.reportDismiss){b.disabled=true;const {error}=await client.from('community_reports').update({status:'dismissed'}).eq('id',b.dataset.reportDismiss);if(error){setStatus('communityProfileStatus',friendlySupabaseError(error,'descartar la denuncia'));b.disabled=false;return;}await loadModeration();}
+    else if(b.dataset.reportRemove){
+      if(!confirm('¿Eliminar esta publicación para todos? También se borran sus fotos, comentarios y me gusta.'))return;b.disabled=true;
+      const id=b.dataset.reportRemove,{data}=await client.from('community_posts').select('before_path,after_path,image_path').eq('id',id).maybeSingle();
+      const {error}=await client.from('community_posts').delete().eq('id',id);
+      if(error){setStatus('communityProfileStatus',friendlySupabaseError(error,'eliminar la publicación'));b.disabled=false;return;}
+      const paths=[data?.before_path,data?.after_path,data?.image_path].filter(Boolean);if(paths.length){const r=await client.storage.from(bucket).remove(paths);if(r.error)console.warn('No se pudieron borrar las fotos de la publicación eliminada:',r.error.message);}
+      await loadModeration();await loadFeed();
+    }
+  }
   function bindFeedActions(root=$('communityFeed')){
     if(!root)return;
     root.querySelectorAll('[data-community-like]').forEach(b=>b.addEventListener('click',()=>toggleLike(b.dataset.communityLike)));
@@ -370,7 +400,7 @@
   async function emailLogin(e){e.preventDefault();if(!client)return setStatus('communityEmailStatus',authHint());const email=$('communityEmail').value.trim(),password=$('communityPassword').value;const {error}=await client.auth.signInWithPassword({email,password});if(error){setStatus('communityEmailStatus',`No se pudo iniciar sesión: ${error.message}`);return;}$('communityPassword').value='';setStatus('communityEmailStatus','Sesión iniciada.');}
   async function emailRegister(){if(!client)return setStatus('communityEmailStatus',authHint());const email=$('communityEmail').value.trim(),password=$('communityPassword').value;if(!email||password.length<8)return setStatus('communityEmailStatus','Ingresá un correo válido y una contraseña de al menos 8 caracteres.');const {data,error}=await client.auth.signUp({email,password});if(error){setStatus('communityEmailStatus',`No se pudo crear la cuenta: ${error.message}`);return;}if(data.session)setStatus('communityEmailStatus','Cuenta creada y sesión iniciada.');else setStatus('communityEmailStatus','Cuenta creada. Revisá tu correo para confirmar la dirección antes de iniciar sesión.');}
   async function googleLogin(){if(!client)return setStatus('communityProfileStatus',authHint());const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href.split('#')[0]}});if(error)setStatus('communityProfileStatus',`No se pudo iniciar con Google: ${error.message}`);}
-  async function refresh(){if(!client){setControls();return;}if(user){try{await ensureProfile();await loadFollowRequests();}catch(e){setStatus('communityProfileStatus',`No se pudo preparar el perfil: ${e.message}`);}}setControls();await loadFeed();await loadChatContacts();await loadBlockedUsers();updateKindAvailability();renderPostPreview();}
+  async function refresh(){if(!client){setControls();return;}if(user){try{await ensureProfile();await loadFollowRequests();}catch(e){setStatus('communityProfileStatus',`No se pudo preparar el perfil: ${e.message}`);}}setControls();await loadFeed();await loadChatContacts();await loadBlockedUsers();updateKindAvailability();renderPostPreview();await loadModeration();}
   function init(supabase,userSession,diagnostic=''){client=supabase||null;user=userSession||null;connectionMessage=client?'':String(diagnostic||connectionMessage||'');connectionStatus(client?'Cliente de Supabase inicializado. Comprobando tablas y permisos de Comunidad…':(diagnostic||'Supabase todavía no está conectado.'));setControls();if(client)return refresh();return loadFeed();}
   async function testConnection(){
     if(!client)return {ok:false,stage:'config',message:authHint()};
@@ -418,7 +448,7 @@
       searchTerm='';if($('communitySearch'))$('communitySearch').value='';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communitySearchPosts'))$('communitySearchPosts').innerHTML='';
       if(client)loadFeed();
     }else if(name==='messages'&&client){loadChatContacts();}
-    else if(name==='profile'&&authReady()){loadFollowRequests();loadBlockedUsers();}
+    else if(name==='profile'&&authReady()){loadFollowRequests();loadBlockedUsers();loadModeration();}
     else if(name==='publish'){fillAchievementOptions();renderPostPreview();}
   }
   function bindCommunitySubnavigation(){
@@ -440,7 +470,7 @@
     $('communityTextPostForm')?.addEventListener('submit',createKindPost);$('communityAchievementPostForm')?.addEventListener('submit',createKindPost);
     ['communityTextBody','communityTextImage','communityAchievementSelect','communityAchievementComment'].forEach(id=>{const el=$(id);if(el){el.addEventListener('input',renderPostPreview);el.addEventListener('change',renderPostPreview);}});
     window.addEventListener('fittforma:badgeschange',()=>{fillAchievementOptions();renderPostPreview();});
-    setPostKind('text');
+    setPostKind('text');$('communityReportsList')?.addEventListener('click',moderationAction);
     const today=localDateKey();if($('communityEndDate'))$('communityEndDate').value=today;if($('communityStartDate'))$('communityStartDate').value=today;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();

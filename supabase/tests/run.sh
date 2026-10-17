@@ -21,6 +21,11 @@ values('eeeeeeee-0000-0000-0000-000000000005','2026-01-01','2026-03-01','eeeeeee
 SQL
 for m in "$root"/migrations/*.sql; do run "$m"; run "$m"; done   # dos veces: debe ser re-ejecutable
 psql -d "$url" -v ON_ERROR_STOP=1 -qAtc "select case when post_kind='transformation' then 'legacy ok' else 'legacy MAL' end from public.community_posts where user_id='eeeeeeee-0000-0000-0000-000000000005'"
-out="$(psql -d "$url" -v ON_ERROR_STOP=1 -q -f "$here/rls_v41_test.sql" 2>&1)" || { echo "$out" | grep -E "OK|FALLO|ERROR"; echo "RESULTADO: FALLÓ"; exit 1; }
+out=""
+for t in "$here"/rls_v4*_test.sql; do
+  part="$(psql -d "$url" -v ON_ERROR_STOP=1 -q -f "$t" 2>&1)" || { echo "$part" | grep -E "OK|FALLO|ERROR"; echo "RESULTADO: FALLÓ en $(basename "$t")"; exit 1; }
+  out="$out
+$part"
+done
 echo "$out" | grep -E "OK|PASARON"
 echo "RESULTADO: OK ($(echo "$out" | grep -c 'OK') comprobaciones)"

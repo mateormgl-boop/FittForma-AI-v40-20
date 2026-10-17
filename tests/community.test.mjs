@@ -8,7 +8,7 @@ const read=f=>readFile(path.join(root,f),'utf8');
 
 test('v40 incluye recursos de comunidad y precaché PWA versionado',async()=>{
   for(const f of ['community.js','supabase/community.sql'])await access(path.join(root,f));
-  const sw=await read('sw.js');const m=sw.match(/const ASSETS = (\[[\s\S]*?\]);/);assert.ok(m);assert.ok(JSON.parse(m[1]).includes('./community.js'));assert.match(sw,/fittforma-ai-static-v42-1/);
+  const sw=await read('sw.js');const m=sw.match(/const ASSETS = (\[[\s\S]*?\]);/);assert.ok(m);assert.ok(JSON.parse(m[1]).includes('./community.js'));assert.match(sw,/fittforma-ai-static-v43-0/);
 });
 
 test('la interfaz comunitaria incluye perfil privado, transformaciones, feed y acciones sociales',async()=>{
@@ -30,8 +30,8 @@ test('validación de fotos y fechas se realiza antes de publicar',async()=>{
 });
 
 test('las versiones visibles, traducciones y paquetes coinciden en 41.0',async()=>{
-  const a=JSON.parse(await read('package.json')),b=JSON.parse(await read('backend/package.json'));assert.equal(a.version,'0.42.1');assert.equal(b.version,'0.42.1');
-  const html=await read('index.html');assert.match(html,/Versión 42\.1/);assert.match(html,/V42\.1/);const i18n=await read('i18n.js');assert.match(i18n,/VERSION 42\.1 · ONLINE FITNESS COMMUNITY/);assert.match(i18n,/VERSION 42\.1 · ONLINE FITNESS COMMUNITY/);
+  const a=JSON.parse(await read('package.json')),b=JSON.parse(await read('backend/package.json'));assert.equal(a.version,'0.43.0');assert.equal(b.version,'0.43.0');
+  const html=await read('index.html');assert.match(html,/Versión 43\.0/);assert.match(html,/V43\.0/);const i18n=await read('i18n.js');assert.match(i18n,/VERSION 43\.0 · ONLINE FITNESS COMMUNITY/);assert.match(i18n,/VERSION 43\.0 · ONLINE FITNESS COMMUNITY/);
 });
 
 test('la búsqueda pública limita la información de perfiles privados y el seguimiento pasa por aprobación',async()=>{
@@ -49,7 +49,7 @@ test('v40 conserva el chat y usa un ranking orgánico por actividad',async()=>{
   assert.match(js,/community_messages/);assert.match(js,/loadChatContacts/);assert.match(js,/community_ranked_post_ids/);
   assert.match(sql,/community_are_mutual_follows/);assert.match(sql,/community_messages_insert_mutual/);assert.match(sql,/community_messages_read_mutual/);
   assert.match(sql,/community_memberships/);assert.match(sql,/order by activity_score desc, d\.created_at desc/);assert.match(sql,/least\(e\.recent_posts,5\)\*2\.0/);assert.match(sql,/least\(e\.active_days,10\)\*1\.5/);assert.match(sql,/Pro is a badge only/);
-  assert.match(sql,/revoke insert,update,delete on public\.community_memberships from anon,authenticated/);assert.match(sw,/fittforma-ai-static-v42-1/);
+  assert.match(sql,/revoke insert,update,delete on public\.community_memberships from anon,authenticated/);assert.match(sw,/fittforma-ai-static-v43-0/);
 });
 
 test('chat exige seguimiento mutuo aceptado en ambos sentidos',async()=>{
@@ -68,7 +68,7 @@ test('la membresía Pro no puede activarse desde el cliente normal',async()=>{
 test('v40 ranking rewards regular activity, caps spam and diversifies authors',async()=>{
  const sql=await read('supabase/community.sql'),js=await read('community.js'),sw=await read('sw.js');
  assert.match(sql,/now\(\)-interval '30 days'/);assert.match(sql,/p\.created_at > now\(\)-interval '90 days'/);assert.match(sql,/least\(e\.recent_posts,5\)/);assert.match(sql,/least\(e\.active_days,10\)/);assert.match(sql,/least\(e\.recent_likes,20\)/);assert.match(sql,/least\(e\.recent_comments,10\)/);assert.match(sql,/row_number\(\) over\(partition by s\.user_id/);
- assert.match(js,/activityScore:Number\(r\.activity_score\)\|\|0/);assert.match(sw,/fittforma-ai-static-v42-1/);
+ assert.match(js,/activityScore:Number\(r\.activity_score\)\|\|0/);assert.match(sw,/fittforma-ai-static-v43-0/);
 });
 
 

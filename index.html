@@ -1637,6 +1637,13 @@
     .profile-menu button{display:flex;align-items:center;gap:12px;min-height:50px;padding:0 4px;border:0;border-bottom:1px solid var(--ff-line);background:none;color:var(--ff-text);font-size:15px;text-align:left}
     .profile-menu svg{width:20px;height:20px;fill:none;stroke:#b9a8ff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.profile-menu span{margin-left:auto;color:var(--ff-muted);font-size:20px}
 
+    .bubble-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+    .bubble-go{min-height:34px;padding:0 12px;border-radius:999px;border:1px solid rgba(122,92,255,.55);background:rgba(122,92,255,.14);color:#e3dcff;font-size:13px;font-weight:600}
+    .recipe{border:1px solid var(--ff-line);border-radius:16px;margin-bottom:8px;background:rgba(255,255,255,.02)}
+    .recipe>summary{display:flex;align-items:center;gap:12px;padding:10px;cursor:pointer;list-style:none}.recipe>summary::-webkit-details-marker{display:none}
+    .recipe>summary img{border-radius:14px;flex:none}.recipe>summary strong{display:block}.recipe>summary small{color:var(--ff-muted)}
+    .recipe-body{padding:0 14px 14px}.recipe-body h5{margin:10px 0 4px}.recipe-body ul,.recipe-body ol{margin:0;padding-left:20px;font-size:14px;color:#d3daf0}
+    .community-report{padding:12px;border:1px solid var(--ff-line);border-radius:14px;margin-top:8px}
     /* Botón + flotante y hoja */
     .ff-fab{display:none}
     @media(max-width:760px){
@@ -1815,7 +1822,7 @@
   </nav>
       <div class="section-head"><div><h2>FittAI</h2><p>Tu asistente de entrenamiento, running, nutrición y progreso. Las propuestas solo se aplican si las aprobás.</p></div></div>
       <div class="notice"><strong>Estado del entrenador:</strong> <span id="coachConnection" role="status">Comprobando conexión…</span><br><span class="small">La IA real requiere el backend y una clave privada configurada en el servidor. Nunca la pegues acá en el chat ni en la página.</span></div>
-      <div class="card"><label class="reminder-pref-row coach-share"><input id="coachShareData" type="checkbox" checked><span><strong>Usar mis registros en las respuestas</strong><br><span class="muted small">Perfil, objetivos, plan, rutinas, últimas sesiones y carreras, peso, resumen nutricional, agua e insignias. Si lo desactivás, FittAI solo recibe tu mensaje.</span></span></label><div id="coachMessages" class="chat-log" aria-live="polite"></div><div class="quick-prompts"><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero ajustar mi rutina a mi tiempo disponible.">Ajustar rutina</button><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero mejorar mi alimentación para mi objetivo.">Mejorar alimentación</button><button type="button" class="btn secondary quickPrompt" data-prompt="Esta semana tengo menos energía.">Tengo menos energía</button><button type="button" class="btn secondary quickPrompt" data-prompt="Analizá mi progreso reciente y sugerime el próximo paso seguro, usando solo los datos que tengo registrados.">Analizar mi progreso</button></div><form id="coachForm" class="chat-form"><label class="sr-only" for="coachInput">Mensaje para el entrenador</label><input id="coachInput" maxlength="500" placeholder="Contale qué necesitás…" autocomplete="off"><button class="btn" type="submit">Enviar</button></form><div class="coach-usage" id="coachUsage" aria-live="polite"><p id="coachUsageText">La opción de anuncios todavía no está configurada.</p><button class="btn secondary" id="watchRewardedAd" type="button" hidden>Ver anuncio y obtener 3 consultas</button></div></div>
+      <div class="card"><label class="reminder-pref-row coach-share"><input id="coachShareData" type="checkbox" checked><span><strong>Usar mis registros en las respuestas</strong><br><span class="muted small">Perfil, objetivos, plan, rutinas, últimas sesiones y carreras, peso, resumen nutricional, agua e insignias. Si lo desactivás, FittAI solo recibe tu mensaje.</span></span></label><div id="coachMessages" class="chat-log" aria-live="polite"></div><div class="quick-prompts"><button type="button" class="btn secondary quickPrompt" data-prompt="¿Qué puedo hacer en la app y dónde está cada cosa?">¿Qué puedo hacer?</button><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero ajustar mi rutina a mi tiempo disponible.">Ajustar rutina</button><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero mejorar mi alimentación para mi objetivo.">Mejorar alimentación</button><button type="button" class="btn secondary quickPrompt" data-prompt="Esta semana tengo menos energía.">Tengo menos energía</button><button type="button" class="btn secondary quickPrompt" data-prompt="Analizá mi progreso reciente y sugerime el próximo paso seguro, usando solo los datos que tengo registrados.">Analizar mi progreso</button></div><form id="coachForm" class="chat-form"><label class="sr-only" for="coachInput">Mensaje para el entrenador</label><input id="coachInput" maxlength="500" placeholder="Contale qué necesitás…" autocomplete="off"><button class="btn" type="submit">Enviar</button></form><div class="coach-usage" id="coachUsage" aria-live="polite"><p id="coachUsageText">La opción de anuncios todavía no está configurada.</p><button class="btn secondary" id="watchRewardedAd" type="button" hidden>Ver anuncio y obtener 3 consultas</button></div></div>
       <div id="proposalArea"></div>
     </section>
 
@@ -1895,7 +1902,7 @@
       <nav class="ff-segmented" role="tablist" aria-label="Secciones de Nutrición">
         <button type="button" role="tab" class="ff-seg active" data-view-tab="hoy" aria-selected="true">Hoy</button>
         <button type="button" role="tab" class="ff-seg" data-view-tab="registrar" aria-selected="false" tabindex="-1">Registrar</button>
-        <button type="button" role="tab" class="ff-seg" data-view-tab="plan" aria-selected="false" tabindex="-1">Objetivos</button>
+        <button type="button" role="tab" class="ff-seg" data-view-tab="plan" aria-selected="false" tabindex="-1">Plan y recetas</button>
         <button type="button" role="tab" class="ff-seg" data-view-tab="historial" aria-selected="false" tabindex="-1">Historial</button>
       </nav>
       <div class="view-panel" role="tabpanel" data-view-panel="hoy">
@@ -1913,6 +1920,8 @@
       <div class="view-panel" role="tabpanel" data-view-panel="plan" hidden>
       <div class="card"><div class="eyebrow">Objetivos diarios orientativos</div><div class="grid2"><div class="field"><label for="calorieGoal">Calorías (kcal)</label><input id="calorieGoal" type="number" min="800" max="6000" step="50" value="2400"></div><div class="field"><label for="proteinGoal">Proteínas (g)</label><input id="proteinGoal" type="number" min="20" max="400" step="5" value="120"></div><div class="field"><label for="carbGoal">Carbohidratos (g)</label><input id="carbGoal" type="number" min="0" max="800" step="5" value="280"></div><div class="field"><label for="fatGoal">Grasas (g)</label><input id="fatGoal" type="number" min="0" max="300" step="5" value="80"></div></div><button class="btn secondary full" id="estimateNutritionGoals" type="button">Calcular objetivos con mi perfil</button><button type="button" class="btn full" id="saveNutritionGoals">Guardar objetivos</button><p id="nutritionGoalHint" class="muted small" aria-live="polite">Podés calcular una referencia con edad, altura, peso actual, objetivo de peso y actividad en Perfil. Revisá la propuesta antes de guardarla.</p><p class="muted small">Son estimaciones generales para adultos, no una prescripción médica o dietética. Para menores de 18 años, embarazo, enfermedades o necesidades específicas, consultá con un profesional.</p></div>
       <div class="card"><h3>Menú diario orientativo</h3><p class="muted small">Arma una propuesta con alimentos de la base local teniendo en cuenta tus objetivos de calorías y proteínas. No es una dieta clínica ni contempla alergias o condiciones médicas. Revisá ingredientes y porciones antes de agregarla.</p><button class="btn secondary full" id="generateMenu" type="button">Generar menú para hoy</button><div id="menuProposal"></div></div>
+      <div class="card" id="mealPlanCard"><div class="section-head"><div><div class="eyebrow">Plan semanal</div><h3>Tus comidas de la semana</h3><p class="muted small">Planificá por día. Nada se registra hasta que vos lo confirmes.</p></div></div><div class="ff-chips" id="mealPlanDays" role="group" aria-label="Día de la semana"></div><div class="field"><label for="mealPlanFavorite" class="sr-only">Agregar una comida favorita</label><select id="mealPlanFavorite"></select></div><div id="mealPlanList"></div></div>
+      <div class="card" id="recipesCard"><div class="section-head"><div><div class="eyebrow">Recetas</div><h3>Ideas con valores estimados</h3><p class="muted small">Cargalas en el registro o agregalas al plan del día elegido.</p></div></div><div id="recipeList" class="recipe-list"></div></div>
       </div>
       <div class="view-panel" role="tabpanel" data-view-panel="historial" hidden>
       <div class="card nutrition-week-card"><div class="section-head"><div><h3>Tu tendencia semanal</h3><p class="muted small">Compará tus registros recientes de comida e hidratación. Los días sin registro no se cuentan como cero consumo.</p></div><span class="tag">7 días</span></div><div id="nutritionWeekSummary" class="progress-insight-grid"></div><div class="nutrition-week-legend"><span><i class="nutrition-legend-cal"></i>Calorías vs. objetivo</span><span><i class="nutrition-legend-protein"></i>Proteína vs. objetivo</span><span><i class="nutrition-legend-water"></i>Vasos vs. objetivo</span></div><div id="nutritionWeekChart" class="nutrition-week-chart"></div><p class="muted small">Son estimaciones a partir de lo que registraste, no un análisis de tu alimentación completa. Verificá porciones, preparación y etiquetas.</p></div>
@@ -2067,6 +2076,7 @@
           <form id="communityEmailAuthForm" class="community-email-form"><div class="field"><label for="communityEmail">Correo electrónico</label><input id="communityEmail" type="email" maxlength="254" autocomplete="email" placeholder="tu@correo.com" required></div><div class="field"><label for="communityPassword">Contraseña</label><input id="communityPassword" type="password" minlength="8" maxlength="128" autocomplete="current-password" placeholder="Mínimo 8 caracteres" required></div><div class="btn-row"><button class="btn secondary" id="communityEmailLogin" type="submit">Iniciar sesión</button><button class="btn ghost" id="communityEmailRegister" type="button">Crear cuenta</button></div><div id="communityEmailStatus" class="community-status" role="status" aria-live="polite"></div></form>
           <p class="muted small">Google requiere configurar el proveedor en Supabase. Si el registro por correo pide confirmación, revisá tu bandeja de entrada.</p>
         </div>
+        <div class="card community-moderation" id="communityModerationCard" hidden><h3>Moderación</h3><p class="muted small">Denuncias abiertas. Solo lo ven las cuentas moderadoras asignadas por la persona dueña del proyecto.</p><div id="communityReportsList" class="muted small"></div></div>
         <div class="card community-profile-management"><h3>Solicitudes y privacidad</h3><div class="community-management-section"><strong>Solicitudes de seguimiento</strong><div id="communityFollowRequests" class="muted small">Iniciá sesión para administrar solicitudes.</div></div><div class="community-management-section"><strong>Usuarios bloqueados</strong><p class="muted small">Las cuentas bloqueadas no pueden ver tus publicaciones, seguirte ni enviarte mensajes mientras el bloqueo esté activo.</p><div id="communityBlockedList" class="muted small">Iniciá sesión para administrar los bloqueos.</div></div></div>
       </section>
     </section>
@@ -2152,7 +2162,7 @@
           <div class="field"><label for="cloudPassword">Contraseña</label><input id="cloudPassword" type="password" minlength="8" maxlength="128" autocomplete="current-password" placeholder="Mínimo 8 caracteres" required></div>
           <div class="btn-row"><button class="btn" id="cloudLogin" type="submit">Iniciar sesión</button><button class="btn secondary" id="cloudRegister" type="button">Crear cuenta</button><button class="btn ghost" id="cloudLogout" type="button" hidden>Cerrar sesión</button></div>
         </form>
-        <div class="btn-row" style="margin-top:12px"><button class="btn secondary" id="cloudDownload" type="button" disabled>Cargar datos de la nube</button><button class="btn secondary" id="cloudUpload" type="button" disabled>Guardar datos en la nube</button></div>
+        <div class="btn-row" style="margin-top:12px"><button class="btn secondary" id="cloudDownload" type="button" disabled>Cargar datos de la nube</button><button class="btn secondary" id="cloudUpload" type="button" disabled>Guardar datos en la nube</button></div><button class="btn danger full" id="deleteCloudAccount" type="button" hidden style="margin-top:12px">Eliminar mi cuenta en la nube</button><p class="muted small">Eliminar la cuenta borra definitivamente tu copia en la nube, tu perfil y contenido de Comunidad, mensajes y fotos subidas. Los datos de este dispositivo no se tocan salvo que lo elijas.</p>
         <p class="muted small">La sincronización es manual para evitar sobrescribir datos sin querer. Al cargar desde la nube, se reemplaza la copia local de este navegador. Usá solo una contraseña que no reutilices en otros servicios.</p>
       </div>
       </details>
@@ -2183,14 +2193,14 @@
         <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
         <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">42.1</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">43.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
       </details>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 42.1 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 43.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -2217,7 +2227,7 @@
   <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow">›</span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V42.1</p>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V43.0</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -2286,7 +2296,7 @@
   const PREVIOUS_V3_STORAGE = 'fittforma-ai-v3';
   const PREVIOUS_STORAGE = 'fittforma-ai-v2';
   const LEGACY_STORAGE = 'forma-prototype-v1';
-  const defaults = {routines:[],bodyMeasures:[],notifications:[],coachShareData:true,plannedActivities:[],mealFavorites:[],habitLogs:{},waterLogs:{},badgeRecords:[],badgeUnlocks:{},profile:{goal:'fitness',level:'beginner',days:'3',equipment:'gym',duration:'30',name:'',age:'',heightCm:'',currentWeightKg:'',targetWeightKg:'',activityLevel:'light'},sessions:[],plan:null,meals:[],weights:[],activities:[],water:{date:'',count:0},nutritionGoals:{calories:2400,protein:120,carbs:280,fat:80,water:8},chat:[],proposal:null,planHistory:[],runningPlan:'starter',reminders:{enabled:false,time:'18:00',days:[1,3,5],missedEnabled:true,missedTime:'21:00',lastTrainingNoticeDate:'',lastMissedNoticeDate:''}};
+  const defaults = {mealPlan:{},routines:[],bodyMeasures:[],notifications:[],coachShareData:true,plannedActivities:[],mealFavorites:[],habitLogs:{},waterLogs:{},badgeRecords:[],badgeUnlocks:{},profile:{goal:'fitness',level:'beginner',days:'3',equipment:'gym',duration:'30',name:'',age:'',heightCm:'',currentWeightKg:'',targetWeightKg:'',activityLevel:'light'},sessions:[],plan:null,meals:[],weights:[],activities:[],water:{date:'',count:0},nutritionGoals:{calories:2400,protein:120,carbs:280,fat:80,water:8},chat:[],proposal:null,planHistory:[],runningPlan:'starter',reminders:{enabled:false,time:'18:00',days:[1,3,5],missedEnabled:true,missedTime:'21:00',lastTrainingNoticeDate:'',lastMissedNoticeDate:''}};
   let state = loadState();
   let activeSession = null;
   let lastWorkoutSummary = null;
@@ -4126,10 +4136,10 @@ function findCatalogExercise(name){
     renderNutritionWeek();
     document.querySelectorAll('.removeMeal').forEach(b=>b.addEventListener('click',()=>{state.meals=state.meals.filter(m=>String(m.id)!==b.dataset.id);save();renderNutrition();toast('Comida eliminada.');}));
   }
-  function coachBubble(role,text){return `<div class="bubble ${role}">${esc(text)}</div>`;}
+  function coachBubble(role,text,actions){const acts=cleanActions(actions);return `<div class="bubble ${role}">${esc(text)}${acts.length?`<div class="bubble-actions">${acts.map(a=>`<button type="button" class="bubble-go" data-ai-go="${esc(a.target)}">${esc(a.label)} ›</button>`).join('')}</div>`:''}</div>`;}
   function renderCoach(){
     const messages=state.chat||[];
-    $('coachMessages').innerHTML=messages.length?messages.map(m=>coachBubble(m.role,m.text)).join(''):`<div class="bubble assistant">¡Hola! Soy el entrenador de FittForma AI. Si configuraste el backend, puedo consultar IA real; si no, esta conversación funciona en modo demostración.</div>`;
+    $('coachMessages').innerHTML=messages.length?messages.map(m=>coachBubble(m.role,m.text,m.actions)).join(''):coachBubble('assistant','¡Hola! Soy FittAI. Puedo analizar tus registros, proponerte cambios para que los apruebes y llevarte a cualquier sección. Probá preguntarme «¿dónde registro una comida?».',[{label:'Registrar comida',target:'nutrition:registrar'},{label:'Ver insignias',target:'progress:badges'},{label:'Crear rutina',target:'routines:new'}]);
     $('coachMessages').scrollTop=$('coachMessages').scrollHeight;
     const pr=state.proposal;
     $('proposalArea').innerHTML=pr?`<div class="proposal"><span class="status-label">${pr.status==='pending'?'Pendiente de aprobación':pr.status==='approved'?'Aprobada':'Rechazada'}</span><h3>${esc(pr.title)}</h3><p>${esc(pr.description)}</p>${pr.status==='pending'?`<div class="btn-row"><button type="button" class="btn" id="approveProposal">Aprobar propuesta</button><button type="button" class="btn secondary" id="reviseProposal">Pedir cambios</button><button type="button" class="btn ghost" id="rejectProposal">Rechazar</button></div>`:''}</div>`:'';
@@ -4142,6 +4152,125 @@ function findCatalogExercise(name){
     if(!location.protocol.startsWith('http')){el.textContent='Modo demostración: abriste el archivo directamente. Para probar el backend, ejecutá el servidor local.';return;}
     try{const r=await fetch('/api/status',{cache:'no-store'});if(!r.ok)throw new Error('sin estado');const status=await r.json();el.textContent=status.configured?`Servidor con clave configurada (${status.model}). Probá una consulta para validar que la clave funciona; pueden existir límites o costos.`:'Backend disponible, pero falta configurar la clave privada: modo demostración.';}
     catch{el.textContent='No se detectó el backend de IA en este sitio: modo demostración local.';}
+  }
+  // ---------- v43: recetas y plan semanal de comidas ----------
+  // Valores por porción estimados a partir de cantidades típicas; se muestran como estimación.
+  const RECIPES=[
+    {id:'avena-banana',name:'Avena con banana y maní',type:'Desayuno',minutes:10,portions:1,kcal:520,protein:20,carbs:75,fat:16,ingredients:['60 g de avena','250 ml de leche','1 banana','15 g de mantequilla de maní'],steps:['Cociná la avena con la leche 4–5 minutos, revolviendo.','Agregá la banana en rodajas.','Sumá la mantequilla de maní por encima.']},
+    {id:'omelette-espinaca',name:'Omelette de espinaca y queso',type:'Desayuno',minutes:12,portions:1,kcal:430,protein:30,carbs:18,fat:26,ingredients:['3 huevos','30 g de queso','1 taza de espinaca','1 rebanada de pan integral'],steps:['Batí los huevos con una pizca de sal.','Saltá la espinaca 1 minuto y agregá los huevos.','Sumá el queso, doblá y serví con el pan tostado.']},
+    {id:'pollo-arroz',name:'Pollo con arroz y verduras',type:'Almuerzo',minutes:25,portions:1,kcal:620,protein:46,carbs:66,fat:15,ingredients:['150 g de pechuga de pollo','75 g de arroz (crudo)','150 g de verduras mixtas','10 ml de aceite de oliva'],steps:['Cociná el arroz según el paquete.','Dorá el pollo en tiras con la mitad del aceite.','Saltá las verduras y mezclá todo.']},
+    {id:'bowl-atun',name:'Bowl de atún, garbanzos y quinoa',type:'Almuerzo',minutes:20,portions:1,kcal:590,protein:42,carbs:62,fat:17,ingredients:['120 g de atún al natural','60 g de quinoa (cruda)','100 g de garbanzos cocidos','1 tomate','10 ml de aceite de oliva'],steps:['Cociná la quinoa 12–15 minutos y escurrí.','Mezclá con garbanzos, tomate y atún.','Condimentá con aceite, limón y sal.']},
+    {id:'yogur-granola',name:'Yogur con granola y frutos rojos',type:'Merienda',minutes:3,portions:1,kcal:330,protein:14,carbs:45,fat:10,ingredients:['200 g de yogur natural','40 g de granola','80 g de frutos rojos'],steps:['Serví el yogur.','Agregá granola y frutos rojos.']},
+    {id:'tostadas-palta',name:'Tostadas con palta y huevo',type:'Merienda',minutes:10,portions:1,kcal:380,protein:15,carbs:32,fat:21,ingredients:['2 rebanadas de pan integral','1/2 palta','1 huevo'],steps:['Tostá el pan.','Pisá la palta con sal y limón.','Sumá el huevo a la plancha o duro.']},
+    {id:'salmon-papas',name:'Salmón con papas y ensalada',type:'Cena',minutes:30,portions:1,kcal:580,protein:36,carbs:38,fat:30,ingredients:['150 g de salmón','200 g de papa','Ensalada de hojas y tomate','5 ml de aceite de oliva'],steps:['Horneá las papas en cubos 20 minutos.','Cociná el salmón a la plancha 4 minutos por lado.','Serví con la ensalada condimentada.']},
+    {id:'carne-fideos',name:'Carne magra salteada con fideos',type:'Cena',minutes:20,portions:1,kcal:610,protein:40,carbs:58,fat:22,ingredients:['130 g de carne magra','70 g de fideos (crudos)','150 g de verduras','10 ml de aceite'],steps:['Hervi los fideos.','Saltá la carne en tiras a fuego fuerte.','Agregá verduras y fideos y salteá 2 minutos.']}
+  ];
+  const MEAL_TYPES=['Desayuno','Almuerzo','Merienda','Cena','Colación'],WEEKDAYS=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  let mealPlanDay=((new Date().getDay()+6)%7);
+  const mealSlugOf=t=>({Desayuno:'desayuno',Almuerzo:'almuerzo',Merienda:'merienda',Cena:'cena','Colación':'colacion'})[t]||'colacion';
+  function renderRecipes(){
+    const root=$('recipeList');if(!root)return;
+    root.innerHTML=RECIPES.map(r=>`<details class="recipe"><summary><img src="./assets/illustrations/meal-${mealSlugOf(r.type)}.svg" alt="" width="56" height="56" loading="lazy"><span><strong>${esc(r.name)}</strong><small>${esc(r.type)} · ${r.minutes} min · ${r.kcal} kcal · ${r.protein} g proteína</small></span></summary><div class="recipe-body"><p class="muted small">Por porción (estimación): ${r.kcal} kcal · P ${r.protein} g · C ${r.carbs} g · G ${r.fat} g. Verificá cantidades y marcas.</p><h5>Ingredientes</h5><ul>${r.ingredients.map(i=>`<li>${esc(i)}</li>`).join('')}</ul><h5>Preparación</h5><ol>${r.steps.map(i=>`<li>${esc(i)}</li>`).join('')}</ol><div class="btn-row"><button class="btn btn-sm" type="button" data-recipe-log="${r.id}">Cargar en el registro</button><button class="btn ghost btn-sm" type="button" data-recipe-plan="${r.id}">Agregar al plan del ${esc(WEEKDAYS[mealPlanDay].toLowerCase())}</button></div></div></details>`).join('');
+  }
+  function mealPlanDayList(day){state.mealPlan=state.mealPlan&&typeof state.mealPlan==='object'?state.mealPlan:{};state.mealPlan[day]=Array.isArray(state.mealPlan[day])?state.mealPlan[day]:[];return state.mealPlan[day];}
+  function renderMealPlan(){
+    const root=$('mealPlanDays'),list=$('mealPlanList');if(!root||!list)return;
+    root.innerHTML=WEEKDAYS.map((d,i)=>`<button type="button" class="ff-chip ${i===mealPlanDay?'active':''}" data-plan-day="${i}" aria-pressed="${i===mealPlanDay}">${d.slice(0,3)}</button>`).join('');
+    const items=mealPlanDayList(mealPlanDay),goal=Number(state.nutritionGoals?.calories)||0,total=items.reduce((n,x)=>n+(Number(x.calories)||0),0),prot=items.reduce((n,x)=>n+(Number(x.protein)||0),0);
+    list.innerHTML=items.length?`<p class="muted small">Planificado: ${Math.round(total)} kcal${goal?` de ${goal}`:''} · ${Math.round(prot)} g de proteína (estimación).</p>`+MEAL_TYPES.map(t=>{const its=items.map((x,i)=>({...x,i})).filter(x=>x.type===t);return its.length?`<div class="meal-group"><div class="meal-group-head"><strong>${t}</strong></div>${its.map(x=>`<div class="history-item meal-item"><img class="meal-thumb" src="./assets/illustrations/meal-${mealSlugOf(t)}.svg" alt="" width="44" height="44"><div class="meal-item-copy"><strong>${esc(x.name)}</strong><small>${Math.round(x.calories)} kcal · P ${Math.round(x.protein)} g</small><div class="meal-list-actions"><button class="btn ghost btn-sm" type="button" data-plan-log="${x.i}">Registrar hoy</button><button class="btn ghost btn-sm" type="button" data-plan-remove="${x.i}">Quitar</button></div></div></div>`).join('')}</div>`:'';}).join(''):`<div class="empty"><strong>Sin comidas planificadas para el ${esc(WEEKDAYS[mealPlanDay].toLowerCase())}</strong><p>Agregá recetas o comidas favoritas. El plan no registra nada automáticamente.</p></div>`;
+    const fav=$('mealPlanFavorite');if(fav)fav.innerHTML='<option value="">Agregar una comida favorita…</option>'+(state.mealFavorites||[]).map(f=>`<option value="${esc(String(f.id))}">${esc(f.name)} · ${Math.round(Number(f.calories)||0)} kcal</option>`).join('');
+  }
+  function addToMealPlan(item){
+    const list=mealPlanDayList(mealPlanDay);
+    if(list.some(x=>x.name===item.name&&x.type===item.type)){toast('Esa comida ya está en el plan de ese día.');return;}
+    if(list.length>=20){toast('Máximo 20 comidas por día.');return;}
+    list.push({name:String(item.name).slice(0,120),type:MEAL_TYPES.includes(item.type)?item.type:'Colación',calories:Math.max(0,Math.round(Number(item.calories)||0)),protein:Math.max(0,Number(item.protein)||0),carbs:Math.max(0,Number(item.carbs)||0),fat:Math.max(0,Number(item.fat)||0)});
+    save();renderMealPlan();toast(`Agregado al plan del ${WEEKDAYS[mealPlanDay].toLowerCase()}.`);
+  }
+  function loadIntoMealForm(x){
+    switchView('nutrition');showViewTab('nutrition','registrar');
+    $('mealName').value=x.name;$('mealCalories').value=Math.round(x.kcal??x.calories);$('mealProtein').value=x.protein;$('mealCarbs').value=x.carbs;$('mealFat').value=x.fat;if(MEAL_TYPES.includes(x.type))$('mealType').value=x.type;
+    for(const id of ['mealCalories','mealProtein','mealCarbs','mealFat'])$(id).dataset.manual='1';
+    $('mealEstimateStatus').textContent='Valores cargados como estimación. Ajustalos a tu porción y guardá para registrar.';$('mealName').focus();
+  }
+  function initMealPlanning(){
+    const view=$('view-nutrition');if(!view)return;
+    view.addEventListener('click',e=>{
+      const b=e.target.closest('button');if(!b)return;
+      if(b.dataset.planDay){mealPlanDay=Number(b.dataset.planDay);renderMealPlan();renderRecipes();return;}
+      const recipe=RECIPES.find(r=>r.id===(b.dataset.recipeLog||b.dataset.recipePlan));
+      if(b.dataset.recipeLog&&recipe)loadIntoMealForm(recipe);
+      else if(b.dataset.recipePlan&&recipe)addToMealPlan({name:recipe.name,type:recipe.type,calories:recipe.kcal,protein:recipe.protein,carbs:recipe.carbs,fat:recipe.fat});
+      else if(b.dataset.planRemove!=null){mealPlanDayList(mealPlanDay).splice(Number(b.dataset.planRemove),1);save();renderMealPlan();}
+      else if(b.dataset.planLog!=null){const x=mealPlanDayList(mealPlanDay)[Number(b.dataset.planLog)];if(x)loadIntoMealForm(x);}
+    });
+    $('mealPlanFavorite')?.addEventListener('change',e=>{const f=(state.mealFavorites||[]).find(x=>String(x.id)===e.target.value);if(f)addToMealPlan(f);e.target.value='';});
+    renderRecipes();renderMealPlan();
+  }
+
+  // ---------- v43: eliminar la cuenta en la nube ----------
+  async function deleteCloudAccount(){
+    if(!supabaseClient||!cloudUser){toast('Iniciá sesión para eliminar tu cuenta en la nube.');return;}
+    const answer=prompt('Esto elimina definitivamente tu cuenta en la nube: copia sincronizada, perfil de Comunidad, publicaciones, comentarios, me gusta, seguidores, mensajes y fotos subidas. No se puede deshacer.\n\nEscribí ELIMINAR para confirmar.');
+    if(answer===null)return;if(answer.trim()!=='ELIMINAR'){toast('No se eliminó nada: la confirmación no coincide.');return;}
+    const btn=$('deleteCloudAccount');if(btn)btn.disabled=true;setCloudStatus('Eliminando tus archivos y tu cuenta…');
+    try{
+      const uid=cloudUser.id,bucket=supabaseClient.storage.from('community-media'),paths=[];
+      const top=await bucket.list(uid,{limit:1000});if(top.error)throw top.error;
+      for(const entry of top.data||[]){
+        if(entry.id)paths.push(`${uid}/${entry.name}`);
+        else{const inner=await bucket.list(`${uid}/${entry.name}`,{limit:1000});if(inner.error)throw inner.error;(inner.data||[]).forEach(f=>paths.push(`${uid}/${entry.name}/${f.name}`));}
+      }
+      for(let i=0;i<paths.length;i+=100){const r=await bucket.remove(paths.slice(i,i+100));if(r.error)throw r.error;}
+      const {error}=await supabaseClient.rpc('delete_my_account');
+      if(error)throw error;
+      await supabaseClient.auth.signOut().catch(()=>{});cloudUser=null;updateCloudControls();
+      setCloudStatus('Tu cuenta en la nube fue eliminada. Los datos de este dispositivo siguen acá.');
+      if(confirm('Tu cuenta en la nube se eliminó. ¿Querés borrar también los datos guardados en este dispositivo?'))$('clearData')?.click();
+    }catch(error){
+      const msg=String(error?.message||error);
+      setCloudStatus(/delete_my_account|function|PGRST202/i.test(msg)?'Falta aplicar en Supabase la migración supabase/migrations/2026-10-18_v43_moderation_account_deletion.sql. No se eliminó la cuenta.':`No se pudo eliminar la cuenta: ${msg}. Si se borraron fotos, el resto de tus datos sigue intacto.`);
+    }finally{if(btn)btn.disabled=false;}
+  }
+  // ---------- v43: FittAI conoce la app y navega ----------
+  const FITTAI_TARGETS={home:['plan'],train:['train'],'train:free':['train','free'],routines:['routines'],'routines:new':['routines','new'],exercises:['exercises'],running:['running'],coach:['coach'],nutrition:['nutrition','hoy'],'nutrition:registrar':['nutrition','registrar'],'nutrition:plan':['nutrition','plan'],'nutrition:historial':['nutrition','historial'],progress:['progress','summary'],'progress:badges':['progress','badges'],'progress:history':['progress','history'],'progress:body':['progress','body'],community:['community','feed'],'community:publish':['community','publish'],'community:messages':['community','messages'],'community:explore':['community','explore'],profile:['profile'],'profile:goals':['profile','bodyProfileCard'],'profile:reminders':['profile','workoutReminderCard'],'profile:account':['profile','cloudAccountCard']};
+  function fittaiGo(target){
+    const t=FITTAI_TARGETS[target];if(!t)return;const [view,sub]=t;
+    if(sub==='free'){if(!activeSession)startFreeWorkout();else switchView('train');return;}
+    switchView(view);
+    if(view==='nutrition')showViewTab('nutrition',sub);
+    else if(view==='progress')showProgressTab(sub);
+    else if(view==='community'){const tab={feed:'communityTabFeed',publish:'communityTabPublish',messages:'communityTabMessages',explore:'communityTabExplore'}[sub];if(tab)$(tab)?.click();}
+    else if(view==='routines'&&sub==='new')$('newRoutine')?.click();
+    else if(view==='profile'&&sub){const card=$(sub),g=card?.closest('details');if(g)g.open=true;setTimeout(()=>card?.scrollIntoView({behavior:'smooth',block:'start'}),60);}
+  }
+  function cleanActions(list){return (Array.isArray(list)?list:[]).filter(a=>a&&FITTAI_TARGETS[a.target]).slice(0,3).map(a=>({target:a.target,label:String(a.label||'Ir').slice(0,40)}));}
+  // Guía local (sin IA): responde dónde está cada función con botones reales.
+  const LOCAL_GUIDE=[
+    [/rutina|plan de entren|crear (una )?rutina/,'Las rutinas propias y el plan generado están en Entrenar › Rutinas.',[['Abrir Rutinas','routines'],['Crear una rutina','routines:new']]],
+    [/entrenamiento libre|entrenar libre|sin plan/,'Podés entrenar sin plan y agregar ejercicios sobre la marcha.',[['Empezar entrenamiento libre','train:free']]],
+    [/ejercicio|técnica|tecnica|biblioteca/,'La biblioteca tiene fotos, filtros y fichas de técnica.',[['Ver ejercicios','exercises']]],
+    [/correr|running|gps|carrera|caminar|bici/,'En Correr podés usar el GPS o registrar una actividad manual.',[['Ir a Correr','running']]],
+    [/comida|comer|caloría|caloria|registrar.*(comida|alimento)|foto.*comida|código de barras|codigo de barras/,'Las comidas se registran en Nutrición › Registrar (texto, código de barras o foto).',[['Registrar una comida','nutrition:registrar'],['Ver resumen de hoy','nutrition']]],
+    [/agua|hidrat/,'La hidratación está en Nutrición › Hoy; también podés sumar un vaso desde Inicio.',[['Ver hidratación','nutrition']]],
+    [/objetivo.*(caloría|caloria|macro|prote)|macros|menú|menu/,'Los objetivos de calorías y macros y el menú diario están en Nutrición › Objetivos.',[['Abrir Objetivos','nutrition:plan']]],
+    [/insignia|logro|medalla|nivel/,'Las insignias tienen 12 niveles por desafío; se ven en Progreso › Insignias.',[['Ver insignias','progress:badges']]],
+    [/peso|medida|cintura|foto.*progreso|cuerpo/,'Peso, medidas y fotos privadas están en Progreso › Cuerpo.',[['Abrir Cuerpo','progress:body']]],
+    [/historial|sesiones|editar.*sesión|editar.*sesion|exportar|importar/,'El historial de sesiones (editable) y la exportación están en Progreso › Historial.',[['Ver historial','progress:history']]],
+    [/estadística|estadistica|progreso|gráfico|grafico/,'Tus estadísticas y la comparación por período están en Progreso.',[['Ver progreso','progress']]],
+    [/publicar|compartir|post/,'Podés publicar texto, un logro o una transformación en Comunidad › Publicar.',[['Crear publicación','community:publish']]],
+    [/mensaje|chat privado/,'Los mensajes privados requieren seguimiento mutuo; están en Comunidad › Mensajes.',[['Abrir mensajes','community:messages']]],
+    [/comunidad|seguir|buscar (personas|perfil)/,'En Comunidad ves el feed y podés explorar perfiles.',[['Ir a Comunidad','community'],['Explorar perfiles','community:explore']]],
+    [/recordatorio|notificaci/,'Los recordatorios se configuran en Perfil › Recordatorios.',[['Configurar recordatorios','profile:reminders']]],
+    [/foto de perfil|avatar|mi perfil|nombre/,'En Perfil podés cambiar tu foto (ícono de cámara), nombre y objetivo.',[['Ir a Perfil','profile']]],
+    [/cuenta|sesión|sesion|nube|sincroniz|iniciar/,'La cuenta y la copia en la nube están en Perfil › Cuenta y sincronización.',[['Abrir cuenta','profile:account']]]
+  ];
+  function localAppGuide(msg){
+    const lower=String(msg||'').toLowerCase();
+    if(/qué puedo hacer|que puedo hacer|qué hay en la app|funciones de la app/.test(lower))return {reply:'FittForma tiene seis secciones: Inicio (tu día), Entrenar (plan, rutinas propias, entrenamiento libre, ejercicios y GPS), Nutrición (comidas, macros y agua), Progreso (estadísticas, insignias, historial y cuerpo), Comunidad (publicar, mensajes) y Perfil (foto, objetivos, recordatorios y cuenta). (Guía de la app: respuesta local, sin IA.)',actions:cleanActions([{label:'Entrenar',target:'train'},{label:'Nutrición',target:'nutrition'},{label:'Progreso',target:'progress'}])};
+    if(!/dónde|donde|cómo|como|ir a|llev|abr[ií]|quiero|puedo|hay /.test(lower))return null;
+    const hits=LOCAL_GUIDE.filter(([re])=>re.test(lower)).slice(0,2);if(!hits.length)return null;
+    return {reply:hits.map(h=>h[1]).join(' ')+' (Guía de la app: respuesta local, sin IA.)',actions:cleanActions(hits.flatMap(h=>h[2].map(([label,target])=>({label,target}))))};
   }
   function coachExtraContext(){
     const today=dateKey(),meals=typeof todayMeals==='function'?todayMeals():[],sum=k=>Math.round(meals.reduce((n,m)=>n+(Number(m[k])||0),0));
@@ -4165,7 +4294,7 @@ function findCatalogExercise(name){
       const data=await response.json().catch(()=>({}));
       if(response.ok){
         if(window.FittFormaAds)window.FittFormaAds.recordCoachSuccess();
-        if(data.reply)state.chat.push({role:'assistant',text:data.reply,at:new Date().toISOString()});
+        if(data.reply)state.chat.push({role:'assistant',text:data.reply,actions:cleanActions(data.actions),at:new Date().toISOString()});
         // If Gemini does not propose a new change, keep the current pending proposal available for review.
         if(data.proposal)state.proposal={id:Date.now(),status:'pending',title:String(data.proposal.title||'Propuesta del entrenador').slice(0,100),description:String(data.proposal.description||'Revisá esta propuesta antes de aplicarla.').slice(0,1200),kind:['routine','nutrition','recovery','general'].includes(data.proposal.kind)?data.proposal.kind:'general',days:[2,3,4,5].includes(Number(data.proposal.days))?String(data.proposal.days):state.profile.days,duration:[20,30,45,60].includes(Number(data.proposal.duration))?String(data.proposal.duration):state.profile.duration};
         save();renderCoach();return;
@@ -4174,6 +4303,7 @@ function findCatalogExercise(name){
       else {if(response.status===502&&$('coachConnection'))$('coachConnection').textContent='El servidor respondió, pero Gemini falló: revisá la clave, el modelo y los límites de la API.';if(response.status===429&&$('coachConnection'))$('coachConnection').textContent='Se alcanzó un límite temporal. Esperá un poco y probá de nuevo.';state.chat.push({role:'assistant',text:data.error||'No se pudo consultar el entrenador. Probá de nuevo más tarde.',at:new Date().toISOString()});save();renderCoach();return;}
     }catch(e){backendUnavailable=true;}
     if(backendUnavailable&&$('coachConnection'))$('coachConnection').textContent='Modo demostración: no hay una conexión de IA configurada y operativa.';
+    {const guide=localAppGuide(msg);if(guide){state.chat.push({role:'assistant',text:guide.reply,actions:guide.actions,at:new Date().toISOString()});save();renderCoach();$('coachInput').value='';return;}}
     const lower=msg.toLowerCase();let title='Propuesta para revisar',description='Podés revisar tu rutina actual y definir qué querés cambiar. En la versión conectada, la IA analizará tu perfil y tus registros antes de recomendar ajustes.',kind='general';
     if(/rutina|entren|tiempo|día|dias|semana|ejercicio/.test(lower)){title='Reorganizar el entrenamiento';kind='routine';const dm=lower.match(/(20|30|45|60)\s*min/);const daysMatch=/(2|dos) días|(3|tres) días|(4|cuatro) días|(5|cinco) días/.exec(lower);let proposedDays=state.profile.days;if(daysMatch){if(/(2|dos) días/.test(lower))proposedDays='2';else if(/(3|tres) días/.test(lower))proposedDays='3';else if(/(4|cuatro) días/.test(lower))proposedDays='4';else if(/(5|cinco) días/.test(lower))proposedDays='5';}description=`Propuesta de demostración: generar una rutina para ${proposedDays} días por semana${dm?', con sesiones de '+dm[1]+' minutos':''}, respetando tu nivel y equipamiento. La rutina actual se mantiene hasta que apruebes.`;state.proposal={id:Date.now(),status:'pending',title,description,kind,days:proposedDays,duration:dm?dm[1]:state.profile.duration};}
     else if(/comida|aliment|prote|calor|nutri|dieta|menú|menu/.test(lower)){title='Revisar el objetivo nutricional';description=`Propuesta de demostración: revisar el objetivo actual de ${state.nutritionGoals.calories} kcal y ${state.nutritionGoals.protein} g de proteína según tu objetivo y actividad. Estas cifras son orientativas; no se modificó ningún objetivo.`;kind='nutrition';}
@@ -4405,7 +4535,7 @@ function findCatalogExercise(name){
     if(!gpsStartedAt)return;persistGpsDraft(true);if(gpsWatchId!==null&&navigator.geolocation)navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;gpsLastPoint=null;if(gpsElapsedTimer)clearInterval(gpsElapsedTimer);gpsElapsedTimer=null;releaseGpsWakeLock();if(!gpsPaused){gpsPaused=true;gpsPauseAt=Date.now();}$('gpsPause').textContent='Reanudar';$('gpsStart').disabled=true;$('gpsStart').textContent='GPS pausado';$('gpsStatus').textContent='Sesión pausada para conservar el recorrido. Volvé a la app y reanudá cuando esté visible.';persistGpsDraft(true);
   }
   function setCloudStatus(message){const el=$('cloudStatus');if(el)el.textContent=message;}
-  function updateCloudControls(){const ready=!!supabaseClient,logged=!!cloudUser;$('cloudLogin').disabled=!ready||logged;$('cloudRegister').disabled=!ready||logged;$('cloudLogout').hidden=!logged;$('cloudDownload').disabled=!ready||!logged;$('cloudUpload').disabled=!ready||!logged;if(!ready)setCloudStatus('Sin configurar. La app sigue en modo local; configurá SUPABASE_URL y SUPABASE_ANON_KEY en Render o completá supabase-config.js con la clave pública.');else if(logged)setCloudStatus('Sesión iniciada: '+cloudUser.email+'. Elegí manualmente si querés cargar o guardar datos.');else setCloudStatus('Configuración lista. Iniciá sesión o creá una cuenta para sincronizar.');}
+  function updateCloudControls(){const ready=!!supabaseClient,logged=!!cloudUser;if($('deleteCloudAccount'))$('deleteCloudAccount').hidden=!logged;$('cloudLogin').disabled=!ready||logged;$('cloudRegister').disabled=!ready||logged;$('cloudLogout').hidden=!logged;$('cloudDownload').disabled=!ready||!logged;$('cloudUpload').disabled=!ready||!logged;if(!ready)setCloudStatus('Sin configurar. La app sigue en modo local; configurá SUPABASE_URL y SUPABASE_ANON_KEY en Render o completá supabase-config.js con la clave pública.');else if(logged)setCloudStatus('Sesión iniciada: '+cloudUser.email+'. Elegí manualmente si querés cargar o guardar datos.');else setCloudStatus('Configuración lista. Iniciá sesión o creá una cuenta para sincronizar.');}
   function normalizeCloudState(data){
     if(!data||typeof data!=='object'||!data.profile||!Array.isArray(data.sessions))throw new Error('Los datos de la nube no tienen un formato reconocido.');
     return {...structuredClone(defaults),...data,profile:{...defaults.profile,...(data.profile||{})},nutritionGoals:{...defaults.nutritionGoals,...(data.nutritionGoals||{})},reminders:{...defaults.reminders,...(data.reminders||{}),days:Array.isArray(data.reminders?.days)?data.reminders.days.filter(d=>[0,1,2,3,4,5,6].includes(Number(d))).map(Number):defaults.reminders.days.slice()},water:data.water&&typeof data.water==='object'?data.water:structuredClone(defaults.water),waterLogs:data.waterLogs&&typeof data.waterLogs==='object'&&!Array.isArray(data.waterLogs)?data.waterLogs:{},habitLogs:data.habitLogs&&typeof data.habitLogs==='object'&&!Array.isArray(data.habitLogs)?data.habitLogs:{},sessions:Array.isArray(data.sessions)?data.sessions:[],meals:Array.isArray(data.meals)?data.meals:[],weights:Array.isArray(data.weights)?data.weights:[],activities:Array.isArray(data.activities)?data.activities:[],chat:Array.isArray(data.chat)?data.chat:[],planHistory:Array.isArray(data.planHistory)?data.planHistory.slice(-8):[],badgeRecords:Array.isArray(data.badgeRecords)?data.badgeRecords.slice(-500):[],badgeUnlocks:data.badgeUnlocks&&typeof data.badgeUnlocks==='object'&&!Array.isArray(data.badgeUnlocks)?data.badgeUnlocks:{}};
@@ -4475,7 +4605,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.42.1')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.40.21. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.43.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.43.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -5165,7 +5295,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.42.1';
+  const APP_VERSION='0.43.0';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');
@@ -5208,7 +5338,7 @@ function findCatalogExercise(name){
   document.querySelectorAll('[data-library-mode]').forEach(b=>b.addEventListener('click',()=>{libraryMode=b.dataset.libraryMode;renderExerciseLibrary();}));
   document.querySelectorAll('.addMealIdea').forEach(b=>b.addEventListener('click',()=>{switchView('nutrition');$('mealName').value=b.dataset.name;$('mealCalories').value=b.dataset.cal;$('mealProtein').value=b.dataset.pro;$('mealCarbs').value=b.dataset.carbs||'';$('mealFat').value=b.dataset.fat||'';$('mealType').value='Almuerzo';$('mealName').focus();}));
   $('exerciseSearch').addEventListener('input',renderExerciseLibrary);$('exerciseGroupFilter').addEventListener('change',renderExerciseLibrary);$('exerciseFavoritesOnly').addEventListener('click',()=>{exerciseFavoritesOnly=!exerciseFavoritesOnly;renderExerciseLibrary();});
-  initBadgeCenter();initProgressTabs();document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});initViewTabs();initRoutines();initBodyTracking();initNotifications();initAvatar();initQuickAdd();initWelcome();initSessionHistoryEditing();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
+  initBadgeCenter();initProgressTabs();document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});$('coachMessages')?.addEventListener('click',e=>{const b=e.target.closest('[data-ai-go]');if(b)fittaiGo(b.dataset.aiGo);});initViewTabs();initRoutines();initBodyTracking();initNotifications();initAvatar();initQuickAdd();initWelcome();initMealPlanning();$('deleteCloudAccount')?.addEventListener('click',deleteCloudAccount);initSessionHistoryEditing();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
   setTimeout(()=>checkWorkoutReminders(),1200);setInterval(()=>{if(document.visibilityState==='visible')checkWorkoutReminders();},30000);window.addEventListener('focus',()=>{renderReminderSettings();checkWorkoutReminders();});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){renderReminderSettings();checkWorkoutReminders();}});
   document.addEventListener('visibilitychange',()=>{if(!activeSession)return;if(document.visibilityState==='hidden'&&!activeSession.pausedAt){activeSession.elapsedMs=activeSessionElapsedMs(activeSession);activeSession.segmentStartedAt=Date.now();activeSession.pausedAt=Date.now();activeSession.pauseReason='background';persistActiveSessionDraft();}else if(document.visibilityState==='visible'&&activeSession.pausedAt&&activeSession.pauseReason==='background'){activeSession.pausedAt=0;activeSession.pauseReason='';activeSession.segmentStartedAt=Date.now();persistActiveSessionDraft();updateWorkoutClock();}});
   window.addEventListener('pagehide',()=>{if(activeSession)persistActiveSessionDraft();});
