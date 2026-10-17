@@ -109,6 +109,45 @@ for (const [w, h, label] of [[390, 844, 'móvil'], [1366, 900, 'escritorio']]) {
   await go('progress'); await page.click('#progressTabBadges');
   step('Progreso › Insignias muestra running', (await text('#badgeGallery')).includes('Running'));
 
+  // Etapa 4: períodos, cuerpo, fotos privadas, notificaciones y contexto de FittAI
+  await go('progress'); await page.click('#progressTabSummary'); await page.click('[data-activity-period="4w"]');
+  step('Período 4 semanas: 4 barras y comparación', (await page.$$('#weeklyActivityChart .activity-bar-day')).length === 4 && (await text('#activityPeriodSummary')).includes('Minutos'));
+  await page.click('[data-activity-period="7d"]');
+  step('Período 7 días: 7 barras', (await page.$$('#weeklyActivityChart .activity-bar-day')).length === 7);
+  await page.click('#progressTabBody');
+  await page.fill('#m_waist', '82.5'); await page.fill('#m_bodyFat', '18'); await page.click('#measureForm button[type=submit]'); s = await st();
+  step('Medidas guardadas', s.bodyMeasures?.length === 1 && s.bodyMeasures[0].waist === 82.5);
+  await page.fill('#m_waist', '82.5'); await page.fill('#m_bodyFat', '18'); await page.click('#measureForm button[type=submit]'); s = await st();
+  step('Medidas duplicadas rechazadas', s.bodyMeasures.length === 1);
+  await page.fill('#m_waist', '500'); await page.click('#measureForm button[type=submit]'); s = await st();
+  step('Medida imposible rechazada', s.bodyMeasures.length === 1);
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+  await page.setInputFiles('#progressPhotoFile', { name: 'p.png', mimeType: 'image/png', buffer: png });
+  await page.click('#progressPhotoForm button[type=submit]'); await page.waitForTimeout(600);
+  step('Foto de progreso guardada en el dispositivo', (await page.$$('.progress-photo img')).length === 1);
+  step('La foto no entra en el estado sincronizable', !JSON.stringify(await st()).includes('image/'));
+  await page.reload(); await page.waitForTimeout(500); await go('progress'); await page.click('#progressTabBody'); await page.waitForTimeout(400);
+  step('Foto persiste tras recargar', (await page.$$('.progress-photo img')).length === 1);
+  await page.click('[data-remove-photo]'); await page.waitForTimeout(400);
+  step('Quitar foto', (await page.$$('.progress-photo img')).length === 0);
+  await go('plan'); s = await st();
+  step('Notificación de insignia creada una sola vez por desafío', (s.notifications || []).filter(n => n.id.startsWith('badge:exercise-flexiones')).length === 1 && (s.notifications || []).some(n => n.id.startsWith('badge:activity-running')));
+  step('Campana con contador', await page.isVisible('#notifCount'));
+  await page.click('#notifBell'); await page.click('#notifReadAll'); await page.waitForTimeout(150); s = await st();
+  step('Marcar todo como leído', (s.notifications || []).every(n => n.read) && !(await page.isVisible('#notifCount')));
+  await page.click('#notifBell');
+  const coachBodies = [];
+  await page.route('**/api/coach', async r => { coachBodies.push(JSON.parse(r.request().postData())); await r.fulfill({ contentType: 'application/json', body: JSON.stringify({ reply: 'Respuesta de prueba', proposal: null }) }); });
+  await go('train'); await page.click('.view.active [data-subview="coach"]');
+  await page.fill('#coachInput', '¿Cómo voy?'); await page.click('#coachForm button[type=submit]'); await page.waitForTimeout(400);
+  const withData = coachBodies[0] || {};
+  step('FittAI recibe nutrición, rutinas e insignias', withData.shareData === true && withData.nutrition?.today?.calories === 650 && withData.routines?.length === 1 && Array.isArray(withData.badges));
+  await page.uncheck('#coachShareData');
+  await page.fill('#coachInput', 'Otra pregunta'); await page.click('#coachForm button[type=submit]'); await page.waitForTimeout(400);
+  const noData = coachBodies[1] || {};
+  step('Sin permiso FittAI solo recibe el mensaje', noData.shareData === false && !('profile' in noData) && !('sessions' in noData) && !('nutrition' in noData));
+  await page.unroute('**/api/coach');
+
   step('Sin errores de JavaScript', errors.length === 0, errors.slice(0, 3).join(' | '));
   await page.close();
 }

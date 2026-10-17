@@ -1,5 +1,12 @@
 # FittForma AI — Registro de cambios
 
+## v42.1 — Períodos, cuerpo, notificaciones y FittAI con contexto (17 de octubre de 2026)
+
+- Progreso: actividad por 7 días, 4 o 12 semanas con comparación contra el período anterior equivalente (running manual vs GPS); peso por 1/3/6 meses o todo.
+- Pestaña «Cuerpo»: medidas corporales validadas y fotos de progreso privadas guardadas solo en el dispositivo.
+- Campana de notificaciones en Inicio: insignias nuevas, recordatorio del día, sesión en curso y mensajes sin leer, con estado de leído.
+- FittAI recibe resumen nutricional, agua, rutinas propias e insignias; un interruptor visible permite no compartir registros (el servidor lo respeta). Límite de consulta a 32 KB.
+
 ## v42.0 — Seis secciones, rutinas propias y entrenamiento libre (17 de octubre de 2026)
 
 - Navegación de 6 secciones: Inicio, Entrenar, Nutrición, Progreso, Comunidad y Perfil. FittAI (antes Coach) en Entrenar, «Más» y la barra lateral.

@@ -1,7 +1,7 @@
 # Auditoría FittForma AI v42.0 — inventario y estado
 
 Estados: **C** completa y funcional · **P** parcial · **D** defectuosa/desconectada · **A** ausente · **NV** no verificable en este entorno.
-"Inicial" es v40.21 (ZIP) / v41.0; "Final" es v42.0. Verificación: `npm test` (175), `tests/e2e/integration.e2e.mjs` (55 comprobaciones en móvil y escritorio), `npm run test:sql` (44), `tests/e2e/community.e2e.mjs` (22), barrido visual de 12 vistas en 5 anchos.
+"Inicial" es v40.21 (ZIP) / v41.0; "Final" es v42.0. Verificación: `npm test` (177), `tests/e2e/integration.e2e.mjs` (82 comprobaciones en móvil y escritorio), `npm run test:sql` (44), `tests/e2e/community.e2e.mjs` (22), barrido visual de 12 vistas en 5 anchos.
 
 ## Matriz
 
@@ -12,7 +12,7 @@ Estados: **C** completa y funcional · **P** parcial · **D** defectuosa/descone
 | Inicio | Objetivo semanal, semana, entrenamiento de hoy, resumen kcal/proteína/agua, hábitos, constancia | C | **C** | E2E: Inicio refleja sesión, kcal y agua |
 | Inicio | Accesos rápidos | P (solo navegaban) | **C** | Entrenar (siguiente sesión o retomar), comida, +1 agua, correr, insignias, FittAI — E2E |
 | Inicio | Próxima insignia | C (v41) | C | |
-| Inicio | Notificaciones internas | A | **A** | No existe un sistema de notificaciones; no se muestra campana falsa |
+| Inicio | Notificaciones internas | A | **C** (v42.1) | Campana con insignias nuevas (sin duplicados), recordatorio del día, sesión en curso y mensajes sin leer; marcar como leído — E2E |
 | Entrenar | Plan generado, biblioteca, fichas, favoritos, sustitución de ejercicios | C | C | Sin cambios funcionales |
 | Entrenar | Rutinas propias (crear/editar/duplicar/eliminar/reordenar, series/reps/kg/descanso/notas) | **A** | **C** | E2E; validación y confirmación de cambios sin guardar |
 | Entrenar | Plantilla desde un día del plan | A | **C** | Copia editable; el plan no cambia |
@@ -24,6 +24,7 @@ Estados: **C** completa y funcional · **P** parcial · **D** defectuosa/descone
 | Entrenar | Running GPS, mapa, parciales, GPX, borrador | C | NV | Requiere teléfono con GPS en exterior |
 | Entrenar | Running manual, ritmo, historial | C | C | E2E: 5 km/25 min, no figura como GPS |
 | Entrenar | FittAI (chat, propuestas con aprobación) | C (requiere clave) | NV | Sin `GEMINI_API_KEY` responde con error claro |
+| Entrenar | FittAI con nutrición, agua, rutinas propias e insignias + permiso visible | P | **C** (v42.1) | E2E verifica qué datos se envían con y sin permiso; respuesta real de Gemini: NV |
 | Nutrición | Organización | P (una página larga) | **C** | Hoy · Registrar · Objetivos · Historial |
 | Nutrición | Registrar comida, estimación por texto, base de alimentos, código de barras, foto IA, favoritas, ideas, menú | C | C | Foto IA y código de barras: NV (servicios externos/cámara) |
 | Nutrición | Editar comida | **A** (solo quitar) | **C** | E2E: no duplica; Inicio se actualiza |
@@ -31,7 +32,8 @@ Estados: **C** completa y funcional · **P** parcial · **D** defectuosa/descone
 | Nutrición | Tendencia semanal (días sin registro ≠ 0) | C | C | |
 | Progreso | Resumen, insignias, historial, peso | C (v41) | C | |
 | Progreso | Corregir/eliminar sesiones | **A** | **C** | E2E: eliminar revoca insignias dependientes |
-| Progreso | Medidas corporales (más allá del peso) y fotos de progreso privadas | A | **A** | Pendiente; requiere modelo de datos y almacenamiento privado |
+| Progreso | Medidas corporales y fotos de progreso privadas | A | **C** (v42.1) | Medidas validadas y sin duplicados; fotos comprimidas en IndexedDB del dispositivo, no se sincronizan ni exportan — E2E |
+| Progreso | Filtros de período y comparación con el período anterior | A | **C** (v42.1) | Actividad 7 días/4/12 semanas; peso 1/3/6 meses/todo; running manual vs GPS — E2E |
 | Comunidad | Feed, explorar, publicar (texto/logro/transformación), likes, comentarios, edición, mensajes, no leídos, bloqueo, denuncia | C (v41) | C | E2E 22/22 + RLS 44/44 (local) |
 | Comunidad | Moderación administrativa de denuncias | A | A | Pendiente |
 | Perfil | Organización | P (lista larga) | **C** | Cabecera con estadísticas reales + 6 grupos plegables |
@@ -48,6 +50,7 @@ Estados: **C** completa y funcional · **P** parcial · **D** defectuosa/descone
 - Las grillas antiguas de escritorio desordenaban Nutrición/Perfil/Entrenar (neutralizadas).
 
 ## Pendientes / no verificados
-- Notificaciones internas, medidas corporales y fotos de progreso privadas, moderación de denuncias, borrado de cuenta.
+- Moderación de denuncias, borrado de cuenta, plan semanal de comidas y recetas con fotos.
+- Las fotos de progreso no se sincronizan entre dispositivos (decisión de privacidad).
 - No verificable aquí: Supabase real, Gemini, Render, GPS y cámara en teléfono físico, PWA instalada.
 - Los mensajes dinámicos nuevos están solo en español (las etiquetas sí en 6 idiomas).

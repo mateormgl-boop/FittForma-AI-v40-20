@@ -51,3 +51,22 @@ test('v42: historial de sesiones y comidas editables sin duplicar', () => {
   assert.match(html, /function setMealEditing\(meal\)/);
   assert.match(html, /if\(editing\)Object\.assign\(editing,values/);
 });
+
+test('v42.1: períodos en Progreso, medidas, fotos locales y notificaciones reales', () => {
+  for (const p of ['7d', '4w', '12w']) assert.match(html, new RegExp(`data-activity-period="${p}"`));
+  for (const p of ['1m', '3m', '6m', 'all']) assert.match(html, new RegExp(`data-weight-period="${p}"`));
+  assert.match(html, /function periodTotals\(fromKey,toKey\)/);
+  assert.match(html, /sin registros en el período anterior/);
+  assert.match(html, /const MEASURE_FIELDS=/);
+  assert.match(html, /const PHOTO_DB='fittforma-progress-photos'/);
+  assert.match(html, /No se suben a la nube ni se publican/);
+  assert.match(html, /addNotification\(\{id:`badge:\$\{b\.id\}`/);
+  assert.match(html, /if\(state\.notifications\.some\(x=>x\.id===n\.id\)\)return false;/);
+  assert.match(html, /id="notifBell"/);
+});
+
+test('v42.1: FittAI usa más contexto solo con permiso visible', () => {
+  assert.match(html, /id="coachShareData" type="checkbox" checked/);
+  assert.match(html, /state\.coachShareData===false\?\{message:msg/);
+  assert.match(html, /function coachExtraContext\(\)/);
+});

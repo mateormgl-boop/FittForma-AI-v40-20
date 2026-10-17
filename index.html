@@ -1450,6 +1450,29 @@
     .profile-stats small{color:var(--ff-muted);font-size:11px}
     @media(min-width:1200px){#view-nutrition .view-panel:not([hidden]){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 var(--ff-s4);align-items:start}}
     @media(prefers-reduced-motion:reduce){.ff-group>summary::after{transition:none}}
+    /* v42.1 — períodos, cuerpo, notificaciones */
+    .period-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}
+    .period-metric{padding:10px 12px;border-radius:var(--ff-r-md);border:1px solid var(--ff-line);background:rgba(6,11,23,.35)}
+    .period-metric span{display:block;font-size:12px;color:var(--ff-muted)}.period-metric strong{display:block;font-size:20px}
+    .period-metric small{display:block;font-size:11px;line-height:1.35}.period-metric .up{color:#7ff0cd}.period-metric .down{color:#ffb4ab}
+    .measure-deltas{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0;font-size:13px;color:#c5d3ee}.measure-deltas strong{flex-basis:100%}
+    .progress-photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:12px}
+    .progress-photo{margin:0;border:1px solid var(--ff-line);border-radius:var(--ff-r-md);overflow:hidden;background:#060b17}
+    .progress-photo img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover}
+    .progress-photo figcaption{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 8px;font-size:12px;color:var(--ff-muted)}
+    .home-top-actions{display:flex;align-items:center;gap:10px}
+    .home-bell{position:relative;width:46px;height:46px;border-radius:50%;border:1px solid var(--ff-line);background:var(--ff-card2);color:var(--ff-text);display:grid;place-items:center}
+    .home-bell svg{width:22px;height:22px}
+    .notif-count{position:absolute;top:-3px;right:-3px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#ff5a6e;color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center}
+    .notif-count[hidden]{display:none}
+    .notif-panel{border:1px solid var(--ff-line);border-radius:var(--ff-r-lg);background:linear-gradient(160deg,var(--ff-surface-2),var(--ff-surface));padding:12px;box-shadow:0 18px 40px rgba(0,0,0,.35)}
+    .home-dash>.notif-panel{grid-column:1/-1}
+    .notif-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+    .notif-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:360px;overflow:auto}
+    .notif-item{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:10px 12px;border-radius:var(--ff-r-md);border:1px solid var(--ff-line);background:rgba(6,11,23,.35);color:var(--ff-text);text-align:left}
+    .notif-item.unread{border-color:rgba(26,167,255,.55);background:rgba(26,167,255,.08)}
+    .notif-item span{font-size:13px;color:#c5d3ee}.notif-item small{font-size:11px;color:var(--ff-muted)}.notif-empty{padding:10px}
+    .coach-share{margin-bottom:12px}
     /* v42 — Entrenar: lanzador, rutinas propias y edición de sesión */
     .train-launch h3{margin:4px 0 12px}
     .train-launch-main{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:14px;margin-bottom:12px;border-radius:var(--ff-r-md);border:1px solid rgba(26,167,255,.45);background:linear-gradient(135deg,rgba(30,91,255,.28),rgba(26,167,255,.10));color:var(--ff-text);text-align:left}
@@ -1524,8 +1547,9 @@
   <div class="home-dash">
     <div class="home-top">
       <div><h1 id="homeGreeting">Hola</h1><p>Hoy es un buen día para avanzar</p></div>
-      <button class="home-avatar" type="button" data-shortcut-view="profile" aria-label="Abrir mi perfil"><span id="homeInitial">F</span></button>
+      <div class="home-top-actions"><button class="home-bell" id="notifBell" type="button" aria-label="Notificaciones" aria-expanded="false" aria-controls="notifPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0"/></svg><span class="notif-count" id="notifCount" hidden></span></button><button class="home-avatar" type="button" data-shortcut-view="profile" aria-label="Abrir mi perfil"><span id="homeInitial">F</span></button></div>
     </div>
+    <div class="notif-panel" id="notifPanel" role="region" aria-label="Notificaciones" hidden><div class="notif-head"><strong>Notificaciones</strong><button type="button" class="link-btn" id="notifReadAll">Marcar todo como leído</button></div><ul class="notif-list"></ul></div>
     <section class="home-card home-goal" aria-label="Tu objetivo">
       <div class="home-goal-info">
         <small>Tu objetivo</small>
@@ -1650,7 +1674,7 @@
   </nav>
       <div class="section-head"><div><h2>FittAI</h2><p>Tu asistente de entrenamiento, running, nutrición y progreso. Las propuestas solo se aplican si las aprobás.</p></div></div>
       <div class="notice"><strong>Estado del entrenador:</strong> <span id="coachConnection" role="status">Comprobando conexión…</span><br><span class="small">La IA real requiere el backend y una clave privada configurada en el servidor. Nunca la pegues acá en el chat ni en la página.</span></div>
-      <div class="card"><div id="coachMessages" class="chat-log" aria-live="polite"></div><div class="quick-prompts"><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero ajustar mi rutina a mi tiempo disponible.">Ajustar rutina</button><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero mejorar mi alimentación para mi objetivo.">Mejorar alimentación</button><button type="button" class="btn secondary quickPrompt" data-prompt="Esta semana tengo menos energía.">Tengo menos energía</button><button type="button" class="btn secondary quickPrompt" data-prompt="Analizá mi progreso reciente y sugerime el próximo paso seguro, usando solo los datos que tengo registrados.">Analizar mi progreso</button></div><form id="coachForm" class="chat-form"><label class="sr-only" for="coachInput">Mensaje para el entrenador</label><input id="coachInput" maxlength="500" placeholder="Contale qué necesitás…" autocomplete="off"><button class="btn" type="submit">Enviar</button></form><div class="coach-usage" id="coachUsage" aria-live="polite"><p id="coachUsageText">La opción de anuncios todavía no está configurada.</p><button class="btn secondary" id="watchRewardedAd" type="button" hidden>Ver anuncio y obtener 3 consultas</button></div></div>
+      <div class="card"><label class="reminder-pref-row coach-share"><input id="coachShareData" type="checkbox" checked><span><strong>Usar mis registros en las respuestas</strong><br><span class="muted small">Perfil, objetivos, plan, rutinas, últimas sesiones y carreras, peso, resumen nutricional, agua e insignias. Si lo desactivás, FittAI solo recibe tu mensaje.</span></span></label><div id="coachMessages" class="chat-log" aria-live="polite"></div><div class="quick-prompts"><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero ajustar mi rutina a mi tiempo disponible.">Ajustar rutina</button><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero mejorar mi alimentación para mi objetivo.">Mejorar alimentación</button><button type="button" class="btn secondary quickPrompt" data-prompt="Esta semana tengo menos energía.">Tengo menos energía</button><button type="button" class="btn secondary quickPrompt" data-prompt="Analizá mi progreso reciente y sugerime el próximo paso seguro, usando solo los datos que tengo registrados.">Analizar mi progreso</button></div><form id="coachForm" class="chat-form"><label class="sr-only" for="coachInput">Mensaje para el entrenador</label><input id="coachInput" maxlength="500" placeholder="Contale qué necesitás…" autocomplete="off"><button class="btn" type="submit">Enviar</button></form><div class="coach-usage" id="coachUsage" aria-live="polite"><p id="coachUsageText">La opción de anuncios todavía no está configurada.</p><button class="btn secondary" id="watchRewardedAd" type="button" hidden>Ver anuncio y obtener 3 consultas</button></div></div>
       <div id="proposalArea"></div>
     </section>
 
@@ -1761,10 +1785,10 @@
         <button type="button" role="tab" class="ff-seg active" id="progressTabSummary" data-progress-tab="summary" aria-controls="progressPanelSummary" aria-selected="true">Resumen</button>
         <button type="button" role="tab" class="ff-seg" id="progressTabBadges" data-progress-tab="badges" aria-controls="progressPanelBadges" aria-selected="false" tabindex="-1">Insignias</button>
         <button type="button" role="tab" class="ff-seg" id="progressTabHistory" data-progress-tab="history" aria-controls="progressPanelHistory" aria-selected="false" tabindex="-1">Historial</button>
-        <button type="button" role="tab" class="ff-seg" id="progressTabBody" data-progress-tab="body" aria-controls="progressPanelBody" aria-selected="false" tabindex="-1">Peso</button>
+        <button type="button" role="tab" class="ff-seg" id="progressTabBody" data-progress-tab="body" aria-controls="progressPanelBody" aria-selected="false" tabindex="-1">Cuerpo</button>
       </nav>
       <div class="progress-panel" id="progressPanelSummary" role="tabpanel" aria-labelledby="progressTabSummary" data-progress-panel="summary">
-      <div class="card progress-overview-card"><div class="eyebrow">Resumen</div><div id="progressSummary"></div></div>      <div class="card"><div class="section-head"><div><h3>Tu actividad de la semana</h3><p class="muted small">Minutos registrados por día, combinando rutinas y actividad al aire libre.</p></div><span class="tag">Últimos 7 días</span></div><div id="weeklyActivityChart" class="weekly-activity-chart"></div></div>      <div class="card"><div class="section-head"><div><h3>Retos de constancia</h3><p class="muted small">Pequeñas metas para mantener el hábito, ajustadas según lo que registres.</p></div><span class="tag">Esta semana</span></div><div id="consistencyChallenges" class="progress-insight-grid"></div><p class="muted small">El avance se calcula con rutinas y actividades anotadas en este dispositivo. No es un registro médico ni una verificación automática del ejercicio realizado.</p></div>      <div class="card"><div class="section-head"><div><h3>Comparación semanal</h3><p class="muted small">Últimos 7 días frente a los 7 días anteriores. Los cambios se calculan solo con tus registros.</p></div></div><div id="weeklyComparison" class="progress-insight-grid"></div></div>      <div class="card"><div class="section-head"><div><h3>Resumen del mes</h3><p class="muted small">Actividad registrada durante el mes actual.</p></div><span id="monthlySummaryLabel" class="tag">Este mes</span></div><div id="monthlySummary" class="progress-insight-grid"></div></div>      <div class="card daily-habits-card"><div class="section-head"><div><h3>Hábitos de hoy</h3><p class="muted small">Marcá lo que hiciste. Se guarda en este dispositivo y podés desmarcarlo cuando quieras.</p></div><span class="tag" id="habitTodayDate">Hoy</span></div><div id="habitTodaySummary" class="habit-today-summary"></div><div id="habitChecklist" class="habit-checklist"></div><div class="habit-week-heading"><strong>Últimos 7 días</strong><span class="muted small" id="habitWeekSummary"></span></div><div id="habitWeekHistory" class="habit-week-history"></div><p class="muted small">El registro es personal y subjetivo; no verifica automáticamente tus hábitos ni reemplaza orientación profesional.</p></div>      </div>
+      <div class="card progress-overview-card"><div class="eyebrow">Resumen</div><div id="progressSummary"></div></div>      <div class="card"><div class="section-head"><div><h3>Tu actividad</h3><p class="muted small">Minutos registrados entre rutinas y actividad al aire libre, comparados con el período anterior equivalente.</p></div></div><div class="ff-chips" role="group" aria-label="Período"><button type="button" class="ff-chip active" data-activity-period="7d" aria-pressed="true">7 días</button><button type="button" class="ff-chip" data-activity-period="4w" aria-pressed="false">4 semanas</button><button type="button" class="ff-chip" data-activity-period="12w" aria-pressed="false">12 semanas</button></div><div id="weeklyActivityChart" class="weekly-activity-chart"></div><div id="activityPeriodSummary" class="period-summary"></div></div>      <div class="card"><div class="section-head"><div><h3>Retos de constancia</h3><p class="muted small">Pequeñas metas para mantener el hábito, ajustadas según lo que registres.</p></div><span class="tag">Esta semana</span></div><div id="consistencyChallenges" class="progress-insight-grid"></div><p class="muted small">El avance se calcula con rutinas y actividades anotadas en este dispositivo. No es un registro médico ni una verificación automática del ejercicio realizado.</p></div>      <div class="card"><div class="section-head"><div><h3>Comparación semanal</h3><p class="muted small">Últimos 7 días frente a los 7 días anteriores. Los cambios se calculan solo con tus registros.</p></div></div><div id="weeklyComparison" class="progress-insight-grid"></div></div>      <div class="card"><div class="section-head"><div><h3>Resumen del mes</h3><p class="muted small">Actividad registrada durante el mes actual.</p></div><span id="monthlySummaryLabel" class="tag">Este mes</span></div><div id="monthlySummary" class="progress-insight-grid"></div></div>      <div class="card daily-habits-card"><div class="section-head"><div><h3>Hábitos de hoy</h3><p class="muted small">Marcá lo que hiciste. Se guarda en este dispositivo y podés desmarcarlo cuando quieras.</p></div><span class="tag" id="habitTodayDate">Hoy</span></div><div id="habitTodaySummary" class="habit-today-summary"></div><div id="habitChecklist" class="habit-checklist"></div><div class="habit-week-heading"><strong>Últimos 7 días</strong><span class="muted small" id="habitWeekSummary"></span></div><div id="habitWeekHistory" class="habit-week-history"></div><p class="muted small">El registro es personal y subjetivo; no verifica automáticamente tus hábitos ni reemplaza orientación profesional.</p></div>      </div>
       <div class="progress-panel" id="progressPanelBadges" role="tabpanel" aria-labelledby="progressTabBadges" data-progress-panel="badges" hidden>
       <div class="card achievement-center" id="achievementCenter">
         <div class="section-head"><div><div class="eyebrow">Logros personales</div><h3>Insignias y desafíos</h3><p class="muted small achievement-intro">Cada desafío tiene 12 niveles: Bronce, Plata, Oro y Diamante, con tres niveles cada uno. Cada actividad usa su propia métrica.</p></div></div>
@@ -1798,7 +1822,9 @@
       <div class="card"><div class="section-head"><div><h3>Récords personales registrados</h3><p class="muted small">Mejor carga y mayor número de repeticiones que anotaste por ejercicio. No son pruebas máximas supervisadas.</p></div></div><div id="personalRecords"></div></div>      <div class="card"><h3>Historial de sesiones</h3><div id="historyList"></div><div class="btn-row"><button type="button" class="btn ghost" id="exportData">Exportar mis datos</button><button type="button" class="btn secondary" id="importData">Importar copia</button><input id="importDataFile" type="file" accept="application/json,.json" hidden><button type="button" class="btn danger" id="clearData">Borrar todos los datos</button></div><p class="muted small">Exportá tus datos antes de cambiar de dispositivo. La importación reemplaza los datos locales actuales con la copia elegida.</p></div>
       </div>
       <div class="progress-panel" id="progressPanelBody" role="tabpanel" aria-labelledby="progressTabBody" data-progress-panel="body" hidden>
-      <div class="card"><h3>Seguimiento de peso</h3><form id="weightForm" class="chat-form"><label class="sr-only" for="weightInput">Peso en kg</label><input id="weightInput" type="number" min="20" max="350" step="0.1" placeholder="Peso actual en kg" required><button class="btn" type="submit">Registrar</button></form><div id="weightChart" class="weight-chart"></div><div id="weightHistory"></div><p class="muted small">El peso puede fluctuar por hidratación, comidas y otros factores; mirá tendencias, no un único dato.</p></div>
+      <div class="card"><h3>Seguimiento de peso</h3><div class="ff-chips" role="group" aria-label="Período del peso"><button type="button" class="ff-chip" data-weight-period="1m" aria-pressed="false">1 mes</button><button type="button" class="ff-chip active" data-weight-period="3m" aria-pressed="true">3 meses</button><button type="button" class="ff-chip" data-weight-period="6m" aria-pressed="false">6 meses</button><button type="button" class="ff-chip" data-weight-period="all" aria-pressed="false">Todo</button></div><form id="weightForm" class="chat-form"><label class="sr-only" for="weightInput">Peso en kg</label><input id="weightInput" type="number" min="20" max="350" step="0.1" placeholder="Peso actual en kg" required><button class="btn" type="submit">Registrar</button></form><div id="weightChart" class="weight-chart"></div><div id="weightHistory"></div><p class="muted small">El peso puede fluctuar por hidratación, comidas y otros factores; mirá tendencias, no un único dato.</p></div>
+      <div class="card" id="measureCard"><h3>Medidas corporales</h3><p class="muted small">Privadas. Completá solo las que quieras; mirá tendencias, no un único dato.</p><form id="measureForm" novalidate><div class="field"><label for="measureDate">Fecha</label><input id="measureDate" name="measureDate" type="date" required></div><div class="grid2"><div class="field"><label for="m_waist">Cintura (cm)</label><input id="m_waist" name="m_waist" type="number" min="40" max="200" step="0.1" inputmode="decimal" placeholder="—"></div><div class="field"><label for="m_hip">Cadera (cm)</label><input id="m_hip" name="m_hip" type="number" min="40" max="220" step="0.1" inputmode="decimal" placeholder="—"></div><div class="field"><label for="m_chest">Pecho (cm)</label><input id="m_chest" name="m_chest" type="number" min="40" max="220" step="0.1" inputmode="decimal" placeholder="—"></div><div class="field"><label for="m_arm">Brazo (cm)</label><input id="m_arm" name="m_arm" type="number" min="10" max="80" step="0.1" inputmode="decimal" placeholder="—"></div><div class="field"><label for="m_thigh">Muslo (cm)</label><input id="m_thigh" name="m_thigh" type="number" min="20" max="120" step="0.1" inputmode="decimal" placeholder="—"></div><div class="field"><label for="m_bodyFat">Grasa corporal (%)</label><input id="m_bodyFat" name="m_bodyFat" type="number" min="2" max="70" step="0.1" inputmode="decimal" placeholder="—"></div></div><button class="btn full" type="submit">Guardar medidas</button></form><div id="measureHistory"></div></div>
+      <div class="card" id="progressPhotoCard"><h3>Fotos de progreso</h3><p class="muted small">Se guardan solo en este dispositivo, comprimidas y sin metadatos. No se suben a la nube ni se publican.</p><form id="progressPhotoForm" class="grid2"><div class="field"><label for="progressPhotoFile">Foto</label><input id="progressPhotoFile" name="progressPhotoFile" type="file" accept="image/jpeg,image/png,image/webp" required></div><div class="field"><label for="progressPhotoDate">Fecha</label><input id="progressPhotoDate" name="progressPhotoDate" type="date" required></div><button class="btn full" type="submit">Guardar foto</button></form><div id="progressPhotoList"></div></div>
       </div>
     </section>
 
@@ -2011,14 +2037,14 @@
         <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
         <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">42.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">42.1</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
       </details>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 42.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 42.1 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -2045,7 +2071,7 @@
   <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow">›</span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V42.0</p>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V42.1</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -2080,7 +2106,7 @@
   const PREVIOUS_V3_STORAGE = 'fittforma-ai-v3';
   const PREVIOUS_STORAGE = 'fittforma-ai-v2';
   const LEGACY_STORAGE = 'forma-prototype-v1';
-  const defaults = {routines:[],plannedActivities:[],mealFavorites:[],habitLogs:{},waterLogs:{},badgeRecords:[],badgeUnlocks:{},profile:{goal:'fitness',level:'beginner',days:'3',equipment:'gym',duration:'30',name:'',age:'',heightCm:'',currentWeightKg:'',targetWeightKg:'',activityLevel:'light'},sessions:[],plan:null,meals:[],weights:[],activities:[],water:{date:'',count:0},nutritionGoals:{calories:2400,protein:120,carbs:280,fat:80,water:8},chat:[],proposal:null,planHistory:[],runningPlan:'starter',reminders:{enabled:false,time:'18:00',days:[1,3,5],missedEnabled:true,missedTime:'21:00',lastTrainingNoticeDate:'',lastMissedNoticeDate:''}};
+  const defaults = {routines:[],bodyMeasures:[],notifications:[],coachShareData:true,plannedActivities:[],mealFavorites:[],habitLogs:{},waterLogs:{},badgeRecords:[],badgeUnlocks:{},profile:{goal:'fitness',level:'beginner',days:'3',equipment:'gym',duration:'30',name:'',age:'',heightCm:'',currentWeightKg:'',targetWeightKg:'',activityLevel:'light'},sessions:[],plan:null,meals:[],weights:[],activities:[],water:{date:'',count:0},nutritionGoals:{calories:2400,protein:120,carbs:280,fat:80,water:8},chat:[],proposal:null,planHistory:[],runningPlan:'starter',reminders:{enabled:false,time:'18:00',days:[1,3,5],missedEnabled:true,missedTime:'21:00',lastTrainingNoticeDate:'',lastMissedNoticeDate:''}};
   let state = loadState();
   let activeSession = null;
   let lastWorkoutSummary = null;
@@ -3449,6 +3475,7 @@ function findCatalogExercise(name){
       });
     }
     const changed=JSON.stringify(unlocks)!==JSON.stringify(state.badgeUnlocks||{});state.badgeUnlocks=unlocks;
+    if(newlyUnlocked.length){const top=new Map();for(const b of newlyUnlocked){const prev=top.get(b.exerciseId);if(!prev||b.level>prev.level)top.set(b.exerciseId,b);}for(const b of top.values())addNotification({id:`badge:${b.id}`,title:'Nueva insignia',body:`${b.exerciseName} · ${BadgeEngine.rankForLevel(b.level-1).label}`,target:'badges'});}
     if(changed)window.dispatchEvent(new CustomEvent('fittforma:badgeschange'));
     return {changed,newlyUnlocked,upgraded,revoked,catalog};
   }
@@ -3607,7 +3634,7 @@ function findCatalogExercise(name){
     const tabs=[...document.querySelectorAll('[data-progress-tab]')];if(!tabs.some(t=>t.dataset.progressTab===name))name='summary';
     tabs.forEach(t=>{const on=t.dataset.progressTab===name;t.classList.toggle('active',on);t.setAttribute('aria-selected',String(on));t.tabIndex=on?0:-1;if(on&&focus)t.focus();});
     document.querySelectorAll('[data-progress-panel]').forEach(p=>{p.hidden=p.dataset.progressPanel!==name;});
-    if(name==='body'&&typeof renderWeights==='function')renderWeights();
+    if(name==='body'){renderWeights();renderMeasures();renderProgressPhotos();}
   }
   function initProgressTabs(){
     const tabs=[...document.querySelectorAll('[data-progress-tab]')];
@@ -3626,7 +3653,7 @@ function findCatalogExercise(name){
     const weightGoalHtml=Number.isFinite(currentKg)&&currentKg>0&&Number.isFinite(targetKg)&&targetKg>0?`<div class="notice"><strong>Tu objetivo de peso:</strong> ${currentKg.toFixed(1)} kg actuales → ${targetKg.toFixed(1)} kg objetivo. ${Math.abs(targetKg-currentKg)<0.1?'Estás en el peso que definiste como meta.':`Diferencia: ${Math.abs(targetKg-currentKg).toFixed(1)} kg ${targetKg>currentKg?'por ganar para la meta':'por bajar para la meta'}.`} El peso diario puede fluctuar; mirá la tendencia a lo largo de las semanas.</div>`:'';
     $('progressSummary').innerHTML=`<div class="stats" style="margin:12px 0 0"><div class="stat"><strong>${total}</strong><small>Rutinas completadas</small></div><div class="stat"><strong>${activeDays}</strong><small>Días activos</small></div><div class="stat"><strong>${totalSets}</strong><small>Registros de series</small></div></div>${weightGoalHtml}<p class="muted small">Tiempo total registrado: ${mins} minutos entre rutinas y actividades al aire libre. El tiempo de las rutinas se estima desde que abriste la sesión hasta que la guardaste.</p>`;
     $('historyList').innerHTML=state.sessions.length?state.sessions.slice(0,30).map(s=>`<div class="history-item"><div><strong>${esc(s.title)}</strong><small>${prettyDate(s.date)} · ${Array.isArray(s.exercises)?s.exercises.length:0} ejercicios · ${Number(s.minutes)||0} min</small>${s.notes?`<div class="muted small">${esc(s.notes)}</div>`:''}${s.editedAt?'<div class="muted small">Editada</div>':''}</div><div class="history-actions"><span class="tag">${setsOf(s)} series</span><button class="btn ghost btn-sm" type="button" data-session-edit="${esc(String(s.id))}">Editar</button><button class="btn ghost btn-sm" type="button" data-session-delete="${esc(String(s.id))}">Eliminar</button></div></div>`).join(''):'<div class="empty"><strong>Todavía no hay sesiones</strong><p>Cuando guardes tu primer entrenamiento, aparecerá acá.</p><button class="btn" type="button" data-goto-view="train">Empezar un entrenamiento</button></div>';
-    renderWeeklyActivityChart();
+    renderActivityPeriod();
     renderConsistencyChallenges();
     renderTrainingInsights();
     renderHabitTracker();
@@ -3929,6 +3956,13 @@ function findCatalogExercise(name){
     try{const r=await fetch('/api/status',{cache:'no-store'});if(!r.ok)throw new Error('sin estado');const status=await r.json();el.textContent=status.configured?`Servidor con clave configurada (${status.model}). Probá una consulta para validar que la clave funciona; pueden existir límites o costos.`:'Backend disponible, pero falta configurar la clave privada: modo demostración.';}
     catch{el.textContent='No se detectó el backend de IA en este sitio: modo demostración local.';}
   }
+  function coachExtraContext(){
+    const today=dateKey(),meals=typeof todayMeals==='function'?todayMeals():[],sum=k=>Math.round(meals.reduce((n,m)=>n+(Number(m[k])||0),0));
+    const from=dateKey(dayStart(6)),recent=(state.meals||[]).filter(m=>m.date>=from&&m.date<=today),days=[...new Set(recent.map(m=>m.date))];
+    const byDay=days.map(d=>recent.filter(m=>m.date===d)),avg=k=>days.length?Math.round(byDay.reduce((n,list)=>n+list.reduce((x,m)=>x+(Number(m[k])||0),0),0)/days.length):null;
+    const badges=(typeof window.FittFormaShareableBadges==='function'?window.FittFormaShareableBadges():[]).slice(0,10).map(b=>({name:b.payload.exerciseName,rank:b.label.split(' · ').slice(1).join(' · ')}));
+    return {nutrition:{today:{calories:sum('calories'),protein:sum('protein'),carbs:sum('carbs'),fat:sum('fat'),meals:meals.length,water:Math.max(0,Number(state.waterLogs?.[today])||0)},last7:{daysWithRecords:days.length,avgCalories:avg('calories'),avgProtein:avg('protein')}},routines:(state.routines||[]).slice(0,5).map(r=>({name:r.name,exercises:r.exercises.slice(0,10).map(e=>({name:e.name,sets:e.sets,reps:e.reps}))})),badges};
+  }
   async function sendCoach(text){
     const msg=text.trim();if(!msg)return;
     if(window.FittFormaAds && !window.FittFormaAds.canAskCoach()){
@@ -3940,7 +3974,7 @@ function findCatalogExercise(name){
     save();renderCoach();$('coachInput').value='';
     let backendUnavailable=false;
     try{
-      const response=await fetch('/api/coach',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),profile:state.profile,goals:state.nutritionGoals,plan:state.plan,sessions:(state.sessions||[]).slice(0,5).map(s=>({date:s.date,title:s.title,minutes:s.minutes,notes:s.notes,exercises:(s.exercises||[]).slice(0,8).map(e=>({name:e.name,entries:(e.entries||[]).slice(0,6).map(x=>({reps:x.reps,weight:x.weight,done:x.done}))}))})),activities:(state.activities||[]).slice(-5).reverse().map(a=>({date:a.date,type:a.type,distance:a.distance,minutes:a.minutes,pace:a.pace})),weights:(state.weights||[]).slice(-5).reverse().map(w=>({date:w.date,kg:w.kg??w.weight})),language:window.FittFormaI18n?.getLanguage?.()||'es'})});
+      const response=await fetch('/api/coach',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(state.coachShareData===false?{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:false,language:window.FittFormaI18n?.getLanguage?.()||'es'}:{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:true,...coachExtraContext(),profile:state.profile,goals:state.nutritionGoals,plan:state.plan,sessions:(state.sessions||[]).slice(0,5).map(s=>({date:s.date,title:s.title,minutes:s.minutes,notes:s.notes,exercises:(s.exercises||[]).slice(0,8).map(e=>({name:e.name,entries:(e.entries||[]).slice(0,6).map(x=>({reps:x.reps,weight:x.weight,done:x.done}))}))})),activities:(state.activities||[]).slice(-5).reverse().map(a=>({date:a.date,type:a.type,distance:a.distance,minutes:a.minutes,pace:a.pace})),weights:(state.weights||[]).slice(-5).reverse().map(w=>({date:w.date,kg:w.kg??w.weight})),language:window.FittFormaI18n?.getLanguage?.()||'es'})});
       const data=await response.json().catch(()=>({}));
       if(response.ok){
         if(window.FittFormaAds)window.FittFormaAds.recordCoachSuccess();
@@ -4254,7 +4288,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.42.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.40.21. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.42.1')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.40.21. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -4328,8 +4362,8 @@ function findCatalogExercise(name){
     root.innerHTML=days.map(x=>{const h=x.minutes?Math.max(5,Math.round(x.minutes/max*100)):3;const label=x.d.toLocaleDateString('es-UY',{weekday:'short'}).replace('.','').slice(0,3);return `<div class="activity-bar-day ${x.key===dateKey()?'today':''}" title="${prettyDate(x.key)}: ${x.minutes} minutos"><span class="activity-bar-value">${x.minutes?x.minutes+'m':'—'}</span><div class="activity-bar-track"><div class="activity-bar-fill" style="height:${h}%"></div></div><span class="activity-bar-label">${label}</span></div>`;}).join('');
   }
   function renderWeightChart(){
-    const root=$('weightChart');if(!root)return;const points=(state.weights||[]).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(-10);
-    if(points.length<2){root.innerHTML='<div class="weight-chart-empty">Registrá al menos dos mediciones de peso para ver una gráfica de tendencia.</div>';return;}
+    const root=$('weightChart');if(!root)return;const points=weightPointsForPeriod().slice(-60);
+    if(points.length<2){root.innerHTML=`<div class="weight-chart-empty">${(state.weights||[]).length>=2?'No hay al menos dos registros de peso en este período. Elegí un período más largo.':'Registrá al menos dos mediciones de peso para ver una gráfica de tendencia.'}</div>`;return;}
     const vals=points.map(p=>Number(p.kg)).filter(Number.isFinite);if(vals.length<2){root.innerHTML='<div class="weight-chart-empty">Todavía no hay suficientes registros válidos para dibujar la tendencia.</div>';return;}
     const min=Math.min(...vals),max=Math.max(...vals),range=Math.max(0.8,max-min),x0=44,x1=756,y0=28,y1=154;const coords=points.map((p,i)=>({x:x0+(x1-x0)*(i/(points.length-1)),y:y1-((Number(p.kg)-(min-(range-(max-min))/2))/range)*(y1-y0),kg:Number(p.kg),date:p.date}));
     const poly=coords.map(p=>`${p.x},${p.y}`).join(' ');const dots=coords.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#83bdff" stroke="#0c1727" stroke-width="2"><title>${esc(p.date)}: ${p.kg.toFixed(1)} kg</title></circle>`).join('');const first=points[0],last=points[points.length-1];
@@ -4451,10 +4485,140 @@ function findCatalogExercise(name){
         set('homeBadgeBtn','Registrar una marca');
       }
     }catch(error){console.error('No se pudo calcular la insignia de Inicio:',error);unlocked=[];}
+    if(typeof renderNotifications==='function')renderNotifications();
     const empty=$('homeEmpty');if(empty)empty.hidden=!!(sessions.length||activities.length||meals.length||water||unlocked.length);
   }
   function renderAll(){renderAllBase();renderHome();}
   function renderAllBase(){renderRoutines();renderStats();renderPlan();renderProgress();renderProfile();renderNutrition();renderCoach();renderWeights();renderActivities();renderRunningPlan();renderRunningHistory();renderPlanner();}
+  // ---------- v42.1: períodos en Progreso ----------
+  const PERIODS={'7d':{days:7,label:'7 días',bucket:'day'},'4w':{days:28,label:'4 semanas',bucket:'week'},'12w':{days:84,label:'12 semanas',bucket:'week'}};
+  let activityPeriod='7d',weightPeriod='3m';
+  function dayStart(offsetDays){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-offsetDays);return d;}
+  function periodTotals(fromKey,toKey){
+    const inRange=x=>{const k=String(x?.date||'').slice(0,10);return k>=fromKey&&k<=toKey;};
+    const sessions=(state.sessions||[]).filter(inRange),acts=(state.activities||[]).filter(inRange),runs=acts.filter(a=>BadgeEngine.normalizeName(a.type)==='correr');
+    const minutes=Math.round(sessions.reduce((n,x)=>n+(Number(x.minutes)||0),0)+acts.reduce((n,x)=>n+(Number(x.minutes)||0),0));
+    const km=runs.reduce((n,a)=>n+(Number(a.distance)||0),0),runMin=runs.reduce((n,a)=>n+(Number(a.minutes)||0),0);
+    const days=new Set([...sessions,...acts].map(x=>String(x.date).slice(0,10))).size;
+    return {sessions:sessions.length,activities:acts.length,minutes,days,km,runs:runs.length,gpsRuns:runs.filter(a=>a.source==='gps').length,paceSec:km>0?runMin*60/km:0};
+  }
+  function changeText(cur,prev,unit=''){
+    if(!prev&&!cur)return '<small class="muted">sin registros en ambos períodos</small>';
+    if(!prev)return '<small class="muted">sin registros en el período anterior</small>';
+    const pct=Math.round((cur-prev)/prev*100);
+    return `<small class="${pct>=0?'up':'down'}">${pct>=0?'+':''}${pct}% vs. período anterior${unit?` (${prev}${unit})`:''}</small>`;
+  }
+  function renderActivityPeriod(){
+    const root=$('weeklyActivityChart'),sum=$('activityPeriodSummary');if(!root)return;
+    const cfg=PERIODS[activityPeriod]||PERIODS['7d'];
+    document.querySelectorAll('[data-activity-period]').forEach(b=>{const on=b.dataset.activityPeriod===activityPeriod;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});
+    if(cfg.bucket==='day')renderWeeklyActivityChart();
+    else{
+      const weeks=cfg.days/7,bars=Array.from({length:weeks},(_,i)=>{const end=dayStart((weeks-1-i)*7),start=dayStart((weeks-1-i)*7+6);const t=periodTotals(dateKey(start),dateKey(end));return {label:`${start.getDate()}/${start.getMonth()+1}`,minutes:t.minutes,title:`${prettyDate(dateKey(start))} – ${prettyDate(dateKey(end))}: ${t.minutes} minutos`};});
+      const max=Math.max(60,...bars.map(b=>b.minutes));
+      root.innerHTML=bars.map((b,i)=>`<div class="activity-bar-day ${i===bars.length-1?'today':''}" title="${esc(b.title)}"><span class="activity-bar-value">${b.minutes?b.minutes+'m':'—'}</span><div class="activity-bar-track"><div class="activity-bar-fill" style="height:${b.minutes?Math.max(5,Math.round(b.minutes/max*100)):3}%"></div></div><span class="activity-bar-label">${esc(b.label)}</span></div>`).join('');
+    }
+    if(!sum)return;
+    const cur=periodTotals(dateKey(dayStart(cfg.days-1)),dateKey(dayStart(0))),prev=periodTotals(dateKey(dayStart(cfg.days*2-1)),dateKey(dayStart(cfg.days)));
+    if(!cur.sessions&&!cur.activities&&!prev.sessions&&!prev.activities){sum.innerHTML=`<p class="muted small">Todavía no hay registros en las últimas ${esc(cfg.label)}. Guardá un entrenamiento o una actividad para ver la comparación.</p>`;return;}
+    sum.innerHTML=`<div class="period-metric"><span>Minutos</span><strong>${cur.minutes}</strong>${changeText(cur.minutes,prev.minutes)}</div><div class="period-metric"><span>Días activos</span><strong>${cur.days}</strong>${changeText(cur.days,prev.days)}</div><div class="period-metric"><span>Entrenamientos</span><strong>${cur.sessions}</strong>${changeText(cur.sessions,prev.sessions)}</div><div class="period-metric"><span>Running</span><strong>${cur.km.toLocaleString('es-UY',{maximumFractionDigits:1})} km</strong><small class="muted">${cur.runs} carrera(s)${cur.runs?` · ritmo medio ${paceTextFromSeconds(cur.paceSec)} min/km · ${cur.gpsRuns} con GPS, ${cur.runs-cur.gpsRuns} manual(es)`:''}</small></div>`;
+  }
+  function weightPointsForPeriod(){
+    const months={'1m':1,'3m':3,'6m':6}[weightPeriod];const all=(state.weights||[]).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+    if(!months)return all;const from=new Date();from.setMonth(from.getMonth()-months);const key=dateKey(from);return all.filter(w=>String(w.date)>=key);
+  }
+
+  // ---------- v42.1: medidas corporales y fotos privadas ----------
+  const MEASURE_FIELDS=[['waist','Cintura','cm',40,200],['hip','Cadera','cm',40,220],['chest','Pecho','cm',40,220],['arm','Brazo','cm',10,80],['thigh','Muslo','cm',20,120],['bodyFat','Grasa corporal','%',2,70]];
+  function renderMeasures(){
+    const root=$('measureHistory');if(!root)return;const list=(state.bodyMeasures||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+    if(!list.length){root.innerHTML='<p class="muted small">Todavía no registraste medidas. Son privadas y quedan en este dispositivo (y en tu copia de la nube si la usás).</p>';return;}
+    const first=list[list.length-1],last=list[0];
+    const deltas=MEASURE_FIELDS.filter(([k])=>Number.isFinite(Number(first[k]))&&Number.isFinite(Number(last[k]))&&first!==last&&first[k]!==''&&last[k]!=='').map(([k,l,u])=>{const d=Number(last[k])-Number(first[k]);return `<span>${esc(l)}: ${d>0?'+':''}${d.toFixed(1)} ${u}</span>`;});
+    root.innerHTML=(deltas.length?`<div class="measure-deltas"><strong>Cambio desde ${esc(prettyDate(first.date))}</strong>${deltas.join('')}</div>`:'')+`<ul class="ff-list">${list.slice(0,12).map(m=>`<li class="ff-list-row"><div><strong>${esc(prettyDate(m.date))}</strong><small>${MEASURE_FIELDS.filter(([k])=>m[k]!==''&&m[k]!=null).map(([k,l,u])=>`${l} ${Number(m[k]).toFixed(1)} ${u}`).join(' · ')}</small></div><button class="btn ghost btn-sm" type="button" data-remove-measure="${esc(String(m.id))}">Quitar</button></li>`).join('')}</ul>`;
+  }
+  function saveMeasure(e){
+    e.preventDefault();const form=e.target,entry={id:Date.now(),date:form.elements.measureDate.value};
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(entry.date)||entry.date>dateKey()){toast('Elegí una fecha válida que no sea futura.');return;}
+    let count=0;
+    for(const [k,l,u,min,max] of MEASURE_FIELDS){const raw=String(form.elements['m_'+k].value).trim().replace(',','.');if(raw===''){entry[k]='';continue;}const v=Number(raw);if(!Number.isFinite(v)||v<min||v>max){toast(`${l}: ingresá un valor entre ${min} y ${max} ${u}.`);form.elements['m_'+k].focus();return;}entry[k]=Math.round(v*10)/10;count++;}
+    if(!count){toast('Completá al menos una medida.');return;}
+    state.bodyMeasures=Array.isArray(state.bodyMeasures)?state.bodyMeasures:[];
+    if(state.bodyMeasures.some(m=>m.date===entry.date&&MEASURE_FIELDS.every(([k])=>String(m[k]??'')===String(entry[k]??'')))){toast('Ya registraste esas mismas medidas en esa fecha.');return;}
+    state.bodyMeasures.push(entry);state.bodyMeasures=state.bodyMeasures.slice(-300);if(!save())return;
+    form.reset();form.elements.measureDate.value=dateKey();renderMeasures();toast('Medidas guardadas.');
+  }
+  // Fotos de progreso: solo en IndexedDB de este dispositivo. No se sincronizan ni se publican.
+  const PHOTO_DB='fittforma-progress-photos',PHOTO_STORE='photos';
+  function photoDb(){return new Promise((resolve,reject)=>{if(!('indexedDB' in window)){reject(new Error('Este navegador no permite guardar fotos localmente.'));return;}const req=indexedDB.open(PHOTO_DB,1);req.onupgradeneeded=()=>{req.result.createObjectStore(PHOTO_STORE,{keyPath:'id'});};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||new Error('No se pudo abrir el almacenamiento de fotos.'));});}
+  async function photoTx(mode,fn){const db=await photoDb();return new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,mode),store=tx.objectStore(PHOTO_STORE);let out;Promise.resolve(fn(store)).then(v=>{out=v;});tx.oncomplete=()=>{db.close();resolve(out);};tx.onerror=tx.onabort=()=>{db.close();reject(tx.error||new Error('Operación de fotos fallida.'));};});}
+  function reqValue(req){return new Promise((res,rej)=>{req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error);});}
+  async function compressPhoto(file){
+    if(!['image/jpeg','image/png','image/webp'].includes(file?.type))throw new Error('La foto debe ser JPG, PNG o WebP.');
+    if(file.size>12*1024*1024)throw new Error('La foto original supera 12 MB.');
+    const bmp=await createImageBitmap(file);try{const scale=Math.min(1,1280/Math.max(bmp.width,bmp.height)),c=document.createElement('canvas');c.width=Math.round(bmp.width*scale);c.height=Math.round(bmp.height*scale);c.getContext('2d',{alpha:false}).drawImage(bmp,0,0,c.width,c.height);return await new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('No se pudo comprimir la foto.')),'image/jpeg',0.82));}finally{bmp.close?.();}
+  }
+  let photoUrls=[];
+  async function renderProgressPhotos(){
+    const root=$('progressPhotoList');if(!root)return;
+    let photos=[];try{photos=await photoTx('readonly',store=>reqValue(store.getAll()));}catch(error){root.innerHTML=`<p class="muted small">${esc(error.message)}</p>`;return;}
+    photoUrls.forEach(u=>URL.revokeObjectURL(u));photoUrls=[];
+    photos.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+    if(!photos.length){root.innerHTML='<p class="muted small">Sin fotos todavía. Se guardan solo en este dispositivo: no se suben a la nube ni a Comunidad, y no se incluyen en la exportación.</p>';return;}
+    root.innerHTML=`<div class="progress-photo-grid">${photos.map(p=>{const url=URL.createObjectURL(p.blob);photoUrls.push(url);return `<figure class="progress-photo"><img src="${url}" alt="Foto de progreso del ${esc(prettyDate(p.date))}" loading="lazy"><figcaption>${esc(prettyDate(p.date))}<button class="btn ghost btn-sm" type="button" data-remove-photo="${esc(p.id)}">Quitar</button></figcaption></figure>`;}).join('')}</div>`;
+  }
+  async function saveProgressPhoto(e){
+    e.preventDefault();const form=e.target,file=form.elements.progressPhotoFile.files?.[0],date=form.elements.progressPhotoDate.value,btn=form.querySelector('button[type=submit]');
+    if(!file){toast('Elegí una foto.');return;}if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>dateKey()){toast('Elegí una fecha válida que no sea futura.');return;}
+    btn.disabled=true;
+    try{const blob=await compressPhoto(file);await photoTx('readwrite',store=>store.put({id:'p'+Date.now().toString(36),date,blob,createdAt:new Date().toISOString()}));form.reset();form.elements.progressPhotoDate.value=dateKey();await renderProgressPhotos();toast('Foto guardada en este dispositivo.');}
+    catch(error){toast(`No se pudo guardar la foto: ${error.message}`);}finally{btn.disabled=false;}
+  }
+  function initBodyTracking(){
+    const mf=$('measureForm'),pf=$('progressPhotoForm');
+    if(mf){mf.elements.measureDate.value=dateKey();mf.addEventListener('submit',saveMeasure);}
+    if(pf){pf.elements.progressPhotoDate.value=dateKey();pf.addEventListener('submit',saveProgressPhoto);}
+    $('measureHistory')?.addEventListener('click',e=>{const b=e.target.closest('[data-remove-measure]');if(!b)return;if(!confirm('¿Quitar estas medidas?'))return;state.bodyMeasures=(state.bodyMeasures||[]).filter(m=>String(m.id)!==b.dataset.removeMeasure);save();renderMeasures();});
+    $('progressPhotoList')?.addEventListener('click',async e=>{const b=e.target.closest('[data-remove-photo]');if(!b)return;if(!confirm('¿Quitar esta foto de este dispositivo?'))return;try{await photoTx('readwrite',store=>store.delete(b.dataset.removePhoto));await renderProgressPhotos();toast('Foto quitada.');}catch(error){toast(`No se pudo quitar: ${error.message}`);}});
+    document.querySelectorAll('[data-weight-period]').forEach(b=>b.addEventListener('click',()=>{weightPeriod=b.dataset.weightPeriod;document.querySelectorAll('[data-weight-period]').forEach(x=>{const on=x===b;x.classList.toggle('active',on);x.setAttribute('aria-pressed',String(on));});renderWeightChart();}));
+    document.querySelectorAll('[data-activity-period]').forEach(b=>b.addEventListener('click',()=>{activityPeriod=b.dataset.activityPeriod;renderActivityPeriod();}));
+  }
+
+  // ---------- v42.1: notificaciones dentro de la app ----------
+  // Guardadas: insignias obtenidas (id único por insignia). Derivadas en vivo: recordatorio de hoy,
+  // sesión en curso y mensajes sin leer. Ninguna se marca como enviada por el sistema operativo.
+  let communityUnread=0;
+  function addNotification(n){
+    state.notifications=Array.isArray(state.notifications)?state.notifications:[];
+    if(state.notifications.some(x=>x.id===n.id))return false;
+    state.notifications.unshift({read:false,at:new Date().toISOString(),...n});state.notifications=state.notifications.slice(0,50);return true;
+  }
+  function derivedNotifications(){
+    const out=[],today=dateKey(),cfg=state.reminders||{};
+    if(activeSession)out.push({id:'live:session',title:'Entrenamiento en curso',body:`«${activeSession.title}» está ${activeSession.pausedAt?'en pausa':'abierto'}. Podés retomarlo o guardarlo.`,target:'train',live:true});
+    if(communityUnread>0)out.push({id:'live:messages',title:'Mensajes sin leer',body:`Tenés ${communityUnread} mensaje(s) sin leer en Comunidad.`,target:'community',live:true});
+    const days=Array.isArray(cfg.days)?cfg.days.map(Number):[],now=new Date(),[hh,mm]=String(cfg.time||'18:00').split(':').map(Number);
+    if(cfg.enabled&&days.includes(now.getDay())&&(now.getHours()>hh||(now.getHours()===hh&&now.getMinutes()>=mm))&&!(state.sessions||[]).some(s=>s.date===today)&&!(state.activities||[]).some(a=>a.date===today)&&!(state.plannedActivities||[]).some(p=>p.date===today&&p.type==='Descanso'))
+      out.push({id:'live:reminder',title:'Hoy toca entrenar',body:'Según tus recordatorios, hoy es día de entrenamiento y todavía no registraste actividad.',target:'train',live:true});
+    return out;
+  }
+  function renderNotifications(){
+    const stored=Array.isArray(state.notifications)?state.notifications:[],live=derivedNotifications(),unread=stored.filter(n=>!n.read).length+live.length;
+    const count=$('notifCount');if(count){count.hidden=!unread;count.textContent=unread>9?'9+':String(unread);}
+    const bell=$('notifBell');if(bell)bell.setAttribute('aria-label',unread?`Notificaciones: ${unread} sin leer`:'Notificaciones');
+    const panel=$('notifPanel');if(!panel||panel.hidden)return;
+    const items=[...live,...stored];
+    panel.querySelector('.notif-list').innerHTML=items.length?items.map(n=>`<li><button type="button" class="notif-item ${n.read?'':'unread'}" data-notif="${esc(n.id)}" data-target="${esc(n.target||'')}"><strong>${esc(n.title)}</strong><span>${esc(n.body)}</span>${n.at?`<small>${esc(prettyDate(String(n.at).slice(0,10)))}</small>`:''}</button></li>`).join(''):'<li class="muted small notif-empty">No tenés notificaciones. Acá vas a ver insignias nuevas, recordatorios y mensajes.</li>';
+  }
+  function initNotifications(){
+    const bell=$('notifBell'),panel=$('notifPanel');if(!bell||!panel)return;
+    bell.addEventListener('click',()=>{panel.hidden=!panel.hidden;bell.setAttribute('aria-expanded',String(!panel.hidden));renderNotifications();});
+    $('notifReadAll')?.addEventListener('click',()=>{(state.notifications||[]).forEach(n=>{n.read=true;});save();renderNotifications();});
+    panel.addEventListener('click',e=>{const b=e.target.closest('[data-notif]');if(!b)return;const n=(state.notifications||[]).find(x=>x.id===b.dataset.notif);if(n&&!n.read){n.read=true;save();}panel.hidden=true;bell.setAttribute('aria-expanded','false');if(b.dataset.target==='badges')showBadges();else if(b.dataset.target)switchView(b.dataset.target);renderNotifications();});
+    document.addEventListener('click',e=>{if(!panel.hidden&&!e.target.closest('#notifPanel')&&!e.target.closest('#notifBell')){panel.hidden=true;bell.setAttribute('aria-expanded','false');}});
+    window.addEventListener('fittforma:unread',e=>{communityUnread=Math.max(0,Number(e.detail?.total)||0);renderNotifications();});
+    renderNotifications();setInterval(renderNotifications,60000);
+  }
   // v42: pestañas internas reutilizables (Nutrición y futuras vistas). Progreso conserva las suyas.
   function showViewTab(view,name,focus=false){
     const root=$('view-'+view);if(!root)return;
@@ -4492,7 +4656,7 @@ function findCatalogExercise(name){
     if(name==='plan')renderHome();
     if(name==='train')renderTrain();
     if(name==='running'){renderRunningPlan();renderRunningHistory();updateRunPacePreview();initGpsMap();if(gpsMapInstance)setTimeout(()=>gpsMapInstance.invalidateSize(),140);}
-    if(name==='progress'){renderProgress();renderWeights();renderWeeklyActivityChart();}
+    if(name==='progress'){renderProgress();renderWeights();}
     if(name==='nutrition')renderNutrition();
     if(name==='coach')renderCoach();
     if(name==='community')window.FittFormaCommunity?.refresh?.();
@@ -4534,6 +4698,7 @@ function findCatalogExercise(name){
     $('profileDisplayNameInput').value=name;
     $('profileFocusInput').value=focus;
   }
+  {const share=$('coachShareData');if(share){share.checked=state.coachShareData!==false;share.addEventListener('change',()=>{state.coachShareData=share.checked;save();toast(share.checked?'FittAI usará tus registros.':'FittAI solo recibirá tu mensaje.');});}}
   $('identityForm').addEventListener('submit',e=>{
     e.preventDefault();
     const displayName=$('profileDisplayNameInput').value.trim().slice(0,48);
@@ -4720,7 +4885,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.42.0';
+  const APP_VERSION='0.42.1';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');
@@ -4763,7 +4928,7 @@ function findCatalogExercise(name){
   document.querySelectorAll('[data-library-mode]').forEach(b=>b.addEventListener('click',()=>{libraryMode=b.dataset.libraryMode;renderExerciseLibrary();}));
   document.querySelectorAll('.addMealIdea').forEach(b=>b.addEventListener('click',()=>{switchView('nutrition');$('mealName').value=b.dataset.name;$('mealCalories').value=b.dataset.cal;$('mealProtein').value=b.dataset.pro;$('mealCarbs').value=b.dataset.carbs||'';$('mealFat').value=b.dataset.fat||'';$('mealType').value='Almuerzo';$('mealName').focus();}));
   $('exerciseSearch').addEventListener('input',renderExerciseLibrary);$('exerciseGroupFilter').addEventListener('change',renderExerciseLibrary);$('exerciseFavoritesOnly').addEventListener('click',()=>{exerciseFavoritesOnly=!exerciseFavoritesOnly;renderExerciseLibrary();});
-  initBadgeCenter();initProgressTabs();document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});initViewTabs();initRoutines();initSessionHistoryEditing();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
+  initBadgeCenter();initProgressTabs();document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});initViewTabs();initRoutines();initBodyTracking();initNotifications();initSessionHistoryEditing();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
   setTimeout(()=>checkWorkoutReminders(),1200);setInterval(()=>{if(document.visibilityState==='visible')checkWorkoutReminders();},30000);window.addEventListener('focus',()=>{renderReminderSettings();checkWorkoutReminders();});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){renderReminderSettings();checkWorkoutReminders();}});
   document.addEventListener('visibilitychange',()=>{if(!activeSession)return;if(document.visibilityState==='hidden'&&!activeSession.pausedAt){activeSession.elapsedMs=activeSessionElapsedMs(activeSession);activeSession.segmentStartedAt=Date.now();activeSession.pausedAt=Date.now();activeSession.pauseReason='background';persistActiveSessionDraft();}else if(document.visibilityState==='visible'&&activeSession.pausedAt&&activeSession.pauseReason==='background'){activeSession.pausedAt=0;activeSession.pauseReason='';activeSession.segmentStartedAt=Date.now();persistActiveSessionDraft();updateWorkoutClock();}});
   window.addEventListener('pagehide',()=>{if(activeSession)persistActiveSessionDraft();});
