@@ -1,0 +1,1064 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-17T20:59:54+00:00",
+  "title": "Design System: FittForma AI",
+  "extensions": {
+    "colorMeta": {
+      "brand-blue": {
+        "role": "primary",
+        "displayName": "Brand Blue",
+        "canonical": "#2f5fe8",
+        "oklch": "oklch(53.9% 0.214 265.0)",
+        "tonalRamp": [
+          "#010038",
+          "#030079",
+          "#0823ae",
+          "#204bd3",
+          "#3d70fa",
+          "#6f9afd",
+          "#a9c4fc",
+          "#e7effe"
+        ]
+      },
+      "brand-violet": {
+        "role": "primary",
+        "displayName": "Brand Violet",
+        "canonical": "#6a4cf2",
+        "oklch": "oklch(55.1% 0.235 283.9)",
+        "tonalRamp": [
+          "#0b0030",
+          "#23006a",
+          "#3e03aa",
+          "#5831d9",
+          "#745ff6",
+          "#948ffa",
+          "#bdbdfb",
+          "#ecedff"
+        ]
+      },
+      "hero-navy": {
+        "role": "primary",
+        "displayName": "Hero Navy",
+        "canonical": "#101d45",
+        "oklch": "oklch(24.6% 0.077 267.0)",
+        "tonalRamp": [
+          "#02052b",
+          "#132149",
+          "#2d3d69",
+          "#4a5c8a",
+          "#687cac",
+          "#899dcf",
+          "#aec3f7",
+          "#e8eefe"
+        ]
+      },
+      "hero-indigo": {
+        "role": "primary",
+        "displayName": "Hero Indigo",
+        "canonical": "#2a1666",
+        "oklch": "oklch(28.7% 0.130 286.4)",
+        "tonalRamp": [
+          "#0c002f",
+          "#240d5e",
+          "#3d2f80",
+          "#5a4fa2",
+          "#786fc6",
+          "#9991eb",
+          "#bfbcfe",
+          "#edecff"
+        ]
+      },
+      "mod-train": {
+        "role": "secondary",
+        "displayName": "Entrenar Blue",
+        "canonical": "#0a68d6",
+        "oklch": "oklch(53.5% 0.187 257.3)",
+        "tonalRamp": [
+          "#00072c",
+          "#002151",
+          "#003c84",
+          "#0159bb",
+          "#2479e9",
+          "#5a9eff",
+          "#a0c6fd",
+          "#e5effe"
+        ]
+      },
+      "mod-train-2": {
+        "role": "secondary",
+        "displayName": "Entrenar Blue (second stop)",
+        "canonical": "#1b54d8",
+        "oklch": "oklch(49.9% 0.211 263.2)",
+        "tonalRamp": [
+          "#000037",
+          "#000378",
+          "#002ca3",
+          "#154ed1",
+          "#3572f8",
+          "#6c9bfc",
+          "#a8c4fc",
+          "#e7effe"
+        ]
+      },
+      "mod-train-ink": {
+        "role": "secondary",
+        "displayName": "Entrenar Blue Ink",
+        "canonical": "#0b5cb4",
+        "oklch": "oklch(48.3% 0.157 255.7)",
+        "tonalRamp": [
+          "#000829",
+          "#002250",
+          "#033e7e",
+          "#095bb3",
+          "#347dd8",
+          "#579ffd",
+          "#9fc7fd",
+          "#e5f0fe"
+        ]
+      },
+      "mod-train-ink-dark": {
+        "role": "secondary",
+        "displayName": "Entrenar Blue Ink (dark theme)",
+        "canonical": "#8ccaff",
+        "oklch": "oklch(81.7% 0.098 245.2)",
+        "tonalRamp": [
+          "#000c1f",
+          "#012641",
+          "#04436c",
+          "#246291",
+          "#4683b4",
+          "#68a5d8",
+          "#92cbfb",
+          "#e2f1fe"
+        ]
+      },
+      "mod-plan-ink": {
+        "role": "secondary",
+        "displayName": "Inicio Ink",
+        "canonical": "#2347b8",
+        "oklch": "oklch(44.8% 0.183 265.6)",
+        "tonalRamp": [
+          "#010039",
+          "#040773",
+          "#112e9e",
+          "#2b51c3",
+          "#4874e9",
+          "#709afe",
+          "#a9c4fd",
+          "#e7effe"
+        ]
+      },
+      "mod-plan-ink-dark": {
+        "role": "secondary",
+        "displayName": "Inicio Ink (dark theme)",
+        "canonical": "#9bb6ff",
+        "oklch": "oklch(78.4% 0.109 268.3)",
+        "tonalRamp": [
+          "#030038",
+          "#0f1c58",
+          "#283a79",
+          "#44599b",
+          "#627abe",
+          "#829be3",
+          "#adc3fc",
+          "#e8eefe"
+        ]
+      },
+      "mod-running": {
+        "role": "secondary",
+        "displayName": "Running Teal",
+        "canonical": "#08786a",
+        "oklch": "oklch(51.4% 0.091 180.8)",
+        "tonalRamp": [
+          "#00100c",
+          "#002b25",
+          "#044b41",
+          "#0b6d60",
+          "#2f8f80",
+          "#55b1a1",
+          "#7dd8c7",
+          "#bafff1"
+        ]
+      },
+      "mod-running-2": {
+        "role": "secondary",
+        "displayName": "Running Teal (second stop)",
+        "canonical": "#0b6f86",
+        "oklch": "oklch(50.2% 0.088 219.4)",
+        "tonalRamp": [
+          "#000e15",
+          "#002934",
+          "#094757",
+          "#13687d",
+          "#3389a1",
+          "#58acc4",
+          "#7fd2eb",
+          "#d6f5ff"
+        ]
+      },
+      "mod-running-ink": {
+        "role": "secondary",
+        "displayName": "Running Teal Ink",
+        "canonical": "#07705f",
+        "oklch": "oklch(48.8% 0.089 177.1)",
+        "tonalRamp": [
+          "#00100b",
+          "#002c24",
+          "#004b3f",
+          "#016e5d",
+          "#368e7c",
+          "#5bb19d",
+          "#82d7c3",
+          "#bdfeee"
+        ]
+      },
+      "mod-running-ink-dark": {
+        "role": "secondary",
+        "displayName": "Running Teal Ink (dark theme)",
+        "canonical": "#79e6d3",
+        "oklch": "oklch(85.5% 0.105 181.0)",
+        "tonalRamp": [
+          "#00100c",
+          "#002c25",
+          "#074b42",
+          "#116c60",
+          "#089181",
+          "#42b4a2",
+          "#6ddbc8",
+          "#bbfef1"
+        ]
+      },
+      "mod-nutrition": {
+        "role": "secondary",
+        "displayName": "Nutrición Green",
+        "canonical": "#0a7a50",
+        "oklch": "oklch(51.3% 0.113 160.2)",
+        "tonalRamp": [
+          "#001006",
+          "#012c1a",
+          "#054c31",
+          "#0e6f49",
+          "#309166",
+          "#56b486",
+          "#7edbab",
+          "#c4ffde"
+        ]
+      },
+      "mod-nutrition-2": {
+        "role": "secondary",
+        "displayName": "Nutrición Green (second stop)",
+        "canonical": "#0c7d63",
+        "oklch": "oklch(52.6% 0.100 171.1)",
+        "tonalRamp": [
+          "#001009",
+          "#002c21",
+          "#014c3b",
+          "#066e57",
+          "#2d9075",
+          "#54b396",
+          "#7cd9bc",
+          "#beffe8"
+        ]
+      },
+      "mod-nutrition-ink": {
+        "role": "secondary",
+        "displayName": "Nutrición Green Ink",
+        "canonical": "#08704a",
+        "oklch": "oklch(48.2% 0.105 160.8)",
+        "tonalRamp": [
+          "#001006",
+          "#002c1a",
+          "#014d31",
+          "#066f49",
+          "#389068",
+          "#5cb389",
+          "#83daae",
+          "#c2ffde"
+        ]
+      },
+      "mod-nutrition-ink-dark": {
+        "role": "secondary",
+        "displayName": "Nutrición Green Ink (dark theme)",
+        "canonical": "#86e6bd",
+        "oklch": "oklch(85.4% 0.109 164.7)",
+        "tonalRamp": [
+          "#001007",
+          "#002c1d",
+          "#004c35",
+          "#046f4f",
+          "#2b916d",
+          "#53b48d",
+          "#7bdbb2",
+          "#c2ffe2"
+        ]
+      },
+      "mod-coach": {
+        "role": "secondary",
+        "displayName": "FittAI Violet-Blue",
+        "canonical": "#5a3ed6",
+        "oklch": "oklch(49.4% 0.219 283.4)",
+        "tonalRamp": [
+          "#0b0030",
+          "#23006b",
+          "#3e00ab",
+          "#5739d1",
+          "#735ff8",
+          "#938ffc",
+          "#bcbdfc",
+          "#ecedfe"
+        ]
+      },
+      "mod-coach-2": {
+        "role": "secondary",
+        "displayName": "FittAI Violet-Blue (second stop)",
+        "canonical": "#2a63d8",
+        "oklch": "oklch(53.2% 0.190 262.4)",
+        "tonalRamp": [
+          "#00003a",
+          "#001864",
+          "#013299",
+          "#1b52c6",
+          "#3b75ec",
+          "#6b9cfa",
+          "#a5c5ff",
+          "#e6efff"
+        ]
+      },
+      "mod-progress-ink": {
+        "role": "secondary",
+        "displayName": "Progreso Violet Ink",
+        "canonical": "#4d32c4",
+        "oklch": "oklch(45.1% 0.212 282.3)",
+        "tonalRamp": [
+          "#0b0033",
+          "#210269",
+          "#3b0ca9",
+          "#543dce",
+          "#7062f4",
+          "#9190f9",
+          "#babdff",
+          "#ebedff"
+        ]
+      },
+      "mod-progress-ink-dark": {
+        "role": "secondary",
+        "displayName": "Progreso Violet Ink (dark theme)",
+        "canonical": "#c3b5ff",
+        "oklch": "oklch(81.1% 0.104 292.6)",
+        "tonalRamp": [
+          "#10002e",
+          "#281450",
+          "#433271",
+          "#605193",
+          "#7f71b6",
+          "#a092da",
+          "#c6b9fd",
+          "#eeecfe"
+        ]
+      },
+      "mod-community": {
+        "role": "secondary",
+        "displayName": "Comunidad Magenta",
+        "canonical": "#bd2b84",
+        "oklch": "oklch(54.8% 0.198 348.5)",
+        "tonalRamp": [
+          "#200010",
+          "#46002d",
+          "#74014d",
+          "#a50670",
+          "#cc3b91",
+          "#f360b3",
+          "#fea3d1",
+          "#ffe7f2"
+        ]
+      },
+      "mod-community-2": {
+        "role": "secondary",
+        "displayName": "Comunidad Magenta (second stop)",
+        "canonical": "#9b2bb0",
+        "oklch": "oklch(51.9% 0.211 320.7)",
+        "tonalRamp": [
+          "#190020",
+          "#3d0048",
+          "#660077",
+          "#8f1aa3",
+          "#b245c8",
+          "#d769ed",
+          "#eda5fb",
+          "#fae7fe"
+        ]
+      },
+      "mod-community-ink": {
+        "role": "secondary",
+        "displayName": "Comunidad Magenta Ink",
+        "canonical": "#a3226f",
+        "oklch": "oklch(48.9% 0.178 349.5)",
+        "tonalRamp": [
+          "#1f0010",
+          "#46002c",
+          "#73044b",
+          "#a01e6c",
+          "#c6458d",
+          "#ec69af",
+          "#fea4d0",
+          "#fee7f1"
+        ]
+      },
+      "mod-community-ink-dark": {
+        "role": "secondary",
+        "displayName": "Comunidad Magenta Ink (dark theme)",
+        "canonical": "#ff9ad6",
+        "oklch": "oklch(80.8% 0.140 344.2)",
+        "tonalRamp": [
+          "#1e0013",
+          "#440130",
+          "#6e1251",
+          "#913670",
+          "#b55791",
+          "#da78b3",
+          "#ffa1d8",
+          "#ffe7f4"
+        ]
+      },
+      "mod-profile": {
+        "role": "secondary",
+        "displayName": "Perfil Indigo",
+        "canonical": "#4f46e5",
+        "oklch": "oklch(51.1% 0.230 277.0)",
+        "tonalRamp": [
+          "#070033",
+          "#1c0070",
+          "#3200b4",
+          "#483bda",
+          "#6366f7",
+          "#8893fb",
+          "#b6c0fb",
+          "#eaeefe"
+        ]
+      },
+      "mod-profile-2": {
+        "role": "secondary",
+        "displayName": "Perfil Indigo (second stop)",
+        "canonical": "#3a5be0",
+        "oklch": "oklch(52.9% 0.206 267.9)",
+        "tonalRamp": [
+          "#020036",
+          "#0b0076",
+          "#1824a9",
+          "#2e4bcf",
+          "#4a6ff5",
+          "#7799fa",
+          "#abc3ff",
+          "#e8eeff"
+        ]
+      },
+      "mod-profile-ink": {
+        "role": "secondary",
+        "displayName": "Perfil Indigo Ink",
+        "canonical": "#3b33c4",
+        "oklch": "oklch(43.8% 0.214 275.4)",
+        "tonalRamp": [
+          "#070034",
+          "#190072",
+          "#2e15ad",
+          "#4442d2",
+          "#5f67f9",
+          "#8494fc",
+          "#b4c0fc",
+          "#eaeefe"
+        ]
+      },
+      "mod-profile-ink-dark": {
+        "role": "secondary",
+        "displayName": "Perfil Indigo Ink (dark theme)",
+        "canonical": "#b4b1ff",
+        "oklch": "oklch(79.2% 0.110 285.4)",
+        "tonalRamp": [
+          "#0c002f",
+          "#221555",
+          "#3c3476",
+          "#595398",
+          "#7773bc",
+          "#9894e0",
+          "#bebcfe",
+          "#ecedff"
+        ]
+      },
+      "page": {
+        "role": "neutral",
+        "displayName": "Cool Paper",
+        "canonical": "#f3f6fb",
+        "oklch": "oklch(97.2% 0.007 260.7)",
+        "tonalRamp": [
+          "#090b0e",
+          "#222428",
+          "#3d4044",
+          "#5b5e62",
+          "#7b7d82",
+          "#9c9ea3",
+          "#c1c4c9",
+          "#eceff4"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "White Card",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#404040",
+          "#5d5d5d",
+          "#7d7d7d",
+          "#9e9e9e",
+          "#c4c4c4",
+          "#eeeeee"
+        ]
+      },
+      "panel-2": {
+        "role": "neutral",
+        "displayName": "Mist Panel",
+        "canonical": "#eef2f9",
+        "oklch": "oklch(96.0% 0.010 261.8)",
+        "tonalRamp": [
+          "#090b10",
+          "#212429",
+          "#3d4045",
+          "#5a5e64",
+          "#7a7d84",
+          "#9b9fa5",
+          "#c0c4cb",
+          "#ebeff6"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "rgba(30,50,100,.11)"
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Ink Navy",
+        "canonical": "#0d1830",
+        "oklch": "oklch(21.3% 0.050 264.1)",
+        "tonalRamp": [
+          "#030920",
+          "#17233c",
+          "#323f5b",
+          "#4f5e7a",
+          "#6e7d9c",
+          "#8f9fbe",
+          "#b4c4e6",
+          "#e6efff"
+        ]
+      },
+      "text-2": {
+        "role": "neutral",
+        "displayName": "Slate",
+        "canonical": "#3b4764",
+        "oklch": "oklch(40.0% 0.052 266.8)",
+        "tonalRamp": [
+          "#030921",
+          "#19233d",
+          "#333f5b",
+          "#505d7b",
+          "#6f7d9d",
+          "#909ebf",
+          "#b5c4e7",
+          "#e8eefe"
+        ]
+      },
+      "text-3": {
+        "role": "neutral",
+        "displayName": "Muted Slate",
+        "canonical": "#56627e",
+        "oklch": "oklch(49.7% 0.047 266.6)",
+        "tonalRamp": [
+          "#04091f",
+          "#19233b",
+          "#343f59",
+          "#515d79",
+          "#707d9a",
+          "#919ebd",
+          "#b6c4e4",
+          "#e8effe"
+        ]
+      },
+      "page-dark": {
+        "role": "neutral",
+        "displayName": "Deep Night",
+        "canonical": "#060b18",
+        "oklch": "oklch(15.2% 0.030 265.4)",
+        "tonalRamp": [
+          "#060b18",
+          "#1d2433",
+          "#384050",
+          "#565e6f",
+          "#757d8f",
+          "#969fb1",
+          "#bbc4d8",
+          "#e7efff"
+        ]
+      },
+      "panel-dark": {
+        "role": "neutral",
+        "displayName": "Night Panel",
+        "canonical": "#0d172e",
+        "oklch": "oklch(20.9% 0.048 264.8)",
+        "tonalRamp": [
+          "#03091f",
+          "#18233b",
+          "#333f59",
+          "#505d79",
+          "#6f7d9b",
+          "#909fbd",
+          "#b5c4e4",
+          "#e7effe"
+        ]
+      },
+      "panel-2-dark": {
+        "role": "neutral",
+        "displayName": "Raised Night",
+        "canonical": "#13203d",
+        "oklch": "oklch(24.9% 0.058 264.4)",
+        "tonalRamp": [
+          "#020823",
+          "#162340",
+          "#303f5f",
+          "#4d5d7f",
+          "#6c7da1",
+          "#8c9fc3",
+          "#b1c4eb",
+          "#e7efff"
+        ]
+      },
+      "border-dark": {
+        "role": "neutral",
+        "displayName": "Night Hairline",
+        "canonical": "rgba(120,150,220,.16)"
+      },
+      "text-dark": {
+        "role": "neutral",
+        "displayName": "Moon White",
+        "canonical": "#eef3ff",
+        "oklch": "oklch(96.4% 0.017 267.8)",
+        "tonalRamp": [
+          "#080b12",
+          "#20242c",
+          "#3c4049",
+          "#595d68",
+          "#797d88",
+          "#9a9ea9",
+          "#bfc4cf",
+          "#e9eefa"
+        ]
+      },
+      "text-2-dark": {
+        "role": "neutral",
+        "displayName": "Fog",
+        "canonical": "#b4c1dc",
+        "oklch": "oklch(81.0% 0.041 265.0)",
+        "tonalRamp": [
+          "#040a1c",
+          "#1a2438",
+          "#354056",
+          "#525e75",
+          "#717d96",
+          "#929fb9",
+          "#b7c4df",
+          "#e7effe"
+        ]
+      },
+      "text-3-dark": {
+        "role": "neutral",
+        "displayName": "Muted Fog",
+        "canonical": "#8d9bbb",
+        "oklch": "oklch(69.0% 0.050 266.5)",
+        "tonalRamp": [
+          "#030920",
+          "#19233c",
+          "#343f5a",
+          "#515d7a",
+          "#707d9c",
+          "#909ebe",
+          "#b5c4e5",
+          "#e7efff"
+        ]
+      },
+      "on-color": {
+        "role": "neutral",
+        "displayName": "On Colour White",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#404040",
+          "#5d5d5d",
+          "#7d7d7d",
+          "#9e9e9e",
+          "#c4c4c4",
+          "#eeeeee"
+        ]
+      },
+      "ok": {
+        "role": "status",
+        "displayName": "Success Green",
+        "canonical": "#22c993",
+        "oklch": "oklch(74.3% 0.151 164.6)",
+        "tonalRamp": [
+          "#001007",
+          "#002c1d",
+          "#024c35",
+          "#076f4f",
+          "#1c936b",
+          "#27b988",
+          "#4ae2ab",
+          "#c3fee2"
+        ]
+      },
+      "warn": {
+        "role": "status",
+        "displayName": "Warning Amber",
+        "canonical": "#f5a524",
+        "oklch": "oklch(78.2% 0.158 72.3)",
+        "tonalRamp": [
+          "#160700",
+          "#351e00",
+          "#5a3700",
+          "#7e5310",
+          "#a96f0a",
+          "#d58d12",
+          "#fdb34a",
+          "#ffebd3"
+        ]
+      },
+      "warn-text": {
+        "role": "status",
+        "displayName": "Warning Amber Text",
+        "canonical": "#8f5400",
+        "oklch": "oklch(50.3% 0.113 65.0)",
+        "tonalRamp": [
+          "#180600",
+          "#381c00",
+          "#5c3503",
+          "#854f09",
+          "#ab6e29",
+          "#ce8f4d",
+          "#f7b573",
+          "#feebd9"
+        ]
+      },
+      "bad": {
+        "role": "status",
+        "displayName": "Error Coral",
+        "canonical": "#ff6b6b",
+        "oklch": "oklch(71.2% 0.181 22.8)",
+        "tonalRamp": [
+          "#220000",
+          "#4c0007",
+          "#790b18",
+          "#ad1628",
+          "#d34347",
+          "#fb6768",
+          "#fbaca8",
+          "#ffe9e7"
+        ]
+      },
+      "bad-text": {
+        "role": "status",
+        "displayName": "Error Red Text",
+        "canonical": "#bb2f2a",
+        "oklch": "oklch(52.5% 0.178 27.4)",
+        "tonalRamp": [
+          "#210000",
+          "#4c0002",
+          "#7c0107",
+          "#ab1d1c",
+          "#d2463e",
+          "#f96a5e",
+          "#feaba1",
+          "#fee9e6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Inicio greeting and section hero titles."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings above each view."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card and group headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text and form values."
+      },
+      "body-sm": {
+        "displayName": "Body Small",
+        "purpose": "Descriptions, list metadata, chips."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, tabs, nav labels; 11px floor."
+      },
+      "stat": {
+        "displayName": "Stat",
+        "purpose": "Big logged numbers in charts and summaries."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-light",
+        "value": "0 3px 10px rgba(22,40,90,.07)",
+        "purpose": "Cards, tiles, tab trays, toggles in light theme."
+      },
+      {
+        "name": "card-dark",
+        "value": "0 4px 14px rgba(0,0,0,.28)",
+        "purpose": "Same roles in dark theme."
+      },
+      {
+        "name": "raised-light",
+        "value": "0 10px 28px rgba(22,40,90,.08)",
+        "purpose": "Larger floating surfaces, light."
+      },
+      {
+        "name": "raised-dark",
+        "value": "0 10px 30px rgba(0,0,0,.35)",
+        "purpose": "Larger floating surfaces, dark."
+      },
+      {
+        "name": "module-lift",
+        "value": "0 8px 20px -8px var(--mod)",
+        "purpose": "Under primary buttons in light theme (tabs 0 6px 16px -8px, heroes 0 14px 30px -18px)."
+      },
+      {
+        "name": "neutral-lift-dark",
+        "value": "0 8px 20px -10px rgba(0,0,0,.7)",
+        "purpose": "Replaces every module lift in dark theme."
+      },
+      {
+        "name": "bottom-nav",
+        "value": "0 -6px 24px rgba(10,20,50,.08)",
+        "purpose": "Phone bottom navigation bar."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-fast",
+        "value": ".15s ease",
+        "purpose": "Button filter, transform, border and shadow changes on hover and press."
+      },
+      {
+        "name": "progress-fill",
+        "value": "width .4s / stroke-dashoffset .5s",
+        "purpose": "Progress bars and ring fills animating to logged values."
+      },
+      {
+        "name": "press",
+        "value": "transform: scale(.99)",
+        "purpose": "Active state on buttons."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "durations .01ms",
+        "purpose": "prefers-reduced-motion collapses all animation and transitions."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "xs",
+        "value": "420px"
+      },
+      {
+        "name": "phone-header",
+        "value": "600px"
+      },
+      {
+        "name": "tablet",
+        "value": "900px"
+      },
+      {
+        "name": "desktop-rail",
+        "value": "1024px"
+      },
+      {
+        "name": "wide",
+        "value": "1200px"
+      },
+      {
+        "name": "library-4col",
+        "value": "1280px"
+      }
+    ],
+    "themes": {
+      "default": "light",
+      "attribute": "html[data-theme]",
+      "storageKey": "fittforma-theme",
+      "themeColor": {
+        "light": "#f3f6fb",
+        "dark": "#060b18"
+      }
+    },
+    "moduleVariables": [
+      "--mod",
+      "--mod-2",
+      "--mod-ink",
+      "--mod-soft"
+    ],
+    "font": {
+      "family": "Inter",
+      "source": "assets/fonts/inter-latin-wght.woff2",
+      "weights": "100 900",
+      "features": "\"cv11\",\"ss01\""
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Module-gradient pill for the main action of a section; brand gradient outside sections.",
+      "html": "<button class=\"ds-btn-primary\">Crear mi rutina</button>",
+      "css": ".ds-btn-primary{font-family:Inter,system-ui,sans-serif;font-weight:700;font-size:15px;min-height:44px;padding:10px 20px;border:0;border-radius:999px;color:#fff;background:linear-gradient(135deg,var(--mod,#2f5fe8),var(--mod-2,#6a4cf2));box-shadow:0 8px 20px -8px var(--mod,#2f5fe8);cursor:pointer;transition:filter .15s,transform .15s}.ds-btn-primary:hover{filter:brightness(1.08)}.ds-btn-primary:active{transform:scale(.99)}.ds-btn-primary:focus-visible{outline:2px solid var(--mod,#2f5fe8);outline-offset:2px}.ds-btn-primary:disabled{opacity:.55;box-shadow:none}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outline pill in module ink for the second action.",
+      "html": "<button class=\"ds-btn-secondary\">Ver mis 6 insignias</button>",
+      "css": ".ds-btn-secondary{font-family:Inter,system-ui,sans-serif;font-weight:700;font-size:15px;min-height:44px;padding:10px 20px;border-radius:999px;background:transparent;color:var(--mod-ink,#2347b8);border:1.5px solid color-mix(in srgb,var(--mod,#2f5fe8) 55%,transparent);cursor:pointer;transition:background .15s}.ds-btn-secondary:hover{background:var(--mod-soft,rgba(47,95,232,.1))}.ds-btn-secondary:focus-visible{outline:2px solid var(--mod,#2f5fe8);outline-offset:2px}"
+    },
+    {
+      "name": "Pill Tabs",
+      "kind": "nav",
+      "refersTo": "pill-tabs",
+      "description": "Subsection switcher: white pill tray, active tab in the module gradient.",
+      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button class=\"ds-tab is-active\" role=\"tab\" aria-selected=\"true\">Rutinas</button><button class=\"ds-tab\" role=\"tab\">Ejercicios</button><button class=\"ds-tab\" role=\"tab\">Running</button><button class=\"ds-tab\" role=\"tab\">Planes</button></div>",
+      "css": ".ds-tabs{display:inline-flex;gap:4px;padding:4px;background:var(--ff-panel,#fff);border:1px solid var(--ff-border,rgba(30,50,100,.11));border-radius:999px;box-shadow:var(--ff-shadow-sm,0 3px 10px rgba(22,40,90,.07));font-family:Inter,system-ui,sans-serif}.ds-tab{min-height:40px;padding:8px 14px;border:0;border-radius:999px;background:transparent;color:var(--text-2,#3b4764);font-weight:700;font-size:13px;cursor:pointer}.ds-tab:hover{color:var(--text,#0d1830)}.ds-tab:focus-visible{outline:2px solid var(--mod,#2f5fe8);outline-offset:1px}.ds-tab.is-active{background:linear-gradient(135deg,var(--mod,#0a68d6),var(--mod-2,#1b54d8));color:#fff;box-shadow:0 6px 16px -8px var(--mod,#0a68d6)}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Default container: 20px radius, hairline, soft shadow; nested content goes flat.",
+      "html": "<article class=\"ds-card\"><h3>Hábitos de hoy</h3><p>3 de 5 completados</p><div class=\"ds-card-nested\">Me moví o entrené según mi plan</div></article>",
+      "css": ".ds-card{font-family:Inter,system-ui,sans-serif;background:var(--ff-panel,#fff);color:var(--text,#0d1830);border:1px solid var(--ff-border,rgba(30,50,100,.11));border-radius:20px;padding:16px;box-shadow:var(--ff-shadow-sm,0 3px 10px rgba(22,40,90,.07));max-width:360px}.ds-card h3{margin:0 0 4px;font-size:17px;font-weight:800;letter-spacing:-.02em}.ds-card p{margin:0 0 12px;font-size:13px;color:var(--text-3,#56627e)}.ds-card-nested{background:var(--ff-panel-2,#eef2f9);border:1px solid var(--ff-border,rgba(30,50,100,.11));border-radius:14px;padding:10px 12px;font-size:15px}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Field on the second panel tone with a module-coloured focus outline.",
+      "html": "<label class=\"ds-field\"><span>Peso (kg)</span><input class=\"ds-input\" placeholder=\"72,5\"></label>",
+      "css": ".ds-field{display:grid;gap:6px;font-family:Inter,system-ui,sans-serif;font-size:13px;color:var(--text-2,#3b4764);max-width:280px}.ds-input{min-height:44px;padding:10px 12px;font:inherit;font-size:16px;background:var(--ff-panel-2,#eef2f9);color:var(--text,#0d1830);border:1px solid var(--ff-border,rgba(30,50,100,.11));border-radius:12px}.ds-input::placeholder{color:var(--text-3,#56627e)}.ds-input:focus-visible{outline:2px solid var(--mod,#2f5fe8);outline-offset:1px;border-color:transparent}"
+    },
+    {
+      "name": "Tag and Chip",
+      "kind": "chip",
+      "refersTo": "tag",
+      "description": "Soft-tint tag in module ink; selected filter chip fills with the module base.",
+      "html": "<span class=\"ds-tag\">Pecho</span> <button class=\"ds-chip\">Todos</button> <button class=\"ds-chip is-active\" aria-pressed=\"true\">Favoritos</button>",
+      "css": ".ds-tag{display:inline-block;font-family:Inter,system-ui,sans-serif;font-size:11px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--mod-soft,rgba(10,104,214,.1));color:var(--mod-ink,#0b5cb4)}.ds-chip{font-family:Inter,system-ui,sans-serif;font-size:13px;font-weight:700;min-height:36px;padding:6px 14px;border-radius:999px;border:1px solid var(--ff-border,rgba(30,50,100,.11));background:var(--ff-panel,#fff);color:var(--text-2,#3b4764);cursor:pointer}.ds-chip:hover{border-color:var(--mod,#0a68d6)}.ds-chip:focus-visible{outline:2px solid var(--mod,#0a68d6);outline-offset:1px}.ds-chip.is-active{background:var(--mod,#0a68d6);border-color:var(--mod,#0a68d6);color:#fff}"
+    },
+    {
+      "name": "Section Hero",
+      "kind": "custom",
+      "refersTo": "section-hero",
+      "description": "Signature band at the top of each section: module gradient, white type, translucent outline action.",
+      "html": "<section class=\"ds-hero\"><div><h2>Nutrición</h2><p>Comé bien, rendí mejor.</p></div><button class=\"ds-hero-btn\">Registrar comida</button></section>",
+      "css": ".ds-hero{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;min-height:118px;padding:18px;border-radius:22px;color:#fff;font-family:Inter,system-ui,sans-serif;background:linear-gradient(90deg,rgba(0,0,0,.22),rgba(0,0,0,0) 70%),linear-gradient(135deg,var(--mod,#0a7a50),var(--mod-2,#0c7d63));box-shadow:0 14px 30px -18px var(--mod,#0a7a50)}.ds-hero h2{margin:0 0 4px;font-size:26px;font-weight:800;letter-spacing:-.03em}.ds-hero p{margin:0;font-size:13px}.ds-hero-btn{min-height:40px;padding:8px 16px;border-radius:999px;background:rgba(0,0,0,.22);color:#fff;border:1.5px solid rgba(255,255,255,.55);font:inherit;font-weight:700;font-size:13px;cursor:pointer}.ds-hero-btn:hover{background:rgba(0,0,0,.32)}.ds-hero-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}"
+    },
+    {
+      "name": "Bottom Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Six-item phone nav; the active item wears its own module ink on a 12% tint.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item is-active\" style=\"--nav-c:#2347c8\" href=\"#\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 11l8-7 8 7v9h-5v-6H9v6H4z\"/></svg>Inicio</a><a class=\"ds-nav-item\" href=\"#\"><svg viewBox=\"0 0 24 24\"><path d=\"M3 12h2M19 12h2M6 8v8M18 8v8M9 12h6\"/></svg>Entrenar</a><a class=\"ds-nav-item\" href=\"#\"><svg viewBox=\"0 0 24 24\"><path d=\"M7 3v8M5 3v5a2 2 0 004 0V3M7 11v10M16 3c-2 0-3 3-3 6s1 4 3 4v8\"/></svg>Nutrición</a><a class=\"ds-nav-item\" href=\"#\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 20V4M4 20h16M7 15l4-4 3 3 5-6\"/></svg>Progreso</a></nav>",
+      "css": ".ds-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;padding:6px;background:color-mix(in srgb,var(--ff-panel,#fff) 94%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--ff-border,rgba(30,50,100,.11));box-shadow:0 -6px 24px rgba(10,20,50,.08);font-family:Inter,system-ui,sans-serif;max-width:390px}.ds-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:58px;justify-content:center;border-radius:14px;color:var(--text-3,#56627e);font-size:11px;font-weight:600;text-decoration:none}.ds-nav-item svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ds-nav-item:hover{color:var(--text,#0d1830)}.ds-nav-item:focus-visible{outline:2px solid #2f6bff;outline-offset:-2px}.ds-nav-item.is-active{color:var(--nav-c,#2f6bff);background:color-mix(in srgb,var(--nav-c,#2f6bff) 12%,transparent)}"
+    },
+    {
+      "name": "Icon Stat Tile",
+      "kind": "custom",
+      "refersTo": "card-nested",
+      "description": "Weekly indicator: tinted rounded-square line icon beside a label and a bold value.",
+      "html": "<div class=\"ds-stat\"><svg viewBox=\"0 0 24 24\"><path d=\"M12 3s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z\"/></svg><small>Agua</small><strong>0/6</strong></div>",
+      "css": ".ds-stat{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;max-width:180px;padding:10px;border-radius:16px;background:var(--ff-panel-2,#eef2f9);border:1px solid var(--ff-border,rgba(30,50,100,.11));font-family:Inter,system-ui,sans-serif}.ds-stat svg{grid-row:1/3;width:30px;height:30px;padding:6px;border-radius:10px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;color:#0a8fd0;background:rgba(10,143,208,.14)}.ds-stat small{font-size:12px;color:var(--text-3,#56627e)}.ds-stat strong{font-size:17px;font-weight:800;color:var(--text,#0d1830)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "One Kit, Seven Colours",
+    "overview": "FittForma AI is a phone-first training app whose sections (Inicio, Entrenar, Running, Nutrición, Progreso, Comunidad, Perfil, plus FittAI) each carry their own colour while sharing one component family. The same pill button, pill tab, rounded card and progress bar appear everywhere; only the module colour changes. That refuses the grey dashboard with a single accent: you always know which part of your training you are in by colour, and you never have to relearn a control.\n\nLight is the default theme: a cool blue-white ground with white cards lifted by soft, blue-tinted shadows. Dark is a deep navy world with layered panels, a faint brand glow in the page background and neutral black shadows. Both themes keep identical geometry and component behaviour; only surfaces, ink tints and shadow colour swap. Density is phone-practical: generous rounded containers, 44px controls, short labels, and primary actions within one or two taps.\n\nReal imagery carries the energy where it matters. Workout heroes use real gym photography under a dark navy overlay with white type in both themes, while charts, rings and progress bars take the module colour. Nothing decorates for its own sake: numbers come from logged data, and colour marks place and state.",
+    "keyCharacteristics": [
+      "One component family; colour is assigned per section through four variables (base, second stop, ink, soft tint).",
+      "Pill-shaped actions and tabs; 18–24px rounded cards and heroes.",
+      "Module gradient (135deg, base to second stop) on primary actions, active tabs, section heroes and progress fills.",
+      "Light default with soft tinted shadows; dark navy alternative with neutral shadows.",
+      "Photo heroes under dark overlays with white type, regardless of theme.",
+      "Inter, self-hosted, heavy weights (700–800) with tight negative tracking on headings."
+    ],
+    "rules": [
+      {
+        "name": "The Four Variables Rule",
+        "body": "A section's colour is expressed only through `--mod`, `--mod-2`, `--mod-ink` and `--mod-soft` set on its `#view-*` container. Components read those variables; they never hard-code a section hue.",
+        "section": "colors"
+      },
+      {
+        "name": "The White On Colour Rule",
+        "body": "Anything drawn on a module gradient, a photo hero or the navy greeting band (heading, body, status, button) is white, in both themes. Buttons inside a coloured hero become translucent outline pills.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Not Base Rule",
+        "body": "Coloured text on the page ground uses the module ink for the current theme; the saturated base is reserved for fills behind white text.",
+        "section": "colors"
+      },
+      {
+        "name": "The Weight Carries Rank Rule",
+        "body": "Hierarchy is weight plus size: 800 for headings and numbers, 700 for actions and labels, 400–600 for reading text. Headings always take negative tracking (-0.02em to -0.03em).",
+        "section": "typography"
+      },
+      {
+        "name": "The 11px Floor Rule",
+        "body": "No UI text below 11px in either theme.",
+        "section": "typography"
+      },
+      {
+        "name": "The Nested Goes Flat Rule",
+        "body": "A card inside a card loses its shadow and takes the second panel tone. Rows inside a group (meals, recent activity) are separated by hairlines, never boxed again.",
+        "section": "elevation"
+      },
+      {
+        "name": "The No Coloured Glow In The Dark Rule",
+        "body": "In dark theme, depth comes from neutral black shadows; module-tinted halos exist only in light theme.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** set a section's colour only through its four module variables on the `#view-*` container and let components inherit.",
+      "**Do** use the 135deg module gradient for every primary action, active pill tab, section hero and progress fill.",
+      "**Do** keep text on any coloured or photo surface white, in both themes.",
+      "**Do** use the module ink (not the base) for coloured text on the page ground, with the theme's own ink value.",
+      "**Do** flatten nested surfaces: second panel tone, no shadow, hairline separators for rows.",
+      "**Do** keep controls at 40–44px minimum height and UI text at 11px or larger.",
+      "**Do** put real gym photos under a dark navy overlay with white type when a hero needs imagery.",
+      "**Do** use stroked line icons (1.8–1.9px) inside rounded-square tinted chips."
+    ],
+    "donts": [
+      "**Don't** hard-code a section hue inside a component; read `--mod`, `--mod-2`, `--mod-ink`, `--mod-soft`.",
+      "**Don't** use coloured glows for depth in dark theme; use neutral black shadows.",
+      "**Don't** box rows inside a card as cards again.",
+      "**Don't** use square or small-radius buttons; actions are pills.",
+      "**Don't** introduce a second typeface; Inter carries every role.",
+      "**Don't** use text glyphs or emoji as icons; use inline SVG line icons."
+    ]
+  }
+}

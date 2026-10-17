@@ -1,8 +1,35 @@
-# FittForma AI — v42.1
+# FittForma AI — v47.0
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v47.0
+
+- Rediseño completo según las referencias: tema claro (por defecto) y oscuro, un color por sección, logo nuevo y fotos reales en Inicio y Entrenar.
+- Tema elegible desde el encabezado o en Perfil → Apariencia e idioma; se recuerda en el dispositivo.
+- Inicio con «Actividad reciente» (solo registros reales) y gráfico de peso rehecho en Progreso.
+- Guía de despliegue: `docs/DESPLIEGUE.md`. Sistema visual: `DESIGN.md`.
+
+## Novedades v46.0
+
+- Etapa 8, ajustes de diseño con la skill *impeccable*: mejor contraste, textos legibles (mínimo 11 px) y profundidad sin halos, con el mismo diseño.
+- La skill queda configurada en `.claude/settings.json` (marketplace `pbakaus/impeccable`).
+
+## Novedades v45.0
+
+- Etapa 7, pruebas: flujos críticos de punta a punta (GPS, propuestas de FittAI, copia en la nube, uso sin conexión) y la app completa traducida a los 6 idiomas.
+
+## Novedades v44.0
+
+- Etapa 6, seguridad y datos: correcciones en la base, el servidor y la app. Detalle en `docs/SEGURIDAD_v44.md`.
+
+## Novedades v43.0
+
+- Diseño según las referencias: acento degradado, tarjetas ilustradas, botón «+» de registro rápido y bienvenida inicial.
+- Foto de perfil y nivel por XP con fórmula visible.
+- FittAI conoce toda la app y te lleva a cada sección con botones «Ir a…».
+- Plan semanal de comidas y recetas; moderación de denuncias; eliminar la cuenta en la nube; mensajes dinámicos traducidos.
 
 ## Novedades v42.0
 
@@ -38,22 +65,29 @@ npm test                  # pruebas automáticas (node --test)
 ```
 
 Pruebas de base de datos y de extremo a extremo: `docs/PRUEBAS.md`.
-Integración entre secciones en navegador (con `npm start` en otra terminal): `node tests/e2e/integration.e2e.mjs`.
+Pruebas en navegador (con `npm start` en otra terminal): `npm run test:e2e` (integración entre secciones y flujos críticos).
 
 ## Desplegar (Render + Supabase)
 
 1. **Supabase (una sola vez, antes del deploy)**: en el SQL Editor de un proyecto de *pruebas*,
    ejecutá `supabase/migrations/2026-10-17_v41_posts_achievements_unread.sql`. Es aditiva y
    re-ejecutable (no borra datos). Verificá con dos cuentas reales y recién después aplicala en
-   producción. No vuelvas a ejecutar `schema.sql` ni `community.sql`.
+   producción. Después ejecutá `supabase/migrations/2026-10-18_v43_moderation_account_deletion.sql`
+   (v43: moderación y eliminación de cuenta) y luego `supabase/migrations/2026-10-19_v44_security_hardening.sql`
+   (v44: seguridad). Ambas son aditivas y re-ejecutables. No vuelvas a ejecutar
+   `schema.sql` ni `community.sql`. Para nombrar moderadores (no se puede desde la app):
+   `insert into public.community_moderators(user_id) values ('UUID-DEL-USUARIO');`
 2. **Render**: variables `GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL` y una clave pública
    (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`). Nunca `service_role`/`sb_secret_`.
-3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v42-1`
+3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v47-0`
    y la app ofrece actualizar.
 
 ## Documentación
 
+- `docs/DESPLIEGUE.md` — pasos para publicar v47 en Render y comprobarlo.
+- `DESIGN.md` — sistema visual (temas, colores por sección, componentes).
 - `docs/INSIGNIAS.md` — reglas, umbrales y evidencia de las insignias.
+- `docs/SEGURIDAD_v44.md` — revisión de seguridad de la Etapa 6.
 - `docs/PRUEBAS.md` — cómo correr las pruebas unitarias, SQL/RLS y E2E.
 - `ESTADO_Y_PENDIENTES.md` — estado y límites conocidos.
 - `CHANGELOG.md` — historial de versiones.

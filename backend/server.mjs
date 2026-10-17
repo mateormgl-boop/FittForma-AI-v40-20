@@ -18,7 +18,7 @@ const root=rootCandidates.find(candidate=>existsSync(path.join(candidate,'index.
 const rawPort=String(process.env.PORT||'8787');
 const port=Number(rawPort);
 if(!Number.isInteger(port)||port<0||port>65535)throw new Error(`PORT debe ser un entero entre 0 y 65535; se recibió ${JSON.stringify(rawPort)}.`);
-const appVersion='0.42.1';
+const appVersion='0.47.0';
 const apiKey=String(process.env.GEMINI_API_KEY||'').trim(), model=String(process.env.GEMINI_MODEL||'gemini-3.8-flash').trim()||'gemini-3.8-flash';
 const trustRenderClientIp=String(process.env.TRUST_RENDER_CLIENT_IP||'').toLowerCase()==='true';
 // If the primary model temporarily returns 503, try a lighter official model automatically.
@@ -96,11 +96,11 @@ function sanitizeHistory(items){
   }
   return alternating.slice(-8);
 }
-const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.ico':'image/x-icon'};
+const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.ico':'image/x-icon','.woff2':'font/woff2'};
 const limits=new Map();
 const MAX_TRACKED_CLIENTS=5000;
 const PUBLIC_ROOT_FILES=new Set([
-  '/index.html','/i18n.js','/community.js','/ads-config.js','/ads.js','/membership-config.js',
+  '/index.html','/i18n.js','/i18n-extra.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js',
   '/manifest.json','/icon.svg','/icon-180.png','/icon-192.png','/icon-512.png',
   '/supabase-config.js','/achievements.js','/sw.js'
 ]);
@@ -110,8 +110,9 @@ const CSP=[
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com",
-  "style-src 'self' 'unsafe-inline' https://unpkg.com",
+  // Solo las versiones exactas de supabase-js y Leaflet que usa la app (además con integridad SRI en el HTML).
+  "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/ https://unpkg.com/@supabase/supabase-js@2.45.4/ https://unpkg.com/leaflet@1.9.4/",
+  "style-src 'self' 'unsafe-inline' https://unpkg.com/leaflet@1.9.4/",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https:",
   "connect-src 'self' https://generativelanguage.googleapis.com https://world.openfoodfacts.org https://*.supabase.co wss://*.supabase.co",
@@ -145,8 +146,7 @@ function rateLimitClientKey(req){
   if(trustRenderClientIp&&req.headers['cf-ray']){
     const cloudflareIp=String(req.headers['cf-connecting-ip']||'').trim();
     if(isIP(cloudflareIp))return `ip:${cloudflareIp}`;
-    const forwarded=String(req.headers['x-forwarded-for']||'').split(',')[0].trim();
-    if(isIP(forwarded))return `ip:${forwarded}`;
+    // No se usa X-Forwarded-For: su primer valor lo controla el cliente.
   }
   return `socket:${req.socket.remoteAddress||'unknown'}`;
 }
@@ -187,7 +187,7 @@ function isPublicAssetPath(requested){
   const relative=requested.slice('/assets/'.length);
   if(relative.startsWith('exercises/unverified-generated/'))return false;
   if(!relative||relative.split('/').some(part=>!part||part==='.'||part==='..'||part.startsWith('.')))return false;
-  return ['.svg','.webp','.png','.jpg','.jpeg','.ico'].includes(path.posix.extname(relative).toLowerCase());
+  return ['.svg','.webp','.png','.jpg','.jpeg','.ico','.woff2'].includes(path.posix.extname(relative).toLowerCase());
 }
 async function readBody(req,maxBytes=12000){
   const declared=Number(req.headers['content-length']);
@@ -202,7 +202,21 @@ async function readBody(req,maxBytes=12000){
   try{return JSON.parse(Buffer.concat(chunks,total).toString('utf8')||'{}');}
   catch{throw new Error('invalid_json');}
 }
-const prompt=`Sos el entrenador de FittForma AI. Respondé en el idioma seleccionado por la persona, con un estilo claro, cercano y práctico. Usá el perfil, equipamiento, plan, rutinas propias, objetivos nutricionales, el resumen nutricional y de agua (los días sin registro no significan consumo cero), las insignias y el resumen reciente de entrenamientos/actividades/peso cuando estén disponibles. Personalizá cada respuesta con esos datos concretos; no inventes registros ausentes. Si el historial muestra constancia, reconocela brevemente; si muestra pausas, poca actividad o cargas/repeticiones estancadas, proponé un paso pequeño y realista, sin culpabilizar. Diferenciá los datos registrados de las inferencias. Adaptá recomendaciones a nivel y tiempo. Para fuerza, sugerí técnica controlada, calentamiento y progresión gradual; no prescribas cargas máximas ni diagnostiques. No sugieras aumentar carga si no hay registros suficientes o si la técnica/dolor es una preocupación. Ante dolor, lesión, mareo o síntomas preocupantes, no recomiendes entrenar a través del síntoma y sugerí orientación profesional. No inventes exactitud nutricional ni prometas resultados físicos. Nunca cambies datos: solo proponé cambios para que la persona los apruebe. Las propuestas deben ser concretas y explicar qué cambiaría y por qué. Devolvé ÚNICAMENTE JSON válido: {"reply":"respuesta útil","proposal":null o {"title":"...","description":"...","kind":"routine|nutrition|recovery|general","days":2|3|4|5 opcional,"duration":20|30|45|60 opcional}}. Solo incluí days/duration si el usuario los pide o si son necesarios para una propuesta de rutina. Si no pide ningún cambio concreto, proposal=null.`;
+const prompt=`Sos el entrenador de FittForma AI. Respondé en el idioma seleccionado por la persona, con un estilo claro, cercano y práctico. Usá el perfil, equipamiento, plan, rutinas propias, objetivos nutricionales, el resumen nutricional y de agua (los días sin registro no significan consumo cero), las insignias y el resumen reciente de entrenamientos/actividades/peso cuando estén disponibles. Personalizá cada respuesta con esos datos concretos; no inventes registros ausentes. Si el historial muestra constancia, reconocela brevemente; si muestra pausas, poca actividad o cargas/repeticiones estancadas, proponé un paso pequeño y realista, sin culpabilizar. Diferenciá los datos registrados de las inferencias. Adaptá recomendaciones a nivel y tiempo. Para fuerza, sugerí técnica controlada, calentamiento y progresión gradual; no prescribas cargas máximas ni diagnostiques. No sugieras aumentar carga si no hay registros suficientes o si la técnica/dolor es una preocupación. Ante dolor, lesión, mareo o síntomas preocupantes, no recomiendes entrenar a través del síntoma y sugerí orientación profesional. No inventes exactitud nutricional ni prometas resultados físicos. Nunca cambies datos: solo proponé cambios para que la persona los apruebe. Las propuestas deben ser concretas y explicar qué cambiaría y por qué. Devolvé ÚNICAMENTE JSON válido: {"reply":"respuesta útil","actions":[] o hasta 3 {"label":"Ir a …","target":"destino de la guía"},"proposal":null o {"title":"...","description":"...","kind":"routine|nutrition|recovery|general","days":2|3|4|5 opcional,"duration":20|30|45|60 opcional}}. Solo incluí days/duration si el usuario los pide o si son necesarios para una propuesta de rutina. Si no pide ningún cambio concreto, proposal=null.`;
+const APP_TARGETS=new Set(['home','train','train:free','routines','routines:new','exercises','running','coach','nutrition','nutrition:registrar','nutrition:plan','nutrition:historial','progress','progress:badges','progress:history','progress:body','community','community:publish','community:messages','community:explore','profile','profile:goals','profile:reminders','profile:account']);
+const APP_GUIDE=`GUÍA DE FITTFORMA AI (usala para explicar dónde está cada cosa y ofrecer botones de navegación):
+- Inicio [home]: saludo, progreso semanal, entrenamiento de hoy, próxima insignia, accesos rápidos (entrenar, comida, +1 vaso de agua, correr, insignias, FittAI), resumen de calorías/proteína/agua, hábitos del día, campana de notificaciones. Botón + flotante para registrar rápido.
+- Entrenar [train]: empezar la siguiente sesión del plan, una rutina propia o un entrenamiento libre [train:free]; durante la sesión se registran series, repeticiones, kg, descanso automático, pausar y retomar.
+- Rutinas [routines]: plan generado (objetivo, nivel, días, equipamiento, duración), rutinas propias para crear/editar/duplicar/reordenar/eliminar [routines:new], calendario semanal.
+- Ejercicios [exercises]: biblioteca con fotos, filtros por grupo muscular y equipamiento, favoritos y fichas de técnica.
+- Correr [running]: GPS con mapa, ritmo y parciales, registro manual de carreras/caminatas/bici, planes de running, exportación GPX.
+- FittAI [coach]: este chat.
+- Nutrición [nutrition]: Hoy (resumen de macros, comidas del día, hidratación), Registrar [nutrition:registrar] (texto con estimación, código de barras, foto con IA, base de alimentos, favoritas), Objetivos [nutrition:plan] (objetivos de calorías y macros, menú diario), Historial [nutrition:historial] (tendencia semanal).
+- Progreso [progress]: Resumen (variación 4 semanas, actividad por 7 días/4/12 semanas, retos, comparación), Insignias [progress:badges] (12 niveles Bronce→Diamante por desafío, registrar marcas), Historial [progress:history] (sesiones editables, récords, exportar/importar), Cuerpo [progress:body] (peso, medidas, fotos privadas).
+- Comunidad [community]: feed, explorar perfiles [community:explore], publicar texto/logros/transformaciones [community:publish], mensajes privados con seguimiento mutuo [community:messages], perfil público, bloqueo y denuncias.
+- Perfil [profile]: foto de perfil, nivel y XP, objetivos y datos físicos [profile:goals], recordatorios [profile:reminders], cuenta y sincronización en la nube [profile:account], privacidad, membresía, versión.
+Cuando la persona pregunte dónde o cómo hacer algo, explicalo en una o dos frases e incluí hasta 3 acciones con los destinos exactos entre corchetes. No inventes funciones que no estén en esta guía.`;
+function sanitizeActions(list){return Array.isArray(list)?list.filter(a=>a&&APP_TARGETS.has(String(a.target))).slice(0,3).map(a=>({target:String(a.target),label:cleanText(a.label,40)||'Ir'})):[];}
 function sanitizeProposal(x){if(!x||typeof x!=='object')return null;const kinds=['routine','nutrition','recovery','general'],days=Number(x.days),duration=Number(x.duration);return {title:String(x.title||'Propuesta del entrenador').slice(0,100),description:String(x.description||'Revisá esta propuesta antes de aplicarla.').slice(0,1200),kind:kinds.includes(x.kind)?x.kind:'general',...( [2,3,4,5].includes(days)?{days}:{} ),...( [20,30,45,60].includes(duration)?{duration}:{} )};}
 function cleanText(value,max=100){return typeof value==='string'?value.replace(/[<>]/g,'').trim().slice(0,max):'';}
 function sanitizeTrainingContext(body){
@@ -216,10 +230,44 @@ function sanitizeTrainingContext(body){
   const badges=Array.isArray(body.badges)?body.badges.slice(0,10).map(b=>({name:cleanText(b?.name,72),rank:cleanText(b?.rank,40)})):[];
   return {recentSessions:sessions,recentActivities:activities,recentWeights:weights,nutrition,ownRoutines:routines,badges};
 }
+// Solo los campos del perfil y del plan que el entrenador necesita (nunca la foto de perfil u otros datos).
+function sanitizeCoachProfile(p){
+  if(!isJsonObject(p))return {};
+  const out={};
+  for(const k of ['goal','level','days','equipment','duration','activityLevel','sex'])if(p[k]!==undefined)out[k]=cleanText(String(p[k]),24);
+  for(const [k,max] of [['age',120],['heightCm',250],['currentWeightKg',350],['targetWeightKg',350]]){const n=Number(p[k]);if(Number.isFinite(n)&&n>0)out[k]=Math.min(max,n);}
+  return out;
+}
+function sanitizeCoachGoals(g){
+  if(!isJsonObject(g))return {};
+  const out={};
+  for(const [k,max] of [['calories',10000],['protein',500],['carbs',1500],['fat',500],['water',40]]){const n=Number(g[k]);if(Number.isFinite(n)&&n>=0)out[k]=Math.min(max,Math.round(n));}
+  return out;
+}
+function sanitizeCoachPlan(plan){
+  if(!isJsonObject(plan)||!Array.isArray(plan.days))return null;
+  return {days:plan.days.slice(0,7).map(d=>({title:cleanText(d?.title,60),exercises:Array.isArray(d?.exercises)?d.exercises.slice(0,12).map(e=>({name:cleanText(e?.name,72),sets:cleanText(String(e?.sets??''),8),reps:cleanText(String(e?.reps??''),12)})):[]}))};
+}
+// Presupuesto diario de consultas a Gemini (por cliente y total) para que el endpoint no sea un LLM gratuito abierto.
+const DAILY_PER_CLIENT=Math.max(1,Number(process.env.GEMINI_DAILY_PER_CLIENT)||150);
+const DAILY_TOTAL=Math.max(1,Number(process.env.GEMINI_DAILY_LIMIT)||2000);
+let dailyBudget={day:'',total:0,clients:new Map()};
+function overDailyBudget(req){
+  const day=new Date().toISOString().slice(0,10);
+  if(dailyBudget.day!==day)dailyBudget={day,total:0,clients:new Map()};
+  const key=rateLimitClientKey(req),used=dailyBudget.clients.get(key)||0;
+  if(dailyBudget.total>=DAILY_TOTAL||used>=DAILY_PER_CLIENT)return true;
+  if(dailyBudget.clients.size>=MAX_TRACKED_CLIENTS*4)dailyBudget.clients.delete(dailyBudget.clients.keys().next().value);
+  dailyBudget.clients.set(key,used+1);dailyBudget.total++;return false;
+}
+// Los navegadores envían Origin (o al menos Sec-Fetch-Site) en un POST; sin ninguno de los dos se rechaza.
+function sameOriginPost(req){
+  if(req.headers.origin){try{return new URL(req.headers.origin).host===String(req.headers.host||'');}catch{return false;}}
+  return String(req.headers['sec-fetch-site']||'')==='same-origin';
+}
 const server=http.createServer(async(req,res)=>{try{
   const url=new URL(req.url,'http://localhost');
-  // Reject browser POSTs from a different origin; requests without Origin (e.g. local health tooling) remain possible.
-  if(req.method==='POST'&&req.headers.origin){try{if(new URL(req.headers.origin).host!==String(req.headers.host||''))return send(req,res,403,{error:'Origen no permitido.'});}catch{return send(req,res,403,{error:'Origen no válido.'});}}
+  if(req.method==='POST'&&!sameOriginPost(req))return send(req,res,403,{error:'Origen no permitido.'});
   if(!['GET','POST','HEAD'].includes(req.method))return send(req,res,405,{error:'Método no permitido.'});
   if(req.method==='POST'&&String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase()!=='application/json')return send(req,res,415,{error:'El servidor espera JSON.'});
   if(req.method==='GET'&&url.pathname==='/api/public-config'){
@@ -242,6 +290,7 @@ const server=http.createServer(async(req,res)=>{try{
     let body;try{body=await readBody(req,4_000_000);}catch(e){return send(req,res,e.message==='too_large'?413:400,{error:e.message==='too_large'?'La imagen es demasiado grande. Elegí una foto más liviana.':'Solicitud de imagen inválida.'});}
     if(!isJsonObject(body))return send(req,res,400,{error:'La solicitud de imagen debe ser un objeto JSON.'});
     if(!apiKey)return send(req,res,503,{error:'La estimación por foto necesita configurar GEMINI_API_KEY en el servidor.'});
+    if(overDailyBudget(req))return send(req,res,429,{error:'Se alcanzó el límite diario de consultas a la IA. Probá mañana.'});
     if(typeof body.image!=='string'||body.image.length>3_600_000||!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(body.image))return send(req,res,400,{error:'La imagen debe ser JPG, PNG o WebP y pesar menos de aproximadamente 2,5 MB después de comprimir.'});
     const localeNames={es:'español',en:'English',pt:'portugués',fr:'francés',it:'italiano',de:'alemán'};
     const responseLanguage=localeNames[['es','en','pt','fr','it','de'].includes(body.language)?body.language:'es'];
@@ -256,13 +305,14 @@ const server=http.createServer(async(req,res)=>{try{
     if(!isJsonObject(body))return send(req,res,400,{error:'La solicitud debe ser un objeto JSON.'});
     if(typeof body.message!=='string'||!body.message.trim()||body.message.length>500)return send(req,res,400,{error:'El mensaje debe tener entre 1 y 500 caracteres.'});
     if(!apiKey)return send(req,res,503,{error:'Falta configurar GEMINI_API_KEY en el servidor.'});
+    if(overDailyBudget(req))return send(req,res,429,{error:'Se alcanzó el límite diario de consultas a la IA. Probá mañana.'});
     const shareData=body.shareData!==false;
     const training=shareData?sanitizeTrainingContext(body):{};
-    const context=!shareData?{note:'La persona eligió no compartir sus registros. No asumas datos personales; si hacen falta, pedíselos.'}:{profile:isJsonObject(body.profile)?body.profile:{},goals:isJsonObject(body.goals)?body.goals:{},plan:isJsonObject(body.plan)?body.plan:null,...training,availableEquipment:body.profile?.equipment||'gym',note:'La rutina se genera desde una biblioteca local curada; proponé cambios realistas y respetá el equipamiento indicado. El historial recibido es solo contexto enviado por el usuario; no lo guardes ni asumas que está completo.'};
+    const context=!shareData?{note:'La persona eligió no compartir sus registros. No asumas datos personales; si hacen falta, pedíselos.'}:{profile:sanitizeCoachProfile(body.profile),goals:sanitizeCoachGoals(body.goals),plan:sanitizeCoachPlan(body.plan),...training,availableEquipment:cleanText(String(body.profile?.equipment||'gym'),24),note:'La rutina se genera desde una biblioteca local curada; proponé cambios realistas y respetá el equipamiento indicado. El historial recibido es solo contexto enviado por el usuario; no lo guardes ni asumas que está completo.'};
     const history=sanitizeHistory(body.history);
     const localeNames={es:'español rioplatense/uruguayo',en:'English',pt:'portugués',fr:'francés',it:'italiano',de:'alemán'};
     const responseLanguage=localeNames[['es','en','pt','fr','it','de'].includes(body.language)?body.language:'es'];
-    const languagePrompt=prompt+`\nIDIOMA OBLIGATORIO DE RESPUESTA: ${responseLanguage}. Escribí reply, title y description de cualquier propuesta exclusivamente en ese idioma. No cambies de idioma salvo que la persona lo solicite expresamente.`;
+    const languagePrompt=prompt+'\n'+APP_GUIDE+`\nIDIOMA OBLIGATORIO DE RESPUESTA: ${responseLanguage}. Escribí reply, title y description de cualquier propuesta exclusivamente en ese idioma. No cambies de idioma salvo que la persona lo solicite expresamente.`;
     let result;try{result=await askGemini({system:languagePrompt,history,user:`Contexto actual del usuario: ${JSON.stringify(context).slice(0,10000)}\nMensaje actual: ${body.message}`,maxTokens:900});}catch(e){
       console.error('[Gemini coach] Falló la solicitud:',e.status||'',e.message||'error',e.details||'');
       if(e.status===429)return send(req,res,429,{error:'Google informó que se alcanzó un límite de uso de Gemini. Esperá y probá más tarde; el nivel gratuito tiene cuotas.'});
@@ -273,7 +323,7 @@ const server=http.createServer(async(req,res)=>{try{
       if(e.status===503||e.status===504||e.status===500||e.status===502)return send(req,res,502,{error:'Gemini sigue temporalmente sin disponibilidad incluso tras reintentar y probar un modelo alternativo. Esperá un poco y probá de nuevo; revisá Render → Logs si persiste.'});
       return send(req,res,502,{error:'Gemini falló por un error de API o conexión. Abrí Render → Logs y buscá [Gemini coach] para ver el código real.'});
     }
-    return send(req,res,200,{reply:typeof result.reply==='string'?result.reply.slice(0,1800):'Contame un poco más para ayudarte.',proposal:sanitizeProposal(result.proposal)});
+    return send(req,res,200,{reply:typeof result.reply==='string'?result.reply.slice(0,1800):'Contame un poco más para ayudarte.',proposal:sanitizeProposal(result.proposal),actions:sanitizeActions(result.actions)});
   }
   if(['GET','HEAD'].includes(req.method)&&(url.pathname==='/'||!url.pathname.startsWith('/api/'))){
     let decodedPath;
