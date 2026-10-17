@@ -26,16 +26,16 @@ test('v41.0: Inicio es un panel con las métricas de constancia y ya no repite e
   assert.doesNotMatch(html, /<section class="hero hero-v18">/);
 });
 
-test('v41: acceso a la IA y cinco accesos móviles apuntan a vistas reales', async () => {
+test('v42: acceso a la IA y seis accesos móviles apuntan a vistas reales', async () => {
   const html = await read('index.html');
   const nav = html.match(/<nav class="mobile-app-nav" id="mobileAppNav"[\s\S]*?<\/nav>/)?.[0] || '';
   const ids = [...nav.matchAll(/data-mobile-view="([^"]+)"/g)].map(match => match[1]);
-  assert.deepEqual(ids, ['plan', 'train', 'progress', 'community', 'profile']);
+  assert.deepEqual(ids, ['plan', 'train', 'nutrition', 'progress', 'community', 'profile']);
   for (const view of ['plan', 'train', 'exercises', 'routines', 'nutrition', 'progress', 'community', 'profile', 'coach', 'running']) {
     assert.match(html, new RegExp(`id="view-${view}"`), `Falta vista ${view}`);
   }
   assert.match(html, /data-shortcut-view="coach" aria-label="Consultar a la IA"/);
-  assert.match(html, /const inMoreMenu=name==='nutrition';/);
+  assert.match(html, /const inMoreMenu=false;/);
 });
 
 test('v40.7: service worker y versiones de paquetes fuerzan una actualización de caché', async () => {

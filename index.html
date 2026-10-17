@@ -1374,7 +1374,8 @@
     .more-desc{display:block;margin-top:1px;font-size:11px;font-weight:500;color:var(--ff-muted)}
     .mobile-more-trigger.active{border-color:var(--ff-cyan);color:#dff3ff}
     @media(max-width:760px){
-      .mobile-app-nav{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+      .mobile-app-nav{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+      .mobile-app-nav .mobile-nav-item{font-size:10.5px;padding-left:0;padding-right:0}
     }
     @media(min-width:761px) and (max-width:1023px){
       .tabs{grid-template-columns:repeat(7,minmax(0,1fr))}
@@ -1431,6 +1432,24 @@
       .community-privacy-note{font-size:13px;padding:10px 12px}
       .community-panel-heading .btn{min-height:38px;padding:6px 12px;font-size:13px}
     }
+    /* v42 — paneles internos, grupos de Perfil y barra de 6 destinos */
+    .view-panel[hidden]{display:none}
+    #view-nutrition.view.active,#view-profile.view.active,#view-train.view.active{display:block}
+    .ff-group{margin:0 0 var(--ff-s3);border:1px solid var(--ff-line);border-radius:var(--ff-r-lg);background:linear-gradient(160deg,var(--ff-surface-2),var(--ff-surface));overflow:hidden}
+    .ff-group>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:14px 16px;cursor:pointer}
+    .ff-group>summary::-webkit-details-marker{display:none}
+    .ff-group>summary::after{content:'';width:9px;height:9px;flex:none;border-right:2px solid var(--ff-muted);border-bottom:2px solid var(--ff-muted);transform:rotate(45deg);transition:transform .15s}
+    .ff-group[open]>summary::after{transform:rotate(-135deg)}
+    .ff-group>summary strong{display:block;font-size:var(--ff-fs-md)}
+    .ff-group>summary small{display:block;color:var(--ff-muted);font-size:var(--ff-fs-xs);margin-top:2px}
+    .ff-group>.card{margin:0;border:0;border-top:1px solid var(--ff-line);border-radius:0;background:transparent;box-shadow:none}
+    .ff-group>summary+.card:last-child>h3:first-child{display:none}
+    .profile-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+    .profile-stats div{padding:10px;border-radius:var(--ff-r-md);border:1px solid var(--ff-line);background:rgba(6,11,23,.35);text-align:center}
+    .profile-stats strong{display:block;font-size:20px}
+    .profile-stats small{color:var(--ff-muted);font-size:11px}
+    @media(min-width:1200px){#view-nutrition .view-panel:not([hidden]){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 var(--ff-s4);align-items:start}}
+    @media(prefers-reduced-motion:reduce){.ff-group>summary::after{transition:none}}
     /* v41 — Comunidad: tipos de publicación, logros y no leídos */
     .community-kind{display:inline-block;margin-bottom:6px;color:var(--ff-muted);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
     .community-achievement{display:flex;align-items:center;gap:var(--ff-s3);padding:var(--ff-s3);margin:4px 0 8px;border-radius:var(--ff-r-md);border:1px solid rgba(26,167,255,.35);background:rgba(26,167,255,.07)}
@@ -1464,12 +1483,13 @@
   <nav class="tabs" aria-label="Navegación principal">
     <button type="button" class="tab active" data-view="plan" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Inicio</span></button>
     <button type="button" class="tab" data-view="train"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg><span>Entrenar</span></button>
+    <button type="button" class="tab" data-view="nutrition"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M17 21V3c-2 1-3 4-3 8h3"/></svg><span>Nutrición</span></button>
     <button type="button" class="tab" data-view="progress"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M7 15l4-4 3 2 5-6"/></svg><span>Progreso</span></button>
     <button type="button" class="tab" data-view="community"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M15 15a5 5 0 0 1 6 5"/></svg><span>Comunidad</span></button>
     <button type="button" class="tab" data-view="profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Perfil</span></button>
     <span class="tab-group-label" aria-hidden="true">Herramientas</span>
-    <button type="button" class="tab" data-view="nutrition"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M17 21V3c-2 1-3 4-3 8h3"/></svg><span>Nutrición</span></button>
-    <button type="button" class="tab" data-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>Coach IA</span></button>
+    <button type="button" class="tab" data-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI</span></button>
+    <button type="button" class="tab" data-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS</span></button>
   </nav>
 
   <main>
@@ -1502,12 +1522,12 @@
     </section>
     <p class="home-empty" id="homeEmpty" hidden>Cuando registres entrenamientos, comidas o agua, acá vas a ver tu avance real.</p>
     <div class="home-tiles" aria-label="Accesos rápidos">
-      <button class="home-tile t-blue" type="button" data-shortcut-view="train"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg><b>Entrenar</b><span>Sesión, ejercicios y rutinas</span></button>
-      <button class="home-tile t-green" type="button" data-shortcut-view="nutrition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M17 21V3c-2 1-3 4-3 8h3"/></svg><b>Nutrición</b><span>Comidas y agua</span></button>
-      <button class="home-tile t-amber" type="button" data-shortcut-view="coach" aria-label="Consultar a la IA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><b>Coach IA</b><span>Te acompaña</span></button>
-      <button class="home-tile t-cyan" type="button" data-shortcut-view="running"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><b>Correr con GPS</b><span>Distancia y ritmo</span></button>
-      <button class="home-tile t-violet" type="button" data-shortcut-view="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5M4 19h17M7 15l4-4 3 2 5-6"/></svg><b>Progreso</b><span>Peso y estadísticas</span></button>
-      <button class="home-tile t-teal" type="button" data-shortcut-view="community"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M15 15a5 5 0 0 1 6 5"/></svg><b>Comunidad</b><span>Compartí y seguí</span></button>
+      <button class="home-tile t-blue" type="button" data-home-quick="train"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg><b>Entrenar</b><span>Sesión, rutinas y libre</span></button>
+      <button class="home-tile t-green" type="button" data-home-quick="meal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M17 21V3c-2 1-3 4-3 8h3"/></svg><b>Registrar comida</b><span>Foto, código o manual</span></button>
+      <button class="home-tile t-cyan" type="button" data-home-quick="water" aria-label="Sumar un vaso de agua"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg><b>+1 vaso de agua</b><span><span id="homeQuickWater">Hidratación de hoy</span></span></button>
+      <button class="home-tile t-teal" type="button" data-shortcut-view="running"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><b>Correr con GPS</b><span>O registrar a mano</span></button>
+      <button class="home-tile t-violet" type="button" data-show-badges><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 19.5 7v10L12 21.5 4.5 17V7z"/><path d="M12 8v5l3 2"/></svg><b>Insignias</b><span>Tus desafíos</span></button>
+      <button class="home-tile t-amber" type="button" data-shortcut-view="coach" aria-label="Consultar a la IA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><b>FittAI</b><span>Preguntá o pedí un plan</span></button>
     </div>
     <h2 class="home-h">Resumen de hoy</h2>
     <section class="home-card home-summary">
@@ -1533,7 +1553,7 @@
     <button type="button" class="subnav-item" data-subview="exercises">Ejercicios</button>
     <button type="button" class="subnav-item" data-subview="routines">Rutinas</button>
     <button type="button" class="subnav-item" data-subview="running">Correr</button>
-    <button type="button" class="subnav-item" data-subview="coach">Coach</button>
+    <button type="button" class="subnav-item" data-subview="coach">FittAI</button>
   </nav>
       <section class="card library-card" aria-labelledby="libraryTitle">
         <div class="section-head"><div><div class="eyebrow">Biblioteca de movimientos</div><h2 id="libraryTitle">Explorá ejercicios</h2><p>Elegí gimnasio, casa o peso corporal. Abrí cada ficha para ver ilustraciones y consejos de técnica.</p></div></div>
@@ -1559,7 +1579,7 @@
     <button type="button" class="subnav-item" data-subview="exercises">Ejercicios</button>
     <button type="button" class="subnav-item" data-subview="routines">Rutinas</button>
     <button type="button" class="subnav-item" data-subview="running">Correr</button>
-    <button type="button" class="subnav-item" data-subview="coach">Coach</button>
+    <button type="button" class="subnav-item" data-subview="coach">FittAI</button>
   </nav>
       <div class="section-head"><div><h2>Tu plan de entrenamiento</h2><p>Rutinas con biblioteca ampliada de ejercicios de gimnasio, casa y peso corporal.</p></div></div>
       <div class="card planner-card">
@@ -1597,9 +1617,9 @@
     <button type="button" class="subnav-item" data-subview="exercises">Ejercicios</button>
     <button type="button" class="subnav-item" data-subview="routines">Rutinas</button>
     <button type="button" class="subnav-item" data-subview="running">Correr</button>
-    <button type="button" class="subnav-item" data-subview="coach">Coach</button>
+    <button type="button" class="subnav-item" data-subview="coach">FittAI</button>
   </nav>
-      <div class="section-head"><div><h2>Tu entrenador inteligente</h2><p>Conversá, pedí ideas y revisá propuestas antes de aplicar cambios.</p></div></div>
+      <div class="section-head"><div><h2>FittAI</h2><p>Tu asistente de entrenamiento, running, nutrición y progreso. Las propuestas solo se aplican si las aprobás.</p></div></div>
       <div class="notice"><strong>Estado del entrenador:</strong> <span id="coachConnection" role="status">Comprobando conexión…</span><br><span class="small">La IA real requiere el backend y una clave privada configurada en el servidor. Nunca la pegues acá en el chat ni en la página.</span></div>
       <div class="card"><div id="coachMessages" class="chat-log" aria-live="polite"></div><div class="quick-prompts"><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero ajustar mi rutina a mi tiempo disponible.">Ajustar rutina</button><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero mejorar mi alimentación para mi objetivo.">Mejorar alimentación</button><button type="button" class="btn secondary quickPrompt" data-prompt="Esta semana tengo menos energía.">Tengo menos energía</button><button type="button" class="btn secondary quickPrompt" data-prompt="Analizá mi progreso reciente y sugerime el próximo paso seguro, usando solo los datos que tengo registrados.">Analizar mi progreso</button></div><form id="coachForm" class="chat-form"><label class="sr-only" for="coachInput">Mensaje para el entrenador</label><input id="coachInput" maxlength="500" placeholder="Contale qué necesitás…" autocomplete="off"><button class="btn" type="submit">Enviar</button></form><div class="coach-usage" id="coachUsage" aria-live="polite"><p id="coachUsageText">La opción de anuncios todavía no está configurada.</p><button class="btn secondary" id="watchRewardedAd" type="button" hidden>Ver anuncio y obtener 3 consultas</button></div></div>
       <div id="proposalArea"></div>
@@ -1611,7 +1631,7 @@
     <button type="button" class="subnav-item" data-subview="exercises">Ejercicios</button>
     <button type="button" class="subnav-item" data-subview="routines">Rutinas</button>
     <button type="button" class="subnav-item" data-subview="running">Correr</button>
-    <button type="button" class="subnav-item" data-subview="coach">Coach</button>
+    <button type="button" class="subnav-item" data-subview="coach">FittAI</button>
   </nav>
       <div class="section-head"><div><h2>Entrenamiento de fuerza</h2><p>Rutinas de gimnasio o casa, series, repeticiones, cargas y descanso. Correr y caminar están en su propia sección.</p></div></div>
       <div id="trainContent"></div>
@@ -1624,7 +1644,7 @@
     <button type="button" class="subnav-item" data-subview="exercises">Ejercicios</button>
     <button type="button" class="subnav-item" data-subview="routines">Rutinas</button>
     <button type="button" class="subnav-item" data-subview="running">Correr</button>
-    <button type="button" class="subnav-item" data-subview="coach">Coach</button>
+    <button type="button" class="subnav-item" data-subview="coach">FittAI</button>
   </nav>
       <div class="section-head"><div><h2>Correr y actividad al aire libre</h2><p>Registrá carreras, caminatas y bicicleta con GPS o manualmente. Los planes para correr están más abajo.</p></div></div>
       <div class="running-hero card">
@@ -1677,17 +1697,33 @@
     </section>
 
     <section class="view" id="view-nutrition">
-      <div class="section-head"><div><h2>Nutrición</h2><p>Registrá comidas y seguí estimaciones orientativas.</p></div></div>
-      <aside class="ad-slot" id="adSlotNutrition" aria-label="Publicidad"><span class="ad-slot-label">Publicidad</span><div class="ad-slot-content" id="adContentNutrition"></div></aside>
-      <div class="card"><div class="eyebrow">Objetivos diarios orientativos</div><div class="grid2"><div class="field"><label for="calorieGoal">Calorías (kcal)</label><input id="calorieGoal" type="number" min="800" max="6000" step="50" value="2400"></div><div class="field"><label for="proteinGoal">Proteínas (g)</label><input id="proteinGoal" type="number" min="20" max="400" step="5" value="120"></div><div class="field"><label for="carbGoal">Carbohidratos (g)</label><input id="carbGoal" type="number" min="0" max="800" step="5" value="280"></div><div class="field"><label for="fatGoal">Grasas (g)</label><input id="fatGoal" type="number" min="0" max="300" step="5" value="80"></div></div><button class="btn secondary full" id="estimateNutritionGoals" type="button">Calcular objetivos con mi perfil</button><button type="button" class="btn full" id="saveNutritionGoals">Guardar objetivos</button><p id="nutritionGoalHint" class="muted small" aria-live="polite">Podés calcular una referencia con edad, altura, peso actual, objetivo de peso y actividad en Perfil. Revisá la propuesta antes de guardarla.</p><p class="muted small">Son estimaciones generales para adultos, no una prescripción médica o dietética. Para menores de 18 años, embarazo, enfermedades o necesidades específicas, consultá con un profesional.</p></div>
+      <div class="section-head"><div><h2>Nutrición</h2><p>Comidas, macronutrientes e hidratación. Los valores son estimaciones.</p></div></div>
+      <nav class="ff-segmented" role="tablist" aria-label="Secciones de Nutrición">
+        <button type="button" role="tab" class="ff-seg active" data-view-tab="hoy" aria-selected="true">Hoy</button>
+        <button type="button" role="tab" class="ff-seg" data-view-tab="registrar" aria-selected="false" tabindex="-1">Registrar</button>
+        <button type="button" role="tab" class="ff-seg" data-view-tab="plan" aria-selected="false" tabindex="-1">Objetivos</button>
+        <button type="button" role="tab" class="ff-seg" data-view-tab="historial" aria-selected="false" tabindex="-1">Historial</button>
+      </nav>
+      <div class="view-panel" role="tabpanel" data-view-panel="hoy">
+      <div class="card nutrition-summary-card"><div class="section-head"><div><h3>Resumen de hoy</h3><p>Basado en lo que registraste.</p></div><span class="tag" id="nutritionDate"></span></div><div class="nutri-hero"><div class="nutri-ring" aria-hidden="true"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"></circle><circle class="fg" id="nutriRingArc" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle></svg><div><b id="nutriRingValue">0</b><small>kcal</small></div></div><div class="nutri-hero-copy"><strong id="nutriRingTitle">Tu día de comidas</strong><p id="nutriRingText">Registrá tu primera comida.</p></div></div><div class="stats"><div class="stat"><strong id="todayCalories">0</strong><small>kcal registradas</small></div><div class="stat"><strong id="todayProtein">0 g</strong><small>Proteínas</small></div><div class="stat"><strong id="todayCarbs">0 g</strong><small>Carbohidratos</small></div><div class="stat"><strong id="todayFat">0 g</strong><small>Grasas</small></div><div class="stat"><strong id="mealsCount">0</strong><small>Comidas</small></div></div><div class="progressbar nutri-hide"><span id="calorieBar" style="width:0%"></span></div><p class="muted small" id="calorieCaption">Registrá tu primera comida.</p><div class="macro-progress"><div><div class="macro-progress-label"><span>Proteínas</span><strong id="proteinCaption">0 / 120 g</strong></div><div class="progressbar"><span id="proteinBar" style="width:0%"></span></div></div><div><div class="macro-progress-label"><span>Carbohidratos</span><strong id="carbCaption">0 / 280 g</strong></div><div class="progressbar"><span id="carbBar" style="width:0%"></span></div></div><div><div class="macro-progress-label"><span>Grasas</span><strong id="fatCaption">0 / 80 g</strong></div><div class="progressbar"><span id="fatBar" style="width:0%"></span></div></div></div><div id="mealList"></div></div>
+      <div class="card hydration-card"><h3>Hidratación</h3><p class="muted small">Registrá vasos de agua; el objetivo es configurable y no reemplaza las necesidades individuales.</p><div class="water-row"><strong><span id="waterCount">0</span> / <span id="waterGoalText">8</span> vasos</strong><div class="btn-row"><button type="button" class="btn secondary" id="addWater">+ 1 vaso</button><button type="button" class="btn ghost" id="removeWater">− 1 vaso</button></div></div><div class="field"><label for="waterGoal">Objetivo de vasos por día</label><input id="waterGoal" type="number" min="1" max="20" value="8"></div></div>
+      </div>
+      <div class="view-panel" role="tabpanel" data-view-panel="registrar" hidden>
       <div class="card"><h3>Registrar una comida</h3><form id="mealForm"><div class="field"><label for="mealName">¿Qué comiste? Escribilo con cantidades</label><input id="mealName" maxlength="120" required placeholder="Ej. 2 huevos, 2 panes y 1 vaso de leche"><p id="mealEstimateStatus" class="muted small" aria-live="polite">Al escribir alimentos conocidos, FittForma estima calorías y macronutrientes automáticamente. Revisá los valores antes de guardar.</p></div><div class="grid2"><div class="field"><label for="mealCalories">Calorías (kcal)</label><input id="mealCalories" type="number" min="0" max="10000" required placeholder="Autoestimación"></div><div class="field"><label for="mealProtein">Proteínas (g)</label><input id="mealProtein" type="number" min="0" max="500" step="0.1" required placeholder="Autoestimación"></div><div class="field"><label for="mealCarbs">Carbohidratos (g)</label><input id="mealCarbs" type="number" min="0" max="1000" step="0.1" placeholder="Opcional"></div><div class="field"><label for="mealFat">Grasas (g)</label><input id="mealFat" type="number" min="0" max="500" step="0.1" placeholder="Opcional"></div></div><div class="field"><label for="mealType">Momento</label><select id="mealType"><option>Desayuno</option><option>Almuerzo</option><option>Merienda</option><option>Cena</option><option>Colación</option></select></div><button class="btn full" type="submit">Guardar comida</button></form></div>
+      <div class="card"><h3>Base rápida de alimentos</h3><p class="muted small">Estimaciones aproximadas por 100 g (o 100 ml en leche), con calorías, proteínas, carbohidratos y grasas. La base es orientativa y no sustituye la etiqueta del producto. Seleccioná un alimento y una cantidad para cargar los valores en el formulario; verificá etiqueta y preparación.</p><div class="grid2"><div class="field"><label for="foodSearch">Buscar alimento</label><input id="foodSearch" placeholder="Ej. arroz, huevo, leche" autocomplete="off"></div><div class="field"><label for="foodAmount">Cantidad (g/ml)</label><input id="foodAmount" type="number" min="1" max="3000" value="100"></div></div><div class="field"><label for="foodSelect">Resultados</label><select id="foodSelect"></select></div><button class="btn secondary full" id="useFood" type="button">Cargar en el formulario</button><p id="foodEstimate" class="muted small"></p></div>
       <div class="card"><h3>Buscar producto por código de barras</h3><p class="muted small">Consultamos Open Food Facts. La disponibilidad y los datos dependen de la ficha del producto; verificá siempre la etiqueta del envase.</p><div class="field"><label for="barcodeInput">Código de barras</label><input id="barcodeInput" inputmode="numeric" autocomplete="off" maxlength="32" placeholder="Ej. 3017620422003"></div><div class="btn-row"><button class="btn secondary" id="lookupBarcode" type="button">Buscar producto</button><button class="btn ghost" id="startBarcodeCamera" type="button">Escanear con cámara</button><button class="btn ghost" id="stopBarcodeCamera" type="button" hidden>Detener cámara</button></div><video id="barcodeVideo" playsinline muted hidden style="width:100%;max-height:260px;object-fit:cover;border-radius:14px;margin-top:12px"></video><p id="barcodeStatus" class="muted small" role="status">Podés ingresar el número manualmente si tu navegador no admite el escaneo.</p></div>
       <div class="card"><h3>Estimar comida desde una foto</h3><p class="muted small">La IA puede estimar ingredientes, calorías y proteínas, pero puede equivocarse con porciones, aceites y recetas. La foto se envía al Gemini solo cuando tocás analizar y el backend está configurado. Revisá el resultado antes de guardarlo.</p><div class="field"><label for="mealPhoto">Foto de la comida</label><input id="mealPhoto" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"></div><button class="btn secondary full" id="analyzeMealPhoto" type="button">Analizar foto con IA</button><p id="photoStatus" class="muted small" role="status">No se guarda ni registra nada automáticamente.</p></div>
-      <div class="card"><h3>Base rápida de alimentos</h3><p class="muted small">Estimaciones aproximadas por 100 g (o 100 ml en leche), con calorías, proteínas, carbohidratos y grasas. La base es orientativa y no sustituye la etiqueta del producto. Seleccioná un alimento y una cantidad para cargar los valores en el formulario; verificá etiqueta y preparación.</p><div class="grid2"><div class="field"><label for="foodSearch">Buscar alimento</label><input id="foodSearch" placeholder="Ej. arroz, huevo, leche" autocomplete="off"></div><div class="field"><label for="foodAmount">Cantidad (g/ml)</label><input id="foodAmount" type="number" min="1" max="3000" value="100"></div></div><div class="field"><label for="foodSelect">Resultados</label><select id="foodSelect"></select></div><button class="btn secondary full" id="useFood" type="button">Cargar en el formulario</button><p id="foodEstimate" class="muted small"></p></div><div class="card"><h3>Menú diario orientativo</h3><p class="muted small">Arma una propuesta con alimentos de la base local teniendo en cuenta tus objetivos de calorías y proteínas. No es una dieta clínica ni contempla alergias o condiciones médicas. Revisá ingredientes y porciones antes de agregarla.</p><button class="btn secondary full" id="generateMenu" type="button">Generar menú para hoy</button><div id="menuProposal"></div></div><div class="card nutrition-summary-card"><div class="section-head"><div><h3>Resumen de hoy</h3><p>Basado en lo que registraste.</p></div><span class="tag" id="nutritionDate"></span></div><div class="nutri-hero"><div class="nutri-ring" aria-hidden="true"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"></circle><circle class="fg" id="nutriRingArc" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle></svg><div><b id="nutriRingValue">0</b><small>kcal</small></div></div><div class="nutri-hero-copy"><strong id="nutriRingTitle">Tu día de comidas</strong><p id="nutriRingText">Registrá tu primera comida.</p></div></div><div class="stats"><div class="stat"><strong id="todayCalories">0</strong><small>kcal registradas</small></div><div class="stat"><strong id="todayProtein">0 g</strong><small>Proteínas</small></div><div class="stat"><strong id="todayCarbs">0 g</strong><small>Carbohidratos</small></div><div class="stat"><strong id="todayFat">0 g</strong><small>Grasas</small></div><div class="stat"><strong id="mealsCount">0</strong><small>Comidas</small></div></div><div class="progressbar nutri-hide"><span id="calorieBar" style="width:0%"></span></div><p class="muted small" id="calorieCaption">Registrá tu primera comida.</p><div class="macro-progress"><div><div class="macro-progress-label"><span>Proteínas</span><strong id="proteinCaption">0 / 120 g</strong></div><div class="progressbar"><span id="proteinBar" style="width:0%"></span></div></div><div><div class="macro-progress-label"><span>Carbohidratos</span><strong id="carbCaption">0 / 280 g</strong></div><div class="progressbar"><span id="carbBar" style="width:0%"></span></div></div><div><div class="macro-progress-label"><span>Grasas</span><strong id="fatCaption">0 / 80 g</strong></div><div class="progressbar"><span id="fatBar" style="width:0%"></span></div></div></div><div id="mealList"></div></div>
-      <div class="card nutrition-week-card"><div class="section-head"><div><h3>Tu tendencia semanal</h3><p class="muted small">Compará tus registros recientes de comida e hidratación. Los días sin registro no se cuentan como cero consumo.</p></div><span class="tag">7 días</span></div><div id="nutritionWeekSummary" class="progress-insight-grid"></div><div class="nutrition-week-legend"><span><i class="nutrition-legend-cal"></i>Calorías vs. objetivo</span><span><i class="nutrition-legend-protein"></i>Proteína vs. objetivo</span><span><i class="nutrition-legend-water"></i>Vasos vs. objetivo</span></div><div id="nutritionWeekChart" class="nutrition-week-chart"></div><p class="muted small">Son estimaciones a partir de lo que registraste, no un análisis de tu alimentación completa. Verificá porciones, preparación y etiquetas.</p></div>
       <div class="card meal-favorites-card"><div class="section-head"><div><h3>Comidas favoritas</h3><p>Guardá comidas que repetís para cargarlas rápidamente otro día.</p></div><span class="tag">Acceso rápido</span></div><div id="mealFavoritesList"></div></div>
       <div class="card"><h3>Ideas sencillas de comidas</h3><p class="muted small">Ejemplos orientativos. Las cantidades, marcas y preparación cambian los valores reales.</p><div class="exercise"><div><strong>Avena con leche y banana</strong><div class="muted small">Desayuno · ajustar porciones a tu apetito</div></div><button type="button" class="btn secondary addMealIdea" data-name="Avena con leche y banana" data-cal="400" data-pro="16" data-carbs="67" data-fat="9">Usar</button></div><div class="exercise"><div><strong>Arroz con atún y verduras</strong><div class="muted small">Almuerzo · fuente de carbohidratos y proteína</div></div><button type="button" class="btn secondary addMealIdea" data-name="Arroz con atún y verduras" data-cal="500" data-pro="30" data-carbs="68" data-fat="8">Usar</button></div><div class="exercise"><div><strong>Huevos con pan integral</strong><div class="muted small">Comida rápida · valores según porción</div></div><button type="button" class="btn secondary addMealIdea" data-name="Huevos con pan integral" data-cal="350" data-pro="22" data-carbs="30" data-fat="14">Usar</button></div><p class="muted small">Al elegir “Usar”, la idea se carga en el formulario para que la revises antes de registrarla.</p></div>
-      <div class="card hydration-card"><h3>Hidratación</h3><p class="muted small">Registrá vasos de agua; el objetivo es configurable y no reemplaza las necesidades individuales.</p><div class="water-row"><strong><span id="waterCount">0</span> / <span id="waterGoalText">8</span> vasos</strong><div class="btn-row"><button type="button" class="btn secondary" id="addWater">+ 1 vaso</button><button type="button" class="btn ghost" id="removeWater">− 1 vaso</button></div></div><div class="field"><label for="waterGoal">Objetivo de vasos por día</label><input id="waterGoal" type="number" min="1" max="20" value="8"></div></div>
+      </div>
+      <div class="view-panel" role="tabpanel" data-view-panel="plan" hidden>
+      <div class="card"><div class="eyebrow">Objetivos diarios orientativos</div><div class="grid2"><div class="field"><label for="calorieGoal">Calorías (kcal)</label><input id="calorieGoal" type="number" min="800" max="6000" step="50" value="2400"></div><div class="field"><label for="proteinGoal">Proteínas (g)</label><input id="proteinGoal" type="number" min="20" max="400" step="5" value="120"></div><div class="field"><label for="carbGoal">Carbohidratos (g)</label><input id="carbGoal" type="number" min="0" max="800" step="5" value="280"></div><div class="field"><label for="fatGoal">Grasas (g)</label><input id="fatGoal" type="number" min="0" max="300" step="5" value="80"></div></div><button class="btn secondary full" id="estimateNutritionGoals" type="button">Calcular objetivos con mi perfil</button><button type="button" class="btn full" id="saveNutritionGoals">Guardar objetivos</button><p id="nutritionGoalHint" class="muted small" aria-live="polite">Podés calcular una referencia con edad, altura, peso actual, objetivo de peso y actividad en Perfil. Revisá la propuesta antes de guardarla.</p><p class="muted small">Son estimaciones generales para adultos, no una prescripción médica o dietética. Para menores de 18 años, embarazo, enfermedades o necesidades específicas, consultá con un profesional.</p></div>
+      <div class="card"><h3>Menú diario orientativo</h3><p class="muted small">Arma una propuesta con alimentos de la base local teniendo en cuenta tus objetivos de calorías y proteínas. No es una dieta clínica ni contempla alergias o condiciones médicas. Revisá ingredientes y porciones antes de agregarla.</p><button class="btn secondary full" id="generateMenu" type="button">Generar menú para hoy</button><div id="menuProposal"></div></div>
+      </div>
+      <div class="view-panel" role="tabpanel" data-view-panel="historial" hidden>
+      <div class="card nutrition-week-card"><div class="section-head"><div><h3>Tu tendencia semanal</h3><p class="muted small">Compará tus registros recientes de comida e hidratación. Los días sin registro no se cuentan como cero consumo.</p></div><span class="tag">7 días</span></div><div id="nutritionWeekSummary" class="progress-insight-grid"></div><div class="nutrition-week-legend"><span><i class="nutrition-legend-cal"></i>Calorías vs. objetivo</span><span><i class="nutrition-legend-protein"></i>Proteína vs. objetivo</span><span><i class="nutrition-legend-water"></i>Vasos vs. objetivo</span></div><div id="nutritionWeekChart" class="nutrition-week-chart"></div><p class="muted small">Son estimaciones a partir de lo que registraste, no un análisis de tu alimentación completa. Verificá porciones, preparación y etiquetas.</p></div>
+      </div>
+      <aside class="ad-slot" id="adSlotNutrition" aria-label="Publicidad"><span class="ad-slot-label">Publicidad</span><div class="ad-slot-content" id="adContentNutrition"></div></aside>
     </section>
 
     <section class="view" id="view-progress">
@@ -1838,9 +1874,10 @@
       </section>
     </section>
     <section class="view" id="view-profile">
-      <div class="section-head"><div><h2>Tu perfil</h2><p>Guardado en este dispositivo.</p></div></div>
+      <div class="section-head"><div><h2>Tu perfil</h2><p>Tus datos, objetivos y configuración.</p></div></div>
       <div class="card" id="profileIdentityCard">
         <div class="profile-identity-row"><div class="profile-avatar" id="profileAvatar" aria-hidden="true">FF</div><div class="profile-identity-copy"><h3 id="profileDisplayName">Tu perfil FittForma</h3><p class="muted small" id="profileDisplayGoal">Tu progreso, a tu manera</p></div></div>
+        <div class="profile-stats" id="profileStats" aria-label="Tu actividad"></div>
         <form id="identityForm">
           <div class="field"><label for="profileDisplayNameInput">Cómo querés que te llamemos</label><input id="profileDisplayNameInput" maxlength="48" autocomplete="nickname" placeholder="Tu nombre o apodo"></div>
           <div class="field"><label for="profileFocusInput">Objetivo principal (opcional)</label><select id="profileFocusInput"><option value="">Elegí tu objetivo</option><option value="Ganar masa muscular">Ganar masa muscular</option><option value="Aumentar fuerza">Aumentar fuerza</option><option value="Mejorar resistencia">Mejorar resistencia</option><option value="Perder grasa gradualmente">Perder grasa gradualmente</option><option value="Crear el hábito de entrenar">Crear el hábito de entrenar</option></select></div>
@@ -1849,7 +1886,32 @@
         <div class="profile-badges-preview" id="profileBadgesPreview"><h4>Mis insignias</h4><div id="profileBadgeChips" class="profile-badge-chips"><span class="muted small">Tus logros aparecerán acá.</span></div><button class="btn secondary full" id="profileViewBadges" type="button" style="margin-top:10px">Ver todas mis insignias</button></div>
         <p class="muted small" style="margin-bottom:0">Tu nombre y objetivo se guardan en este dispositivo. Tus insignias se guardan en este dispositivo. Podés compartir la que elijas desde Comunidad › Publicar › Logro.</p>
       </div>
-      <div class="card" id="workoutReminderCard">
+      <details class="ff-group">
+        <summary><span><strong>Objetivos y datos físicos</strong><small>Peso, altura, actividad y preferencias de entrenamiento</small></span></summary>
+        <div class="card" id="bodyProfileCard">
+        <h3>Datos físicos y objetivo de peso</h3>
+        <p class="muted small">Estos datos permiten calcular una referencia nutricional inicial. Podés dejarlos incompletos y completar el perfil más adelante.</p>
+        <form id="bodyProfileForm">
+          <div class="grid2">
+            <div class="field"><label for="profileAge">Edad (años)</label><input id="profileAge" type="number" min="13" max="100" inputmode="numeric" placeholder="Ej. 25"></div>
+            <div class="field"><label for="profileHeight">Altura (cm)</label><input id="profileHeight" type="number" min="100" max="250" step="0.5" inputmode="decimal" placeholder="Ej. 175"></div>
+            <div class="field"><label for="profileCurrentWeight">Peso actual (kg)</label><input id="profileCurrentWeight" type="number" min="25" max="350" step="0.1" inputmode="decimal" placeholder="Ej. 72.5"></div>
+            <div class="field"><label for="profileTargetWeight">Peso al que querés llegar (kg)</label><input id="profileTargetWeight" type="number" min="25" max="350" step="0.1" inputmode="decimal" placeholder="Ej. 76"></div>
+            <div class="field"><label for="profileActivityLevel">Actividad habitual</label><select id="profileActivityLevel"><option value="sedentary">Mayormente sentado/a</option><option value="light" selected>Ligera (1–3 días/semana)</option><option value="moderate">Moderada (3–5 días/semana)</option><option value="high">Alta (6–7 días/semana)</option></select></div>
+          </div>
+          <button class="btn full" id="saveBodyProfile" type="submit">Guardar datos físicos</button>
+        </form>
+        <div id="bodyProfileSummary" class="muted small" style="margin-top:12px" aria-live="polite"></div>
+      </div>
+        <div class="card">
+        <h3>Preferencias de entrenamiento</h3>
+        <p class="muted small">Modificá tus preferencias en “Mi plan” y tocá “Crear mi rutina”. No hace falta ingresar información médica ni datos sensibles.</p>
+        <div id="profileSummary"></div>
+      </div>
+      </details>
+      <details class="ff-group">
+        <summary><span><strong>Recordatorios</strong><small>Días, horario y notificaciones</small></span></summary>
+        <div class="card" id="workoutReminderCard">
         <h3>Recordatorios de entrenamiento</h3>
         <p class="muted small">Elegí los días y la hora. FittForma te avisará si todavía no registraste actividad ese día.</p>
         <form id="workoutReminderForm">
@@ -1877,27 +1939,10 @@
         <p class="muted small" id="calendarReminderHelp" style="margin-bottom:8px">Importá el archivo .ics en Google Calendar, Apple Calendar u otra agenda para tener un aviso programado aunque FittForma esté cerrada. Es un evento recurrente independiente: el calendario no sabe si ya registraste tu entrenamiento.</p>
         <p class="muted small" style="margin-bottom:0">Los recordatorios internos se revisan mientras FittForma está abierta y al volver a abrirla. No se garantiza la entrega si queda en segundo plano o cerrada; para notificaciones push propias hace falta configurar un servicio en el servidor.</p><p class="muted small" style="margin-bottom:0">En iPhone, agregá FittForma a la pantalla de inicio para habilitar las notificaciones web compatibles (iOS 16.4 o posterior). Después aceptá el permiso y probá el aviso.</p>
       </div>
-      <div class="card" id="bodyProfileCard">
-        <h3>Datos físicos y objetivo de peso</h3>
-        <p class="muted small">Estos datos permiten calcular una referencia nutricional inicial. Podés dejarlos incompletos y completar el perfil más adelante.</p>
-        <form id="bodyProfileForm">
-          <div class="grid2">
-            <div class="field"><label for="profileAge">Edad (años)</label><input id="profileAge" type="number" min="13" max="100" inputmode="numeric" placeholder="Ej. 25"></div>
-            <div class="field"><label for="profileHeight">Altura (cm)</label><input id="profileHeight" type="number" min="100" max="250" step="0.5" inputmode="decimal" placeholder="Ej. 175"></div>
-            <div class="field"><label for="profileCurrentWeight">Peso actual (kg)</label><input id="profileCurrentWeight" type="number" min="25" max="350" step="0.1" inputmode="decimal" placeholder="Ej. 72.5"></div>
-            <div class="field"><label for="profileTargetWeight">Peso al que querés llegar (kg)</label><input id="profileTargetWeight" type="number" min="25" max="350" step="0.1" inputmode="decimal" placeholder="Ej. 76"></div>
-            <div class="field"><label for="profileActivityLevel">Actividad habitual</label><select id="profileActivityLevel"><option value="sedentary">Mayormente sentado/a</option><option value="light" selected>Ligera (1–3 días/semana)</option><option value="moderate">Moderada (3–5 días/semana)</option><option value="high">Alta (6–7 días/semana)</option></select></div>
-          </div>
-          <button class="btn full" id="saveBodyProfile" type="submit">Guardar datos físicos</button>
-        </form>
-        <div id="bodyProfileSummary" class="muted small" style="margin-top:12px" aria-live="polite"></div>
-      </div>
-      <div class="card">
-        <h3>Preferencias de entrenamiento</h3>
-        <p class="muted small">Modificá tus preferencias en “Mi plan” y tocá “Crear mi rutina”. No hace falta ingresar información médica ni datos sensibles.</p>
-        <div id="profileSummary"></div>
-      </div>
-      <div class="card" id="cloudAccountCard">
+      </details>
+      <details class="ff-group">
+        <summary><span><strong>Cuenta y sincronización</strong><small>Iniciar sesión y copia en la nube</small></span></summary>
+        <div class="card" id="cloudAccountCard">
         <h3>Cuenta y sincronización opcional</h3>
         <p class="muted small">Opcional: conectá Supabase con SUPABASE_URL y una clave pública anon/publishable en Render para registrar una cuenta y sincronizar manualmente. La app sigue funcionando localmente si no configurás la nube.</p>
         <p id="cloudStatus" class="notice" role="status">Comprobando configuración de sincronización…</p>
@@ -1909,7 +1954,19 @@
         <div class="btn-row" style="margin-top:12px"><button class="btn secondary" id="cloudDownload" type="button" disabled>Cargar datos de la nube</button><button class="btn secondary" id="cloudUpload" type="button" disabled>Guardar datos en la nube</button></div>
         <p class="muted small">La sincronización es manual para evitar sobrescribir datos sin querer. Al cargar desde la nube, se reemplaza la copia local de este navegador. Usá solo una contraseña que no reutilices en otros servicios.</p>
       </div>
-      <div class="card membership-card" id="membershipCard">
+      </details>
+      <details class="ff-group">
+        <summary><span><strong>Privacidad y funcionamiento</strong><small>Qué se guarda y dónde</small></span></summary>
+        <div class="card">
+        <h3>Privacidad y funcionamiento</h3>
+        <p class="muted small">Por defecto, tus preferencias y sesiones se guardan localmente. Si configurás Supabase, podés crear una cuenta y sincronizar manualmente; sin esa configuración, cambiar de dispositivo no transfiere tus datos. Exportalos para guardar una copia.</p>
+        <p class="muted small">No ingreses información sensible. La IA y la sincronización son opcionales y requieren configurar servicios externos; pueden aplicarse costos según el proveedor.</p>
+
+      </div>
+      </details>
+      <details class="ff-group">
+        <summary><span><strong>Membresía</strong><small>Plan gratuito y FittForma Pro</small></span></summary>
+        <div class="card membership-card" id="membershipCard">
         <div class="membership-head"><div><div class="eyebrow">Tu membresía</div><h3>FittForma Pro</h3><p class="muted small">Una propuesta de beneficios para la futura suscripción. La versión gratuita seguirá siendo útil.</p></div><span class="membership-status" id="membershipStatus">Plan gratuito · activo</span></div>
         <div class="membership-price">US$ 5,99 <small>/ mes · precio orientativo, aún no definitivo</small></div>
         <div class="membership-grid">
@@ -1920,18 +1977,16 @@
         <button class="btn full" id="membershipInfoButton" type="button">Consultar estado de Pro</button>
         <p id="membershipMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0">La contratación se habilitará después de integrar y probar los pagos.</p>
       </div>
-      <div class="card" id="appVersionCard">
+      </details>
+      <details class="ff-group">
+        <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
+        <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
         <p class="muted small">Estás usando la versión <strong id="appVersionLabel">41.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
-      <div class="card">
-        <h3>Privacidad y funcionamiento</h3>
-        <p class="muted small">Por defecto, tus preferencias y sesiones se guardan localmente. Si configurás Supabase, podés crear una cuenta y sincronizar manualmente; sin esa configuración, cambiar de dispositivo no transfiere tus datos. Exportalos para guardar una copia.</p>
-        <p class="muted small">No ingreses información sensible. La IA y la sincronización son opcionales y requieren configurar servicios externos; pueden aplicarse costos según el proveedor.</p>
-
-      </div>
+      </details>
     </section>
   </main>
   <div class="footer">FITTFORMA AI · Versión 41.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
@@ -1944,6 +1999,9 @@
   <button class="mobile-nav-item" type="button" data-mobile-view="train" aria-label="Entrenar">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg><span>Entrenar</span>
   </button>
+  <button class="mobile-nav-item" type="button" data-mobile-view="nutrition" aria-label="Nutrición">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M17 21V3c-2 1-3 4-3 8h3"/></svg><span>Nutrición</span>
+  </button>
   <button class="mobile-nav-item" type="button" data-mobile-view="progress" aria-label="Progreso">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M7 15l4-4 3 2 5-6"/></svg><span>Progreso</span>
   </button>
@@ -1955,8 +2013,7 @@
   </button>
 </nav>
 <div class="mobile-more-menu" id="mobileMoreMenu" hidden aria-label="Más secciones">
-  <button class="mobile-more-link" type="button" data-mobile-view="nutrition"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M17 21V3c-2 1-3 4-3 8h3"/></svg><span>Nutrición<small class="more-desc">Comidas, agua y objetivos</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
-  <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>Coach IA<small class="more-desc">Planes y orientación</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
+  <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow">›</span></button>
   <p class="mobile-menu-footnote">FITTFORMA AI · V41.0</p>
@@ -3381,6 +3438,8 @@ function findCatalogExercise(name){
     $('bodyProfileSummary').textContent=pieces.length?`Guardado: ${pieces.join(' · ')} · ${activity}.`:'Todavía no cargaste tus datos físicos. Completalos para personalizar los objetivos nutricionales.';
   }
   function renderProfile(){
+    const statsBox=$('profileStats');
+    if(statsBox){const sessions=state.sessions||[],acts=state.activities||[],days=new Set([...sessions,...acts].map(x=>String(x?.date||'').slice(0,10)).filter(Boolean)).size,badges=Object.keys(state.badgeUnlocks||{}).length;statsBox.innerHTML=[[sessions.length,'Entrenamientos'],[days,'Días activos'],[badges,'Insignias']].map(([v,l])=>`<div><strong>${v}</strong><small>${l}</small></div>`).join('');}
     const p=state.profile;renderIdentityProfile();renderBodyProfileSummary();renderReminderSettings();renderProfileBadgesPreview();
     $('profileSummary').innerHTML=`<div class="exercise"><div><strong>Objetivo</strong><div class="muted small">${esc(goalText(p.goal))}</div></div></div><div class="exercise"><div><strong>Experiencia</strong><div class="muted small">${esc(levelText(p.level))}</div></div></div><div class="exercise"><div><strong>Frecuencia</strong><div class="muted small">${esc(p.days)} días por semana · ${esc(p.duration)} min por sesión</div></div></div><div class="exercise"><div><strong>Equipamiento</strong><div class="muted small">${esc(equipText(p.equipment))}</div></div></div>`;
   }
@@ -3640,7 +3699,7 @@ function findCatalogExercise(name){
     $('calorieBar').style.width=Math.min(100,g.calories?cal/g.calories*100:0)+'%';{const pct=g.calories?Math.min(1,cal/g.calories):0;$('nutriRingArc').style.strokeDashoffset=String(326.7*(1-pct));$('nutriRingValue').textContent=Math.round(cal);$('nutriRingTitle').textContent=g.calories?`Objetivo: ${Math.round(g.calories)} kcal`:'Sin objetivo definido';$('nutriRingText').textContent=meals.length?`${Math.round(pct*100)}% de tu objetivo diario · ${meals.length} ${meals.length===1?'comida':'comidas'}`:'Registrá tu primera comida.';}$('calorieCaption').textContent=`${Math.max(0,Math.round(g.calories-cal))} kcal estimadas restantes para tu objetivo diario.`;
     const carbTarget=Number.isFinite(Number(g.carbs))?Number(g.carbs):280,fatTarget=Number.isFinite(Number(g.fat))?Number(g.fat):80;const macroProgress=[['protein',pro,g.protein||120,'proteinCaption'],['carb',carbs,carbTarget,'carbCaption'],['fat',fat,fatTarget,'fatCaption']];
     for(const [prefix,amount,target,captionId] of macroProgress){$(captionId).textContent=`${Math.round(amount)} / ${Math.round(target)} g`;$(`${prefix}Bar`).style.width=Math.min(100,target?amount/target*100:0)+'%';}
-    $('mealList').innerHTML=meals.length?meals.slice().reverse().map(m=>{const favorite=(state.mealFavorites||[]).some(f=>f.sourceId===m.id||f.name===m.name);return `<div class="history-item"><div><strong>${esc(m.name)}</strong><small>${esc(m.type)} · ${Math.round(m.calories)} kcal · ${Math.round(m.protein)} g P · ${Math.round(Number(m.carbs||0))} g C · ${Math.round(Number(m.fat||0))} g G</small><div class="meal-list-actions"><button class="btn ghost toggleMealFavorite" type="button" data-id="${esc(String(m.id))}">${favorite?'★ Guardada':'☆ Guardar favorita'}</button></div></div><button type="button" class="btn ghost removeMeal" data-id="${esc(String(m.id))}" aria-label="Eliminar ${esc(m.name)}">Quitar</button></div>`;}).join(''):'<div class="empty"><strong>Sin comidas registradas</strong><p>Agregá lo que comiste para ver tu resumen.</p></div>';
+    $('mealList').innerHTML=meals.length?meals.slice().reverse().map(m=>{const favorite=(state.mealFavorites||[]).some(f=>f.sourceId===m.id||f.name===m.name);return `<div class="history-item"><div><strong>${esc(m.name)}</strong><small>${esc(m.type)} · ${Math.round(m.calories)} kcal · ${Math.round(m.protein)} g P · ${Math.round(Number(m.carbs||0))} g C · ${Math.round(Number(m.fat||0))} g G</small><div class="meal-list-actions"><button class="btn ghost toggleMealFavorite" type="button" data-id="${esc(String(m.id))}">${favorite?'★ Guardada':'☆ Guardar favorita'}</button></div></div><button type="button" class="btn ghost removeMeal" data-id="${esc(String(m.id))}" aria-label="Eliminar ${esc(m.name)}">Quitar</button></div>`;}).join(''):'<div class="empty"><strong>Sin comidas registradas</strong><p>Agregá lo que comiste para ver tu resumen.</p><button class="btn" type="button" data-home-quick="meal">Registrar una comida</button></div>';
     document.querySelectorAll('.toggleMealFavorite').forEach(b=>b.addEventListener('click',()=>{const meal=state.meals.find(m=>String(m.id)===b.dataset.id);if(!meal)return;state.mealFavorites=state.mealFavorites||[];const idx=state.mealFavorites.findIndex(f=>f.sourceId===meal.id||f.name===meal.name);if(idx>=0){state.mealFavorites.splice(idx,1);toast('Comida quitada de favoritas.');}else{state.mealFavorites.push({id:Date.now(),sourceId:meal.id,name:meal.name,calories:Number(meal.calories)||0,protein:Number(meal.protein)||0,carbs:Number(meal.carbs)||0,fat:Number(meal.fat)||0,type:meal.type||'Almuerzo'});toast('Comida guardada en favoritas.');}save();renderNutrition();}));
     renderMealFavorites();
     $('waterCount').textContent=state.water.count;$('waterGoalText').textContent=g.water;
@@ -4082,8 +4141,9 @@ function findCatalogExercise(name){
     const set=(id,value)=>{const el=$(id);if(el)el.textContent=value;};
     const arc=(id,fraction)=>{const el=$(id);if(el)el.style.strokeDashoffset=String(251.2*(1-Math.max(0,Math.min(1,fraction||0))));};
     const sessions=Array.isArray(state.sessions)?state.sessions:[],activities=Array.isArray(state.activities)?state.activities:[],planned=Array.isArray(state.plannedActivities)?state.plannedActivities:[];
-    const profile=state.profile||{},name=String(profile.name||'').trim();
-    set('homeGreeting',name?'Hola, '+name:'Hola');
+    const profile=state.profile||{},name=String(profile.displayName||profile.name||'').trim();
+    const hour=new Date().getHours(),salute=hour<6||hour>=20?'Buenas noches':hour<13?'Buen día':'Buenas tardes';
+    set('homeGreeting',name?salute+', '+name:salute);
     set('homeInitial',(name||'F').charAt(0).toUpperCase());
     set('homeGoalTitle',typeof goalText==='function'&&profile.goal?goalText(profile.goal):'Ponerme en forma');
     const now=new Date();now.setHours(12,0,0,0);
@@ -4141,6 +4201,7 @@ function findCatalogExercise(name){
     const fmt=v=>Math.round(v).toLocaleString('es-UY');
     set('homeKcalVal',fmt(cal));set('homeKcalLbl','de '+fmt(goals.calories||0)+' kcal');arc('homeKcalArc',goals.calories?cal/goals.calories:0);
     set('homeProtVal',fmt(pro)+' g');set('homeProtLbl','de '+fmt(goals.protein||0)+' g de proteína');arc('homeProtArc',goals.protein?pro/goals.protein:0);
+    set('homeQuickWater',water?`${water} de ${goals.water||0} vasos hoy`:'Todavía sin registrar hoy');
     set('homeWaterVal',String(water));set('homeWaterLbl','de '+(goals.water||0)+' vasos');arc('homeWaterArc',goals.water?water/goals.water:0);
     // Hábitos de hoy (mismos registros que Progreso)
     const habitBox=$('homeHabits');
@@ -4188,6 +4249,33 @@ function findCatalogExercise(name){
   }
   function renderAll(){renderAllBase();renderHome();}
   function renderAllBase(){renderStats();renderPlan();renderProgress();renderProfile();renderNutrition();renderCoach();renderWeights();renderActivities();renderRunningPlan();renderRunningHistory();renderPlanner();}
+  // v42: pestañas internas reutilizables (Nutrición y futuras vistas). Progreso conserva las suyas.
+  function showViewTab(view,name,focus=false){
+    const root=$('view-'+view);if(!root)return;
+    const tabs=[...root.querySelectorAll('[data-view-tab]')];if(!tabs.length)return;
+    if(!tabs.some(t=>t.dataset.viewTab===name))name=tabs[0].dataset.viewTab;
+    tabs.forEach(t=>{const on=t.dataset.viewTab===name;t.classList.toggle('active',on);t.setAttribute('aria-selected',String(on));t.tabIndex=on?0:-1;if(on&&focus)t.focus();});
+    root.querySelectorAll('[data-view-panel]').forEach(panel=>{panel.hidden=panel.dataset.viewPanel!==name;});
+  }
+  function initViewTabs(){
+    document.querySelectorAll('.view').forEach(view=>{
+      const tabs=[...view.querySelectorAll('[data-view-tab]')],name=view.id.replace('view-','');
+      tabs.forEach((t,i)=>{
+        t.addEventListener('click',()=>showViewTab(name,t.dataset.viewTab));
+        t.addEventListener('keydown',e=>{const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(!d)return;e.preventDefault();showViewTab(name,tabs[(i+d+tabs.length)%tabs.length].dataset.viewTab,true);});
+      });
+    });
+  }
+  // Acciones rápidas de Inicio: cada una abre o ejecuta la función real correspondiente.
+  function homeQuickAction(kind){
+    if(kind==='train'){
+      if(activeSession){switchView('train');return;}
+      const start=$('homeStartBtn');if(start&&String(start.dataset.homeAction||'').startsWith('start:')){start.click();return;}
+      switchView('train');return;
+    }
+    if(kind==='meal'){switchView('nutrition');showViewTab('nutrition','registrar');setTimeout(()=>$('mealName')?.focus(),60);return;}
+    if(kind==='water'){$('addWater')?.click();const key=dateKey(),count=Math.max(0,Number(state.waterLogs?.[key])||0),goal=Number(state.nutritionGoals?.water)||8;renderHome();toast(`Agua registrada: ${count} de ${goal} vasos hoy. Podés corregirlo en Nutrición › Hoy.`);return;}
+  }
   function switchView(name){
     const trainViews=['exercises','routines','running','coach'];
     const hasTab=[...document.querySelectorAll('.tab')].some(b=>b.dataset.view===name);
@@ -4206,7 +4294,7 @@ function findCatalogExercise(name){
     {const strip=document.querySelector('.view.active .train-subnav'),current=strip&&strip.querySelector('.subnav-item.active');if(strip&&current)strip.scrollLeft=Math.max(0,current.offsetLeft-(strip.clientWidth-current.offsetWidth)/2);}
     document.querySelectorAll('.mobile-nav-item[data-mobile-view]').forEach(b=>{const active=b.dataset.mobileView===mobileName;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
     const moreToggle=$('mobileMoreToggle');
-    const inMoreMenu=name==='nutrition';
+    const inMoreMenu=false;
     moreToggle.classList.toggle('active',inMoreMenu);moreToggle.setAttribute('aria-expanded','false');
     document.querySelectorAll('.mobile-more-link[data-mobile-view]').forEach(b=>b.classList.toggle('active',b.dataset.mobileView===name));
     $('mobileMoreMenu').hidden=true;
@@ -4230,7 +4318,8 @@ function findCatalogExercise(name){
   $('coachForm').addEventListener('submit',e=>{e.preventDefault();sendCoach($('coachInput').value);});
   document.querySelectorAll('.quickPrompt').forEach(b=>b.addEventListener('click',()=>sendCoach(b.dataset.prompt)));
   function renderIdentityProfile(){
-    const name=String(state.profile.displayName||'').trim();
+    // Un solo nombre visible: el de identidad y, si no existe, el que se cargó al crear el plan.
+    const name=String(state.profile.displayName||state.profile.name||'').trim();
     const focus=String(state.profile.focusGoal||'').trim();
     $('profileDisplayName').textContent=name||'Tu perfil FittForma';
     $('profileDisplayGoal').textContent=focus||'Tu progreso, a tu manera';
@@ -4241,8 +4330,9 @@ function findCatalogExercise(name){
   }
   $('identityForm').addEventListener('submit',e=>{
     e.preventDefault();
-    state.profile={...state.profile,displayName:$('profileDisplayNameInput').value.trim().slice(0,48),focusGoal:$('profileFocusInput').value};
-    save();renderIdentityProfile();toast('Perfil guardado en este dispositivo.');
+    const displayName=$('profileDisplayNameInput').value.trim().slice(0,48);
+    state.profile={...state.profile,displayName,name:displayName?displayName.slice(0,30):state.profile.name,focusGoal:$('profileFocusInput').value};
+    save();syncForm();renderIdentityProfile();renderHome();toast('Perfil guardado en este dispositivo.');
   });
 
   function reminderText(text){return window.FittFormaI18n?.translate?.(text)||text;}
@@ -4454,7 +4544,7 @@ function findCatalogExercise(name){
   document.querySelectorAll('[data-library-mode]').forEach(b=>b.addEventListener('click',()=>{libraryMode=b.dataset.libraryMode;renderExerciseLibrary();}));
   document.querySelectorAll('.addMealIdea').forEach(b=>b.addEventListener('click',()=>{switchView('nutrition');$('mealName').value=b.dataset.name;$('mealCalories').value=b.dataset.cal;$('mealProtein').value=b.dataset.pro;$('mealCarbs').value=b.dataset.carbs||'';$('mealFat').value=b.dataset.fat||'';$('mealType').value='Almuerzo';$('mealName').focus();}));
   $('exerciseSearch').addEventListener('input',renderExerciseLibrary);$('exerciseGroupFilter').addEventListener('change',renderExerciseLibrary);$('exerciseFavoritesOnly').addEventListener('click',()=>{exerciseFavoritesOnly=!exerciseFavoritesOnly;renderExerciseLibrary();});
-  initBadgeCenter();initProgressTabs();document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();});syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
+  initBadgeCenter();initProgressTabs();document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});initViewTabs();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
   setTimeout(()=>checkWorkoutReminders(),1200);setInterval(()=>{if(document.visibilityState==='visible')checkWorkoutReminders();},30000);window.addEventListener('focus',()=>{renderReminderSettings();checkWorkoutReminders();});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){renderReminderSettings();checkWorkoutReminders();}});
   document.addEventListener('visibilitychange',()=>{if(!activeSession)return;if(document.visibilityState==='hidden'&&!activeSession.pausedAt){activeSession.elapsedMs=activeSessionElapsedMs(activeSession);activeSession.segmentStartedAt=Date.now();activeSession.pausedAt=Date.now();activeSession.pauseReason='background';persistActiveSessionDraft();}else if(document.visibilityState==='visible'&&activeSession.pausedAt&&activeSession.pauseReason==='background'){activeSession.pausedAt=0;activeSession.pauseReason='';activeSession.segmentStartedAt=Date.now();persistActiveSessionDraft();updateWorkoutClock();}});
   window.addEventListener('pagehide',()=>{if(activeSession)persistActiveSessionDraft();});
