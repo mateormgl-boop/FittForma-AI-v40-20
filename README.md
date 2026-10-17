@@ -48,7 +48,7 @@ Integración entre secciones en navegador (con `npm start` en otra terminal): `n
    producción. No vuelvas a ejecutar `schema.sql` ni `community.sql`.
 2. **Render**: variables `GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL` y una clave pública
    (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`). Nunca `service_role`/`sb_secret_`.
-3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v41-0`
+3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v42-0`
    y la app ofrece actualizar.
 
 ## Documentación
