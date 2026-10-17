@@ -80,8 +80,8 @@ test('todos los botones estáticos y de plantillas declaran su tipo para no envi
 });
 
 test('versiones visibles del pie de página y traducciones están alineadas', () => {
-  assert.match(html, /Versión 41\.0/);
-  assert.match(i18n, /VERSION 41\.0 · ONLINE FITNESS COMMUNITY/);
+  assert.match(html, /Versión 42\.1/);
+  assert.match(i18n, /VERSION 42\.1 · ONLINE FITNESS COMMUNITY/);
   assert.doesNotMatch(html, /Versión 26\.0|Versión 25\.0|Versión 24\.0|Versión 23\.0/);
   assert.doesNotMatch(i18n, /Version 23\.0|Versão 23\.0|Versione 23\.0/);
 });
@@ -89,15 +89,15 @@ test('versiones visibles del pie de página y traducciones están alineadas', ()
 
 
 
-test('v41 presenta cinco destinos móviles; Nutrición, Coach y Correr quedan en Más y en Entrenar', () => {
+test('v42 presenta seis destinos móviles; FittAI y Correr quedan en Más y en Entrenar', () => {
   const nav = html.match(/<nav class="mobile-app-nav"[\s\S]*?<\/nav>/)?.[0] || '';
   const destinations = [...nav.matchAll(/data-mobile-view="([^"]+)"/g)].map(m => m[1]);
-  assert.deepEqual(destinations, ['plan', 'train', 'progress', 'community', 'profile']);
+  assert.deepEqual(destinations, ['plan', 'train', 'nutrition', 'progress', 'community', 'profile']);
   assert.match(html, /id="mobileMoreToggle"[\s\S]*?aria-controls="mobileMoreMenu"/);
   const menu = html.match(/<div class="mobile-more-menu" id="mobileMoreMenu"[\s\S]*?<\/div>/)?.[0] || '';
-  for (const view of ['coach', 'running', 'nutrition']) assert.match(menu, new RegExp(`data-mobile-view="${view}"`), `${view} debe estar en Más`);
+  for (const view of ['coach', 'running']) assert.match(menu, new RegExp(`data-mobile-view="${view}"`), `${view} debe estar en Más`);
   assert.match(html, /data-shortcut-view="coach" aria-label="Consultar a la IA"/);
-  assert.match(html, /\.mobile-app-nav\{grid-template-columns:repeat\(5,minmax\(0,1fr\)\)!important\}/);
+  assert.match(html, /\.mobile-app-nav\{grid-template-columns:repeat\(6,minmax\(0,1fr\)\)!important\}/);
   assert.match(html, /id="installBtn"/);
   assert.match(html, /env\(safe-area-inset-bottom/);
   const planStart = html.indexOf('<section class="view active" id="view-plan">');
@@ -164,7 +164,7 @@ test('v40.7: los SVG generados que no demuestran de forma fiable la biomecánica
 
 test('la PWA tolera recursos estáticos opcionales no disponibles durante la instalación', () => {
   assert.match(sw, /Promise\.allSettled\(ASSETS\.map\(asset=>cache\.add\(asset\)\)\)/);
-  assert.match(sw, /fittforma-ai-static-v41-0/);
+  assert.match(sw, /fittforma-ai-static-v42-1/);
 });
 
 test('los estilos móviles protegen desbordamientos y el scroll de menús/modales', () => {
@@ -337,14 +337,14 @@ test('v36.1 mantiene válidos los metadatos y las traducciones del perfil/Pro', 
   const manifest = JSON.parse(await read('manifest.json'));
   const rootPackage = JSON.parse(await read('package.json'));
   const backendPackage = JSON.parse(await read('backend/package.json'));
-  assert.equal(rootPackage.version, '0.41.0');
-  assert.equal(backendPackage.version, '0.41.0');
+  assert.equal(rootPackage.version, '0.42.1');
+  assert.equal(backendPackage.version, '0.42.1');
   assert.equal(manifest.theme_color, '#080d18');
   assert.equal(manifest.background_color, '#080d18');
-  assert.match(i18n, /VERSION 41\.0 · ONLINE FITNESS COMMUNITY/i);
+  assert.match(i18n, /VERSION 42\.1 · ONLINE FITNESS COMMUNITY/i);
   assert.match(server, /GEMINI_MODEL\|\|'gemini-3\.8-flash'/);
   assert.match(await read('render.yaml'), /value: gemini-3\.8-flash/);
-  assert.match(sw, /const CACHE = 'fittforma-ai-static-v41-0'/);
+  assert.match(sw, /const CACHE = 'fittforma-ai-static-v42-1'/);
 });
 
 
@@ -372,7 +372,7 @@ test('v36.1 conserva identidad visual propia y perfil local editable', () => {
   assert.match(html, /identityForm/);
   assert.match(html, /displayName/);
   assert.match(html, /focusGoal/);
-  assert.match(sw, /fittforma-ai-static-v41-0/);
+  assert.match(sw, /fittforma-ai-static-v42-1/);
 });
 
 
@@ -389,7 +389,7 @@ test('v36.1 incluye preferencias completas de recordatorios y estado de permisos
   assert.match(html, /Notification\.requestPermission\(\)/);
   assert.match(html, /registration\.showNotification/);
   assert.match(sw, /notificationclick/);
-  assert.match(sw, /fittforma-ai-static-v41-0/);
+  assert.match(sw, /fittforma-ai-static-v42-1/);
 });
 
 test('v36.1 evita avisos duplicados y no marca entrenamientos como pendientes si hubo actividad', () => {

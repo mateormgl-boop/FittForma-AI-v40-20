@@ -305,11 +305,11 @@
   }
   async function loadUnread(){
     const badge=$('communityUnreadBadge');
-    if(!authReady()||schemaV41===false){if(badge)badge.hidden=true;return;}
+    if(!authReady()||schemaV41===false){if(badge)badge.hidden=true;window.dispatchEvent(new CustomEvent('fittforma:unread',{detail:{total:0}}));return;}
     const {data,error}=await client.from('community_messages').select('sender_id').eq('recipient_id',user.id).is('read_at',null).limit(500);
     if(error){if(isMissingColumn(error)){markLegacySchema();updateKindAvailability();}else console.warn('No se pudieron contar los mensajes no leídos:',error.message);if(badge)badge.hidden=true;return;}
     const bySender={};(data||[]).forEach(m=>{bySender[m.sender_id]=(bySender[m.sender_id]||0)+1;});
-    const total=(data||[]).length;
+    const total=(data||[]).length;window.dispatchEvent(new CustomEvent('fittforma:unread',{detail:{total}}));
     if(badge){badge.hidden=!total;badge.textContent=total>99?'99+':String(total);badge.setAttribute('aria-label',`${total} mensaje(s) sin leer`);}
     document.querySelectorAll('#communityChatContact option').forEach(o=>{if(!o.value)return;if(!o.dataset.base)o.dataset.base=o.textContent;const n=bySender[o.value]||0;o.textContent=o.dataset.base+(n?` · ${n} sin leer`:'');});
   }

@@ -33,7 +33,8 @@ test('v41.0: Entrenar agrupa Sesión, Ejercicios, Rutinas, Correr y Coach y la b
   assert.match(html, /if\(name==='plan'\)renderHome\(\);/);
   assert.match(html, /function renderAll\(\)\{renderAllBase\(\);renderHome\(\);\}/);
   const menu = html.match(/<div class="mobile-more-menu" id="mobileMoreMenu"[\s\S]*?<\/div>/)?.[0] || '';
-  for (const view of ['nutrition', 'coach', 'running']) assert.match(menu, new RegExp(`data-mobile-view="${view}"`), `${view} accesible desde Más`);
+  for (const view of ['coach', 'running']) assert.match(menu, new RegExp(`data-mobile-view="${view}"`), `${view} accesible desde Más`);
+  assert.doesNotMatch(menu, /data-mobile-view="nutrition"/, 'Nutrición está en la barra inferior');
   assert.match(html, /\.mobile-app-nav \.mobile-nav-item\{min-height:58px;font-size:11px/);
 });
 
