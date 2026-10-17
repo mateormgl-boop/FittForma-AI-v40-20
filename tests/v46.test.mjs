@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,8 +17,11 @@ test('v46: el acento deja el texto blanco en 4.5:1 o más en ambos extremos', ()
 });
 
 test('v46: placeholders legibles, sin texto con degradado y con foco visible', () => {
-  const ph = [...html.matchAll(/::placeholder\{color:(#[0-9a-f]{6})/gi)].pop()[1]; // gana la última regla
-  assert.ok(ratio(ph, '#080f1f') >= 4.5);
+  // v47: el placeholder usa --text-3 de cada tema (design.css); se verifica en ambos fondos de campo.
+  const design = readFileSync(path.join(root, 'design.css'), 'utf8');
+  assert.match(design, /::placeholder\{color:var\(--text-3\)!important/);
+  assert.ok(ratio('#8d9bbb', '#13203d') >= 4.5, 'oscuro');
+  assert.ok(ratio('#56627e', '#eef2f9') >= 4.5, 'claro');
   assert.doesNotMatch(html, /background-clip:text/);
   assert.match(html, /:focus-visible\{outline:2px solid/);
   assert.match(html, /::selection\{/);

@@ -1,0 +1,156 @@
+/* FittForma AI v47 — sistema visual: temas claro y oscuro, un color por módulo y componentes comunes.
+   index.html conserva la maquetación; aquí viven los tokens y el aspecto. Se carga después del <style> principal. */
+
+/* ---------- Tokens: tema oscuro (base) ---------- */
+:root{
+  color-scheme:dark;
+  --bg-rgb:6 11 24;--surface-rgb:13 23 46;--surface2-rgb:20 33 62;--line-rgb:120 150 220;--ink-rgb:255 255 255;
+  --text:#eef3ff;--text-rgb:238 243 255;--text-2:#b4c1dc;--text-2-rgb:180 193 220;--text-3:#8d9bbb;--text-3-rgb:141 155 187;
+  --t-blue:#8cc2ff;--t-blue-rgb:140 194 255;--t-violet:#c3b5ff;--t-violet-rgb:195 181 255;--t-green:#7fe0b6;--t-green-rgb:127 224 182;
+  --t-amber:#ffc66b;--t-amber-rgb:255 198 107;--t-red:#ff9d97;--t-red-rgb:255 157 151;--t-pink:#ff9ad6;--t-pink-rgb:255 154 214;
+  --ff-page:#060b18;--ff-panel:#0d172e;--ff-panel-2:#13203d;--ff-border:rgba(120,150,220,.16);
+  --ff-shadow:0 10px 30px rgba(0,0,0,.35);--ff-shadow-sm:0 4px 14px rgba(0,0,0,.28);
+  --ff-brand:linear-gradient(135deg,#2f6bff 0%,#6a4cf2 100%);--ff-brand-alt:linear-gradient(135deg,#19b8ff 0%,#6a4cf2 100%);
+  --ff-hero:linear-gradient(150deg,#101d45 0%,#1b1f5c 52%,#2a1666 100%);
+  --mod:#3f6bff;--mod-2:#6a4cf2;--mod-ink:#9bb6ff;--mod-soft:rgba(63,107,255,.16);
+  --ok:#22c993;--warn:#f5a524;--bad:#ff6b6b;
+}
+/* ---------- Tokens: tema claro ---------- */
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg-rgb:243 246 251;--surface-rgb:255 255 255;--surface2-rgb:238 242 249;--line-rgb:196 206 225;--ink-rgb:22 36 72;
+  --text:#0d1830;--text-rgb:13 24 48;--text-2:#3b4764;--text-2-rgb:59 71 100;--text-3:#56627e;--text-3-rgb:86 98 126;
+  --t-blue:#1658c9;--t-blue-rgb:22 88 201;--t-violet:#5a3ed6;--t-violet-rgb:90 62 214;--t-green:#08744a;--t-green-rgb:8 116 74;
+  --t-amber:#8f5400;--t-amber-rgb:143 84 0;--t-red:#bb2f2a;--t-red-rgb:187 47 42;--t-pink:#a3226f;--t-pink-rgb:163 34 111;
+  --ff-page:#f3f6fb;--ff-panel:#ffffff;--ff-panel-2:#eef2f9;--ff-border:rgba(30,50,100,.11);
+  --ff-shadow:0 10px 28px rgba(22,40,90,.08);--ff-shadow-sm:0 3px 10px rgba(22,40,90,.07);
+  --mod-ink:#2347b8;--mod-soft:rgba(63,107,255,.11);
+  /* Variables heredadas del diseño anterior, en versión clara. */
+  --bg:#f3f6fb;--ff-bg:#f3f6fb;--ff-card:#ffffff;--ff-card2:#f3f6fb;--ff-surface:#ffffff;--ff-surface-2:#eef2f9;--ff-surface-3:#e3e9f4;
+  --ff-text:#0d1830;--ff-muted:#56627e;--muted:#56627e;--ff-line:rgba(30,50,100,.12);--line:rgba(30,50,100,.12);
+  --panel:#ffffff;--panel2:#eef2f9;--ff-danger:#bb2f2a;--red:#bb2f2a;--ff-violet:#5a3ed6;--mint:#0b84c6;--blue2:#1d6fe0;
+  --surface-glow:rgba(60,110,255,.08);--ff-glow:0 8px 22px rgba(40,80,200,.12);--ff-focus:#2f6bff;
+}
+
+/* ---------- Color por módulo ----------
+   --mod y --mod-2 son los extremos del degradado del módulo: ambos con texto blanco ≥4.5:1.
+   --mod-ink es el color del módulo para texto sobre el fondo de cada tema. */
+#view-plan{--mod:#2f5fe8;--mod-2:#6a4cf2;--mod-ink:#9bb6ff;--mod-soft:rgba(47,95,232,.15)}
+#view-train,#view-routines,#view-exercises{--mod:#0a68d6;--mod-2:#1b54d8;--mod-ink:#8ccaff;--mod-soft:rgba(10,104,214,.15)}
+#view-running{--mod:#08786a;--mod-2:#0b6f86;--mod-ink:#79e6d3;--mod-soft:rgba(8,120,106,.17)}
+#view-coach{--mod:#5a3ed6;--mod-2:#2a63d8;--mod-ink:#c3b5ff;--mod-soft:rgba(90,62,214,.16)}
+#view-nutrition{--mod:#0a7a50;--mod-2:#0c7d63;--mod-ink:#86e6bd;--mod-soft:rgba(10,122,80,.16)}
+#view-progress{--mod:#6a4cf2;--mod-2:#5a3ed6;--mod-ink:#c3b5ff;--mod-soft:rgba(106,76,242,.16)}
+#view-community{--mod:#bd2b84;--mod-2:#9b2bb0;--mod-ink:#ff9ad6;--mod-soft:rgba(189,43,132,.15)}
+#view-profile{--mod:#4f46e5;--mod-2:#3a5be0;--mod-ink:#b4b1ff;--mod-soft:rgba(79,70,229,.16)}
+:root[data-theme="light"] #view-plan{--mod-ink:#2347b8;--mod-soft:rgba(47,95,232,.1)}
+:root[data-theme="light"] #view-train,:root[data-theme="light"] #view-routines,:root[data-theme="light"] #view-exercises{--mod-ink:#0b5cb4;--mod-soft:rgba(10,104,214,.1)}
+:root[data-theme="light"] #view-running{--mod-ink:#07705f;--mod-soft:rgba(8,120,106,.1)}
+:root[data-theme="light"] #view-coach,:root[data-theme="light"] #view-progress{--mod-ink:#4d32c4;--mod-soft:rgba(106,76,242,.1)}
+:root[data-theme="light"] #view-nutrition{--mod-ink:#08704a;--mod-soft:rgba(10,122,80,.1)}
+:root[data-theme="light"] #view-community{--mod-ink:#a3226f;--mod-soft:rgba(189,43,132,.09)}
+:root[data-theme="light"] #view-profile{--mod-ink:#3b33c4;--mod-soft:rgba(79,70,229,.1)}
+
+/* ---------- Página ---------- */
+html{background:var(--ff-page)}
+body{background:var(--ff-page)!important;color:var(--text)}
+:root:not([data-theme="light"]) body{background:radial-gradient(900px 520px at 85% -8%,rgba(47,107,255,.22),transparent 62%),radial-gradient(700px 480px at -10% 30%,rgba(106,76,242,.14),transparent 60%),var(--ff-page)!important;background-attachment:fixed!important}
+::selection{background:rgba(106,76,242,.32);color:inherit}
+
+/* ---------- Cabecera y marca ---------- */
+header{background:transparent!important;border:0!important;box-shadow:none!important}
+.brand{gap:10px!important;color:var(--text)!important;font-weight:800!important;letter-spacing:-.02em!important;font-size:19px!important;text-transform:none!important}
+.brand-logo{filter:none!important;border-radius:0!important}
+.brand .brand-word b{color:#a996ff;font-weight:800}
+:root[data-theme="light"] .brand .brand-word b{color:#5a3ed6}
+.theme-toggle{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;border:1px solid var(--ff-border);background:var(--ff-panel);color:var(--text);cursor:pointer;box-shadow:var(--ff-shadow-sm)}
+.theme-toggle svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.theme-toggle .icon-sun{display:none}:root:not([data-theme="light"]) .theme-toggle .icon-sun{display:block}:root:not([data-theme="light"]) .theme-toggle .icon-moon{display:none}
+.language-picker select,.mobile-more-trigger{background:var(--ff-panel)!important;color:var(--text)!important;border:1px solid var(--ff-border)!important;box-shadow:var(--ff-shadow-sm)}
+
+/* ---------- Tarjetas y superficies ---------- */
+.card,.home-card,.panel{background:var(--ff-panel)!important;border:1px solid var(--ff-border)!important;box-shadow:var(--ff-shadow-sm)!important;border-radius:20px}
+:root:not([data-theme="light"]) .card,:root:not([data-theme="light"]) .home-card{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0)),var(--ff-panel)!important}
+.card .card,.card .home-card{box-shadow:none!important;background:var(--ff-panel-2)!important}
+
+/* ---------- Botones ---------- */
+.btn:not(.ghost):not(.secondary):not(.danger):not(.chip),.home-cta,.ff-btn-primary{background:linear-gradient(135deg,var(--mod),var(--mod-2))!important;color:#fff!important;border:0!important;border-radius:999px!important;box-shadow:0 8px 20px -8px var(--mod)!important;font-weight:700}
+.btn.secondary,.btn.ghost{background:transparent!important;color:var(--mod-ink)!important;border:1.5px solid color-mix(in srgb,var(--mod) 55%,transparent)!important;border-radius:999px!important;box-shadow:none!important;font-weight:700}
+.btn.danger{border-radius:999px!important}
+.btn:disabled,.btn[disabled]{opacity:.55;box-shadow:none!important}
+/* Los botones primarios llevan el color del módulo donde están; fuera de una sección, el de la marca. */
+body>.btn,.welcome .btn,.ff-sheet .btn{--mod:#2f6bff;--mod-2:#6a4cf2}
+
+/* ---------- Pestañas tipo píldora (subsecciones) ---------- */
+.ff-segmented,.train-subnav,.community-subnav,.progress-subnav{background:var(--ff-panel)!important;border:1px solid var(--ff-border)!important;border-radius:999px!important;padding:4px!important;box-shadow:var(--ff-shadow-sm)!important;gap:4px!important}
+.ff-segmented>button,.ff-seg,.train-subnav .subnav-item,.community-subtab{border-radius:999px!important;color:var(--text-2)!important;background:transparent!important;border:0!important;font-weight:700!important}
+.ff-segmented>button.active,.ff-segmented>button[aria-selected="true"],.ff-seg.active,.ff-seg[aria-selected="true"],.train-subnav .subnav-item.active,.train-subnav .subnav-item[aria-current="page"],.community-subtab.is-active,.community-subtab[aria-selected="true"]{background:linear-gradient(135deg,var(--mod),var(--mod-2))!important;color:#fff!important;box-shadow:0 6px 16px -8px var(--mod)!important}
+
+/* ---------- Formularios ---------- */
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea{background:var(--ff-panel-2)!important;color:var(--text)!important;border:1px solid var(--ff-border)!important;border-radius:12px!important}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--mod)!important;outline-offset:1px;border-color:transparent!important}
+::placeholder{color:var(--text-3)!important;opacity:1}
+label,.field label{color:var(--text-2)}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--mod)}
+
+/* ---------- Texto ---------- */
+h1,h2,h3,h4{color:var(--text);letter-spacing:-.02em}
+.muted,.small.muted,p.muted{color:var(--text-3)!important}
+.eyebrow,.home-kicker{color:var(--mod-ink)!important}
+a{color:var(--mod-ink)}
+
+/* ---------- Barra inferior (móvil) y lateral (escritorio) ---------- */
+.mobile-app-nav{background:color-mix(in srgb,var(--ff-panel) 94%,transparent)!important;backdrop-filter:blur(14px);border-top:1px solid var(--ff-border)!important;box-shadow:0 -6px 24px rgba(10,20,50,.08)!important}
+.mobile-app-nav .mobile-nav-item{color:var(--text-3)!important;background:transparent!important}
+.mobile-app-nav .mobile-nav-item.active,.mobile-app-nav .mobile-nav-item[aria-current="page"]{color:var(--nav-c,#2f6bff)!important;background:color-mix(in srgb,var(--nav-c,#2f6bff) 12%,transparent)!important}
+.mobile-app-nav .mobile-nav-item.active:before{background:var(--nav-c,#2f6bff)!important}
+.mobile-nav-item[data-mobile-view="plan"],.tab[data-view="plan"]{--nav-c:#2f6bff}
+.mobile-nav-item[data-mobile-view="train"],.tab[data-view="train"]{--nav-c:#0b7fe8}
+.mobile-nav-item[data-mobile-view="nutrition"],.tab[data-view="nutrition"]{--nav-c:#0b8a59}
+.mobile-nav-item[data-mobile-view="progress"],.tab[data-view="progress"]{--nav-c:#6a4cf2}
+.mobile-nav-item[data-mobile-view="community"],.tab[data-view="community"]{--nav-c:#c02d86}
+.mobile-nav-item[data-mobile-view="profile"],.tab[data-view="profile"]{--nav-c:#4f46e5}
+.tab[data-view="coach"]{--nav-c:#6a4cf2}.tab[data-view="running"]{--nav-c:#0a8a77}
+:root:not([data-theme="light"]) .mobile-nav-item,:root:not([data-theme="light"]) .tab{--nav-c-l:1}
+:root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="plan"],:root:not([data-theme="light"]) .tab[data-view="plan"]{--nav-c:#7aa2ff}
+:root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="train"],:root:not([data-theme="light"]) .tab[data-view="train"]{--nav-c:#5cb8ff}
+:root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="nutrition"],:root:not([data-theme="light"]) .tab[data-view="nutrition"]{--nav-c:#4fd9a0}
+:root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="progress"],:root:not([data-theme="light"]) .tab[data-view="progress"],:root:not([data-theme="light"]) .tab[data-view="coach"]{--nav-c:#b3a2ff}
+:root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="community"],:root:not([data-theme="light"]) .tab[data-view="community"]{--nav-c:#ff8fcf}
+:root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="profile"],:root:not([data-theme="light"]) .tab[data-view="profile"]{--nav-c:#a9a6ff}
+:root:not([data-theme="light"]) .tab[data-view="running"]{--nav-c:#5fe0cc}
+.tabs{background:var(--ff-panel)!important;border-color:var(--ff-border)!important}
+.tabs .tab{color:var(--text-2)!important;background:transparent!important}
+.tabs .tab.active,.tabs .tab[aria-current="page"]{color:var(--nav-c)!important;background:color-mix(in srgb,var(--nav-c) 12%,transparent)!important;box-shadow:none!important}
+.tabs .tab.active svg{stroke:currentColor}
+
+/* ---------- Encabezado de cada sección ---------- */
+.section-hero{background:linear-gradient(135deg,var(--mod),var(--mod-2))!important;border:0!important;color:#fff!important;box-shadow:0 14px 30px -18px var(--mod)!important;min-height:118px!important}
+.section-hero:before{background:linear-gradient(90deg,rgba(0,0,0,.22),rgba(0,0,0,0) 70%)!important}
+.section-hero h2,.section-hero p,.section-hero small{color:#fff!important}
+.section-hero small{opacity:.9}
+
+/* ---------- Píldoras, chips y etiquetas ---------- */
+.chip,.tag,.ff-chip{border-radius:999px!important}
+.chip.active,.chip[aria-pressed="true"],.ff-chip.active{background:var(--mod)!important;border-color:var(--mod)!important;color:#fff!important}
+.tag{background:var(--mod-soft)!important;color:var(--mod-ink)!important;border-color:transparent!important}
+
+/* ---------- Barras de progreso ---------- */
+.progressbar,.home-bar,.level-bar,.plan-hero-bar,.home-badge-bar{background:rgb(var(--ink-rgb) / .1)!important}
+.progressbar span,.home-bar i,.level-bar i,.plan-hero-bar i,.home-badge-bar i{background:linear-gradient(90deg,var(--mod),var(--mod-2))!important}
+
+/* ---------- Botón + ---------- */
+.ff-fab{background:var(--ff-brand)!important;box-shadow:0 12px 26px -10px rgba(63,90,255,.75)!important}
+
+/* ---------- Cabecera compacta en móvil: idioma y tema también están en Perfil › Apariencia e idioma ---------- */
+@media(max-width:600px){
+  header .language-picker{display:none!important}
+  .brand{font-size:18px!important}
+  .header-actions{gap:8px!important}
+}
+
+/* ---------- Anillos y medallas bloqueadas: pista y relleno según el tema ---------- */
+.home-ring .bg,.nutri-ring .bg{stroke:rgb(var(--ink-rgb) / .1)!important}
+:root[data-theme="light"] .ff-medal.is-locked .ff-medal-shape{fill:#e6ebf5;stroke:#b7c2d8}
+:root[data-theme="light"] .ff-medal.is-locked .ff-medal-inner{stroke:#c4cde0}
+:root[data-theme="light"] .ff-medal.is-locked .ff-medal-glyph{stroke:#7a88a6}

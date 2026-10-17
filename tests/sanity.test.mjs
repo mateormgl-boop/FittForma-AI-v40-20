@@ -339,8 +339,8 @@ test('v36.1 mantiene válidos los metadatos y las traducciones del perfil/Pro', 
   const backendPackage = JSON.parse(await read('backend/package.json'));
   assert.equal(rootPackage.version, '0.46.0');
   assert.equal(backendPackage.version, '0.46.0');
-  assert.equal(manifest.theme_color, '#080d18');
-  assert.equal(manifest.background_color, '#080d18');
+  assert.equal(manifest.theme_color, '#f3f6fb');
+  assert.equal(manifest.background_color, '#f3f6fb');
   assert.match(i18n, /VERSION 46\.0 · ONLINE FITNESS COMMUNITY/i);
   assert.match(server, /GEMINI_MODEL\|\|'gemini-3\.8-flash'/);
   assert.match(await read('render.yaml'), /value: gemini-3\.8-flash/);

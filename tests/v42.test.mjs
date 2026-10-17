@@ -24,7 +24,7 @@ test('v42: Inicio ofrece acciones reales (entrenar, comida, agua, correr, insign
 test('v42: Nutrición en pestañas y Perfil en grupos sin perder IDs', () => {
   assert.deepEqual([...html.matchAll(/data-view-tab="([^"]+)"/g)].map(m => m[1]), ['hoy', 'registrar', 'plan', 'historial']);
   for (const id of ['mealForm', 'barcodeInput', 'mealPhoto', 'foodSearch', 'generateMenu', 'nutritionWeekChart', 'mealFavoritesList', 'addWater', 'removeWater', 'calorieGoal', 'identityForm', 'bodyProfileForm', 'workoutReminderForm', 'cloudAuthForm', 'membershipCard', 'checkUpdateButton', 'profileStats']) assert.match(html, new RegExp(`id="${id}"`), id);
-  assert.equal((html.match(/<details class="ff-group"/g) || []).length, 6);
+  assert.equal((html.match(/<details class="ff-group"/g) || []).length, 7, "v47 suma Apariencia e idioma");
 });
 
 test('v42: rutinas propias con CRUD, validación y plantilla desde el plan', () => {
