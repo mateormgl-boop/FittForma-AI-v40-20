@@ -117,6 +117,24 @@ await page.evaluate(() => window.FittFormaI18n?.setLanguage('es')); await page.w
 step('La navegación se traduce en los cinco idiomas', Object.values(langs).every(t => t && t !== spanish) && new Set(Object.values(langs)).size === 5, langs.en);
 step('Volver a español restaura los textos', (await navText()) === spanish);
 
+// 7b. Cobertura de traducción: en inglés no quedan textos con letras propias del español en las secciones principales
+await page.evaluate(() => window.FittFormaI18n?.setLanguage('en'));
+const leftovers = new Set();
+for (const v of ['plan', 'train', 'routines', 'exercises', 'nutrition', 'progress', 'community', 'profile', 'coach', 'running']) {
+  await go(v);
+  (await page.evaluate(() => {
+    const root = document.querySelector('.view.active'); const out = [];
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n;
+    while ((n = w.nextNode())) { const t = n.nodeValue.trim(); if (t && !n.parentElement.closest('[hidden],.bubble,script,style,select,#proposalArea,#photoStatus') && /[áéíóúñ¿¡]/.test(t)) out.push(t); }
+    root.querySelectorAll('[placeholder],[aria-label],[title]').forEach(e => ['placeholder', 'aria-label', 'title'].forEach(a => { const t = e.getAttribute(a); if (t && /[áéíóúñ¿¡]/.test(t) && !e.closest('[hidden]')) out.push(t); }));
+    return out;
+  })).forEach(t => leftovers.add(t));
+}
+const enDate = await page.textContent('#habitTodayDate');
+await page.evaluate(() => window.FittFormaI18n?.setLanguage('es')); await page.waitForTimeout(150);
+step('Las fechas siguen el idioma elegido', /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/.test(enDate) && /\b(ene|feb|mar|abr|may|jun|jul|ago|sept?|oct|nov|dic)\b/.test(await page.textContent('#habitTodayDate')), enDate);
+step('En inglés no quedan textos en español visibles', leftovers.size === 0, [...leftovers].slice(0, 5).join(' | '));
+
 // 8. Sin conexión: el service worker sirve la app ya visitada
 await page.clock.runFor(1000);
 const swReady = await page.evaluate(async () => { if (!('serviceWorker' in navigator)) return false; const reg = await Promise.race([navigator.serviceWorker.ready, new Promise(r => setTimeout(() => r(null), 8000))]); return Boolean(reg?.active); });

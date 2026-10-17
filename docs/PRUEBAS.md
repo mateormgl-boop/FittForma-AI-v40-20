@@ -33,9 +33,9 @@ Las pruebas con dos cuentas en un proyecto Supabase de pruebas siguen siendo nec
 ## 3. Comunidad de extremo a extremo (navegador + PostgREST)
 
 `tests/e2e/community.e2e.mjs` usa Chromium (Playwright), supabase-js real y PostgREST real sobre la
-base de datos local; solo `/auth/v1` y `/storage/v1` se simulan en el navegador. Recorre 30 pasos:
+base de datos local; solo `/auth/v1` y `/storage/v1` se simulan en el navegador. Recorre 33 pasos:
 feed anónimo, inicio de sesión, no leídos, publicar texto con foto (con y sin consentimiento),
-compartir un logro, me gusta sin duplicar, comentar, editar, mensajes, eliminar, moderar denuncias y eliminar la propia cuenta. El script recrea
+compartir un logro, me gusta sin duplicar, comentar, editar, mensajes, eliminar, moderar denuncias, guardar y recuperar la copia en la nube y eliminar la propia cuenta. El script recrea
 sus usuarios, perfiles y seguimientos en cada ejecución.
 
 Preparación (resumen):
@@ -58,3 +58,11 @@ PGHOST=... PGPORT=... PGUSER=... node tests/e2e/community.e2e.mjs
 - Supabase real con dos cuentas: RLS, OAuth de Google, confirmación por correo, Storage y URLs firmadas.
 - Gemini con clave válida (cuotas, idioma, propuestas).
 - Teléfonos físicos: instalación PWA, GPS en exterior, notificaciones, cámara para código de barras.
+
+## 4. Flujos críticos e idiomas (navegador)
+
+`tests/e2e/flows.e2e.mjs` (22 pasos, con `npm start` en otra terminal): generar el plan, propuesta de FittAI
+(aprobar, deshacer, rechazar), GPS con posiciones simuladas y reloj controlado (distancia, ritmo, señal imprecisa),
+foto de comida (no registra sin confirmar), hábitos, exportar → borrar → importar, navegación en los 6 idiomas,
+ningún texto en español visible con la app en inglés, fechas en el formato del idioma y apertura sin conexión
+desde el service worker. Junto con la integración: `npm run test:e2e`.

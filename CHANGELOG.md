@@ -1,5 +1,14 @@
 # FittForma AI — Registro de cambios
 
+## v45.0 — Etapa 7: pruebas (17 de octubre de 2026)
+
+- Nueva prueba de flujos críticos (`tests/e2e/flows.e2e.mjs`): generar plan, propuesta de FittAI (aprobar, deshacer, rechazar), GPS simulado, foto de comida, hábitos, exportar → borrar → importar, idiomas, fechas localizadas y uso sin conexión.
+- Comunidad E2E: guardar y recuperar la copia en la nube contra PostgREST (33 pasos).
+- Traducción: unos 900 textos que seguían en español en los otros 5 idiomas (`i18n-extra.js`), patrones para textos con números y fechas en el formato del idioma elegido.
+- Corregido: los placeholders de los cuadros de texto y las etiquetas de las fotos de ejercicios no se traducían.
+- `npm run test:e2e` corre integración y flujos críticos.
+- Pruebas: 197 automáticas, 115 de integración, 22 de flujos críticos, 91 SQL/RLS y 33 E2E de Comunidad.
+
 ## v44.0 — Etapa 6: seguridad y datos (17 de octubre de 2026)
 
 - Corregido un fallo que permitía fabricar un «seguimiento mutuo» para enviar mensajes a perfiles privados.

@@ -1,8 +1,12 @@
-# FittForma AI — v44.0
+# FittForma AI — v45.0
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v45.0
+
+- Etapa 7, pruebas: flujos críticos de punta a punta (GPS, propuestas de FittAI, copia en la nube, uso sin conexión) y la app completa traducida a los 6 idiomas.
 
 ## Novedades v44.0
 
@@ -49,7 +53,7 @@ npm test                  # pruebas automáticas (node --test)
 ```
 
 Pruebas de base de datos y de extremo a extremo: `docs/PRUEBAS.md`.
-Integración entre secciones en navegador (con `npm start` en otra terminal): `node tests/e2e/integration.e2e.mjs`.
+Pruebas en navegador (con `npm start` en otra terminal): `npm run test:e2e` (integración entre secciones y flujos críticos).
 
 ## Desplegar (Render + Supabase)
 
@@ -63,7 +67,7 @@ Integración entre secciones en navegador (con `npm start` en otra terminal): `n
    `insert into public.community_moderators(user_id) values ('UUID-DEL-USUARIO');`
 2. **Render**: variables `GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL` y una clave pública
    (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`). Nunca `service_role`/`sb_secret_`.
-3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v44-0`
+3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v45-0`
    y la app ofrece actualizar.
 
 ## Documentación
