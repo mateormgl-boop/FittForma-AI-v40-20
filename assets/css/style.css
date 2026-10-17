@@ -1754,6 +1754,46 @@ header{
   line-height:1.6;
 }
 
+/* ===================== Etapa C — Mejoras experiencia móvil ===================== */
+/* Scroll nativo fluido en contenedores con overflow en móvil */
+.chat-log,.exercise-modal-panel,.mobile-more-menu,.community-feed{
+  -webkit-overflow-scrolling:touch;
+  overflow-anchor:none;
+}
+
+/* Evitar que el scroll se escape de modales y menús en móvil */
+.exercise-modal-panel,.mobile-more-menu{
+  overscroll-behavior:contain;
+}
+
+/* El toast no debe quedar oculto detrás de la barra inferior en móvil */
+@media(max-width:760px){
+  .toast{bottom:calc(120px + env(safe-area-inset-bottom))}
+}
+
+/* Evitar doble tap zoom en botones y controles táctiles */
+button,a[role="button"],label,.mobile-nav-item,.mobile-more-link,.tab,.dashboard-action{
+  touch-action:manipulation;
+}
+
+/* Inputs numéricos: teclado numérico en móvil y sin zoom en iOS */
+input[type="number"],input[type="date"],input[type="time"],input[inputmode="decimal"],input[inputmode="numeric"]{
+  font-size:16px; /* evita zoom automático en iOS al enfocar */
+}
+
+/* Asegurar que el contenido no quede oculto tras la barra inferior al hacer scroll */
+@media(max-width:760px){
+  .app{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
+  .view{overflow-anchor:none}
+}
+
+/* Indicador activo más visible en la barra inferior móvil */
+.mobile-nav-item.active svg{stroke:var(--accent);filter:drop-shadow(0 0 6px rgba(79,140,255,.5))}
+
+/* Estados de carga y toasts siempre visibles sobre cualquier overlay */
+.toast{z-index:100}
+.unlock-toast{z-index:110}
+
 /* ===================== PWA standalone ===================== */
 @media(display-mode:standalone){
   .app{padding-top:0}
