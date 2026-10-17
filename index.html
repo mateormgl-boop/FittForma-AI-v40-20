@@ -1401,10 +1401,16 @@
       .home-dash>.home-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
       .home-dash>.home-habits{grid-column:2;grid-row:5 / span 3}
       .home-dash>.ad-slot{grid-column:1/-1}
+    }
+    @media(min-width:1200px){
       #view-progress .progress-panel[data-progress-panel="summary"]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 var(--ff-s4);align-items:start}
       #view-progress .progress-panel[data-progress-panel="summary"][hidden]{display:none}
       #view-progress .progress-panel[data-progress-panel="summary"]>.progress-overview-card{grid-column:1/-1}
     }
+    /* v41: Progreso se organiza con pestañas; la grilla de dos columnas de v20 ya no aplica a la vista entera. */
+    #view-progress.view.active{display:block}
+    #view-progress .section-head{flex-wrap:wrap}
+    #view-progress .section-head>div{min-width:0;flex:1 1 220px}
     @media(prefers-reduced-motion:reduce){.badge-tile,.home-badge-bar i{transition:none}}
     /* v41 — controles de formulario base (baja especificidad: los componentes pueden sobrescribir) */
     :where(input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),select,textarea){background:#080f1f;border:1px solid #2c4166;border-radius:12px;color:var(--ff-text);padding:10px 12px;min-height:44px;font:inherit;font-size:15px}
@@ -1631,7 +1637,7 @@
           <span class="gps-live-indicator" id="gpsReadyBadge">GPS listo</span>
         </div>
         <div class="field gps-select-field"><label for="gpsActivityType">Qué vas a hacer</label><select id="gpsActivityType"><option value="Correr">Correr</option><option value="Caminar">Caminar</option><option value="Bicicleta">Bicicleta</option></select></div>
-        <div class="gps-hint"><span aria-hidden="true">📍</span><div><strong>Privacidad y límites</strong><br>El recorrido se guarda en este dispositivo y no se envía a FittForma. Si usás la función de sincronización en la nube o exportás una copia, los datos guardados pueden incluir el recorrido. Al mostrar el mapa, el servicio de mapas recibe solicitudes de mosaicos de la zona. Para que el registro no se interrumpa, mantené esta pantalla abierta; los navegadores pueden suspender el GPS en segundo plano.</div></div>
+        <div class="gps-hint"><svg class="gps-hint-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><div><strong>Privacidad y límites</strong><br>El recorrido se guarda en este dispositivo y no se envía a FittForma. Si usás la función de sincronización en la nube o exportás una copia, los datos guardados pueden incluir el recorrido. Al mostrar el mapa, el servicio de mapas recibe solicitudes de mosaicos de la zona. Para que el registro no se interrumpa, mantené esta pantalla abierta; los navegadores pueden suspender el GPS en segundo plano.</div></div>
         <div class="stats gps-stats" style="grid-template-columns:repeat(2,minmax(0,1fr));margin:14px 0">
           <div class="stat"><strong id="gpsDistance">0.00 km</strong><small>Distancia</small></div>
           <div class="stat"><strong id="gpsTime">00:00</strong><small>Tiempo activo</small></div>
@@ -1916,7 +1922,7 @@
       </div>
       <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">40.21</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">41.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
@@ -1928,7 +1934,7 @@
       </div>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 40.21 · Comunidad fitness online · Las estimaciones no sustituyen asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 41.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -1953,7 +1959,7 @@
   <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>Coach IA<small class="more-desc">Planes y orientación</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow">›</span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V40.21</p>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V41.0</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -2361,7 +2367,6 @@
     state.plan={createdAt:new Date().toISOString(),days:split.map((exercises,i)=>({title:p.goal==='endurance'?`Resistencia · Día ${i+1}`:dayCount<=3?`Cuerpo completo · Día ${i+1}`:dayCount===4?(['Tren superior A','Tren inferior A','Tren superior B','Tren inferior B'][i]||`Día ${i+1}`):(['Tren superior A','Tren inferior A','Cuerpo completo','Tren superior B','Tren inferior B'][i]||`Día ${i+1}`),exercises:exercises.map(e=>({...e,sets:e.kind==='cardio'?1:(p.level==='beginner'?Math.min(e.sets,2):e.sets)}))}))};
     save();renderAll();toast('¡Rutina equilibrada creada y guardada!');
   }
-  function exerciseEmoji(group,kind){if(kind==='cardio')return '🏃';return ({Piernas:'🦵',Pecho:'💪',Espalda:'🏋️',Hombros:'🙆',Brazos:'💪',Core:'🧘',Glúteos:'🏋️',Cardio:'🏃'})[group]||'🏋️';}
   function exerciseCue(name,group,kind){
     const n=name.toLowerCase();
     if(kind==='cardio')return 'Mantené un ritmo que te permita hablar; aumentá gradualmente.';
@@ -2819,7 +2824,7 @@ function findCatalogExercise(name){
     const g=$('exerciseGroupFilter')?.value||'all';
     const favorites=readExerciseFavorites();
     const filtered=items.filter(e=>(g==='all'||e.group===g)&&(!exerciseFavoritesOnly||favorites.has(exerciseFavoriteKey(e.name,libraryMode)))&&(!q||normalizeExerciseName(e.name+' '+e.group+' '+exerciseCue(e.name,e.group,e.kind)+' '+exerciseEquipment(e.name,libraryMode)+' '+e.kind).includes(q)));
-    root.innerHTML=filtered.length?filtered.map(e=>{const favorite=favorites.has(exerciseFavoriteKey(e.name,libraryMode));return `<article class="exercise-library-item">${exercisePhoto(e.name,e.group,false,e.kind)}<div class="exercise-library-copy"><strong>${esc(e.name)}</strong><span class="tag">${esc(e.group)} · ${e.kind==='cardio'?'Cardio':'Fuerza'}</span><p class="muted">${e.sets} series · ${esc(e.reps)} · ${esc(exerciseEquipment(e.name,libraryMode))}</p><div class="exercise-progress-cue" aria-label="Progresión orientativa: técnica, control y avance gradual"><span>Técnica</span><span>Control</span><span>Progresión</span></div><div class="exercise-card-actions"><button class="btn secondary" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${libraryMode}">Ver técnica</button><button class="btn ghost favorite-toggle" type="button" data-exercise-favorite="${esc(e.name)}" data-favorite-mode="${libraryMode}" aria-label="${favorite?'Quitar':'Agregar'} ${esc(e.name)} ${favorite?'de':'a'} favoritos" aria-pressed="${favorite}">${favorite?'★':'☆'}</button></div></div></article>`;}).join(''):`<div class="empty" style="grid-column:1/-1"><div class="emoji">🔎</div><strong>${exerciseFavoritesOnly?'Todavía no hay favoritos en esta modalidad':'No encontramos ejercicios'}</strong><p>${exerciseFavoritesOnly?'Marcá ejercicios con la estrella para tenerlos a mano.':'Probá otra búsqueda o elegí otro grupo muscular.'}</p></div>`;
+    root.innerHTML=filtered.length?filtered.map(e=>{const favorite=favorites.has(exerciseFavoriteKey(e.name,libraryMode));return `<article class="exercise-library-item">${exercisePhoto(e.name,e.group,false,e.kind)}<div class="exercise-library-copy"><strong>${esc(e.name)}</strong><span class="tag">${esc(e.group)} · ${e.kind==='cardio'?'Cardio':'Fuerza'}</span><p class="muted">${e.sets} series · ${esc(e.reps)} · ${esc(exerciseEquipment(e.name,libraryMode))}</p><div class="exercise-progress-cue" aria-label="Progresión orientativa: técnica, control y avance gradual"><span>Técnica</span><span>Control</span><span>Progresión</span></div><div class="exercise-card-actions"><button class="btn secondary" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${libraryMode}">Ver técnica</button><button class="btn ghost favorite-toggle" type="button" data-exercise-favorite="${esc(e.name)}" data-favorite-mode="${libraryMode}" aria-label="${favorite?'Quitar':'Agregar'} ${esc(e.name)} ${favorite?'de':'a'} favoritos" aria-pressed="${favorite}">${favorite?'★':'☆'}</button></div></div></article>`;}).join(''):`<div class="empty" style="grid-column:1/-1"><strong>${exerciseFavoritesOnly?'Todavía no hay favoritos en esta modalidad':'No encontramos ejercicios'}</strong><p>${exerciseFavoritesOnly?'Marcá ejercicios con la estrella para tenerlos a mano.':'Probá otra búsqueda o elegí otro grupo muscular.'}</p></div>`;
     const count=$('exerciseResultCount');if(count)count.textContent=`${filtered.length} ejercicio${filtered.length===1?'':'s'}`;
     const favoriteButton=$('exerciseFavoritesOnly');if(favoriteButton){favoriteButton.setAttribute('aria-pressed',String(exerciseFavoritesOnly));favoriteButton.textContent=exerciseFavoritesOnly?'★ Ver todos los ejercicios':'☆ Mostrar favoritos';}
     document.querySelectorAll('[data-library-mode]').forEach(b=>b.classList.toggle('active',b.dataset.libraryMode===libraryMode));
@@ -2856,7 +2861,7 @@ function findCatalogExercise(name){
   }
   function renderPlan(){
     const p=state.profile;
-    if(!state.plan){$('planOutput').innerHTML='<div class="card empty"><div class="emoji">✳️</div><strong>Tu rutina empieza acá</strong><p>Elegí tus preferencias y creá tu plan personalizado.</p></div>';renderPlanChangeHistory();return;}
+    if(!state.plan){$('planOutput').innerHTML='<div class="card empty"><strong>Tu rutina empieza acá</strong><p>Elegí tus preferencias y creá tu plan personalizado.</p></div>';renderPlanChangeHistory();return;}
     $('planOutput').innerHTML=`<div class="section-head"><div><h2>${p.name?'Plan de '+esc(p.name):'Tu rutina'}</h2><p>${esc(goalText(p.goal))} · ${esc(levelText(p.level))} · ${esc(p.days)} días/semana</p></div><span class="tag">${esc(p.duration)} min</span></div>`+
       state.plan.days.map((day,i)=>`<div class="card"><div class="section-head"><div><h3>${esc(day.title)}</h3><p>${day.exercises.length} actividades · descansá entre sesiones según tu recuperación</p></div><span class="tag">Sesión ${i+1}</span></div>`+
       day.exercises.map((e,ei)=>`<div class="exercise"><div class="exercise-row-content">${exercisePhoto(e.name,e.group,true,e.kind)}<div class="exercise-copy"><strong>${esc(e.name)}</strong><div class="muted small">${esc(e.group)} · ${e.kind==='cardio'?'Ritmo cómodo':'Movimientos controlados'}</div><div class="exercise-cues">${esc(exerciseCue(e.name,e.group,e.kind))}</div><div class="exercise-actions"><button class="btn ghost" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${esc(p.equipment)}">Ver técnica</button><button class="btn ghost" type="button" data-replace-exercise="${i}:${ei}" aria-label="Cambiar ${esc(e.name)} por una alternativa compatible">Cambiar</button><span class="tag">${e.sets} × ${esc(e.reps)}</span></div></div></div></div>`).join('')+
@@ -2985,7 +2990,7 @@ function findCatalogExercise(name){
         root.innerHTML=`<div class="card workout-live-card"><div class="eyebrow">ENTRENAMIENTO GUARDADO</div><h2 style="margin:5px 0">${esc(x.title)}</h2><p class="muted small">${prettyDate(x.date)} · Sesión guardada en tu historial.</p><div class="workout-summary-grid"><div class="workout-summary-metric"><small>Tiempo total</small><strong>${formatWorkoutDuration(x.minutes*60)}</strong></div><div class="workout-summary-metric"><small>Series completadas</small><strong>${x.completedSets}/${x.totalSets}</strong></div><div class="workout-summary-metric"><small>Ejercicios con datos</small><strong>${x.completedExercises}/${x.totalExercises}</strong></div><div class="workout-summary-metric"><small>Volumen registrado</small><strong>${x.volumeKg.toLocaleString('es-UY',{maximumFractionDigits:1})} kg</strong></div></div><div class="workout-summary-check">✓ Tu sesión está guardada en este dispositivo. ${x.recordedSets>x.completedSets?`${x.recordedSets-x.completedSets} serie(s) tenían datos pero no quedaron marcadas como completadas.`:'Las series marcadas como listas quedaron registradas.'}</div><div class="btn-row" style="margin-top:14px"><button class="btn full" id="summaryGoProgress" type="button">Ver mi progreso</button><button class="btn ghost full" id="summaryGoPlan" type="button">Volver al plan</button></div></div>`;
         $('summaryGoProgress').onclick=()=>switchView('progress');$('summaryGoPlan').onclick=()=>switchView('routines');return;
       }
-      root.innerHTML=`<div class="card empty"><div class="emoji">🏋️</div><strong>¿Listo para entrenar?</strong><p>Elegí una sesión de tu plan para registrar tus series y repeticiones.</p><button type="button" class="btn" id="goPlan">Ver mi plan</button></div>`;
+      root.innerHTML=`<div class="card empty"><strong>¿Listo para entrenar?</strong><p>Elegí una sesión de tu plan para registrar tus series y repeticiones.</p><button type="button" class="btn" id="goPlan">Ver mi plan</button></div>`;
       $('goPlan').onclick=()=>switchView('routines');return;
     }
     root.innerHTML=`<div class="card workout-live-card"><div class="workout-live-title-row"><div><div class="eyebrow">SESIÓN EN CURSO</div><h2 style="margin:5px 0">${esc(activeSession.title)}</h2><p class="muted small">${prettyDate(activeSession.date)} · Registrá tus series y mantené una técnica controlada.</p></div><div class="workout-duration-badge ${activeSession.pausedAt?'is-paused':''}" id="workoutDurationBadge"><span>Tiempo activo</span><strong id="workoutElapsedDisplay">${formatWorkoutDuration(Math.floor(activeSessionElapsedMs()/1000))}</strong><small id="workoutStateBadge">${activeSession.pausedAt?'EN PAUSA':'EN CURSO'}</small></div></div><div class="workout-session-controls"><button class="btn secondary" type="button" id="toggleWorkoutPause">${activeSession.pausedAt?'Reanudar sesión':'Pausar sesión'}</button><button class="btn ghost" type="button" id="leaveWorkoutForLater">Salir y guardar para retomar</button></div><p class="workout-pause-status" id="workoutPauseStatus" role="status">${activeSession.pausedAt?'La sesión está en pausa. El tiempo activo no avanza.':'El tiempo activo incluye el descanso entre series.'}</p><div id="workoutAutosaveStatus" class="workout-autosave-status" role="status">Borrador guardado automáticamente en este dispositivo.</div><div class="workout-progress-head"><span id="workoutProgressText">0 series completadas</span><span class="muted small" id="workoutProgressCount">0%</span></div><div class="progressbar"><span id="workoutProgressBar" style="width:0%"></span></div></div>`+
@@ -3609,7 +3614,7 @@ function findCatalogExercise(name){
     summaryRoot.innerHTML=metrics.map(m=>`<div class="progress-insight-metric"><span class="metric-label">${m.label}</span><strong>${m.value}</strong><small>${m.detail}</small></div>`).join('');
     const anyData=stats.days.some(d=>d.mealCount>0||d.water!==null);
     if(!anyData){chartRoot.innerHTML='<div class="nutrition-week-empty">Cuando registres comidas o vasos de agua, acá vas a ver una comparación de los últimos siete días.</div>';return;}
-    chartRoot.innerHTML=stats.days.map(day=>`<div class="nutrition-week-day ${day.isToday?'today':''}" title="${prettyDate(day.key)} · ${day.mealCount?`${day.calories} kcal, ${Math.round(day.protein)} g proteína`:'sin comidas registradas'} · ${day.water===null?'sin registro de agua':`${day.water} vasos de agua`}"><div class="nutrition-day-bars"><div class="nutrition-day-meter cal" aria-label="Calorías registradas"><span style="height:${day.mealCount?Math.max(day.calories?3:0,day.caloriePct):0}%"></span></div><div class="nutrition-day-meter pro" aria-label="Proteínas registradas"><span style="height:${day.mealCount?Math.max(day.protein?3:0,day.proteinPct):0}%"></span></div><div class="nutrition-day-meter water" aria-label="Agua registrada"><span style="height:${day.water===null?0:Math.max(day.water?3:0,day.waterPct)}%"></span></div></div><span class="nutrition-day-label">${day.label}</span><strong>${day.mealCount?day.calories:'—'}</strong><small>${day.mealCount?`P ${Math.round(day.protein)}g`:'sin comidas'}</small><small>${day.water===null?'💧 —':`💧 ${day.water}`}</small></div>`).join('');
+    chartRoot.innerHTML=stats.days.map(day=>`<div class="nutrition-week-day ${day.isToday?'today':''}" title="${prettyDate(day.key)} · ${day.mealCount?`${day.calories} kcal, ${Math.round(day.protein)} g proteína`:'sin comidas registradas'} · ${day.water===null?'sin registro de agua':`${day.water} vasos de agua`}"><div class="nutrition-day-bars"><div class="nutrition-day-meter cal" aria-label="Calorías registradas"><span style="height:${day.mealCount?Math.max(day.calories?3:0,day.caloriePct):0}%"></span></div><div class="nutrition-day-meter pro" aria-label="Proteínas registradas"><span style="height:${day.mealCount?Math.max(day.protein?3:0,day.proteinPct):0}%"></span></div><div class="nutrition-day-meter water" aria-label="Agua registrada"><span style="height:${day.water===null?0:Math.max(day.water?3:0,day.waterPct)}%"></span></div></div><span class="nutrition-day-label">${day.label}</span><strong>${day.mealCount?day.calories:'—'}</strong><small>${day.mealCount?`P ${Math.round(day.protein)}g`:'sin comidas'}</small><small>${day.water===null?'Agua —':`Agua ${day.water}`}</small></div>`).join('');
   }
   function renderHabitTracker(){
     const checklist=$('habitChecklist'),history=$('habitWeekHistory'),summary=$('habitTodaySummary');if(!checklist||!history||!summary)return;
@@ -3635,7 +3640,7 @@ function findCatalogExercise(name){
     $('calorieBar').style.width=Math.min(100,g.calories?cal/g.calories*100:0)+'%';{const pct=g.calories?Math.min(1,cal/g.calories):0;$('nutriRingArc').style.strokeDashoffset=String(326.7*(1-pct));$('nutriRingValue').textContent=Math.round(cal);$('nutriRingTitle').textContent=g.calories?`Objetivo: ${Math.round(g.calories)} kcal`:'Sin objetivo definido';$('nutriRingText').textContent=meals.length?`${Math.round(pct*100)}% de tu objetivo diario · ${meals.length} ${meals.length===1?'comida':'comidas'}`:'Registrá tu primera comida.';}$('calorieCaption').textContent=`${Math.max(0,Math.round(g.calories-cal))} kcal estimadas restantes para tu objetivo diario.`;
     const carbTarget=Number.isFinite(Number(g.carbs))?Number(g.carbs):280,fatTarget=Number.isFinite(Number(g.fat))?Number(g.fat):80;const macroProgress=[['protein',pro,g.protein||120,'proteinCaption'],['carb',carbs,carbTarget,'carbCaption'],['fat',fat,fatTarget,'fatCaption']];
     for(const [prefix,amount,target,captionId] of macroProgress){$(captionId).textContent=`${Math.round(amount)} / ${Math.round(target)} g`;$(`${prefix}Bar`).style.width=Math.min(100,target?amount/target*100:0)+'%';}
-    $('mealList').innerHTML=meals.length?meals.slice().reverse().map(m=>{const favorite=(state.mealFavorites||[]).some(f=>f.sourceId===m.id||f.name===m.name);return `<div class="history-item"><div><strong>${esc(m.name)}</strong><small>${esc(m.type)} · ${Math.round(m.calories)} kcal · ${Math.round(m.protein)} g P · ${Math.round(Number(m.carbs||0))} g C · ${Math.round(Number(m.fat||0))} g G</small><div class="meal-list-actions"><button class="btn ghost toggleMealFavorite" type="button" data-id="${esc(String(m.id))}">${favorite?'★ Guardada':'☆ Guardar favorita'}</button></div></div><button type="button" class="btn ghost removeMeal" data-id="${esc(String(m.id))}" aria-label="Eliminar ${esc(m.name)}">Quitar</button></div>`;}).join(''):'<div class="empty"><div class="emoji">🥗</div><strong>Sin comidas registradas</strong><p>Agregá lo que comiste para ver tu resumen.</p></div>';
+    $('mealList').innerHTML=meals.length?meals.slice().reverse().map(m=>{const favorite=(state.mealFavorites||[]).some(f=>f.sourceId===m.id||f.name===m.name);return `<div class="history-item"><div><strong>${esc(m.name)}</strong><small>${esc(m.type)} · ${Math.round(m.calories)} kcal · ${Math.round(m.protein)} g P · ${Math.round(Number(m.carbs||0))} g C · ${Math.round(Number(m.fat||0))} g G</small><div class="meal-list-actions"><button class="btn ghost toggleMealFavorite" type="button" data-id="${esc(String(m.id))}">${favorite?'★ Guardada':'☆ Guardar favorita'}</button></div></div><button type="button" class="btn ghost removeMeal" data-id="${esc(String(m.id))}" aria-label="Eliminar ${esc(m.name)}">Quitar</button></div>`;}).join(''):'<div class="empty"><strong>Sin comidas registradas</strong><p>Agregá lo que comiste para ver tu resumen.</p></div>';
     document.querySelectorAll('.toggleMealFavorite').forEach(b=>b.addEventListener('click',()=>{const meal=state.meals.find(m=>String(m.id)===b.dataset.id);if(!meal)return;state.mealFavorites=state.mealFavorites||[];const idx=state.mealFavorites.findIndex(f=>f.sourceId===meal.id||f.name===meal.name);if(idx>=0){state.mealFavorites.splice(idx,1);toast('Comida quitada de favoritas.');}else{state.mealFavorites.push({id:Date.now(),sourceId:meal.id,name:meal.name,calories:Number(meal.calories)||0,protein:Number(meal.protein)||0,carbs:Number(meal.carbs)||0,fat:Number(meal.fat)||0,type:meal.type||'Almuerzo'});toast('Comida guardada en favoritas.');}save();renderNutrition();}));
     renderMealFavorites();
     $('waterCount').textContent=state.water.count;$('waterGoalText').textContent=g.water;
@@ -3984,7 +3989,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.40.21')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.40.21. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.41.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.40.21. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -4406,7 +4411,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.40.21';
+  const APP_VERSION='0.41.0';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');

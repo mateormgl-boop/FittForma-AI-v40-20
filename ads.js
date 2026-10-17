@@ -1,4 +1,4 @@
-/* FittForma AI v40.21 — Google Ad Manager web ads. Ads stay off until configured. */
+/* FittForma AI v41.0 — Google Ad Manager web ads. Ads stay off until configured. */
 (() => {
   const config = window.FittFormaAdsConfig || {};
   const DAILY_KEY = 'fittforma-ai-ad-usage-v1';

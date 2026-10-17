@@ -16,7 +16,7 @@ test('v40.7: el shell y el diseño unificado están presentes en la hoja princip
   assert.match(html, /prefers-reduced-motion:reduce/);
 });
 
-test('v40.21: Inicio es un panel con las métricas de constancia y ya no repite el hero antiguo', async () => {
+test('v41.0: Inicio es un panel con las métricas de constancia y ya no repite el hero antiguo', async () => {
   const html = await read('index.html');
   const home = html.match(/<section class="view active" id="view-plan">([\s\S]*?)<section class="view" id="view-exercises">/)?.[1] || '';
   assert.match(home, /class="home-dash"/);
@@ -42,11 +42,11 @@ test('v40.7: service worker y versiones de paquetes fuerzan una actualización d
   const sw = await read('sw.js');
   const rootPkg = JSON.parse(await read('package.json'));
   const backendPkg = JSON.parse(await read('backend/package.json'));
-  assert.match(sw, /const CACHE = 'fittforma-ai-static-v40-21'/);
+  assert.match(sw, /const CACHE = 'fittforma-ai-static-v41-0'/);
   assert.match(sw, /self\.skipWaiting\(\)/);
   assert.match(sw, /self\.clients\.claim\(\)/);
-  assert.equal(rootPkg.version, '0.40.21');
-  assert.equal(backendPkg.version, '0.40.21');
+  assert.equal(rootPkg.version, '0.41.0');
+  assert.equal(backendPkg.version, '0.41.0');
 });
 
 test('v40.7: las ilustraciones de ejercicios no se etiquetan como demostraciones exactas si solo son referencias de grupo', async () => {

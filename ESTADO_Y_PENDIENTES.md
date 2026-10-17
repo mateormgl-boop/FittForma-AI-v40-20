@@ -1,3 +1,23 @@
+## v41.0 — Estado
+
+**Verificado en este entorno**
+- `npm test`: 169 pruebas, 0 fallidas.
+- SQL/RLS en PostgreSQL 16 local con stub de Supabase: 44 comprobaciones; migración aplicada dos veces sin error; publicaciones previas siguen válidas.
+- E2E de Comunidad (Chromium + supabase-js + PostgREST 12): 22/22 pasos. Compatibilidad sin migración: feed y transformaciones funcionan; texto/logros explican qué falta.
+- Barrido visual de 10 vistas a 360, 390, 412, 1024 y 1366 px: sin desborde horizontal ni errores de página.
+
+**No verificado (requiere tu entorno)**
+- Supabase real (RLS con cuentas reales, OAuth Google, Storage y URLs firmadas), Gemini con clave, Render, teléfonos físicos y PWA instalada.
+
+**Pendientes y límites conocidos**
+- No existe verificación de marcas en el servidor; «Con ruta GPS» es un control en el dispositivo y lo informa el cliente.
+- Los mensajes dinámicos nuevos («Te faltan…», estados) solo están en español; las etiquetas sí en 6 idiomas.
+- En proyectos sin la migración v41, la detección produce una respuesta 400 por sesión del navegador (consulta de prueba de columnas).
+- Sin notificaciones de interacciones (likes/comentarios), sin moderación administrativa de denuncias, sin borrado de cuenta en la nube.
+- El backend de IA limita por IP en memoria; no hay cupo por cuenta.
+- El CSS conserva capas históricas (v11→v40.21) bajo la capa final v41; conviene consolidarlas en una próxima versión.
+- La edición de identidad en Perfil («Cómo querés que te llamemos») y el nombre del plan son campos distintos heredados.
+
 ## v40.21 — Navegación nueva y diseño
 
 - Reestructura de Inicio/Entrenar y diseño visual aplicado a todas las pantallas.

@@ -111,11 +111,11 @@ test('al finalizar se guardan métricas de la sesión y se muestra el resumen an
   assert.match(html, /switchView\('train'\);toast\('Sesión guardada/);
 });
 
-test('el service worker y los paquetes están alineados con v40.21 para refrescar la PWA', async () => {
+test('el service worker y los paquetes están alineados con v41.0 para refrescar la PWA', async () => {
   const sw = await readFile(path.join(root, 'sw.js'), 'utf8');
   const pkg = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
   const backendPkg = JSON.parse(await readFile(path.join(root, 'backend/package.json'), 'utf8'));
-  assert.match(sw, /fittforma-ai-static-v40-21/);
-  assert.equal(pkg.version, '0.40.21');
-  assert.equal(backendPkg.version, '0.40.21');
+  assert.match(sw, /fittforma-ai-static-v41-0/);
+  assert.equal(pkg.version, '0.41.0');
+  assert.equal(backendPkg.version, '0.41.0');
 });

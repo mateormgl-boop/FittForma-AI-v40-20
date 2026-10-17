@@ -101,12 +101,12 @@ test('hidratación e historial de hábitos sobreviven carga local, importación 
   assert.match(html, /JSON\.stringify\(state,null,2\)/);
 });
 
-test('v40.21 fuerza la actualización de la caché PWA y mantiene recursos base', async () => {
+test('v41.0 fuerza la actualización de la caché PWA y mantiene recursos base', async () => {
   const pkg = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
   const backendPkg = JSON.parse(await readFile(path.join(root, 'backend/package.json'), 'utf8'));
-  assert.equal(pkg.version, '0.40.21');
-  assert.equal(backendPkg.version, '0.40.21');
-  assert.match(sw, /fittforma-ai-static-v40-21/);
+  assert.equal(pkg.version, '0.41.0');
+  assert.equal(backendPkg.version, '0.41.0');
+  assert.match(sw, /fittforma-ai-static-v41-0/);
   assert.match(sw, /\.\/index\.html/);
   assert.match(sw, /\.\/supabase-config\.js/);
 });

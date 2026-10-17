@@ -1,3 +1,16 @@
+ACTUALIZAR A v41.0
+==================
+1. Hacé una copia de seguridad de la base (Supabase → Database → Backups) antes de tocar SQL.
+2. En un proyecto Supabase DE PRUEBAS ejecutá en el SQL Editor:
+   supabase/migrations/2026-10-17_v41_posts_achievements_unread.sql
+   (aditiva y re-ejecutable: no borra tablas ni filas). Probá con dos cuentas: publicar texto,
+   compartir un logro, editar, mensajes sin leer. Recién después aplicala en producción.
+   NO vuelvas a ejecutar schema.sql ni community.sql.
+3. Render no necesita variables nuevas. Hacé merge de la rama a la que despliega Render.
+4. Abrí la app: el service worker cambia a fittforma-ai-static-v41-0 y ofrece actualizar.
+5. Si no aplicás la migración, la app funciona igual; en Comunidad › Publicar solo queda
+   habilitada la transformación y se muestra qué archivo falta aplicar.
+
 ACTUALIZAR FITTFORMA AI A LA V40.21
 
 1. Hacé una copia de seguridad del repositorio y la carpeta local.

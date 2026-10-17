@@ -1,5 +1,16 @@
 # FittForma AI — Registro de cambios
 
+## v41.0 — Navegación de 5 destinos, insignias con reglas únicas y comunidad ampliada (17 de octubre de 2026)
+
+- Base: se incorporó el ZIP v40.21 sobre el repositorio (que contenía v40.2); se retiraron solo assets que v40.21 ya no usaba.
+- Navegación: 5 destinos móviles; Nutrición, Coach IA y Correr con GPS en «Más». Escritorio ≥1024 px con barra lateral e Inicio a dos columnas.
+- Insignias: catálogo, categorías, umbrales, topes de plausibilidad, deduplicación, mensajes de progreso y medallas SVG en `achievements.js`. Galería, detalle de 12 niveles con fecha, lista de marcas con borrado y revocación. Estados «Declarada» y «Con ruta GPS»; ninguno se presenta como verificado.
+- Progreso: secciones Resumen, Insignias, Historial y Peso. Inicio: próxima insignia con avance real.
+- Comunidad: publicaciones de texto (foto opcional) y de logros con vista previa, edición del texto propio, mensajes sin leer. Migración aditiva `supabase/migrations/2026-10-17_v41_posts_achievements_unread.sql`; sin ella la app degrada a transformaciones y lo indica.
+- Corregido: `renderProgress` con sesiones sin `exercises`; el pie de página no coincidía con su traducción; grilla antigua de Progreso en escritorio.
+- Diseño: capa final de tokens, controles de formulario coherentes, cabecera de posts y subpestañas de Comunidad sin cortes en móvil, sin emojis como iconos.
+- Pruebas: 169 automáticas (`npm test`), 44 comprobaciones SQL/RLS (`npm run test:sql`) y 22 pasos E2E de Comunidad contra PostgREST local.
+
 ## v40.21 — Nueva navegación y diseño visual de app móvil
 
 - Inicio nuevo con datos reales: saludo, objetivo semanal con anillo, tira de la semana, entrenamiento de hoy con botón que arranca la sesión, accesos de color (Entrenar, Nutrición, Coach IA, Correr con GPS, Progreso, Comunidad), anillos de kcal/proteína/agua, hábitos marcables e insignias.

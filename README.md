@@ -1,37 +1,53 @@
-# FittForma AI — v40.20
+# FittForma AI — v41.0
 
-Aplicación fitness web instalable como PWA, con frontend móvil, backend Node.js, integración opcional con Gemini y comunidad con Supabase. El repositorio está pensado para continuar usando GitHub y Render.
+Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
+compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
+servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
 
-## Novedades v40.20 — Insignias personales
+## Novedades v41.0
 
-- Insignias en Progreso y vista previa en Perfil para ejercicios medibles, actividades al aire libre y constancia.
-- Doce niveles por desafío: Bronce, Plata, Oro y Diamante (tres niveles de cada rango).
-- Marcas de flexiones, dominadas, sentadillas, abdominales, plancha y otros ejercicios detectados en la biblioteca; admite desafíos personalizados.
-- Las actividades GPS plausibles pueden marcar hitos de distancia con distintivo GPS; no es una verificación antifraude completa.
-- La publicación de insignias en Comunidad se deja para una fase posterior.
+- **Navegación**: 5 destinos en móvil (Inicio · Entrenar · Progreso · Comunidad · Perfil);
+  Nutrición, Coach IA y Correr con GPS en el menú «Más». En escritorio (≥1024 px), barra lateral fija
+  con sección «Herramientas» y un Inicio a dos columnas.
+- **Insignias**: reglas en un único lugar (`achievements.js`), categorías por disciplina, topes de
+  plausibilidad, sin duplicados del día, mensajes concretos («Te faltan 3 repeticiones para Plata I»),
+  galería con medallas SVG por rango, detalle de los 12 niveles con fecha de obtención y lista de
+  marcas con borrado (que quita las insignias que dependían de ellas). Ver `docs/INSIGNIAS.md`.
+- **Sin falsas verificaciones**: los estados son «Declarada» o «Con ruta GPS» (comprobación en el
+  dispositivo). Ninguna insignia se presenta como verificada.
+- **Progreso** en cuatro secciones: Resumen · Insignias · Historial · Peso.
+- **Inicio** muestra la insignia más cercana a subir de nivel con su avance real.
+- **Comunidad**: publicaciones de texto (con foto opcional) y de logros, vista previa de lo que se
+  comparte y para quién, edición del texto propio e indicador de mensajes sin leer. Requiere la
+  migración `supabase/migrations/2026-10-17_v41_posts_achievements_unread.sql`; sin ella la app sigue
+  funcionando con transformaciones y lo explica en pantalla.
+- Correcciones: `renderProgress` ya no falla con sesiones sin `exercises`; capa CSS final con tokens
+  y controles de formulario coherentes; se quitaron emojis usados como iconos.
 
-## Novedades v40.19 — Comunidad por secciones y corrección de PGRST201
+## Ejecutar en local
 
-- La consulta del feed selecciona explícitamente la FK `community_posts_user_id_fkey`; los comentarios seleccionan `community_comments_user_id_fkey`.
-- Si PostgREST todavía devuelve una relación ambigua o una FK con nombre distinto, el feed intenta consultar publicaciones y perfiles por separado, siempre respetando RLS.
-- Comunidad tiene cinco secciones internas: **Feed, Explorar, Publicar, Mensajes y Mi perfil**. No se apilan todos los formularios en una única pantalla.
-- Explorar mantiene juntos los perfiles encontrados y las publicaciones coincidentes; volver al Feed limpia la búsqueda.
-- Las pestañas son adaptables a móvil, accesibles con teclado y marcan el estado seleccionado.
-- El embed de comentarios también tiene recuperación por consultas separadas cuando el nombre de la FK difiere o hay relaciones ambiguas.
-- Las pestañas y los principales títulos de Comunidad tienen traducciones añadidas para los seis idiomas de la app.
-- `npm test`: 149 pruebas aprobadas, 0 fallidas en ejecución local, incluida la suite de insignias.
+```bash
+npm start                 # http://localhost:8787 (sin GEMINI_API_KEY la IA queda en modo demo)
+npm test                  # pruebas automáticas (node --test)
+```
 
-## Importante antes de publicar
+Pruebas de base de datos y de extremo a extremo: `docs/PRUEBAS.md`.
 
-- Conservá la configuración real de `supabase-config.js` o usá las variables de Render.
-- En Render deben estar `SUPABASE_URL`, una clave pública (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`) y `GEMINI_API_KEY`; `GEMINI_MODEL` debe ser un modelo soportado.
-- Nunca pongas claves `service_role`/`sb_secret_` en el frontend.
-- Esta versión no cambia el esquema SQL. No vuelvas a ejecutar `supabase/schema.sql` ni `supabase/community.sql` por este cambio.
-- Las pruebas locales no verifican las credenciales reales, RLS, OAuth ni Storage del proyecto de producción.
+## Desplegar (Render + Supabase)
 
-## Guías
+1. **Supabase (una sola vez, antes del deploy)**: en el SQL Editor de un proyecto de *pruebas*,
+   ejecutá `supabase/migrations/2026-10-17_v41_posts_achievements_unread.sql`. Es aditiva y
+   re-ejecutable (no borra datos). Verificá con dos cuentas reales y recién después aplicala en
+   producción. No vuelvas a ejecutar `schema.sql` ni `community.sql`.
+2. **Render**: variables `GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL` y una clave pública
+   (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`). Nunca `service_role`/`sb_secret_`.
+3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v41-0`
+   y la app ofrece actualizar.
 
-- `ACTUALIZAR_DESDE_VERSION_ANTERIOR.txt`: instrucciones de despliegue.
-- `AUDITORIA_COMPLETA_FittForma_AI_v40_20.md`: alcance de las insignias y pendientes de producción.
-- `AUDITORIA_COMUNIDAD_FittForma_AI_v40_19.md`: alcance de la corrección de comunidad v40.19.
-- `ESTADO_Y_PENDIENTES.md`: estado acumulado del proyecto.
+## Documentación
+
+- `docs/INSIGNIAS.md` — reglas, umbrales y evidencia de las insignias.
+- `docs/PRUEBAS.md` — cómo correr las pruebas unitarias, SQL/RLS y E2E.
+- `ESTADO_Y_PENDIENTES.md` — estado y límites conocidos.
+- `CHANGELOG.md` — historial de versiones.
+- `SECURITY_REVIEW.md`, `GUIA_COMPLETA_PROYECTO.md`, `GUIA_DESDE_CERO.md`, `docs/auditorias/` — material de versiones anteriores.

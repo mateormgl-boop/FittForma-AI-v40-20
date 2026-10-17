@@ -6,14 +6,14 @@ import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=file=>readFile(path.join(root,file),'utf8');
 
-test('v40.21 usa claves foráneas explícitas para evitar el error PGRST201 en feed y comentarios',async()=>{
+test('v41.0 usa claves foráneas explícitas para evitar el error PGRST201 en feed y comentarios',async()=>{
  const js=await read('community.js');
  assert.match(js,/community_profiles!community_posts_user_id_fkey!inner\(/);
  assert.match(js,/community_profiles!community_comments_user_id_fkey\(/);
  assert.match(js,/PGRST201|community_posts_user_id_fkey/);
 });
 
-test('Comunidad v40.21 separa Feed, Explorar, Publicar, Mensajes y Mi perfil en paneles internos',async()=>{
+test('Comunidad v41.0 separa Feed, Explorar, Publicar, Mensajes y Mi perfil en paneles internos',async()=>{
  const html=await read('index.html'),js=await read('community.js');
  for(const name of ['feed','explore','publish','messages','profile']){
   assert.match(html,new RegExp(`data-community-tab="${name}"`));
@@ -33,11 +33,11 @@ test('feed search results render inside Explore and clearing the query does not 
  assert.match(js,/searchTerm='';if\(\$\('communitySearch'\)\)/);
 });
 
-test('version, backend and service-worker cache match v40.21',async()=>{
+test('version, backend and service-worker cache match v41.0',async()=>{
  const a=JSON.parse(await read('package.json')),b=JSON.parse(await read('backend/package.json'));
- assert.equal(a.version,'0.40.21');assert.equal(b.version,'0.40.21');
+ assert.equal(a.version,'0.41.0');assert.equal(b.version,'0.41.0');
  const server=await read('backend/server.mjs'),html=await read('index.html'),sw=await read('sw.js');
- assert.match(server,/0\.40\.21/);assert.match(html,/Versión 40\.21/);assert.match(sw,/fittforma-ai-static-v40-21/);
+ assert.match(server,/0\.41\.0/);assert.match(html,/Versión 41\.0/);assert.match(sw,/fittforma-ai-static-v41-0/);
 });
 
 test('la navegación y los títulos principales de Comunidad están traducidos en los seis idiomas',async()=>{
