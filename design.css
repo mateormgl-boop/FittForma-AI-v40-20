@@ -10,7 +10,7 @@
   --t-amber:#ffc66b;--t-amber-rgb:255 198 107;--t-red:#ff9d97;--t-red-rgb:255 157 151;--t-pink:#ff9ad6;--t-pink-rgb:255 154 214;
   --ff-page:#060b18;--ff-panel:#0d172e;--ff-panel-2:#13203d;--ff-border:rgba(120,150,220,.16);
   --ff-shadow:0 10px 30px rgba(0,0,0,.35);--ff-shadow-sm:0 4px 14px rgba(0,0,0,.28);
-  --ff-brand:linear-gradient(135deg,#2f6bff 0%,#6a4cf2 100%);--ff-brand-alt:linear-gradient(135deg,#19b8ff 0%,#6a4cf2 100%);
+  --ff-brand:linear-gradient(135deg,#2f5fe8 0%,#6a4cf2 100%);--ff-brand-alt:linear-gradient(135deg,#19b8ff 0%,#6a4cf2 100%);
   --ff-hero:linear-gradient(150deg,#101d45 0%,#1b1f5c 52%,#2a1666 100%);
   --mod:#3f6bff;--mod-2:#6a4cf2;--mod-ink:#9bb6ff;--mod-soft:rgba(63,107,255,.16);
   --ok:#22c993;--warn:#f5a524;--bad:#ff6b6b;
@@ -58,7 +58,7 @@ body{background:var(--ff-page)!important;color:var(--text)}
 ::selection{background:rgba(106,76,242,.32);color:inherit}
 
 /* ---------- Cabecera y marca ---------- */
-header{background:transparent!important;border:0!important;box-shadow:none!important}
+header{background:color-mix(in srgb,var(--ff-page) 88%,transparent)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:0!important;border-bottom:1px solid var(--ff-border)!important;box-shadow:none!important}
 .brand{gap:10px!important;color:var(--text)!important;font-weight:800!important;letter-spacing:-.02em!important;font-size:19px!important;text-transform:none!important}
 .brand-logo{filter:none!important;border-radius:0!important}
 .brand .brand-word b{color:#a996ff;font-weight:800}
@@ -104,13 +104,13 @@ a{color:var(--mod-ink)}
 .mobile-app-nav .mobile-nav-item{color:var(--text-3)!important;background:transparent!important}
 .mobile-app-nav .mobile-nav-item.active,.mobile-app-nav .mobile-nav-item[aria-current="page"]{color:var(--nav-c,#2f6bff)!important;background:color-mix(in srgb,var(--nav-c,#2f6bff) 12%,transparent)!important}
 .mobile-app-nav .mobile-nav-item.active:before{background:var(--nav-c,#2f6bff)!important}
-.mobile-nav-item[data-mobile-view="plan"],.tab[data-view="plan"]{--nav-c:#2f6bff}
-.mobile-nav-item[data-mobile-view="train"],.tab[data-view="train"]{--nav-c:#0b7fe8}
-.mobile-nav-item[data-mobile-view="nutrition"],.tab[data-view="nutrition"]{--nav-c:#0b8a59}
-.mobile-nav-item[data-mobile-view="progress"],.tab[data-view="progress"]{--nav-c:#6a4cf2}
-.mobile-nav-item[data-mobile-view="community"],.tab[data-view="community"]{--nav-c:#c02d86}
-.mobile-nav-item[data-mobile-view="profile"],.tab[data-view="profile"]{--nav-c:#4f46e5}
-.tab[data-view="coach"]{--nav-c:#6a4cf2}.tab[data-view="running"]{--nav-c:#0a8a77}
+.mobile-nav-item[data-mobile-view="plan"],.tab[data-view="plan"]{--nav-c:#2347c8}
+.mobile-nav-item[data-mobile-view="train"],.tab[data-view="train"]{--nav-c:#0a5fc0}
+.mobile-nav-item[data-mobile-view="nutrition"],.tab[data-view="nutrition"]{--nav-c:#08704a}
+.mobile-nav-item[data-mobile-view="progress"],.tab[data-view="progress"]{--nav-c:#5338d0}
+.mobile-nav-item[data-mobile-view="community"],.tab[data-view="community"]{--nav-c:#a3226f}
+.mobile-nav-item[data-mobile-view="profile"],.tab[data-view="profile"]{--nav-c:#3b33c4}
+.tab[data-view="coach"]{--nav-c:#5338d0}.tab[data-view="running"]{--nav-c:#07705f}
 :root:not([data-theme="light"]) .mobile-nav-item,:root:not([data-theme="light"]) .tab{--nav-c-l:1}
 :root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="plan"],:root:not([data-theme="light"]) .tab[data-view="plan"]{--nav-c:#7aa2ff}
 :root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="train"],:root:not([data-theme="light"]) .tab[data-view="train"]{--nav-c:#5cb8ff}
@@ -154,3 +154,134 @@ a{color:var(--mod-ink)}
 :root[data-theme="light"] .ff-medal.is-locked .ff-medal-shape{fill:#e6ebf5;stroke:#b7c2d8}
 :root[data-theme="light"] .ff-medal.is-locked .ff-medal-inner{stroke:#c4cde0}
 :root[data-theme="light"] .ff-medal.is-locked .ff-medal-glyph{stroke:#7a88a6}
+
+/* =================== INICIO =================== */
+#view-plan .home-top{position:relative;overflow:hidden;margin:0 0 14px!important;padding:20px 18px 22px!important;border-radius:24px!important;background:radial-gradient(420px 220px at 95% -20%,rgba(41,214,255,.35),transparent 60%),radial-gradient(360px 240px at -10% 120%,rgba(239,77,255,.28),transparent 60%),var(--ff-hero)!important;color:#fff!important;box-shadow:0 18px 40px -22px rgba(40,50,160,.8)!important}
+#view-plan .home-top h1{color:#fff!important;font-size:26px!important;letter-spacing:-.03em}
+#view-plan .home-top p{color:rgba(255,255,255,.82)!important}
+#view-plan .home-top .home-bell,#view-plan .home-top .home-avatar{background:rgba(255,255,255,.12)!important;border:1px solid rgba(255,255,255,.22)!important;color:#fff!important}
+#view-plan .home-top .home-avatar{box-shadow:none!important}
+/* Semana: píldoras con el día de hoy en degradado y los días con actividad marcados. */
+.home-week .home-day span{color:var(--text-3)!important;font-weight:700}
+.home-week .home-day i{background:var(--ff-panel)!important;border:1px solid var(--ff-border)!important;color:var(--text)!important;border-radius:14px!important;box-shadow:var(--ff-shadow-sm)!important}
+.home-week .home-day.done i{background:var(--mod-soft)!important;border-color:color-mix(in srgb,var(--mod) 45%,transparent)!important;color:var(--mod-ink)!important}
+.home-week .home-day.today i{background:var(--ff-brand)!important;color:#fff!important;border-color:transparent!important;box-shadow:0 8px 18px -8px #4b54f0!important}
+/* Indicadores de la semana con ícono por tipo. */
+.home-week-stats .ws{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;background:var(--ff-panel-2)!important;border:1px solid var(--ff-border)!important;border-radius:16px!important;padding:10px!important;text-align:left!important}
+.home-week-stats .ws svg{grid-row:1/3;width:30px;height:30px;padding:6px;border-radius:10px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.home-week-stats .ws small{color:var(--text-3)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-week-stats .ws strong{color:var(--text)!important;font-size:17px!important}
+.ws-train svg{color:#2f6bff;background:rgba(47,107,255,.13)}.ws-food svg{color:#0b8a59;background:rgba(18,166,110,.14)}
+.ws-water svg{color:#0a8fd0;background:rgba(10,143,208,.14)}.ws-active svg{color:#6a4cf2;background:rgba(106,76,242,.14)}
+:root:not([data-theme="light"]) .ws-train svg{color:#8cb4ff}:root:not([data-theme="light"]) .ws-food svg{color:#6fe0b0}:root:not([data-theme="light"]) .ws-water svg{color:#7fd3ff}:root:not([data-theme="light"]) .ws-active svg{color:#c3b5ff}
+@media(max-width:420px){.home-week-stats{grid-template-columns:repeat(2,1fr)!important}}
+/* Entrenamiento de hoy: foto con capa oscura y texto blanco en ambos temas (como la referencia). */
+#view-plan .home-hero{background:linear-gradient(100deg,rgba(6,10,28,.94) 0%,rgba(10,18,52,.78) 50%,rgba(20,20,70,.2) 100%),url(./assets/hero/gym-v20.webp) center/cover!important;border:0!important;box-shadow:0 18px 36px -22px rgba(20,30,90,.9)!important}
+#view-plan .home-hero small,#view-plan .home-hero h2,#view-plan .home-hero .home-meta span{color:#fff!important}
+#view-plan .home-hero small{color:#9ec0ff!important;font-weight:700}
+#view-plan .home-hero .home-meta{display:flex;flex-wrap:wrap;gap:6px}
+#view-plan .home-hero .home-meta span{display:inline-block;padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.14)!important;border:1px solid rgba(255,255,255,.22)!important;font-size:12.5px}
+/* Accesos rápidos: tarjeta clara con ícono en chip de color. */
+.home-tiles .home-tile{background:var(--ff-panel)!important;border:1px solid var(--ff-border)!important;box-shadow:var(--ff-shadow-sm)!important;border-radius:18px!important;color:var(--text)!important}
+.home-tiles .home-tile b{color:var(--text)!important}.home-tiles .home-tile span{color:var(--text-3)!important}
+.home-tiles .home-tile svg{width:38px!important;height:38px!important;padding:9px;border-radius:12px;background:color-mix(in srgb,var(--tc) 14%,transparent)!important;color:var(--tc)!important}
+.home-tile.t-blue{--tc:#2f6bff}.home-tile.t-green{--tc:#0b8a59}.home-tile.t-cyan{--tc:#0a8fd0}.home-tile.t-teal{--tc:#08786a}.home-tile.t-violet{--tc:#6a4cf2}.home-tile.t-amber{--tc:#b86a00}
+:root:not([data-theme="light"]) .home-tile.t-blue{--tc:#8cb4ff}:root:not([data-theme="light"]) .home-tile.t-green{--tc:#6fe0b0}:root:not([data-theme="light"]) .home-tile.t-cyan{--tc:#7fd3ff}:root:not([data-theme="light"]) .home-tile.t-teal{--tc:#6fe3d0}:root:not([data-theme="light"]) .home-tile.t-violet{--tc:#c3b5ff}:root:not([data-theme="light"]) .home-tile.t-amber{--tc:#ffc66b}
+/* Frase del día. */
+.home-quote{background:var(--ff-brand)!important;color:#fff!important;border:0!important;border-radius:20px!important}
+.home-quote p{color:#fff!important}
+/* Hábitos. */
+.home-habit{background:var(--ff-panel-2)!important;border:1px solid var(--ff-border)!important;color:var(--text)!important;border-radius:14px!important}
+.home-habit[aria-pressed="true"]{background:var(--mod-soft)!important;border-color:color-mix(in srgb,var(--mod) 45%,transparent)!important}
+.home-habit[aria-pressed="true"] .box{background:var(--mod)!important;color:#fff!important;border-color:var(--mod)!important}
+/* Actividad reciente. */
+.home-recent .home-card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.home-recent .home-card-head h3{margin:0;font-size:17px}
+.home-recent-list{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.recent-item{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--ff-border)}
+.recent-item:last-child{border-bottom:0}
+.recent-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;flex:none}
+.recent-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.recent-train .recent-icon{color:#2f6bff;background:rgba(47,107,255,.13)}.recent-run .recent-icon{color:#08786a;background:rgba(15,179,154,.15)}.recent-meal .recent-icon{color:#0b8a59;background:rgba(18,166,110,.14)}
+:root:not([data-theme="light"]) .recent-train .recent-icon{color:#8cb4ff}:root:not([data-theme="light"]) .recent-run .recent-icon{color:#6fe3d0}:root:not([data-theme="light"]) .recent-meal .recent-icon{color:#6fe0b0}
+.recent-copy{display:grid;min-width:0}.recent-copy strong{color:var(--text);font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.recent-copy small{color:var(--text-3);font-size:12.5px}
+.recent-empty{color:var(--text-3);font-size:13.5px;padding:8px 0}
+.link-btn{color:var(--mod-ink)!important;font-weight:700}
+/* Constancia. */
+.stats .stat{background:var(--ff-panel)!important;border:1px solid var(--ff-border)!important;box-shadow:var(--ff-shadow-sm)!important;border-radius:18px!important}
+.stats .stat strong{color:var(--mod-ink)!important}
+
+/* =================== ENTRENAR =================== */
+.section-head h2{font-size:24px!important;letter-spacing:-.03em}
+.section-head p{color:var(--text-3)!important}
+/* Plan actual: foto con capa oscura y texto blanco en ambos temas. */
+.plan-hero{background:linear-gradient(100deg,rgba(6,12,32,.94) 38%,rgba(10,30,80,.35)),url(./assets/exercises/deadlift.webp) center/cover!important;border:0!important;box-shadow:0 18px 36px -22px rgba(10,40,120,.85)!important;color:#fff!important}
+.plan-hero small{color:#9ec0ff!important;font-weight:700}.plan-hero strong,.plan-hero b,.plan-hero span{color:#fff!important}
+.plan-hero .plan-hero-bar{background:rgba(255,255,255,.18)!important}
+/* Biblioteca: grilla de fotos (2 columnas en móvil), nombre y grupo, ficha y favorito. */
+.library-mode{background:var(--ff-panel)!important;border:1px solid var(--ff-border)!important;color:var(--text-2)!important;border-radius:999px!important;box-shadow:var(--ff-shadow-sm)}
+.library-mode.active{background:linear-gradient(135deg,var(--mod),var(--mod-2))!important;color:#fff!important;border-color:transparent!important}
+#exerciseLibraryResults.exercise-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+@media(min-width:900px){#exerciseLibraryResults.exercise-library-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(min-width:1280px){#exerciseLibraryResults.exercise-library-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+.exercise-library-item{position:relative;background:var(--ff-panel)!important;border:1px solid var(--ff-border)!important;border-radius:18px!important;box-shadow:var(--ff-shadow-sm)!important;padding:0!important;display:flex!important;flex-direction:column!important;grid-template-columns:none!important}
+.exercise-library-item .exercise-photo{width:100%!important;height:auto!important;aspect-ratio:4/3;border-radius:0!important;border:0!important}
+.exercise-library-item .exercise-photo img{width:100%;height:100%;object-fit:cover}
+.exercise-library-copy{display:flex;flex-direction:column;gap:6px;padding:10px 11px 12px!important;flex:1}
+.exercise-library-copy strong{font-size:14px;line-height:1.25;color:var(--text)}
+.exercise-library-copy .tag{align-self:flex-start;font-size:11px!important;padding:3px 8px!important}
+.exercise-library-copy p.muted{font-size:12px!important;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:0}
+.exercise-library-item .exercise-progress-cue{display:none!important}
+.exercise-library-item .exercise-card-actions{margin-top:auto;display:flex;gap:6px}
+.exercise-library-item .exercise-card-actions .btn:not(.favorite-toggle){flex:1;min-height:38px;padding:6px 8px!important;font-size:12.5px!important}
+.exercise-library-item .favorite-toggle{position:absolute;top:8px;right:8px;width:36px;height:36px;min-height:0!important;padding:0!important;border-radius:999px!important;background:rgba(6,12,32,.72)!important;color:#fff!important;border:1px solid rgba(255,255,255,.35)!important;backdrop-filter:blur(6px)}
+.exercise-library-item .favorite-toggle[aria-pressed="true"]{color:#ffd166!important}
+.exercise-photo .exercise-photo-label,.exercise-photo span{font-size:10.5px}
+/* Inicio de sesión y sesión activa. */
+.train-start-card,.workout-card,.active-session{border-radius:20px!important}
+.library-card{background:transparent!important;border:0!important;box-shadow:none!important}
+
+/* Calendario de la semana (Rutinas): el día de hoy con el color del módulo. */
+.calendar-day{background:var(--ff-panel)!important;border:1px solid var(--ff-border)!important}
+.calendar-day.today,.calendar-day.active{background:linear-gradient(145deg,var(--mod),var(--mod-2))!important;border-color:transparent!important;box-shadow:none!important}
+.calendar-day.today *,.calendar-day.active *{color:#fff!important}
+
+/* =================== NUTRICIÓN =================== */
+.nutri-ring .fg{stroke:url(#ffGradNutri)!important}
+.home-ring .fg#homeWeekArc{stroke:url(#ffGradBrand)!important}
+.nutri-ring b{color:var(--text)}
+/* Macros con color propio y punto de color, como en la referencia. */
+.macro-progress-label span{display:inline-flex;align-items:center;gap:7px;color:var(--text-2)!important;font-weight:600}
+.macro-progress-label span:before{content:"";width:9px;height:9px;border-radius:50%;background:var(--mc)}
+.macro-progress>div:nth-child(1){--mc:#12b981}.macro-progress>div:nth-child(2){--mc:#2f6bff}.macro-progress>div:nth-child(3){--mc:#f59e0b}
+.macro-progress .progressbar span{background:var(--mc)!important}
+/* Comidas: filas con miniatura, kcal y acciones compactas. */
+.meal-group{background:var(--ff-panel-2);border:1px solid var(--ff-border);border-radius:18px;padding:10px 12px;margin:10px 0}
+.meal-group-head{display:flex;justify-content:space-between;align-items:center}
+.meal-group-head strong{text-transform:capitalize}
+.meal-group-head strong{color:var(--text)}.meal-group-head span{color:var(--mod-ink);font-weight:800}
+.meal-item{background:var(--ff-panel)!important;border:1px solid var(--ff-border)!important;border-radius:16px!important;padding:10px!important;margin-top:8px;box-shadow:var(--ff-shadow-sm)}
+.meal-thumb{border-radius:14px!important;background:var(--mod-soft)}
+.meal-item-copy small{color:var(--text-3)!important}
+.meal-list-actions .btn{min-height:34px!important;padding:4px 12px!important;font-size:12.5px!important}
+/* Hidratación y metas. */
+#view-nutrition .nutri-hero{background:var(--ff-panel)!important}
+input[type=file]{color:var(--text-2);font-size:13px}
+input[type=file]::file-selector-button{margin-right:10px;padding:8px 14px;border-radius:999px;border:1.5px solid color-mix(in srgb,var(--mod) 55%,transparent);background:var(--mod-soft);color:var(--mod-ink);font-weight:700;cursor:pointer}
+/* Análisis de comida con IA: acción destacada con el degradado de FittAI. */
+#analyzeMealPhoto{background:linear-gradient(135deg,#0a7a50,#2a63d8 55%,#5a3ed6)!important;color:#fff!important;border:0!important;box-shadow:0 10px 22px -12px #3d48d8!important}
+
+/* =================== PROGRESO =================== */
+#weightChart{--wc-c:#2f6bff}
+:root:not([data-theme="light"]) #weightChart{--wc-c:#5aa2ff}
+#weightChart svg{width:100%;height:150px;display:block;margin-top:6px}
+.wc-summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.wc-summary strong{font-size:28px;letter-spacing:-.03em;color:var(--text)}.wc-summary strong small{font-size:15px;color:var(--text-3)}
+.wc-delta{font-weight:800;font-size:13px;padding:3px 10px;border-radius:999px;background:var(--mod-soft);color:var(--mod-ink)}
+.wc-range{flex-basis:100%;font-size:12px;color:var(--text-3)}
+.wc-grid{stroke:rgb(var(--ink-rgb) / .1);stroke-dasharray:4 6}
+.wc-line{stroke:var(--wc-c);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.wc-dot{fill:var(--ff-panel);stroke:var(--wc-c);stroke-width:3}
+.wc-axis{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-3);margin-top:4px}
+/* Fichas de variación y retos con el color del módulo. */
+.challenge-card,.progress-insight-metric,.progress-record-item{background:var(--ff-panel-2)!important;border:1px solid var(--ff-border)!important}
