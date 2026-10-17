@@ -1,0 +1,215 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
+import net from 'node:net';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+async function unusedPort() {
+  const server = net.createServer();
+  await new Promise((resolve, reject) => server.listen(0, '127.0.0.1', resolve).once('error', reject));
+  const { port } = server.address();
+  await new Promise(resolve => server.close(resolve));
+  return port;
+}
+
+test('el backend rechaza una variable PORT inválida con un mensaje claro', async () => {
+  const child = spawn(process.execPath, ['backend/server.mjs'], {
+    cwd: root,
+    env: { ...process.env, PORT: 'puerto-invalido', GEMINI_API_KEY: '' },
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  let output = '';
+  child.stdout.on('data', chunk => { output += chunk.toString(); });
+  child.stderr.on('data', chunk => { output += chunk.toString(); });
+  const exitCode = await new Promise(resolve => child.once('exit', resolve));
+  assert.notEqual(exitCode, 0, 'El backend no debe iniciar con un puerto inválido');
+  assert.match(output, /PORT debe ser un entero entre 0 y 65535/);
+});
+
+test('pruebas de integración HTTP del backend', async t => {
+  const port = await unusedPort();
+  const base = `http://127.0.0.1:${port}`;
+  const child = spawn(process.execPath, ['backend/server.mjs'], {
+    cwd: root,
+    env: { ...process.env, PORT: String(port), GEMINI_API_KEY: '', TRUST_RENDER_CLIENT_IP: 'true' },
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  let output = '';
+  child.stdout.on('data', chunk => { output += chunk.toString(); });
+  child.stderr.on('data', chunk => { output += chunk.toString(); });
+
+  async function waitForServer() {
+    const deadline = Date.now() + 7000;
+    while (Date.now() < deadline) {
+      if (child.exitCode !== null) throw new Error(`El backend terminó al iniciar. ${output}`);
+      try {
+        const response = await fetch(`${base}/healthz`);
+        if (response.ok) return;
+      } catch {}
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    throw new Error(`El backend no respondió a tiempo. ${output}`);
+  }
+
+  try {
+    await waitForServer();
+
+    await t.test('responde en salud, página principal y estado de IA', async () => {
+      const health = await fetch(`${base}/healthz`);
+      assert.equal(health.status, 200);
+      assert.deepEqual(await health.json(), { ok: true, service: 'fittforma-ai' });
+
+      const home = await fetch(`${base}/`);
+      assert.equal(home.status, 200);
+      assert.match(home.headers.get('content-type') || '', /text\/html/);
+      const html = await home.text();
+      assert.match(html, /FittForma AI/);
+      assert.match(html, /Versión 40\.2/);
+      assert.match(html, /workoutAutosaveStatus/);
+
+      const status = await fetch(`${base}/api/status`);
+      assert.equal(status.status, 200);
+      const payload = await status.json();
+      assert.equal(payload.frontendAvailable, true);
+      assert.equal(payload.configured, false);
+      assert.equal(payload.mode, 'demo');
+    });
+
+    await t.test('sirve el módulo de comunidad incluido en la lista pública permitida', async () => {
+      const response = await fetch(`${base}/community.js`);
+      assert.equal(response.status, 200);
+      assert.match(response.headers.get('content-type') || '', /javascript/);
+      assert.match(await response.text(), /FittFormaCommunity/);
+    });
+
+    await t.test('sirve las ilustraciones con el tipo de contenido correcto', async () => {
+      const response = await fetch(`${base}/assets/exercises/generated/press-de-banca-con-barra.svg`);
+      assert.equal(response.status, 200);
+      assert.match(response.headers.get('content-type') || '', /image\/svg\+xml/);
+      assert.match(await response.text(), /<svg/);
+    });
+
+    await t.test('rechaza métodos, orígenes cruzados y archivos internos', async () => {
+      const method = await fetch(`${base}/`, { method: 'PUT' });
+      assert.equal(method.status, 405);
+
+      const origin = await fetch(`${base}/api/coach`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Origin: 'https://evil.example' },
+        body: JSON.stringify({ message: 'hola' })
+      });
+      assert.equal(origin.status, 403);
+
+      const internal = await fetch(`${base}/backend/server.mjs`);
+      assert.equal(internal.status, 404);
+    });
+
+
+    await t.test('aplica cabeceras de seguridad y permite recursos requeridos', async () => {
+      const home = await fetch(`${base}/`);
+      assert.equal(home.status, 200);
+      assert.match(home.headers.get('content-security-policy') || '', /default-src 'self'/);
+      assert.match(home.headers.get('content-security-policy') || '', /frame-ancestors 'none'/);
+      assert.equal(home.headers.get('x-content-type-options'), 'nosniff');
+      assert.equal(home.headers.get('x-frame-options'), 'DENY');
+      assert.equal(home.headers.get('cross-origin-opener-policy'), 'same-origin');
+      assert.equal(home.headers.get('x-dns-prefetch-control'), 'off');
+      const js = await fetch(`${base}/membership-config.js`);
+      assert.equal(js.status, 200);
+      assert.match(js.headers.get('content-type') || '', /javascript/);
+      const head = await fetch(`${base}/icon.svg`, { method: 'HEAD' });
+      assert.equal(head.status, 200);
+      assert.equal(await head.text(), '');
+    });
+
+    await t.test('no expone archivos internos, paquetes, documentación ni pruebas', async () => {
+      for (const pathname of [
+        '/package.json', '/README.md', '/CHANGELOG.md', '/render.yaml',
+        '/.gitignore', '/tests/runtime.test.mjs', '/supabase/schema.sql',
+        '/supabase-config.example.js', '/backend/server.mjs',
+        '/assets/../package.json', '/assets/README.md'
+      ]) {
+        const response = await fetch(`${base}${pathname}`);
+        assert.equal(response.status, 404, `${pathname} no debería ser público`);
+      }
+    });
+
+    await t.test('valida que el cuerpo JSON sea un objeto y limita bytes reales', async () => {
+      const nullBody = await fetch(`${base}/api/coach`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: 'null'
+      });
+      assert.equal(nullBody.status, 400);
+      assert.match((await nullBody.json()).error, /objeto JSON/);
+
+      const arrayBody = await fetch(`${base}/api/coach`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '[]'
+      });
+      assert.equal(arrayBody.status, 400);
+
+      const badJson = await fetch(`${base}/api/coach`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{'
+      });
+      assert.equal(badJson.status, 400);
+
+      const unicode = JSON.stringify({ message: 'á'.repeat(7000) });
+      const tooLargeBytes = await fetch(`${base}/api/coach`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: unicode
+      });
+      assert.equal(tooLargeBytes.status, 413);
+
+      const mediaType = await fetch(`${base}/api/coach`, {
+        method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: '{}'
+      });
+      assert.equal(mediaType.status, 415);
+    });
+
+    await t.test('los errores también conservan cabeceras y no filtran archivos por rutas codificadas', async () => {
+      const missing = await fetch(`${base}/not-a-real-file`);
+      assert.equal(missing.status, 404);
+      assert.equal(missing.headers.get('x-content-type-options'), 'nosniff');
+      assert.match(missing.headers.get('content-security-policy') || '', /object-src 'none'/);
+
+      for (const pathname of ['/%2e%2e/package.json', '/%2E%2E/README.md', '/supabase/%2e%2e/%2e%2e/package.json']) {
+        const response = await fetch(`${base}${pathname}`);
+        assert.notEqual(response.status, 200, `${pathname} no debería revelar archivos`);
+      }
+    });
+
+    await t.test('el límite de la IA separa clientes detrás del proxy de Render y aplica el umbral por IP', async () => {
+      for (let i = 1; i <= 13; i++) {
+        const response = await fetch(`${base}/api/coach`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'CF-Ray': `test-${i}`, 'X-Forwarded-For': `198.51.100.${i}` },
+          body: JSON.stringify({ message: 'hola' })
+        });
+        assert.equal(response.status, 503, `La IP independiente ${i} no debería consumir la cuota de otra IP`);
+      }
+      const statuses = [];
+      for (let i = 1; i <= 13; i++) {
+        const response = await fetch(`${base}/api/coach`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'CF-Ray': `repeat-${i}`, 'X-Forwarded-For': '198.51.100.200' },
+          body: JSON.stringify({ message: 'hola' })
+        });
+        statuses.push(response.status);
+      }
+      assert.deepEqual(statuses.slice(0, 12), Array(12).fill(503));
+      assert.equal(statuses[12], 429);
+    });
+
+    await t.test('la IA devuelve un error controlado si falta la clave', async () => {
+      const response = await fetch(`${base}/api/coach`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'Ayudame a entrenar' })
+      });
+      assert.equal(response.status, 503);
+      assert.match((await response.json()).error, /GEMINI_API_KEY/);
+    });
+  } finally {
+    child.kill('SIGTERM');
+  }
+});

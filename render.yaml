@@ -1,0 +1,16 @@
+services:
+  - type: web
+    # Se conserva el nombre existente para no arriesgar el dominio de Render ya desplegado.
+    name: fittforma-ai-v19-final
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.8-flash
+      - key: TRUST_RENDER_CLIENT_IP
+        value: "true"
