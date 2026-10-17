@@ -1,4 +1,4 @@
-# FittForma AI — v42.0
+# FittForma AI — v42.1
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
@@ -48,7 +48,7 @@ Integración entre secciones en navegador (con `npm start` en otra terminal): `n
    producción. No vuelvas a ejecutar `schema.sql` ni `community.sql`.
 2. **Render**: variables `GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL` y una clave pública
    (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`). Nunca `service_role`/`sb_secret_`.
-3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v42-0`
+3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v42-1`
    y la app ofrece actualizar.
 
 ## Documentación
