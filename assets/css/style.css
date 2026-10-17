@@ -1744,6 +1744,169 @@ header{
   .rank-badge::after{animation:none}
 }
 
+/* ===================== Etapa D — Pantallas principales ===================== */
+
+/* —— Inicio / Plan —— */
+.plan-hero-summary{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin:16px 0 20px;
+}
+.plan-summary-card{
+  padding:18px;
+  border-radius:18px;
+  background:linear-gradient(145deg,rgba(18,30,49,.98),rgba(10,18,31,.98));
+  border:1px solid rgba(101,139,190,.22);
+  box-shadow:0 10px 26px rgba(0,0,0,.12);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.plan-summary-card.big{grid-column:1/-1}
+.plan-summary-card .eyebrow{font-size:10px;letter-spacing:1.4px;color:#83b6ff;font-weight:800;text-transform:uppercase;margin-bottom:2px;display:block}
+.plan-summary-card h3{margin:0;font-size:15px;letter-spacing:-.3px;color:var(--text-strong)}
+.plan-summary-card .value{font-size:28px;font-weight:900;letter-spacing:-1px;color:var(--text-strong)}
+.plan-summary-card .sub{font-size:12px;color:var(--muted)}
+.plan-summary-card .progress-track{width:100%;height:7px;background:#050913;border:1px solid #1d2e45;border-radius:999px;overflow:hidden;margin-top:6px}
+.plan-summary-card .progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--mint));width:0%;transition:width .6s ease;box-shadow:0 0 12px rgba(79,140,255,.35)}
+
+/* Dashboard actions mejoradas */
+.dashboard-action{
+  position:relative;
+  overflow:hidden;
+}
+.dashboard-action::after{
+  content:"";
+  position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.04),transparent 70%);
+  opacity:0;transition:opacity .18s ease;pointer-events:none;
+}
+.dashboard-action:hover::after{opacity:1}
+
+/* Entrenador IA — burbujas más claras */
+.chat-log{padding:14px}
+.bubble{word-wrap:break-word}
+.quick-prompts .btn{font-size:12px;padding:9px 12px;border-radius:10px}
+.proposal{
+  border-left:4px solid var(--accent);
+  background:linear-gradient(145deg,rgba(15,40,72,.9),rgba(10,28,53,.9));
+}
+
+/* —— Entrenar —— */
+.train-session-card{
+  padding:0;border-radius:20px;overflow:hidden;background:#0c1424;border:1px solid var(--line);
+}
+.train-session-head{
+  padding:18px 20px 14px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);
+}
+.train-session-head h2{margin:0;font-size:20px;letter-spacing:-.5px;color:var(--text-strong)}
+.train-session-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.train-exercise{
+  padding:16px 20px;border-bottom:1px solid rgba(54,76,109,.4);
+  display:flex;align-items:flex-start;gap:14px;
+}
+.train-exercise:last-child{border-bottom:0}
+.train-exercise-visual{
+  width:48px;height:48px;border-radius:14px;flex:0 0 48px;
+  background:linear-gradient(145deg,#1a3d6a,#0d1a2e);border:1px solid #34598a;
+  display:grid;place-items:center;color:#8bb8ff;font-size:20px;
+}
+.train-exercise-copy{flex:1;min-width:0}
+.train-exercise-copy h3{margin:0 0 3px;font-size:15px;color:var(--text-strong)}
+.train-exercise-copy .muted{font-size:12px;color:var(--muted);margin-bottom:6px;display:block}
+.train-sets{
+  display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;
+}
+.train-set{
+  display:flex;align-items:center;gap:8px;
+  background:#080f1b;border:1px solid #2a3e5a;border-radius:10px;padding:8px 10px;
+}
+.train-set input{
+  width:56px;background:#050913;border:1px solid #1d2e45;border-radius:8px;color:var(--text);
+  padding:6px 8px;font-size:13px;text-align:center;
+}
+.train-set span{font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap}
+.train-set-check{
+  width:22px;height:22px;border-radius:8px;border:2px solid var(--line);background:#050913;
+  display:grid;place-items:center;color:var(--accent);cursor:pointer;flex:0 0 22px;
+}
+.train-set-check.done{border-color:var(--mint);background:var(--mint);color:#06182a}
+.train-rest{margin-top:10px;padding:10px 12px;border-radius:12px;background:#101e34;border:1px solid #2a4365}
+.train-rest strong{display:block;font-size:15px;font-variant-numeric:tabular-nums;color:var(--text-strong)}
+.train-rest small{color:var(--muted);font-size:12px}
+
+/* —— Progreso —— */
+.progress-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin:16px 0;
+}
+.progress-metric-card{
+  padding:18px;border-radius:18px;background:linear-gradient(145deg,rgba(18,30,49,.98),rgba(10,18,31,.98));
+  border:1px solid rgba(101,139,190,.22);display:flex;flex-direction:column;gap:8px;
+}
+.progress-metric-card .eyebrow{font-size:10px;letter-spacing:1.4px;color:#83b6ff;font-weight:800;text-transform:uppercase;display:block;margin-bottom:2px}
+.progress-metric-card .value{font-size:30px;font-weight:900;letter-spacing:-1.2px;color:var(--text-strong)}
+.progress-metric-card .sub{font-size:12px;color:var(--muted);line-height:1.4}
+.progress-metric-card .spark{margin-top:8px;height:10px;background:#050913;border:1px solid #1d2e45;border-radius:999px;overflow:hidden}
+.progress-metric-card .spark-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#22c55e,#72f0c2);width:65%;transition:width .6s ease}
+@media(max-width:560px){.progress-grid{grid-template-columns:1fr}}
+
+/* Récords personales visuales */
+.records-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px;
+}
+.record-card{
+  padding:14px 16px;border-radius:16px;border:1px solid var(--line);
+  background:linear-gradient(145deg,rgba(18,30,49,.95),rgba(10,18,31,.95));
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+.record-card .info strong{display:block;font-size:14px;color:var(--text-strong)}
+.record-card .info small{color:var(--muted);font-size:11px;line-height:1.4}
+.record-card .badge{
+  font-size:11px;font-weight:900;padding:6px 10px;border-radius:999px;background:rgba(79,140,255,.12);
+  color:var(--accent);border:1px solid rgba(79,140,255,.24);white-space:nowrap;
+}
+.record-card .badge.pr{background:rgba(114,240,194,.14);color:var(--mint);border-color:rgba(114,240,194,.24)}
+@media(max-width:560px){.records-grid{grid-template-columns:1fr}}
+
+/* —— Perfil —— */
+.profile-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px;
+}
+.profile-stat{
+  padding:16px;border-radius:16px;border:1px solid var(--line);
+  background:linear-gradient(145deg,rgba(18,30,49,.95),rgba(10,18,31,.95));
+  display:flex;flex-direction:column;gap:6px;
+}
+.profile-stat .eyebrow{font-size:10px;letter-spacing:1.4px;color:#83b6ff;font-weight:800;text-transform:uppercase;display:block}
+.profile-stat .value{font-size:24px;font-weight:900;color:var(--text-strong)}
+.profile-stat .sub{font-size:11px;color:var(--muted)}
+@media(max-width:560px){.profile-grid{grid-template-columns:1fr}}
+
+.membership-upgrade{
+  margin-top:16px;padding:20px;border-radius:20px;
+  background:linear-gradient(135deg,#f5d98a,#e8a83c);color:#1c2230;
+  text-align:center;box-shadow:0 12px 30px rgba(245,217,138,.25);
+}
+.membership-upgrade h3{margin:0 0 8px;font-size:18px;font-weight:900}
+.membership-upgrade p{margin:0;font-size:13px;line-height:1.6;opacity:.9}
+.membership-upgrade .btn{margin-top:12px;color:#1c2230}
+
+/* —— Estados vacíos mejorados —— */
+.empty{border-style:solid;border-color:rgba(101,139,190,.18);background:rgba(12,21,35,.25)}
+.empty .emoji{font-size:48px;margin-bottom:12px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.3))}
+
+/* —— Notices más visibles —— */
+.notice{border-left:4px solid var(--accent);padding:16px 18px}
+
+/* Footer más separado en móvil */
+@media(max-width:760px){
+  .footer{padding:30px 8px calc(12px + env(safe-area-inset-bottom))}
+}
+
 /* ===================== Footer ===================== */
 .footer{
   text-align:center;
