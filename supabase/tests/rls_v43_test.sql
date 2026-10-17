@@ -29,7 +29,7 @@ select t.expect_error($q$update public.community_reports set reason='otra' where
 select t.expect_rows($q$update public.community_reports set status='dismissed' where post_id='f0000000-0000-0000-0000-0000000000f1'$q$,1,'Moderador descarta');
 select t.expect_count($q$select 1 from public.community_reports where status='dismissed' and resolved_by='dddddddd-0000-0000-0000-000000000004' and resolved_at is not null$q$,1,'Queda registrado quién resolvió');
 select t.expect_rows($q$delete from public.community_posts where id='f0000000-0000-0000-0000-0000000000f1'$q$,1,'Moderador elimina el post');
-select t.expect_count($q$select 1 from public.community_reports where post_id='f0000000-0000-0000-0000-0000000000f1'$q$,0,'La denuncia desaparece con el post');
+select t.expect_count($q$select 1 from public.community_reports where reason='spam' and post_id is null$q$,1,'La denuncia se conserva sin el post (v44)');
 -- Eliminar cuenta
 reset role; set role anon; select t.as_user(null);
 select t.expect_error($q$select public.delete_my_account()$q$,'Anónimo no elimina cuentas');

@@ -18,7 +18,7 @@ const root=rootCandidates.find(candidate=>existsSync(path.join(candidate,'index.
 const rawPort=String(process.env.PORT||'8787');
 const port=Number(rawPort);
 if(!Number.isInteger(port)||port<0||port>65535)throw new Error(`PORT debe ser un entero entre 0 y 65535; se recibió ${JSON.stringify(rawPort)}.`);
-const appVersion='0.43.0';
+const appVersion='0.44.0';
 const apiKey=String(process.env.GEMINI_API_KEY||'').trim(), model=String(process.env.GEMINI_MODEL||'gemini-3.8-flash').trim()||'gemini-3.8-flash';
 const trustRenderClientIp=String(process.env.TRUST_RENDER_CLIENT_IP||'').toLowerCase()==='true';
 // If the primary model temporarily returns 503, try a lighter official model automatically.
@@ -110,8 +110,9 @@ const CSP=[
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com",
-  "style-src 'self' 'unsafe-inline' https://unpkg.com",
+  // Solo las versiones exactas de supabase-js y Leaflet que usa la app (además con integridad SRI en el HTML).
+  "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/ https://unpkg.com/@supabase/supabase-js@2.45.4/ https://unpkg.com/leaflet@1.9.4/",
+  "style-src 'self' 'unsafe-inline' https://unpkg.com/leaflet@1.9.4/",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https:",
   "connect-src 'self' https://generativelanguage.googleapis.com https://world.openfoodfacts.org https://*.supabase.co wss://*.supabase.co",
@@ -145,8 +146,7 @@ function rateLimitClientKey(req){
   if(trustRenderClientIp&&req.headers['cf-ray']){
     const cloudflareIp=String(req.headers['cf-connecting-ip']||'').trim();
     if(isIP(cloudflareIp))return `ip:${cloudflareIp}`;
-    const forwarded=String(req.headers['x-forwarded-for']||'').split(',')[0].trim();
-    if(isIP(forwarded))return `ip:${forwarded}`;
+    // No se usa X-Forwarded-For: su primer valor lo controla el cliente.
   }
   return `socket:${req.socket.remoteAddress||'unknown'}`;
 }
@@ -230,10 +230,44 @@ function sanitizeTrainingContext(body){
   const badges=Array.isArray(body.badges)?body.badges.slice(0,10).map(b=>({name:cleanText(b?.name,72),rank:cleanText(b?.rank,40)})):[];
   return {recentSessions:sessions,recentActivities:activities,recentWeights:weights,nutrition,ownRoutines:routines,badges};
 }
+// Solo los campos del perfil y del plan que el entrenador necesita (nunca la foto de perfil u otros datos).
+function sanitizeCoachProfile(p){
+  if(!isJsonObject(p))return {};
+  const out={};
+  for(const k of ['goal','level','days','equipment','duration','activityLevel','sex'])if(p[k]!==undefined)out[k]=cleanText(String(p[k]),24);
+  for(const [k,max] of [['age',120],['heightCm',250],['currentWeightKg',350],['targetWeightKg',350]]){const n=Number(p[k]);if(Number.isFinite(n)&&n>0)out[k]=Math.min(max,n);}
+  return out;
+}
+function sanitizeCoachGoals(g){
+  if(!isJsonObject(g))return {};
+  const out={};
+  for(const [k,max] of [['calories',10000],['protein',500],['carbs',1500],['fat',500],['water',40]]){const n=Number(g[k]);if(Number.isFinite(n)&&n>=0)out[k]=Math.min(max,Math.round(n));}
+  return out;
+}
+function sanitizeCoachPlan(plan){
+  if(!isJsonObject(plan)||!Array.isArray(plan.days))return null;
+  return {days:plan.days.slice(0,7).map(d=>({title:cleanText(d?.title,60),exercises:Array.isArray(d?.exercises)?d.exercises.slice(0,12).map(e=>({name:cleanText(e?.name,72),sets:cleanText(String(e?.sets??''),8),reps:cleanText(String(e?.reps??''),12)})):[]}))};
+}
+// Presupuesto diario de consultas a Gemini (por cliente y total) para que el endpoint no sea un LLM gratuito abierto.
+const DAILY_PER_CLIENT=Math.max(1,Number(process.env.GEMINI_DAILY_PER_CLIENT)||150);
+const DAILY_TOTAL=Math.max(1,Number(process.env.GEMINI_DAILY_LIMIT)||2000);
+let dailyBudget={day:'',total:0,clients:new Map()};
+function overDailyBudget(req){
+  const day=new Date().toISOString().slice(0,10);
+  if(dailyBudget.day!==day)dailyBudget={day,total:0,clients:new Map()};
+  const key=rateLimitClientKey(req),used=dailyBudget.clients.get(key)||0;
+  if(dailyBudget.total>=DAILY_TOTAL||used>=DAILY_PER_CLIENT)return true;
+  if(dailyBudget.clients.size>=MAX_TRACKED_CLIENTS*4)dailyBudget.clients.delete(dailyBudget.clients.keys().next().value);
+  dailyBudget.clients.set(key,used+1);dailyBudget.total++;return false;
+}
+// Los navegadores envían Origin (o al menos Sec-Fetch-Site) en un POST; sin ninguno de los dos se rechaza.
+function sameOriginPost(req){
+  if(req.headers.origin){try{return new URL(req.headers.origin).host===String(req.headers.host||'');}catch{return false;}}
+  return String(req.headers['sec-fetch-site']||'')==='same-origin';
+}
 const server=http.createServer(async(req,res)=>{try{
   const url=new URL(req.url,'http://localhost');
-  // Reject browser POSTs from a different origin; requests without Origin (e.g. local health tooling) remain possible.
-  if(req.method==='POST'&&req.headers.origin){try{if(new URL(req.headers.origin).host!==String(req.headers.host||''))return send(req,res,403,{error:'Origen no permitido.'});}catch{return send(req,res,403,{error:'Origen no válido.'});}}
+  if(req.method==='POST'&&!sameOriginPost(req))return send(req,res,403,{error:'Origen no permitido.'});
   if(!['GET','POST','HEAD'].includes(req.method))return send(req,res,405,{error:'Método no permitido.'});
   if(req.method==='POST'&&String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase()!=='application/json')return send(req,res,415,{error:'El servidor espera JSON.'});
   if(req.method==='GET'&&url.pathname==='/api/public-config'){
@@ -256,6 +290,7 @@ const server=http.createServer(async(req,res)=>{try{
     let body;try{body=await readBody(req,4_000_000);}catch(e){return send(req,res,e.message==='too_large'?413:400,{error:e.message==='too_large'?'La imagen es demasiado grande. Elegí una foto más liviana.':'Solicitud de imagen inválida.'});}
     if(!isJsonObject(body))return send(req,res,400,{error:'La solicitud de imagen debe ser un objeto JSON.'});
     if(!apiKey)return send(req,res,503,{error:'La estimación por foto necesita configurar GEMINI_API_KEY en el servidor.'});
+    if(overDailyBudget(req))return send(req,res,429,{error:'Se alcanzó el límite diario de consultas a la IA. Probá mañana.'});
     if(typeof body.image!=='string'||body.image.length>3_600_000||!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(body.image))return send(req,res,400,{error:'La imagen debe ser JPG, PNG o WebP y pesar menos de aproximadamente 2,5 MB después de comprimir.'});
     const localeNames={es:'español',en:'English',pt:'portugués',fr:'francés',it:'italiano',de:'alemán'};
     const responseLanguage=localeNames[['es','en','pt','fr','it','de'].includes(body.language)?body.language:'es'];
@@ -270,9 +305,10 @@ const server=http.createServer(async(req,res)=>{try{
     if(!isJsonObject(body))return send(req,res,400,{error:'La solicitud debe ser un objeto JSON.'});
     if(typeof body.message!=='string'||!body.message.trim()||body.message.length>500)return send(req,res,400,{error:'El mensaje debe tener entre 1 y 500 caracteres.'});
     if(!apiKey)return send(req,res,503,{error:'Falta configurar GEMINI_API_KEY en el servidor.'});
+    if(overDailyBudget(req))return send(req,res,429,{error:'Se alcanzó el límite diario de consultas a la IA. Probá mañana.'});
     const shareData=body.shareData!==false;
     const training=shareData?sanitizeTrainingContext(body):{};
-    const context=!shareData?{note:'La persona eligió no compartir sus registros. No asumas datos personales; si hacen falta, pedíselos.'}:{profile:isJsonObject(body.profile)?body.profile:{},goals:isJsonObject(body.goals)?body.goals:{},plan:isJsonObject(body.plan)?body.plan:null,...training,availableEquipment:body.profile?.equipment||'gym',note:'La rutina se genera desde una biblioteca local curada; proponé cambios realistas y respetá el equipamiento indicado. El historial recibido es solo contexto enviado por el usuario; no lo guardes ni asumas que está completo.'};
+    const context=!shareData?{note:'La persona eligió no compartir sus registros. No asumas datos personales; si hacen falta, pedíselos.'}:{profile:sanitizeCoachProfile(body.profile),goals:sanitizeCoachGoals(body.goals),plan:sanitizeCoachPlan(body.plan),...training,availableEquipment:cleanText(String(body.profile?.equipment||'gym'),24),note:'La rutina se genera desde una biblioteca local curada; proponé cambios realistas y respetá el equipamiento indicado. El historial recibido es solo contexto enviado por el usuario; no lo guardes ni asumas que está completo.'};
     const history=sanitizeHistory(body.history);
     const localeNames={es:'español rioplatense/uruguayo',en:'English',pt:'portugués',fr:'francés',it:'italiano',de:'alemán'};
     const responseLanguage=localeNames[['es','en','pt','fr','it','de'].includes(body.language)?body.language:'es'];

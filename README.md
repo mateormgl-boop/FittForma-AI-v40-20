@@ -1,8 +1,12 @@
-# FittForma AI — v43.0
+# FittForma AI — v44.0
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v44.0
+
+- Etapa 6, seguridad y datos: correcciones en la base, el servidor y la app. Detalle en `docs/SEGURIDAD_v44.md`.
 
 ## Novedades v43.0
 
@@ -53,17 +57,19 @@ Integración entre secciones en navegador (con `npm start` en otra terminal): `n
    ejecutá `supabase/migrations/2026-10-17_v41_posts_achievements_unread.sql`. Es aditiva y
    re-ejecutable (no borra datos). Verificá con dos cuentas reales y recién después aplicala en
    producción. Después ejecutá `supabase/migrations/2026-10-18_v43_moderation_account_deletion.sql`
-   (v43: moderación y eliminación de cuenta; también aditiva y re-ejecutable). No vuelvas a ejecutar
+   (v43: moderación y eliminación de cuenta) y luego `supabase/migrations/2026-10-19_v44_security_hardening.sql`
+   (v44: seguridad). Ambas son aditivas y re-ejecutables. No vuelvas a ejecutar
    `schema.sql` ni `community.sql`. Para nombrar moderadores (no se puede desde la app):
    `insert into public.community_moderators(user_id) values ('UUID-DEL-USUARIO');`
 2. **Render**: variables `GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL` y una clave pública
    (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`). Nunca `service_role`/`sb_secret_`.
-3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v43-0`
+3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v44-0`
    y la app ofrece actualizar.
 
 ## Documentación
 
 - `docs/INSIGNIAS.md` — reglas, umbrales y evidencia de las insignias.
+- `docs/SEGURIDAD_v44.md` — revisión de seguridad de la Etapa 6.
 - `docs/PRUEBAS.md` — cómo correr las pruebas unitarias, SQL/RLS y E2E.
 - `ESTADO_Y_PENDIENTES.md` — estado y límites conocidos.
 - `CHANGELOG.md` — historial de versiones.

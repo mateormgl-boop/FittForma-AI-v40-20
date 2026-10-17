@@ -1,5 +1,16 @@
 # FittForma AI — Registro de cambios
 
+## v44.0 — Etapa 6: seguridad y datos (17 de octubre de 2026)
+
+- Corregido un fallo que permitía fabricar un «seguimiento mutuo» para enviar mensajes a perfiles privados.
+- Copias importadas o de la nube validadas (`sanitizeState`): no pueden inyectar código ni dejar la app inutilizable.
+- Base de datos: fechas puestas por el servidor, límites anti-spam, columnas editables explícitas, mensajes nunca creados como leídos, búsqueda corregida, tamaño máximo de la copia en la nube, denuncias conservadas al eliminar un post.
+- Servidor: mismo origen obligatorio en los POST, cuota diaria de IA, contexto de FittAI filtrado (sin foto de perfil), sin confiar en `X-Forwarded-For`, CSP acotada.
+- supabase-js 2.45.4 y Leaflet 1.9.4 con integridad SRI.
+- Eliminar cuenta: verificación previa, listado paginado y la base no elimina la cuenta si quedan fotos.
+- Migración aditiva `supabase/migrations/2026-10-19_v44_security_hardening.sql`. Informe: `docs/SEGURIDAD_v44.md`.
+- Pruebas: 193 automáticas, 115 de integración en navegador (incluye una copia maliciosa), 91 SQL/RLS con los permisos por defecto de Supabase y 30 E2E de Comunidad.
+
 ## v43.0 — Diseño según referencias, FittAI que guía por la app y etapa 5 (18 de octubre de 2026)
 
 - Diseño: acento degradado azul-violeta, tarjetas con ilustración en Entrenar, Nutrición y Comunidad, tarjeta del plan actual, fichas de variación en Progreso (4 semanas vs. 4 previas), indicadores de la semana en Inicio, botón «+» con registro rápido y pantalla de bienvenida solo la primera vez.
@@ -10,7 +21,7 @@
 - Cuenta: eliminar la cuenta en la nube con confirmación escrita «ELIMINAR» (borra archivos de Storage y, en cascada, todos los datos de la base); los datos del dispositivo se conservan salvo que se pida lo contrario.
 - Traducción de mensajes dinámicos (saludo, faltantes para insignias, niveles, actividad semanal).
 - Migración aditiva `supabase/migrations/2026-10-18_v43_moderation_account_deletion.sql`.
-- Pruebas: 185 automáticas, 107 comprobaciones de integración en navegador (móvil y escritorio), 64 SQL/RLS y 31 E2E de Comunidad (incluye moderación y eliminación de cuenta).
+- Pruebas: 185 automáticas, 107 comprobaciones de integración en navegador (móvil y escritorio), 64 SQL/RLS y 30 E2E de Comunidad (incluye moderación y eliminación de cuenta).
 
 ## v42.1 — Períodos, cuerpo, notificaciones y FittAI con contexto (17 de octubre de 2026)
 

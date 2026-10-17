@@ -14,7 +14,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <title>FittForma AI — Tu objetivo. Tu plan. Tu progreso.</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
   <style>
     :root{--bg:#080d18;--panel:#111a2b;--panel2:#18253b;--text:#f1f5ff;--muted:#a5b4cf;--line:#2b3d5c;--blue:#3b82f6;--blue2:#60a5fa;--red:#ff9c91;--radius:20px}
     *{box-sizing:border-box} html{color-scheme:dark} body{margin:0;background:radial-gradient(900px 450px at 100% -10%,#142b50 0%,transparent 60%),var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
@@ -2193,14 +2193,14 @@
         <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
         <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">43.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">44.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
       </details>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 43.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 44.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -2227,7 +2227,7 @@
   <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow">›</span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V43.0</p>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V44.0</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -2282,8 +2282,8 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="./community.js"></script>
 <script src="./supabase-config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 <script src="./ads-config.js"></script>
 <script src="./ads.js"></script>
 <script src="./membership-config.js"></script>
@@ -2540,6 +2540,31 @@
     }
   };
 
+  // v44: validación de forma para datos que vienen de afuera (copia importada, nube o almacenamiento viejo).
+  // Descarta entradas que romperían la interfaz; los textos igual se escapan al mostrarse.
+  function isPlainObj(v){return Boolean(v)&&typeof v==='object'&&!Array.isArray(v);}  // declaración (no const): loadState() corre antes de esta línea
+  function objList(v,max,check=()=>true){return (Array.isArray(v)?v:[]).filter(x=>isPlainObj(x)&&(x.date===undefined||typeof x.date==='string')&&check(x)).slice(-max);}
+  function cleanPlan(plan){
+    if(!isPlainObj(plan)||!Array.isArray(plan.days))return null;
+    const days=plan.days.filter(d=>isPlainObj(d)&&typeof d.title==='string'&&Array.isArray(d.exercises)).slice(0,7).map(d=>({...d,exercises:d.exercises.filter(e=>isPlainObj(e)&&typeof e.name==='string').slice(0,20)}));
+    return days.length?{...plan,days}:null;
+  }
+  function sanitizeState(st){
+    const out={...st};
+    out.profile=isPlainObj(st.profile)?{...st.profile}:{...defaults.profile};
+    for(const k of Object.keys(defaults.profile))if(out.profile[k]!==undefined&&typeof out.profile[k]!=='string'&&typeof out.profile[k]!=='number')out.profile[k]=defaults.profile[k];
+    if(out.profile.avatar!==undefined&&!validAvatar(out.profile.avatar))delete out.profile.avatar;
+    out.sessions=objList(st.sessions,5000).map(x=>({...x,exercises:objList(x.exercises,40).map(e=>({...e,entries:objList(e.entries,40)}))}));
+    for(const [k,max] of [['meals',10000],['weights',3000],['activities',5000],['plannedActivities',500],['mealFavorites',200],['badgeRecords',500],['bodyMeasures',1000],['notifications',200]])out[k]=objList(st[k],max);
+    out.chat=objList(st.chat,200).map(m=>({...m,role:m.role==='user'?'user':'assistant',text:String(m.text??'').slice(0,4000)}));
+    out.routines=objList(st.routines,50,r=>typeof r.name==='string'&&Array.isArray(r.exercises)).map(r=>({...r,exercises:r.exercises.filter(isPlainObj).slice(0,30)}));
+    out.plan=cleanPlan(st.plan);
+    out.planHistory=objList(st.planHistory,8).map(h=>({...h,label:String(h.label??''),profile:isPlainObj(h.profile)?h.profile:{...out.profile},plan:cleanPlan(h.plan)}));
+    out.proposal=isPlainObj(st.proposal)?st.proposal:null;
+    for(const k of ['mealPlan','waterLogs','habitLogs','badgeUnlocks','nutritionGoals','reminders'])out[k]=isPlainObj(st[k])?st[k]:structuredClone(defaults[k]);
+    out.water=isPlainObj(st.water)?st.water:structuredClone(defaults.water);
+    return out;
+  }
   function loadState(){
     const candidates=[STORAGE,PREVIOUS_V3_STORAGE,PREVIOUS_STORAGE,LEGACY_STORAGE];
     for(const storageKey of candidates){
@@ -2551,7 +2576,8 @@
         const restored={...defaults,...parsed,profile:{...defaults.profile,...parsed.profile},nutritionGoals:{...defaults.nutritionGoals,...parsed.nutritionGoals},reminders:{...defaults.reminders,...(parsed.reminders||{}),days:Array.isArray(parsed.reminders?.days)?parsed.reminders.days.filter(d=>[0,1,2,3,4,5,6].includes(Number(d))).map(Number):defaults.reminders.days.slice()},water:parsed.water&&typeof parsed.water==='object'?parsed.water:structuredClone(defaults.water),waterLogs:parsed.waterLogs&&typeof parsed.waterLogs==='object'&&!Array.isArray(parsed.waterLogs)?parsed.waterLogs:{},habitLogs:parsed.habitLogs&&typeof parsed.habitLogs==='object'&&!Array.isArray(parsed.habitLogs)?parsed.habitLogs:{},meals:Array.isArray(parsed.meals)?parsed.meals:[],weights:Array.isArray(parsed.weights)?parsed.weights:[],activities:Array.isArray(parsed.activities)?parsed.activities:[],chat:Array.isArray(parsed.chat)?parsed.chat:[],plannedActivities:Array.isArray(parsed.plannedActivities)?parsed.plannedActivities:[],mealFavorites:Array.isArray(parsed.mealFavorites)?parsed.mealFavorites:[],badgeRecords:Array.isArray(parsed.badgeRecords)?parsed.badgeRecords.slice(-500):[],badgeUnlocks:parsed.badgeUnlocks&&typeof parsed.badgeUnlocks==='object'&&!Array.isArray(parsed.badgeUnlocks)?parsed.badgeUnlocks:{}};
         // Migrate a recovered older copy to the current key when storage still has space.
         if(storageKey!==STORAGE){try{localStorage.setItem(STORAGE,JSON.stringify(restored));}catch(e){}}
-        return restored;
+        // Si la validación fallara por un error de programación, nunca se pierden los datos guardados.
+        try{return sanitizeState(restored);}catch(err){console.error('sanitizeState',err);return restored;}
       }catch(e){
         // A corrupt current key must not prevent trying the previous recovery slots.
       }
@@ -3126,7 +3152,7 @@ function findCatalogExercise(name){
     const g=$('exerciseGroupFilter')?.value||'all';
     const favorites=readExerciseFavorites();
     const filtered=items.filter(e=>(g==='all'||e.group===g)&&(!exerciseFavoritesOnly||favorites.has(exerciseFavoriteKey(e.name,libraryMode)))&&(!q||normalizeExerciseName(e.name+' '+e.group+' '+exerciseCue(e.name,e.group,e.kind)+' '+exerciseEquipment(e.name,libraryMode)+' '+e.kind).includes(q)));
-    root.innerHTML=filtered.length?filtered.map(e=>{const favorite=favorites.has(exerciseFavoriteKey(e.name,libraryMode));return `<article class="exercise-library-item">${exercisePhoto(e.name,e.group,false,e.kind)}<div class="exercise-library-copy"><strong>${esc(e.name)}</strong><span class="tag">${esc(e.group)} · ${e.kind==='cardio'?'Cardio':'Fuerza'}</span><p class="muted">${e.sets} series · ${esc(e.reps)} · ${esc(exerciseEquipment(e.name,libraryMode))}</p><div class="exercise-progress-cue" aria-label="Progresión orientativa: técnica, control y avance gradual"><span>Técnica</span><span>Control</span><span>Progresión</span></div><div class="exercise-card-actions"><button class="btn secondary" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${libraryMode}">Ver técnica</button><button class="btn ghost favorite-toggle" type="button" data-exercise-favorite="${esc(e.name)}" data-favorite-mode="${libraryMode}" aria-label="${favorite?'Quitar':'Agregar'} ${esc(e.name)} ${favorite?'de':'a'} favoritos" aria-pressed="${favorite}">${favorite?'★':'☆'}</button></div></div></article>`;}).join(''):`<div class="empty" style="grid-column:1/-1"><strong>${exerciseFavoritesOnly?'Todavía no hay favoritos en esta modalidad':'No encontramos ejercicios'}</strong><p>${exerciseFavoritesOnly?'Marcá ejercicios con la estrella para tenerlos a mano.':'Probá otra búsqueda o elegí otro grupo muscular.'}</p></div>`;
+    root.innerHTML=filtered.length?filtered.map(e=>{const favorite=favorites.has(exerciseFavoriteKey(e.name,libraryMode));return `<article class="exercise-library-item">${exercisePhoto(e.name,e.group,false,e.kind)}<div class="exercise-library-copy"><strong>${esc(e.name)}</strong><span class="tag">${esc(e.group)} · ${e.kind==='cardio'?'Cardio':'Fuerza'}</span><p class="muted">${esc(e.sets)} series · ${esc(e.reps)} · ${esc(exerciseEquipment(e.name,libraryMode))}</p><div class="exercise-progress-cue" aria-label="Progresión orientativa: técnica, control y avance gradual"><span>Técnica</span><span>Control</span><span>Progresión</span></div><div class="exercise-card-actions"><button class="btn secondary" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${libraryMode}">Ver técnica</button><button class="btn ghost favorite-toggle" type="button" data-exercise-favorite="${esc(e.name)}" data-favorite-mode="${libraryMode}" aria-label="${favorite?'Quitar':'Agregar'} ${esc(e.name)} ${favorite?'de':'a'} favoritos" aria-pressed="${favorite}">${favorite?'★':'☆'}</button></div></div></article>`;}).join(''):`<div class="empty" style="grid-column:1/-1"><strong>${exerciseFavoritesOnly?'Todavía no hay favoritos en esta modalidad':'No encontramos ejercicios'}</strong><p>${exerciseFavoritesOnly?'Marcá ejercicios con la estrella para tenerlos a mano.':'Probá otra búsqueda o elegí otro grupo muscular.'}</p></div>`;
     const count=$('exerciseResultCount');if(count)count.textContent=`${filtered.length} ejercicio${filtered.length===1?'':'s'}`;
     const favoriteButton=$('exerciseFavoritesOnly');if(favoriteButton){favoriteButton.setAttribute('aria-pressed',String(exerciseFavoritesOnly));favoriteButton.textContent=exerciseFavoritesOnly?'★ Ver todos los ejercicios':'☆ Mostrar favoritos';}
     document.querySelectorAll('[data-library-mode]').forEach(b=>b.classList.toggle('active',b.dataset.libraryMode===libraryMode));
@@ -3166,8 +3192,8 @@ function findCatalogExercise(name){
     if(!state.plan){$('planOutput').innerHTML='<div class="card empty"><strong>Tu rutina empieza acá</strong><p>Elegí tus preferencias y creá tu plan personalizado.</p></div>';renderPlanChangeHistory();return;}
     $('planOutput').innerHTML=`<div class="section-head"><div><h2>${p.name?'Plan de '+esc(p.name):'Tu rutina'}</h2><p>${esc(goalText(p.goal))} · ${esc(levelText(p.level))} · ${esc(p.days)} días/semana</p></div><span class="tag">${esc(p.duration)} min</span></div>`+
       state.plan.days.map((day,i)=>`<div class="card"><div class="section-head"><div><h3>${esc(day.title)}</h3><p>${day.exercises.length} actividades · descansá entre sesiones según tu recuperación</p></div><span class="tag">Sesión ${i+1}</span></div>`+
-      day.exercises.map((e,ei)=>`<div class="exercise"><div class="exercise-row-content">${exercisePhoto(e.name,e.group,true,e.kind)}<div class="exercise-copy"><strong>${esc(e.name)}</strong><div class="muted small">${esc(e.group)} · ${e.kind==='cardio'?'Ritmo cómodo':'Movimientos controlados'}</div><div class="exercise-cues">${esc(exerciseCue(e.name,e.group,e.kind))}</div><div class="exercise-actions"><button class="btn ghost" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${esc(p.equipment)}">Ver técnica</button><button class="btn ghost" type="button" data-replace-exercise="${i}:${ei}" aria-label="Cambiar ${esc(e.name)} por una alternativa compatible">Cambiar</button><span class="tag">${e.sets} × ${esc(e.reps)}</span></div></div></div></div>`).join('')+
-      `<div class="btn-row"><button type="button" class="btn full startDay" data-day="${i}">Registrar ${day.title.toLowerCase()}</button></div></div>`).join('');
+      day.exercises.map((e,ei)=>`<div class="exercise"><div class="exercise-row-content">${exercisePhoto(e.name,e.group,true,e.kind)}<div class="exercise-copy"><strong>${esc(e.name)}</strong><div class="muted small">${esc(e.group)} · ${e.kind==='cardio'?'Ritmo cómodo':'Movimientos controlados'}</div><div class="exercise-cues">${esc(exerciseCue(e.name,e.group,e.kind))}</div><div class="exercise-actions"><button class="btn ghost" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${esc(p.equipment)}">Ver técnica</button><button class="btn ghost" type="button" data-replace-exercise="${i}:${ei}" aria-label="Cambiar ${esc(e.name)} por una alternativa compatible">Cambiar</button><span class="tag">${esc(e.sets)} × ${esc(e.reps)}</span></div></div></div></div>`).join('')+
+      `<div class="btn-row"><button type="button" class="btn full startDay" data-day="${i}">Registrar ${esc(day.title.toLowerCase())}</button></div></div>`).join('');
     document.querySelectorAll('.startDay').forEach(b=>b.addEventListener('click',()=>startWorkout(Number(b.dataset.day))));
     renderPlanChangeHistory();
   }
@@ -4136,7 +4162,7 @@ function findCatalogExercise(name){
     renderNutritionWeek();
     document.querySelectorAll('.removeMeal').forEach(b=>b.addEventListener('click',()=>{state.meals=state.meals.filter(m=>String(m.id)!==b.dataset.id);save();renderNutrition();toast('Comida eliminada.');}));
   }
-  function coachBubble(role,text,actions){const acts=cleanActions(actions);return `<div class="bubble ${role}">${esc(text)}${acts.length?`<div class="bubble-actions">${acts.map(a=>`<button type="button" class="bubble-go" data-ai-go="${esc(a.target)}">${esc(a.label)} ›</button>`).join('')}</div>`:''}</div>`;}
+  function coachBubble(role,text,actions){const acts=cleanActions(actions),r=role==='user'?'user':'assistant';return `<div class="bubble ${r}">${esc(text)}${acts.length?`<div class="bubble-actions">${acts.map(a=>`<button type="button" class="bubble-go" data-ai-go="${esc(a.target)}">${esc(a.label)} ›</button>`).join('')}</div>`:''}</div>`;}
   function renderCoach(){
     const messages=state.chat||[];
     $('coachMessages').innerHTML=messages.length?messages.map(m=>coachBubble(m.role,m.text,m.actions)).join(''):coachBubble('assistant','¡Hola! Soy FittAI. Puedo analizar tus registros, proponerte cambios para que los apruebes y llevarte a cualquier sección. Probá preguntarme «¿dónde registro una comida?».',[{label:'Registrar comida',target:'nutrition:registrar'},{label:'Ver insignias',target:'progress:badges'},{label:'Crear rutina',target:'routines:new'}]);
@@ -4215,12 +4241,13 @@ function findCatalogExercise(name){
     if(answer===null)return;if(answer.trim()!=='ELIMINAR'){toast('No se eliminó nada: la confirmación no coincide.');return;}
     const btn=$('deleteCloudAccount');if(btn)btn.disabled=true;setCloudStatus('Eliminando tus archivos y tu cuenta…');
     try{
+      // Antes de borrar fotos, confirmar que la base tiene la función de eliminación (migración v44).
+      const ready=await supabaseClient.rpc('account_deletion_ready');
+      if(ready.error||ready.data!==true)throw new Error('delete_my_account: '+(ready.error?.message||'no disponible'));
       const uid=cloudUser.id,bucket=supabaseClient.storage.from('community-media'),paths=[];
-      const top=await bucket.list(uid,{limit:1000});if(top.error)throw top.error;
-      for(const entry of top.data||[]){
-        if(entry.id)paths.push(`${uid}/${entry.name}`);
-        else{const inner=await bucket.list(`${uid}/${entry.name}`,{limit:1000});if(inner.error)throw inner.error;(inner.data||[]).forEach(f=>paths.push(`${uid}/${entry.name}/${f.name}`));}
-      }
+      const listAll=async prefix=>{const out=[];for(let offset=0;;offset+=1000){const r=await bucket.list(prefix,{limit:1000,offset});if(r.error)throw r.error;out.push(...(r.data||[]));if((r.data||[]).length<1000)return out;}};
+      const walk=async prefix=>{for(const entry of await listAll(prefix)){const full=`${prefix}/${entry.name}`;if(entry.id)paths.push(full);else await walk(full);}};
+      await walk(uid);
       for(let i=0;i<paths.length;i+=100){const r=await bucket.remove(paths.slice(i,i+100));if(r.error)throw r.error;}
       const {error}=await supabaseClient.rpc('delete_my_account');
       if(error)throw error;
@@ -4229,13 +4256,13 @@ function findCatalogExercise(name){
       if(confirm('Tu cuenta en la nube se eliminó. ¿Querés borrar también los datos guardados en este dispositivo?'))$('clearData')?.click();
     }catch(error){
       const msg=String(error?.message||error);
-      setCloudStatus(/delete_my_account|function|PGRST202/i.test(msg)?'Falta aplicar en Supabase la migración supabase/migrations/2026-10-18_v43_moderation_account_deletion.sql. No se eliminó la cuenta.':`No se pudo eliminar la cuenta: ${msg}. Si se borraron fotos, el resto de tus datos sigue intacto.`);
+      setCloudStatus(/delete_my_account|function|PGRST202/i.test(msg)?'Falta aplicar en Supabase las migraciones v43 y v44 (carpeta supabase/migrations). No se eliminó nada.':`No se pudo eliminar la cuenta: ${msg}. Si se borraron fotos, el resto de tus datos sigue intacto.`);
     }finally{if(btn)btn.disabled=false;}
   }
   // ---------- v43: FittAI conoce la app y navega ----------
   const FITTAI_TARGETS={home:['plan'],train:['train'],'train:free':['train','free'],routines:['routines'],'routines:new':['routines','new'],exercises:['exercises'],running:['running'],coach:['coach'],nutrition:['nutrition','hoy'],'nutrition:registrar':['nutrition','registrar'],'nutrition:plan':['nutrition','plan'],'nutrition:historial':['nutrition','historial'],progress:['progress','summary'],'progress:badges':['progress','badges'],'progress:history':['progress','history'],'progress:body':['progress','body'],community:['community','feed'],'community:publish':['community','publish'],'community:messages':['community','messages'],'community:explore':['community','explore'],profile:['profile'],'profile:goals':['profile','bodyProfileCard'],'profile:reminders':['profile','workoutReminderCard'],'profile:account':['profile','cloudAccountCard']};
   function fittaiGo(target){
-    const t=FITTAI_TARGETS[target];if(!t)return;const [view,sub]=t;
+    const t=Object.hasOwn(FITTAI_TARGETS,target)?FITTAI_TARGETS[target]:null;if(!t)return;const [view,sub]=t;
     if(sub==='free'){if(!activeSession)startFreeWorkout();else switchView('train');return;}
     switchView(view);
     if(view==='nutrition')showViewTab('nutrition',sub);
@@ -4244,7 +4271,7 @@ function findCatalogExercise(name){
     else if(view==='routines'&&sub==='new')$('newRoutine')?.click();
     else if(view==='profile'&&sub){const card=$(sub),g=card?.closest('details');if(g)g.open=true;setTimeout(()=>card?.scrollIntoView({behavior:'smooth',block:'start'}),60);}
   }
-  function cleanActions(list){return (Array.isArray(list)?list:[]).filter(a=>a&&FITTAI_TARGETS[a.target]).slice(0,3).map(a=>({target:a.target,label:String(a.label||'Ir').slice(0,40)}));}
+  function cleanActions(list){return (Array.isArray(list)?list:[]).filter(a=>a&&typeof a.target==='string'&&Object.hasOwn(FITTAI_TARGETS,a.target)).slice(0,3).map(a=>({target:a.target,label:String(a.label||'Ir').slice(0,40)}));}
   // Guía local (sin IA): responde dónde está cada función con botones reales.
   const LOCAL_GUIDE=[
     [/rutina|plan de entren|crear (una )?rutina/,'Las rutinas propias y el plan generado están en Entrenar › Rutinas.',[['Abrir Rutinas','routines'],['Crear una rutina','routines:new']]],
@@ -4290,7 +4317,7 @@ function findCatalogExercise(name){
     save();renderCoach();$('coachInput').value='';
     let backendUnavailable=false;
     try{
-      const response=await fetch('/api/coach',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(state.coachShareData===false?{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:false,language:window.FittFormaI18n?.getLanguage?.()||'es'}:{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:true,...coachExtraContext(),profile:state.profile,goals:state.nutritionGoals,plan:state.plan,sessions:(state.sessions||[]).slice(0,5).map(s=>({date:s.date,title:s.title,minutes:s.minutes,notes:s.notes,exercises:(s.exercises||[]).slice(0,8).map(e=>({name:e.name,entries:(e.entries||[]).slice(0,6).map(x=>({reps:x.reps,weight:x.weight,done:x.done}))}))})),activities:(state.activities||[]).slice(-5).reverse().map(a=>({date:a.date,type:a.type,distance:a.distance,minutes:a.minutes,pace:a.pace})),weights:(state.weights||[]).slice(-5).reverse().map(w=>({date:w.date,kg:w.kg??w.weight})),language:window.FittFormaI18n?.getLanguage?.()||'es'})});
+      const response=await fetch('/api/coach',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(state.coachShareData===false?{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:false,language:window.FittFormaI18n?.getLanguage?.()||'es'}:{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:true,...coachExtraContext(),profile:(({avatar,...rest})=>rest)(state.profile||{}),goals:state.nutritionGoals,plan:state.plan,sessions:(state.sessions||[]).slice(0,5).map(s=>({date:s.date,title:s.title,minutes:s.minutes,notes:s.notes,exercises:(s.exercises||[]).slice(0,8).map(e=>({name:e.name,entries:(e.entries||[]).slice(0,6).map(x=>({reps:x.reps,weight:x.weight,done:x.done}))}))})),activities:(state.activities||[]).slice(-5).reverse().map(a=>({date:a.date,type:a.type,distance:a.distance,minutes:a.minutes,pace:a.pace})),weights:(state.weights||[]).slice(-5).reverse().map(w=>({date:w.date,kg:w.kg??w.weight})),language:window.FittFormaI18n?.getLanguage?.()||'es'})});
       const data=await response.json().catch(()=>({}));
       if(response.ok){
         if(window.FittFormaAds)window.FittFormaAds.recordCoachSuccess();
@@ -4312,7 +4339,7 @@ function findCatalogExercise(name){
     state.chat.push({role:'assistant',text:'Preparé una propuesta de demostración para que la revises. Aún no estoy usando IA real y no se cambió ningún plan ni objetivo.' ,at:new Date().toISOString()});
     save();renderCoach();$('coachInput').value='';
   }
-  function renderWeights(){const list=$('weightHistory');if(!list)return;list.innerHTML=state.weights.length?state.weights.slice(-7).reverse().map(w=>`<div class="history-item"><div><strong>${Number(w.kg).toFixed(1)} kg</strong><small>${prettyDate(w.date)}</small></div><button type="button" class="btn ghost removeWeight" data-id="${w.id}">Quitar</button></div>`).join(''):'<p class="muted small">Todavía no registraste tu peso.</p>';document.querySelectorAll('.removeWeight').forEach(b=>b.addEventListener('click',()=>{state.weights=state.weights.filter(w=>String(w.id)!==b.dataset.id);save();renderWeights();renderProgress();}));renderWeightChart();}
+  function renderWeights(){const list=$('weightHistory');if(!list)return;list.innerHTML=state.weights.length?state.weights.slice(-7).reverse().map(w=>`<div class="history-item"><div><strong>${Number(w.kg).toFixed(1)} kg</strong><small>${prettyDate(w.date)}</small></div><button type="button" class="btn ghost removeWeight" data-id="${esc(String(w.id))}">Quitar</button></div>`).join(''):'<p class="muted small">Todavía no registraste tu peso.</p>';document.querySelectorAll('.removeWeight').forEach(b=>b.addEventListener('click',()=>{state.weights=state.weights.filter(w=>String(w.id)!==b.dataset.id);save();renderWeights();renderProgress();}));renderWeightChart();}
   function paceTextFromSeconds(seconds){
     if(!Number.isFinite(seconds)||seconds<=0)return '—';
     const rounded=Math.round(seconds),m=Math.floor(rounded/60),sec=String(rounded%60).padStart(2,'0');
@@ -4538,7 +4565,7 @@ function findCatalogExercise(name){
   function updateCloudControls(){const ready=!!supabaseClient,logged=!!cloudUser;if($('deleteCloudAccount'))$('deleteCloudAccount').hidden=!logged;$('cloudLogin').disabled=!ready||logged;$('cloudRegister').disabled=!ready||logged;$('cloudLogout').hidden=!logged;$('cloudDownload').disabled=!ready||!logged;$('cloudUpload').disabled=!ready||!logged;if(!ready)setCloudStatus('Sin configurar. La app sigue en modo local; configurá SUPABASE_URL y SUPABASE_ANON_KEY en Render o completá supabase-config.js con la clave pública.');else if(logged)setCloudStatus('Sesión iniciada: '+cloudUser.email+'. Elegí manualmente si querés cargar o guardar datos.');else setCloudStatus('Configuración lista. Iniciá sesión o creá una cuenta para sincronizar.');}
   function normalizeCloudState(data){
     if(!data||typeof data!=='object'||!data.profile||!Array.isArray(data.sessions))throw new Error('Los datos de la nube no tienen un formato reconocido.');
-    return {...structuredClone(defaults),...data,profile:{...defaults.profile,...(data.profile||{})},nutritionGoals:{...defaults.nutritionGoals,...(data.nutritionGoals||{})},reminders:{...defaults.reminders,...(data.reminders||{}),days:Array.isArray(data.reminders?.days)?data.reminders.days.filter(d=>[0,1,2,3,4,5,6].includes(Number(d))).map(Number):defaults.reminders.days.slice()},water:data.water&&typeof data.water==='object'?data.water:structuredClone(defaults.water),waterLogs:data.waterLogs&&typeof data.waterLogs==='object'&&!Array.isArray(data.waterLogs)?data.waterLogs:{},habitLogs:data.habitLogs&&typeof data.habitLogs==='object'&&!Array.isArray(data.habitLogs)?data.habitLogs:{},sessions:Array.isArray(data.sessions)?data.sessions:[],meals:Array.isArray(data.meals)?data.meals:[],weights:Array.isArray(data.weights)?data.weights:[],activities:Array.isArray(data.activities)?data.activities:[],chat:Array.isArray(data.chat)?data.chat:[],planHistory:Array.isArray(data.planHistory)?data.planHistory.slice(-8):[],badgeRecords:Array.isArray(data.badgeRecords)?data.badgeRecords.slice(-500):[],badgeUnlocks:data.badgeUnlocks&&typeof data.badgeUnlocks==='object'&&!Array.isArray(data.badgeUnlocks)?data.badgeUnlocks:{}};
+    return sanitizeState({...structuredClone(defaults),...data,profile:{...defaults.profile,...(data.profile||{})},nutritionGoals:{...defaults.nutritionGoals,...(data.nutritionGoals||{})},reminders:{...defaults.reminders,...(data.reminders||{}),days:Array.isArray(data.reminders?.days)?data.reminders.days.filter(d=>[0,1,2,3,4,5,6].includes(Number(d))).map(Number):defaults.reminders.days.slice()},water:data.water&&typeof data.water==='object'?data.water:structuredClone(defaults.water),waterLogs:data.waterLogs&&typeof data.waterLogs==='object'&&!Array.isArray(data.waterLogs)?data.waterLogs:{},habitLogs:data.habitLogs&&typeof data.habitLogs==='object'&&!Array.isArray(data.habitLogs)?data.habitLogs:{},sessions:Array.isArray(data.sessions)?data.sessions:[],meals:Array.isArray(data.meals)?data.meals:[],weights:Array.isArray(data.weights)?data.weights:[],activities:Array.isArray(data.activities)?data.activities:[],chat:Array.isArray(data.chat)?data.chat:[],planHistory:Array.isArray(data.planHistory)?data.planHistory.slice(-8):[],badgeRecords:Array.isArray(data.badgeRecords)?data.badgeRecords.slice(-500):[],badgeUnlocks:data.badgeUnlocks&&typeof data.badgeUnlocks==='object'&&!Array.isArray(data.badgeUnlocks)?data.badgeUnlocks:{}});
   }
   async function cloudLogin(e){
     e.preventDefault();if(!supabaseClient)return toast('Primero configurá Supabase.');
@@ -4605,7 +4632,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.43.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.43.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.44.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.44.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -4626,7 +4653,7 @@ function findCatalogExercise(name){
       const script=document.createElement('script');let settled=false;
       const finish=value=>{if(settled)return;settled=true;clearTimeout(timer);resolve(Boolean(value&&window.supabase?.createClient));};
       const timer=setTimeout(()=>finish(false),7000);
-      script.src='https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js';script.async=true;
+      script.src='https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';script.integrity='sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o';script.crossOrigin='anonymous';script.async=true;
       script.onload=()=>finish(true);script.onerror=()=>finish(false);document.head.appendChild(script);
     });
     return window.__fittformaSupabaseFallbackPromise;
@@ -5277,12 +5304,17 @@ function findCatalogExercise(name){
   $('importData').addEventListener('click',()=>$('importDataFile').click());
   $('importDataFile').addEventListener('change',async()=>{
     const file=$('importDataFile').files?.[0];if(!file)return;
+    const previous=state;
     try{
+      if(file.size>8*1024*1024)throw new Error('El archivo supera 8 MB; no parece una copia de FittForma.');
       const parsed=JSON.parse(await file.text());
       if(!parsed||typeof parsed!=='object'||!parsed.profile||!Array.isArray(parsed.sessions))throw new Error('El archivo no tiene el formato de una copia de FittForma.');
       if(!confirm('La copia importada reemplazará los datos locales actuales. ¿Querés continuar?'))return;
-      state={...structuredClone(defaults),...parsed,profile:{...defaults.profile,...parsed.profile},nutritionGoals:{...defaults.nutritionGoals,...(parsed.nutritionGoals||{})},reminders:{...defaults.reminders,...(parsed.reminders||{}),days:Array.isArray(parsed.reminders?.days)?parsed.reminders.days.filter(d=>[0,1,2,3,4,5,6].includes(Number(d))).map(Number):defaults.reminders.days.slice()},sessions:Array.isArray(parsed.sessions)?parsed.sessions:[],meals:Array.isArray(parsed.meals)?parsed.meals:[],weights:Array.isArray(parsed.weights)?parsed.weights:[],activities:Array.isArray(parsed.activities)?parsed.activities:[],plannedActivities:Array.isArray(parsed.plannedActivities)?parsed.plannedActivities:[],mealFavorites:Array.isArray(parsed.mealFavorites)?parsed.mealFavorites:[],water:parsed.water||structuredClone(defaults.water),waterLogs:parsed.waterLogs&&typeof parsed.waterLogs==='object'&&!Array.isArray(parsed.waterLogs)?parsed.waterLogs:{},habitLogs:parsed.habitLogs&&typeof parsed.habitLogs==='object'&&!Array.isArray(parsed.habitLogs)?parsed.habitLogs:{},badgeRecords:Array.isArray(parsed.badgeRecords)?parsed.badgeRecords.slice(-500):[],badgeUnlocks:parsed.badgeUnlocks&&typeof parsed.badgeUnlocks==='object'&&!Array.isArray(parsed.badgeUnlocks)?parsed.badgeUnlocks:{},chat:Array.isArray(parsed.chat)?parsed.chat:[]};
-      activeSession=null;resetRestTimer();save();syncForm();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();toast('Copia importada correctamente.');
+      state=sanitizeState({...structuredClone(defaults),...parsed,profile:{...defaults.profile,...parsed.profile},nutritionGoals:{...defaults.nutritionGoals,...(parsed.nutritionGoals||{})},reminders:{...defaults.reminders,...(parsed.reminders||{}),days:Array.isArray(parsed.reminders?.days)?parsed.reminders.days.filter(d=>[0,1,2,3,4,5,6].includes(Number(d))).map(Number):defaults.reminders.days.slice()},sessions:Array.isArray(parsed.sessions)?parsed.sessions:[],meals:Array.isArray(parsed.meals)?parsed.meals:[],weights:Array.isArray(parsed.weights)?parsed.weights:[],activities:Array.isArray(parsed.activities)?parsed.activities:[],plannedActivities:Array.isArray(parsed.plannedActivities)?parsed.plannedActivities:[],mealFavorites:Array.isArray(parsed.mealFavorites)?parsed.mealFavorites:[],water:parsed.water||structuredClone(defaults.water),waterLogs:parsed.waterLogs&&typeof parsed.waterLogs==='object'&&!Array.isArray(parsed.waterLogs)?parsed.waterLogs:{},habitLogs:parsed.habitLogs&&typeof parsed.habitLogs==='object'&&!Array.isArray(parsed.habitLogs)?parsed.habitLogs:{},badgeRecords:Array.isArray(parsed.badgeRecords)?parsed.badgeRecords.slice(-500):[],badgeUnlocks:parsed.badgeUnlocks&&typeof parsed.badgeUnlocks==='object'&&!Array.isArray(parsed.badgeUnlocks)?parsed.badgeUnlocks:{},chat:Array.isArray(parsed.chat)?parsed.chat:[]});
+      if(!save()){state=previous;toast('No hay espacio para guardar la copia en este dispositivo. Tus datos anteriores se conservaron.');return;}
+      try{activeSession=null;resetRestTimer();syncForm();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();}
+      catch(renderError){state=previous;save();syncForm();renderAll();throw new Error('La copia tiene datos que la app no puede mostrar. Se restauraron tus datos anteriores.');}
+      toast('Copia importada correctamente.');
     }catch(err){toast(err.message||'No se pudo importar la copia.');}finally{$('importDataFile').value='';}
   });
   $('clearData').addEventListener('click',()=>{
@@ -5295,7 +5327,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.43.0';
+  const APP_VERSION='0.44.0';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');

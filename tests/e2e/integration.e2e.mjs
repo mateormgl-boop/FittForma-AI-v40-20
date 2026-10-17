@@ -203,6 +203,27 @@ for (const [w, h, label] of [[390, 844, 'móvil'], [1366, 900, 'escritorio']]) {
   step('Mensajes dinámicos traducidos al inglés', /to (Bronze|Silver|Gold|Diamond)/.test(galleryText) && !/Te faltan/.test(galleryText), galleryText.slice(0, 120));
   await page.evaluate(() => window.FittFormaI18n?.setLanguage('es'));
 
+  // v44: una copia maliciosa o rota no ejecuta código ni deja la app inutilizable
+  const evil = '<img src=x onerror="window.__xss=1">';
+  const backup = { profile: { goal: 'fitness', name: evil }, sessions: [{ date: '2026-10-01', title: evil, exercises: 'x' }, 'basura'],
+    plan: { days: [{ title: evil, exercises: [{ name: 'Sentadilla', group: 'Piernas', sets: evil, reps: '10' }] }] },
+    weights: [{ id: '1" autofocus onfocus="window.__xss=2" x="', kg: 70, date: '2026-10-01' }],
+    chat: [{ role: 'x" onmouseover="window.__xss=3', text: 'hola', actions: [{ target: 'constructor', label: 'Mal' }, { target: 'progress', label: 'Bien' }] }],
+    routines: [{}], plannedActivities: [{ date: 1 }], mealPlan: 'roto' };
+  await go('profile');
+  await page.setInputFiles('#importDataFile', { name: 'copia.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(backup)) });
+  await page.waitForTimeout(600);
+  await go('train'); await page.evaluate(() => document.querySelector('[data-subview="routines"]')?.click()); await page.waitForTimeout(300);
+  await go('progress'); await page.click('#progressTabBody').catch(() => {}); await page.waitForTimeout(200);
+  await page.evaluate(() => document.querySelector('[data-subview="coach"]')?.click()); await page.waitForTimeout(300);
+  await page.hover('#coachMessages .bubble').catch(() => {});
+  step('Copia maliciosa no ejecuta código', await page.evaluate(() => window.__xss === undefined));
+  const imported = await st();
+  step('Copia rota se limpia al importar', imported.routines.length === 0 && imported.sessions.length === 1 && Array.isArray(imported.sessions[0].exercises) && imported.plannedActivities.length === 0 && typeof imported.mealPlan === 'object', JSON.stringify({ r: imported.routines.length, s: imported.sessions.length }));
+  step('FittAI ignora destinos que no existen', (await page.$$('#coachMessages [data-ai-go]')).length === 1);
+  await page.reload(); await page.waitForTimeout(700);
+  step('La app sigue funcionando tras recargar', await page.isVisible(w < 761 ? '.mobile-app-nav' : '.tab[data-view="plan"]'));
+
   step('Sin errores de JavaScript', errors.length === 0, errors.slice(0, 3).join(' | '));
   await page.close();
 }
