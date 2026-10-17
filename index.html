@@ -1688,11 +1688,12 @@
     html{scrollbar-color:#2a3a5c transparent}
     .num,.metric-value,.p-tile strong,.home-sum strong{font-variant-numeric:tabular-nums}
   </style>
+  <link rel="preload" href="./assets/fonts/inter-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./design.css">
 </head>
 <body>
 <svg class="ff-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs>
-  <linearGradient id="ffGradNutri" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22c993"/><stop offset=".55" stop-color="#19b8ff"/><stop offset="1" stop-color="#6a4cf2"/></linearGradient>
+  <linearGradient id="ffGradNutri" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22c993"/><stop offset="1" stop-color="#0a7a50"/></linearGradient>
   <linearGradient id="ffGradBrand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#19b8ff"/><stop offset="1" stop-color="#6a4cf2"/></linearGradient>
 </defs></svg>
 <div class="app">
@@ -1800,7 +1801,7 @@
           <div class="library-chips" id="libraryChips" role="group" aria-label="Filtrar por grupo muscular"></div>
           <div class="field library-group-field"><label for="exerciseGroupFilter">Grupo muscular</label><select id="exerciseGroupFilter"><option value="all">Todos los grupos</option><option>Piernas</option><option>Pecho</option><option>Espalda</option><option>Hombros</option><option>Brazos</option><option>Core</option><option>Glúteos</option><option>Cardio</option></select></div>
         </div>
-        <div class="btn-row library-extra-filters"><button class="btn ghost" id="exerciseFavoritesOnly" type="button" aria-pressed="false">☆ Mostrar favoritos</button><span id="exerciseResultCount" class="muted small" aria-live="polite"></span></div>
+        <div class="btn-row library-extra-filters"><button class="btn ghost" id="exerciseFavoritesOnly" type="button" aria-pressed="false">Mostrar favoritos</button><span id="exerciseResultCount" class="muted small" aria-live="polite"></span></div>
         <div id="exerciseLibraryResults" class="exercise-library-grid" aria-live="polite"></div>
         <p class="muted small exercise-credit">Todas las tarjetas usan ilustraciones locales con el mismo estilo visual. Cada ejercicio muestra una referencia asociada al movimiento o grupo muscular; las ilustraciones orientan y no sustituyen una demostración técnica detallada.</p>
       </section>
@@ -1855,7 +1856,7 @@
     <button type="button" class="subnav-item" data-subview="running">Correr</button>
     <button type="button" class="subnav-item" data-subview="coach">FittAI</button>
   </nav>
-      <div class="section-head"><div><h2>FittAI</h2><p>Tu asistente de entrenamiento, running, nutrición y progreso. Las propuestas solo se aplican si las aprobás.</p></div></div>
+      <div class="section-hero hero-coach"><div><small>Asistente</small><h2>FittAI</h2><p>Tu asistente de entrenamiento, running, nutrición y progreso. Las propuestas solo se aplican si las aprobás.</p></div></div>
       <div class="notice"><strong>Estado del entrenador:</strong> <span id="coachConnection" role="status">Comprobando conexión…</span><br><span class="small">La IA real requiere el backend y una clave privada configurada en el servidor. Nunca la pegues acá en el chat ni en la página.</span></div>
       <div class="card"><label class="reminder-pref-row coach-share"><input id="coachShareData" type="checkbox" checked><span><strong>Usar mis registros en las respuestas</strong><br><span class="muted small">Perfil, objetivos, plan, rutinas, últimas sesiones y carreras, peso, resumen nutricional, agua e insignias. Si lo desactivás, FittAI solo recibe tu mensaje.</span></span></label><div id="coachMessages" class="chat-log" aria-live="polite"></div><div class="quick-prompts"><button type="button" class="btn secondary quickPrompt" data-prompt="¿Qué puedo hacer en la app y dónde está cada cosa?">¿Qué puedo hacer?</button><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero ajustar mi rutina a mi tiempo disponible.">Ajustar rutina</button><button type="button" class="btn secondary quickPrompt" data-prompt="Quiero mejorar mi alimentación para mi objetivo.">Mejorar alimentación</button><button type="button" class="btn secondary quickPrompt" data-prompt="Esta semana tengo menos energía.">Tengo menos energía</button><button type="button" class="btn secondary quickPrompt" data-prompt="Analizá mi progreso reciente y sugerime el próximo paso seguro, usando solo los datos que tengo registrados.">Analizar mi progreso</button></div><form id="coachForm" class="chat-form"><label class="sr-only" for="coachInput">Mensaje para el entrenador</label><input id="coachInput" maxlength="500" placeholder="Contale qué necesitás…" autocomplete="off"><button class="btn" type="submit">Enviar</button></form><div class="coach-usage" id="coachUsage" aria-live="polite"><p id="coachUsageText">La opción de anuncios todavía no está configurada.</p><button class="btn secondary" id="watchRewardedAd" type="button" hidden>Ver anuncio y obtener 3 consultas</button></div></div>
       <div id="proposalArea"></div>
@@ -1965,7 +1966,7 @@
     </section>
 
     <section class="view" id="view-progress">
-      <div class="section-head"><div><h2>Tu progreso</h2><p>Evolución, marcas e insignias, con tus datos reales.</p></div></div>
+      <div class="section-hero hero-progress"><div><small>Progreso</small><h2>Tu progreso</h2><p>Evolución, marcas e insignias, con tus datos reales.</p></div></div>
       <nav class="ff-segmented progress-subnav" role="tablist" aria-label="Secciones de Progreso">
         <button type="button" role="tab" class="ff-seg active" id="progressTabSummary" data-progress-tab="summary" aria-controls="progressPanelSummary" aria-selected="true">Resumen</button>
         <button type="button" role="tab" class="ff-seg" id="progressTabBadges" data-progress-tab="badges" aria-controls="progressPanelBadges" aria-selected="false" tabindex="-1">Insignias</button>
@@ -2116,14 +2117,14 @@
       </section>
     </section>
     <section class="view" id="view-profile">
-      <div class="section-head"><div><h2>Tu perfil</h2><p>Tus datos, objetivos y configuración.</p></div></div>
+      <div class="section-hero hero-profile"><div><small>Perfil</small><h2>Tu perfil</h2><p>Tus datos, objetivos y configuración.</p></div></div>
       <div class="card" id="profileIdentityCard">
         <div class="profile-identity-row"><div class="profile-avatar-wrap"><div class="profile-avatar" id="profileAvatar" aria-hidden="true" data-avatar>FF</div><label class="avatar-edit" for="avatarInput" title="Cambiar foto de perfil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span class="sr-only">Cambiar foto de perfil</span></label><input id="avatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden></div><div class="profile-identity-copy"><h3 id="profileDisplayName">Tu perfil FittForma</h3><p class="muted small" id="profileDisplayGoal">Tu progreso, a tu manera</p></div></div>
         <div class="profile-level" id="profileLevel"></div>
         <button class="link-btn" id="avatarRemove" type="button" hidden>Quitar foto de perfil</button>
         <div class="profile-stats" id="profileStats" aria-label="Tu actividad"></div>
         <button type="button" class="profile-ai" data-shortcut-view="coach"><span class="profile-ai-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg></span><span><strong>FittAI, tu asistente</strong><small>Analiza tu progreso y te lleva a cada sección</small></span></button>
-        <nav class="profile-menu" aria-label="Accesos del perfil"><button type="button" data-shortcut-view="routines"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Planes y rutinas<span aria-hidden="true">›</span></button><button type="button" data-shortcut-view="progress"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M7 15l4-4 3 2 5-6"/></svg>Estadísticas<span aria-hidden="true">›</span></button><button type="button" data-show-badges><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 19.5 7v10L12 21.5 4.5 17V7z"/></svg>Logros<span aria-hidden="true">›</span></button><button type="button" data-shortcut-view="community"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M15 15a5 5 0 0 1 6 5"/></svg>Comunidad<span aria-hidden="true">›</span></button></nav>
+        <nav class="profile-menu" aria-label="Accesos del perfil"><button type="button" data-shortcut-view="routines"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Planes y rutinas<span aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button><button type="button" data-shortcut-view="progress"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M7 15l4-4 3 2 5-6"/></svg>Estadísticas<span aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button><button type="button" data-show-badges><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 19.5 7v10L12 21.5 4.5 17V7z"/></svg>Logros<span aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button><button type="button" data-shortcut-view="community"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M15 15a5 5 0 0 1 6 5"/></svg>Comunidad<span aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button></nav>
         <form id="identityForm">
           <div class="field"><label for="profileDisplayNameInput">Cómo querés que te llamemos</label><input id="profileDisplayNameInput" maxlength="48" autocomplete="nickname" placeholder="Tu nombre o apodo"></div>
           <div class="field"><label for="profileFocusInput">Objetivo principal (opcional)</label><select id="profileFocusInput"><option value="">Elegí tu objetivo</option><option value="Ganar masa muscular">Ganar masa muscular</option><option value="Aumentar fuerza">Aumentar fuerza</option><option value="Mejorar resistencia">Mejorar resistencia</option><option value="Perder grasa gradualmente">Perder grasa gradualmente</option><option value="Crear el hábito de entrenar">Crear el hábito de entrenar</option></select></div>
@@ -2236,14 +2237,14 @@
         <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
         <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">46.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">47.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
       </details>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 46.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 47.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -2267,10 +2268,10 @@
   </button>
 </nav>
 <div class="mobile-more-menu" id="mobileMoreMenu" hidden aria-label="Más secciones">
-  <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
-  <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
-  <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow">›</span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V46.0</p>
+  <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
+  <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
+  <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V47.0</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -3198,9 +3199,9 @@ function findCatalogExercise(name){
     const g=$('exerciseGroupFilter')?.value||'all';
     const favorites=readExerciseFavorites();
     const filtered=items.filter(e=>(g==='all'||e.group===g)&&(!exerciseFavoritesOnly||favorites.has(exerciseFavoriteKey(e.name,libraryMode)))&&(!q||normalizeExerciseName(e.name+' '+e.group+' '+exerciseCue(e.name,e.group,e.kind)+' '+exerciseEquipment(e.name,libraryMode)+' '+e.kind).includes(q)));
-    root.innerHTML=filtered.length?filtered.map(e=>{const favorite=favorites.has(exerciseFavoriteKey(e.name,libraryMode));return `<article class="exercise-library-item">${exercisePhoto(e.name,e.group,false,e.kind)}<div class="exercise-library-copy"><strong>${esc(e.name)}</strong><span class="tag">${esc(e.group)} · ${e.kind==='cardio'?'Cardio':'Fuerza'}</span><p class="muted">${esc(e.sets)} series · ${esc(e.reps)} · ${esc(exerciseEquipment(e.name,libraryMode))}</p><div class="exercise-progress-cue" aria-label="Progresión orientativa: técnica, control y avance gradual"><span>Técnica</span><span>Control</span><span>Progresión</span></div><div class="exercise-card-actions"><button class="btn secondary" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${libraryMode}">Ver técnica</button><button class="btn ghost favorite-toggle" type="button" data-exercise-favorite="${esc(e.name)}" data-favorite-mode="${libraryMode}" aria-label="${favorite?'Quitar':'Agregar'} ${esc(e.name)} ${favorite?'de':'a'} favoritos" aria-pressed="${favorite}">${favorite?'★':'☆'}</button></div></div></article>`;}).join(''):`<div class="empty" style="grid-column:1/-1"><strong>${exerciseFavoritesOnly?'Todavía no hay favoritos en esta modalidad':'No encontramos ejercicios'}</strong><p>${exerciseFavoritesOnly?'Marcá ejercicios con la estrella para tenerlos a mano.':'Probá otra búsqueda o elegí otro grupo muscular.'}</p></div>`;
+    root.innerHTML=filtered.length?filtered.map(e=>{const favorite=favorites.has(exerciseFavoriteKey(e.name,libraryMode));return `<article class="exercise-library-item">${exercisePhoto(e.name,e.group,false,e.kind)}<div class="exercise-library-copy"><strong>${esc(e.name)}</strong><span class="tag">${esc(e.group)} · ${e.kind==='cardio'?'Cardio':'Fuerza'}</span><p class="muted">${esc(e.sets)} series · ${esc(e.reps)} · ${esc(exerciseEquipment(e.name,libraryMode))}</p><div class="exercise-progress-cue" aria-label="Progresión orientativa: técnica, control y avance gradual"><span>Técnica</span><span>Control</span><span>Progresión</span></div><div class="exercise-card-actions"><button class="btn secondary" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${libraryMode}">Ver técnica</button><button class="btn ghost favorite-toggle" type="button" data-exercise-favorite="${esc(e.name)}" data-favorite-mode="${libraryMode}" aria-label="${favorite?'Quitar':'Agregar'} ${esc(e.name)} ${favorite?'de':'a'} favoritos" aria-pressed="${favorite}"><svg class="ff-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></button></div></div></article>`;}).join(''):`<div class="empty" style="grid-column:1/-1"><strong>${exerciseFavoritesOnly?'Todavía no hay favoritos en esta modalidad':'No encontramos ejercicios'}</strong><p>${exerciseFavoritesOnly?'Marcá ejercicios con la estrella para tenerlos a mano.':'Probá otra búsqueda o elegí otro grupo muscular.'}</p></div>`;
     const count=$('exerciseResultCount');if(count)count.textContent=`${filtered.length} ejercicio${filtered.length===1?'':'s'}`;
-    const favoriteButton=$('exerciseFavoritesOnly');if(favoriteButton){favoriteButton.setAttribute('aria-pressed',String(exerciseFavoritesOnly));favoriteButton.textContent=exerciseFavoritesOnly?'★ Ver todos los ejercicios':'☆ Mostrar favoritos';}
+    const favoriteButton=$('exerciseFavoritesOnly');if(favoriteButton){favoriteButton.setAttribute('aria-pressed',String(exerciseFavoritesOnly));favoriteButton.textContent=exerciseFavoritesOnly?'Ver todos los ejercicios':'Mostrar favoritos';}
     document.querySelectorAll('[data-library-mode]').forEach(b=>b.classList.toggle('active',b.dataset.libraryMode===libraryMode));
   }
   function renderRunningPlan(){
@@ -4203,7 +4204,7 @@ function findCatalogExercise(name){
     const carbTarget=Number.isFinite(Number(g.carbs))?Number(g.carbs):280,fatTarget=Number.isFinite(Number(g.fat))?Number(g.fat):80;const macroProgress=[['protein',pro,g.protein||120,'proteinCaption'],['carb',carbs,carbTarget,'carbCaption'],['fat',fat,fatTarget,'fatCaption']];
     for(const [prefix,amount,target,captionId] of macroProgress){$(captionId).textContent=`${Math.round(amount)} / ${Math.round(target)} g`;$(`${prefix}Bar`).style.width=Math.min(100,target?amount/target*100:0)+'%';}
     const MEAL_ORDER=['Desayuno','Almuerzo','Merienda','Cena','Colación'],mealSlug=t=>({Desayuno:'desayuno',Almuerzo:'almuerzo',Merienda:'merienda',Cena:'cena','Colación':'colacion'})[t]||'colacion';
-    const mealItem=m=>{const favorite=(state.mealFavorites||[]).some(f=>f.sourceId===m.id||f.name===m.name);return `<div class="history-item meal-item"><img class="meal-thumb" src="./assets/illustrations/meal-${mealSlug(m.type)}.svg" alt="" width="52" height="52" loading="lazy"><div class="meal-item-copy"><strong>${esc(m.name)}</strong><small>${Math.round(m.calories)} kcal · P ${Math.round(m.protein)} g · C ${Math.round(Number(m.carbs||0))} g · G ${Math.round(Number(m.fat||0))} g</small><div class="meal-list-actions"><button class="btn ghost btn-sm toggleMealFavorite" type="button" data-id="${esc(String(m.id))}">${favorite?'★ Guardada':'☆ Favorita'}</button><button type="button" class="btn ghost btn-sm editMeal" data-id="${esc(String(m.id))}" aria-label="Editar ${esc(m.name)}">Editar</button><button type="button" class="btn ghost btn-sm removeMeal" data-id="${esc(String(m.id))}" aria-label="Eliminar ${esc(m.name)}">Quitar</button></div></div></div>`;};
+    const mealItem=m=>{const favorite=(state.mealFavorites||[]).some(f=>f.sourceId===m.id||f.name===m.name);return `<div class="history-item meal-item"><span class="meal-thumb meal-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M17 21V3c-2 1-3 4-3 8h3"/></svg></span><div class="meal-item-copy"><strong>${esc(m.name)}</strong><small>${Math.round(m.calories)} kcal · P ${Math.round(m.protein)} g · C ${Math.round(Number(m.carbs||0))} g · G ${Math.round(Number(m.fat||0))} g</small><div class="meal-list-actions"><button class="btn ghost btn-sm toggleMealFavorite" type="button" data-id="${esc(String(m.id))}" aria-pressed="${favorite}"><svg class="ff-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>${favorite?'Guardada':'Favorita'}</button><button type="button" class="btn ghost btn-sm editMeal" data-id="${esc(String(m.id))}" aria-label="Editar ${esc(m.name)}">Editar</button><button type="button" class="btn ghost btn-sm removeMeal" data-id="${esc(String(m.id))}" aria-label="Eliminar ${esc(m.name)}">Quitar</button></div></div></div>`;};
     const groups=[...MEAL_ORDER,...new Set(meals.map(m=>m.type).filter(t=>!MEAL_ORDER.includes(t)))].map(t=>[t,meals.filter(m=>m.type===t)]).filter(([,list])=>list.length);
     $('mealList').innerHTML=meals.length?`<h4 class="meal-list-title">Comidas de hoy</h4>`+groups.map(([t,list])=>`<div class="meal-group"><div class="meal-group-head"><strong>${esc(t)}</strong><span>${Math.round(list.reduce((n,m)=>n+(Number(m.calories)||0),0))} kcal</span></div>${list.map(mealItem).join('')}</div>`).join(''):'<div class="empty"><img src="./assets/illustrations/meal-almuerzo.svg" alt="" width="72" height="72"><strong>Sin comidas registradas</strong><p>Agregá lo que comiste para ver tu resumen.</p><button class="btn" type="button" data-home-quick="meal">Registrar una comida</button></div>';
     document.querySelectorAll('.toggleMealFavorite').forEach(b=>b.addEventListener('click',()=>{const meal=state.meals.find(m=>String(m.id)===b.dataset.id);if(!meal)return;state.mealFavorites=state.mealFavorites||[];const idx=state.mealFavorites.findIndex(f=>f.sourceId===meal.id||f.name===meal.name);if(idx>=0){state.mealFavorites.splice(idx,1);toast('Comida quitada de favoritas.');}else{state.mealFavorites.push({id:Date.now(),sourceId:meal.id,name:meal.name,calories:Number(meal.calories)||0,protein:Number(meal.protein)||0,carbs:Number(meal.carbs)||0,fat:Number(meal.fat)||0,type:meal.type||'Almuerzo'});toast('Comida guardada en favoritas.');}save();renderNutrition();}));
@@ -4212,7 +4213,7 @@ function findCatalogExercise(name){
     renderNutritionWeek();
     document.querySelectorAll('.removeMeal').forEach(b=>b.addEventListener('click',()=>{state.meals=state.meals.filter(m=>String(m.id)!==b.dataset.id);save();renderNutrition();toast('Comida eliminada.');}));
   }
-  function coachBubble(role,text,actions){const acts=cleanActions(actions),r=role==='user'?'user':'assistant';return `<div class="bubble ${r}">${esc(text)}${acts.length?`<div class="bubble-actions">${acts.map(a=>`<button type="button" class="bubble-go" data-ai-go="${esc(a.target)}">${esc(a.label)} ›</button>`).join('')}</div>`:''}</div>`;}
+  function coachBubble(role,text,actions){const acts=cleanActions(actions),r=role==='user'?'user':'assistant';return `<div class="bubble ${r}">${esc(text)}${acts.length?`<div class="bubble-actions">${acts.map(a=>`<button type="button" class="bubble-go" data-ai-go="${esc(a.target)}">${esc(a.label)}<svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>`).join('')}</div>`:''}</div>`;}
   function renderCoach(){
     const messages=state.chat||[];
     $('coachMessages').innerHTML=messages.length?messages.map(m=>coachBubble(m.role,m.text,m.actions)).join(''):coachBubble('assistant','¡Hola! Soy FittAI. Puedo analizar tus registros, proponerte cambios para que los apruebes y llevarte a cualquier sección. Probá preguntarme «¿dónde registro una comida?».',[{label:'Registrar comida',target:'nutrition:registrar'},{label:'Ver insignias',target:'progress:badges'},{label:'Crear rutina',target:'routines:new'}]);
@@ -4682,7 +4683,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.46.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.46.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.47.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.47.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -5413,7 +5414,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.46.0';
+  const APP_VERSION='0.47.0';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');

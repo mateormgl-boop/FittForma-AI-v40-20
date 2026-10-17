@@ -315,3 +315,45 @@ input[type=file]::file-selector-button{margin-right:10px;padding:8px 14px;border
 .level-badge,.exercise-progression-step .step-number,.tab.active,.habit-check-row input:checked+.habit-check-copy+.habit-check-mark,.subnav-item.active,.notif-count{color:#fff!important}
 html[data-theme="light"] .membership-tier.pro{background:linear-gradient(145deg,var(--mod-soft),var(--ff-panel))!important;color:var(--text)!important}
 .section-hero .btn,.section-hero button{background:rgba(0,0,0,.22)!important}
+
+/* Dark theme: depth from neutral shadows, not colored glows */
+:root:not([data-theme="light"]) .btn:not(.ghost):not(.secondary):not(.danger):not(.chip),:root:not([data-theme="light"]) .home-cta,:root:not([data-theme="light"]) .ff-btn-primary,:root:not([data-theme="light"]) .ff-segmented>button.active,:root:not([data-theme="light"]) .ff-seg.active,:root:not([data-theme="light"]) .subnav-item.active,:root:not([data-theme="light"]) .community-subtab.is-active,:root:not([data-theme="light"]) .tab.active,:root:not([data-theme="light"]) .section-hero,:root:not([data-theme="light"]) .ff-fab{box-shadow:0 8px 20px -10px rgba(0,0,0,.7)!important}
+
+/* v47 finish review */
+@font-face{font-family:"Inter";src:url("./assets/fonts/inter-latin-wght.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+body,button,input,select,textarea{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{font-feature-settings:"cv11","ss01"}
+/* Inicio: the ring carries the weekly number; the bar stays for screen readers only */
+#homeWeekBar{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap}
+/* Dark depth: neutral offset shadows instead of colored halos */
+:root:not([data-theme="light"]) .home-week .home-day.today i{box-shadow:0 6px 14px -6px rgba(0,0,0,.75)!important}
+:root:not([data-theme="light"]) #view-plan .home-top{box-shadow:0 14px 30px -18px rgba(0,0,0,.8)!important}
+/* Progreso: no decorative arcs on stat boxes */
+.stat:after{content:none!important}
+/* Nutrición: meals are rows inside their group, not cards inside cards */
+.meal-item{background:transparent!important;border:0!important;border-top:1px solid var(--ff-border)!important;border-radius:0!important;box-shadow:none!important;padding:10px 0!important;margin-top:6px}
+.meal-group-head+.meal-item{border-top:0!important}
+.meal-ico{display:grid!important;place-items:center;width:44px!important;height:44px!important;border-radius:14px;background:var(--mod-soft);color:var(--mod-ink)}
+.meal-ico svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+/* Icons that replaced text glyphs */
+.ff-star{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;vertical-align:-3px}
+[aria-pressed="true"]>.ff-star{fill:currentColor}
+.toggleMealFavorite{display:inline-flex;align-items:center;gap:6px}
+#exerciseFavoritesOnly{display:inline-flex;align-items:center;gap:6px}
+#exerciseFavoritesOnly::before{content:"";width:16px;height:16px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z' fill='none' stroke='black' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z' fill='none' stroke='black' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+#exerciseFavoritesOnly[aria-pressed="true"]::before{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z'/%3E%3C/svg%3E") center/contain no-repeat}
+.ff-chev{width:16px;height:16px;fill:none!important;stroke:var(--text-3)!important;stroke-width:2!important;stroke-linecap:round;stroke-linejoin:round;display:block}
+.bubble-go{display:inline-flex!important;align-items:center;gap:4px}
+.bubble-go .ff-chev{width:14px;height:14px;stroke:currentColor!important}
+/* Comunidad: one pill-tab component, icon beside the label */
+.community-subnav{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;border-radius:999px!important;scrollbar-width:none}
+.community-subnav::-webkit-scrollbar{display:none}
+.community-subtab{flex-direction:row!important;flex:0 0 auto!important;min-width:0!important;min-height:40px!important;padding:8px 14px!important;gap:6px!important;font-size:13px!important}
+.community-subtab svg{width:16px!important;height:16px!important}
+/* Comunidad: status text is neutral; config problems are a warning, not a success colour */
+.community-status{color:var(--text-2)!important}
+.community-status[data-state="warn"]{display:grid;gap:6px;padding:10px 12px;border-radius:14px;background:rgb(var(--t-amber-rgb) / .12);border:1px solid rgb(var(--t-amber-rgb) / .35);color:var(--text)!important}
+.community-status[data-state="warn"] summary{cursor:pointer;color:var(--t-amber);font-weight:700;font-size:12px}
+.community-status[data-state="warn"] details p{margin:6px 0 0;color:var(--text-2);font-size:12px}
+/* Room under the last content so the + button never covers a primary action */
+@media (max-width:899px){main,.app-main,#app{padding-bottom:calc(150px + env(safe-area-inset-bottom))!important}}

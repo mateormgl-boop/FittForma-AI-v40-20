@@ -18,7 +18,7 @@ const root=rootCandidates.find(candidate=>existsSync(path.join(candidate,'index.
 const rawPort=String(process.env.PORT||'8787');
 const port=Number(rawPort);
 if(!Number.isInteger(port)||port<0||port>65535)throw new Error(`PORT debe ser un entero entre 0 y 65535; se recibió ${JSON.stringify(rawPort)}.`);
-const appVersion='0.46.0';
+const appVersion='0.47.0';
 const apiKey=String(process.env.GEMINI_API_KEY||'').trim(), model=String(process.env.GEMINI_MODEL||'gemini-3.8-flash').trim()||'gemini-3.8-flash';
 const trustRenderClientIp=String(process.env.TRUST_RENDER_CLIENT_IP||'').toLowerCase()==='true';
 // If the primary model temporarily returns 503, try a lighter official model automatically.
@@ -96,7 +96,7 @@ function sanitizeHistory(items){
   }
   return alternating.slice(-8);
 }
-const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.ico':'image/x-icon'};
+const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.ico':'image/x-icon','.woff2':'font/woff2'};
 const limits=new Map();
 const MAX_TRACKED_CLIENTS=5000;
 const PUBLIC_ROOT_FILES=new Set([
@@ -187,7 +187,7 @@ function isPublicAssetPath(requested){
   const relative=requested.slice('/assets/'.length);
   if(relative.startsWith('exercises/unverified-generated/'))return false;
   if(!relative||relative.split('/').some(part=>!part||part==='.'||part==='..'||part.startsWith('.')))return false;
-  return ['.svg','.webp','.png','.jpg','.jpeg','.ico'].includes(path.posix.extname(relative).toLowerCase());
+  return ['.svg','.webp','.png','.jpg','.jpeg','.ico','.woff2'].includes(path.posix.extname(relative).toLowerCase());
 }
 async function readBody(req,maxBytes=12000){
   const declared=Number(req.headers['content-length']);

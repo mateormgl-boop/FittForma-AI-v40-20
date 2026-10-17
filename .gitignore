@@ -21,3 +21,6 @@ pnpm-debug.log*
 Thumbs.db
 .vscode/
 .idea/
+
+# Impeccable review captures (regenerated per review)
+.impeccable/review/

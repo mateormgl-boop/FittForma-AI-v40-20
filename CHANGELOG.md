@@ -1,5 +1,16 @@
 # FittForma AI — Registro de cambios
 
+## v47.0 — Rediseño completo y Etapa 9: entrega (17 de octubre de 2026)
+
+- Diseño nuevo según las referencias claras y oscuras: tema claro por defecto y tema oscuro, elegibles en el encabezado y en Perfil; color propio por sección (Inicio, Entrenar, Correr, Nutrición, Progreso, Comunidad, Perfil, FittAI).
+- Logo nuevo (la «F» que forma una persona corriendo) en el encabezado, los íconos de la app y FittAI. Es una recreación en vector hasta tener el archivo original.
+- Sistema visual en `design.css`: botones, pestañas, tarjetas, formularios, gráficos y encabezados de sección iguales en toda la app.
+- Inicio: franja con la semana, accesos rápidos, «Actividad reciente» con registros reales y estadísticas con íconos. Entrenar: biblioteca en cuadrícula con fotos. Nutrición: anillo de calorías y macros con color. Progreso: gráfico de peso nuevo. Comunidad: fotos que no cargan muestran un fondo neutro.
+- Corregido: fechas con hora completa mostraban «Invalid Date»; el editor de rutinas a veces perdía el foco al abrirse; el encabezado fijo dejaba ver el contenido de abajo.
+- Contraste AA en ambos temas (auditoría en el navegador a 390 y 1366 px) y sombras neutras en el tema oscuro.
+- Entrega: `docs/DESPLIEGUE.md` con variables, orden de migraciones, comprobaciones y vuelta atrás. Sin migraciones nuevas.
+- Pruebas: 200 automáticas, 115 integración, flujos críticos, 91 SQL/RLS y 33 Comunidad.
+
 ## v46.0 — Etapa 8: ajustes de diseño (17 de octubre de 2026)
 
 - Pulido con la skill *impeccable* (`audit` + `polish`), conservando el diseño de las referencias.

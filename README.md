@@ -1,8 +1,15 @@
-# FittForma AI — v46.0
+# FittForma AI — v47.0
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v47.0
+
+- Rediseño completo según las referencias: tema claro (por defecto) y oscuro, un color por sección, logo nuevo y fotos reales en Inicio y Entrenar.
+- Tema elegible desde el encabezado o en Perfil → Apariencia e idioma; se recuerda en el dispositivo.
+- Inicio con «Actividad reciente» (solo registros reales) y gráfico de peso rehecho en Progreso.
+- Guía de despliegue: `docs/DESPLIEGUE.md`. Sistema visual: `DESIGN.md`.
 
 ## Novedades v46.0
 
@@ -72,11 +79,13 @@ Pruebas en navegador (con `npm start` en otra terminal): `npm run test:e2e` (int
    `insert into public.community_moderators(user_id) values ('UUID-DEL-USUARIO');`
 2. **Render**: variables `GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL` y una clave pública
    (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`). Nunca `service_role`/`sb_secret_`.
-3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v46-0`
+3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v47-0`
    y la app ofrece actualizar.
 
 ## Documentación
 
+- `docs/DESPLIEGUE.md` — pasos para publicar v47 en Render y comprobarlo.
+- `DESIGN.md` — sistema visual (temas, colores por sección, componentes).
 - `docs/INSIGNIAS.md` — reglas, umbrales y evidencia de las insignias.
 - `docs/SEGURIDAD_v44.md` — revisión de seguridad de la Etapa 6.
 - `docs/PRUEBAS.md` — cómo correr las pruebas unitarias, SQL/RLS y E2E.
