@@ -62,28 +62,28 @@ test('pruebas de integración HTTP del backend', async t => {
       assert.equal(response.status, 200);
       const raw = await response.text();
       const payload = JSON.parse(raw);
-      assert.deepEqual(payload, { version: '0.42.1', supabase: { configured: true, url: 'https://fittforma-test.supabase.co', anonKey: 'sb_publishable_test_key_for_runtime_checks', keyType: 'publishable' }, missing: [], issue: null });
+      assert.deepEqual(payload, { version: '0.44.0', supabase: { configured: true, url: 'https://fittforma-test.supabase.co', anonKey: 'sb_publishable_test_key_for_runtime_checks', keyType: 'publishable' }, missing: [], issue: null });
       assert.doesNotMatch(raw, /service_role_SECRET_SENTINEL|GEMINI_API_KEY|GEMINI_MODEL|SUPABASE_SERVICE_ROLE_KEY/);
     });
 
     await t.test('responde en salud, página principal y estado de IA', async () => {
       const health = await fetch(`${base}/healthz`);
       assert.equal(health.status, 200);
-      assert.deepEqual(await health.json(), { ok: true, service: 'fittforma-ai', version: '0.42.1' });
+      assert.deepEqual(await health.json(), { ok: true, service: 'fittforma-ai', version: '0.44.0' });
 
       const home = await fetch(`${base}/`);
       assert.equal(home.status, 200);
       assert.match(home.headers.get('content-type') || '', /text\/html/);
       const html = await home.text();
       assert.match(html, /FittForma AI/);
-      assert.match(html, /Versión 42\.1/);
+      assert.match(html, /Versión 44\.0/);
       assert.match(html, /workoutAutosaveStatus/);
 
       const status = await fetch(`${base}/api/status`);
       assert.equal(status.status, 200);
       const payload = await status.json();
       assert.equal(payload.frontendAvailable, true);
-      assert.equal(payload.version, '0.42.1');
+      assert.equal(payload.version, '0.44.0');
       assert.equal(payload.supabaseConfigured, true);
       assert.equal(payload.configured, false);
       assert.equal(payload.mode, 'demo');
@@ -171,29 +171,29 @@ test('pruebas de integración HTTP del backend', async t => {
 
     await t.test('valida que el cuerpo JSON sea un objeto y limita bytes reales', async () => {
       const nullBody = await fetch(`${base}/api/coach`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: 'null'
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Sec-Fetch-Site': 'same-origin' }, body: 'null'
       });
       assert.equal(nullBody.status, 400);
       assert.match((await nullBody.json()).error, /objeto JSON/);
 
       const arrayBody = await fetch(`${base}/api/coach`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '[]'
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Sec-Fetch-Site': 'same-origin' }, body: '[]'
       });
       assert.equal(arrayBody.status, 400);
 
       const badJson = await fetch(`${base}/api/coach`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{'
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Sec-Fetch-Site': 'same-origin' }, body: '{'
       });
       assert.equal(badJson.status, 400);
 
       const unicode = JSON.stringify({ message: 'á'.repeat(17000) });
       const tooLargeBytes = await fetch(`${base}/api/coach`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: unicode
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Sec-Fetch-Site': 'same-origin' }, body: unicode
       });
       assert.equal(tooLargeBytes.status, 413);
 
       const mediaType = await fetch(`${base}/api/coach`, {
-        method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: '{}'
+        method: 'POST', headers: { 'Content-Type': 'text/plain', 'Sec-Fetch-Site': 'same-origin' }, body: '{}'
       });
       assert.equal(mediaType.status, 415);
     });
@@ -214,7 +214,7 @@ test('pruebas de integración HTTP del backend', async t => {
       for (let i = 1; i <= 13; i++) {
         const response = await fetch(`${base}/api/coach`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'CF-Ray': `test-${i}`, 'X-Forwarded-For': `198.51.100.${i}` },
+          headers: { 'Content-Type': 'application/json', 'Sec-Fetch-Site': 'same-origin', 'CF-Ray': `test-${i}`, 'CF-Connecting-IP': `198.51.100.${i}` },
           body: JSON.stringify({ message: 'hola' })
         });
         assert.equal(response.status, 503, `La IP independiente ${i} no debería consumir la cuota de otra IP`);
@@ -223,7 +223,7 @@ test('pruebas de integración HTTP del backend', async t => {
       for (let i = 1; i <= 13; i++) {
         const response = await fetch(`${base}/api/coach`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'CF-Ray': `repeat-${i}`, 'X-Forwarded-For': '198.51.100.200' },
+          headers: { 'Content-Type': 'application/json', 'Sec-Fetch-Site': 'same-origin', 'CF-Ray': `repeat-${i}`, 'CF-Connecting-IP': '198.51.100.200' },
           body: JSON.stringify({ message: 'hola' })
         });
         statuses.push(response.status);
@@ -232,10 +232,15 @@ test('pruebas de integración HTTP del backend', async t => {
       assert.equal(statuses[12], 429);
     });
 
+    await t.test('v44: un POST sin Origin ni Sec-Fetch-Site (script externo) se rechaza', async () => {
+      const response = await fetch(`${base}/api/coach`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: 'hola' }) });
+      assert.equal(response.status, 403);
+    });
+
     await t.test('la IA devuelve un error controlado si falta la clave', async () => {
       const response = await fetch(`${base}/api/coach`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Sec-Fetch-Site': 'same-origin' },
         body: JSON.stringify({ message: 'Ayudame a entrenar' })
       });
       assert.equal(response.status, 503);

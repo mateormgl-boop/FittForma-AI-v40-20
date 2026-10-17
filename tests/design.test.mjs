@@ -42,11 +42,11 @@ test('v40.7: service worker y versiones de paquetes fuerzan una actualización d
   const sw = await read('sw.js');
   const rootPkg = JSON.parse(await read('package.json'));
   const backendPkg = JSON.parse(await read('backend/package.json'));
-  assert.match(sw, /const CACHE = 'fittforma-ai-static-v42-1'/);
+  assert.match(sw, /const CACHE = 'fittforma-ai-static-v44-0'/);
   assert.match(sw, /self\.skipWaiting\(\)/);
   assert.match(sw, /self\.clients\.claim\(\)/);
-  assert.equal(rootPkg.version, '0.42.1');
-  assert.equal(backendPkg.version, '0.42.1');
+  assert.equal(rootPkg.version, '0.44.0');
+  assert.equal(backendPkg.version, '0.44.0');
 });
 
 test('v40.7: las ilustraciones de ejercicios no se etiquetan como demostraciones exactas si solo son referencias de grupo', async () => {

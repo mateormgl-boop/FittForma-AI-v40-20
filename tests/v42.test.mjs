@@ -28,7 +28,7 @@ test('v42: Nutrición en pestañas y Perfil en grupos sin perder IDs', () => {
 });
 
 test('v42: rutinas propias con CRUD, validación y plantilla desde el plan', () => {
-  assert.match(html, /const defaults = \{routines:\[\],/);
+  assert.match(html, /const defaults = \{.{0,40}routines:\[\],/);
   for (const fn of ['renderRoutines', 'openRoutineEditor', 'validateRoutine', 'saveRoutineDraft', 'initRoutines', 'startRoutine']) assert.match(html, new RegExp(`function ${fn}\\(`), fn);
   for (const attr of ['data-routine-start', 'data-routine-edit', 'data-routine-duplicate', 'data-routine-delete', 'data-rmove', 'data-rremove']) assert.match(html, new RegExp(attr));
   assert.match(html, /routineFromTemplate/);

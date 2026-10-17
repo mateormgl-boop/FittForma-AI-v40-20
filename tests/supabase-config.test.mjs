@@ -29,7 +29,7 @@ test('la conexión a Supabase distingue configuración, CDN y diagnóstico de co
   const html = await read('index.html');
   const community = await read('community.js');
   assert.match(html, /communityRetryConnection/);
-  assert.match(html, /unpkg\.com\/@supabase\/supabase-js@2\/dist\/umd\/supabase\.js/);
+  assert.match(html, /unpkg\.com\/@supabase\/supabase-js@2\.45\.4\/dist\/umd\/supabase\.js/);
   assert.match(html, /FittFormaRetrySupabase=initCloud/);
   assert.match(html, /No se pudo consultar \/api\/public-config/);
   assert.match(community, /friendlySupabaseError/);
