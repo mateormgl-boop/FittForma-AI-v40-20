@@ -1406,6 +1406,42 @@
       #view-progress .progress-panel[data-progress-panel="summary"]>.progress-overview-card{grid-column:1/-1}
     }
     @media(prefers-reduced-motion:reduce){.badge-tile,.home-badge-bar i{transition:none}}
+    /* v41 — controles de formulario base (baja especificidad: los componentes pueden sobrescribir) */
+    :where(input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),select,textarea){background:#080f1f;border:1px solid #2c4166;border-radius:12px;color:var(--ff-text);padding:10px 12px;min-height:44px;font:inherit;font-size:15px}
+    :where(textarea){width:100%;resize:vertical;line-height:1.45}
+    :where(input,select,textarea)::placeholder{color:#6b7f9f}
+    :where(input,select,textarea):focus{border-color:#5295ff;outline:none;box-shadow:0 0 0 3px rgba(75,145,255,.16)}
+    :where(input[type=file]){color:#c5d3ee;font-size:14px;max-width:100%}
+    /* v41 — Comunidad móvil: cabecera de post y subpestañas sin cortes */
+    .community-post-head{flex-wrap:wrap}
+    .community-post-head>.community-author{flex:1 1 calc(100% - 64px)}
+    .community-post-head>.btn{min-height:36px;padding:6px 12px;font-size:13px}
+    .community-author strong{overflow-wrap:normal;word-break:normal}
+    .community-author strong .muted{font-weight:500}
+    @media(max-width:600px){
+      .community-subnav{gap:2px;padding:4px;overflow-x:visible}
+      .community-subtab{flex:1 1 0;min-width:0;padding:8px 2px;font-size:11.5px}
+      .community-post-head>.btn{flex:1 1 auto}
+      .community-privacy-note{font-size:13px;padding:10px 12px}
+      .community-panel-heading .btn{min-height:38px;padding:6px 12px;font-size:13px}
+    }
+    /* v41 — Comunidad: tipos de publicación, logros y no leídos */
+    .community-kind{display:inline-block;margin-bottom:6px;color:var(--ff-muted);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+    .community-achievement{display:flex;align-items:center;gap:var(--ff-s3);padding:var(--ff-s3);margin:4px 0 8px;border-radius:var(--ff-r-md);border:1px solid rgba(26,167,255,.35);background:rgba(26,167,255,.07)}
+    .community-achievement-copy{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
+    .community-achievement-copy small{color:var(--ff-muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+    .community-achievement-copy span{font-size:var(--ff-fs-sm);color:#c5d3ee}
+    .community-achievement-copy .ff-evidence{margin:2px 0 0}
+    .community-single-photo{padding:12px 16px 0}
+    .community-single-photo img{display:block;width:100%;max-height:420px;object-fit:cover;border-radius:var(--ff-r-md)}
+    .community-preview{margin-top:var(--ff-s4);padding:var(--ff-s3) var(--ff-s4);border-radius:var(--ff-r-md);border:1px dashed var(--ff-line)}
+    .community-preview-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;margin-bottom:6px}
+    .community-preview p{margin:6px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+    .community-unread{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:2px;border-radius:999px;background:var(--ff-cyan);color:#04101f;font-size:11px;font-weight:800;line-height:1}
+    .community-unread[hidden]{display:none}
+    .community-edit-form{margin-top:8px}
+    .community-edit-form textarea{width:100%;min-height:84px}
+    [data-post-form][hidden]{display:none}
   </style>
 </head>
 <body>
@@ -1705,7 +1741,7 @@
         <button class="community-subtab is-active" id="communityTabFeed" type="button" role="tab" data-community-tab="feed" aria-controls="communityPanelFeed" aria-selected="true"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5h6v6H4zM14 5.5h6v6h-6zM4 15.5h6v4H4zM14 15.5h6v4h-6z"/></svg></span><span>Feed</span></button>
         <button class="community-subtab" id="communityTabExplore" type="button" role="tab" data-community-tab="explore" aria-controls="communityPanelExplore" aria-selected="false" tabindex="-1"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.2 4.2"/></svg></span><span>Explorar</span></button>
         <button class="community-subtab" id="communityTabPublish" type="button" role="tab" data-community-tab="publish" aria-controls="communityPanelPublish" aria-selected="false" tabindex="-1"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><span>Publicar</span></button>
-        <button class="community-subtab" id="communityTabMessages" type="button" role="tab" data-community-tab="messages" aria-controls="communityPanelMessages" aria-selected="false" tabindex="-1"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5h16v11H10l-5 3v-3H4z"/><path d="M8 9.5h8M8 13h5"/></svg></span><span>Mensajes</span></button>
+        <button class="community-subtab" id="communityTabMessages" type="button" role="tab" data-community-tab="messages" aria-controls="communityPanelMessages" aria-selected="false" tabindex="-1"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5h16v11H10l-5 3v-3H4z"/><path d="M8 9.5h8M8 13h5"/></svg></span><span>Mensajes</span><span class="community-unread" id="communityUnreadBadge" hidden></span></button>
         <button class="community-subtab" id="communityTabProfile" type="button" role="tab" data-community-tab="profile" aria-controls="communityPanelProfile" aria-selected="false" tabindex="-1"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.8 20c.7-3.4 3.3-5.2 7.2-5.2s6.5 1.8 7.2 5.2"/></svg></span><span>Mi perfil</span></button>
       </nav>
       <div class="community-note community-privacy-note"><strong>Privacidad primero.</strong> Compartí solo fotos propias. Las experiencias son personales y no garantizan los mismos resultados.</div>
@@ -1727,8 +1763,27 @@
 
       <section id="communityPanelPublish" class="community-subpanel" data-community-panel="publish" role="tabpanel" aria-labelledby="communityTabPublish" hidden>
         <div class="card community-editor">
-          <div class="community-panel-heading"><div><h3>Compartí tu transformación</h3><p class="muted small">Subí fotos propias y contá qué hábitos te ayudaron durante el proceso.</p></div></div>
-          <form id="communityPostForm">
+          <div class="community-panel-heading"><div><h3>Crear una publicación</h3><p class="muted small">Elegí qué querés compartir. Antes de publicar vas a ver exactamente qué datos se muestran.</p></div></div>
+          <nav class="ff-segmented" role="tablist" aria-label="Tipo de publicación">
+            <button type="button" role="tab" class="ff-seg active" data-post-kind="text" aria-selected="true">Texto</button>
+            <button type="button" role="tab" class="ff-seg" data-post-kind="achievement" aria-selected="false" tabindex="-1">Logro</button>
+            <button type="button" role="tab" class="ff-seg" data-post-kind="transformation" aria-selected="false" tabindex="-1">Transformación</button>
+          </nav>
+          <p class="community-status" id="communityKindNotice" role="status" hidden></p>
+          <form id="communityTextPostForm" data-post-form="text">
+            <div class="field"><label for="communityTextBody">¿Qué querés contar?</label><textarea id="communityTextBody" maxlength="1200" rows="4" required placeholder="Ej. Hoy completé mi primera semana de 4 entrenamientos."></textarea><small class="muted"><span id="communityTextCount">0</span>/1200</small></div>
+            <div class="field"><label for="communityTextImage">Foto (opcional)</label><input id="communityTextImage" type="file" accept="image/jpeg,image/png,image/webp"><small class="muted">JPG, PNG o WebP de hasta 8 MB. Se recomprime en tu dispositivo y se eliminan los metadatos (incluida la ubicación).</small></div>
+            <label class="reminder-pref-row" id="communityTextConsentRow" hidden><input id="communityTextPhotoConsent" type="checkbox"><span>Confirmo que tengo derecho a publicar esta foto y que no muestro a otras personas sin su permiso.</span></label>
+            <button class="btn full" id="communityTextPublish" type="submit">Publicar</button>
+          </form>
+          <form id="communityAchievementPostForm" data-post-form="achievement" hidden>
+            <div class="field"><label for="communityAchievementSelect">Insignia para compartir</label><select id="communityAchievementSelect"><option value="">Todavía no tenés insignias</option></select><small class="muted">Solo se comparte el nombre del desafío, el rango, la meta y la fecha. No se comparten tus otros registros.</small></div>
+            <div class="field"><label for="communityAchievementComment">Comentario (opcional)</label><textarea id="communityAchievementComment" maxlength="600" rows="2" placeholder="Ej. Me costó tres semanas llegar."></textarea></div>
+            <button class="btn full" id="communityAchievementPublish" type="submit">Compartir logro</button>
+          </form>
+          <div class="community-preview" id="communityPostPreview" aria-live="polite"></div>
+          <div class="community-status" id="communityComposeStatus" role="status" aria-live="polite"></div>
+          <form id="communityPostForm" data-post-form="transformation" hidden>
             <div class="community-form-grid">
               <div class="field"><label for="communityBeforePhoto">Foto de antes</label><input id="communityBeforePhoto" type="file" accept="image/jpeg,image/png,image/webp" required></div>
               <div class="field"><label for="communityAfterPhoto">Foto de después</label><input id="communityAfterPhoto" type="file" accept="image/jpeg,image/png,image/webp" required></div>
@@ -1786,7 +1841,7 @@
           <button class="btn full" type="submit">Guardar mi perfil</button>
         </form>
         <div class="profile-badges-preview" id="profileBadgesPreview"><h4>Mis insignias</h4><div id="profileBadgeChips" class="profile-badge-chips"><span class="muted small">Tus logros aparecerán acá.</span></div><button class="btn secondary full" id="profileViewBadges" type="button" style="margin-top:10px">Ver todas mis insignias</button></div>
-        <p class="muted small" style="margin-bottom:0">Tu nombre y objetivo se guardan en este dispositivo. Tus insignias personales se muestran acá; compartirlas públicamente en Comunidad se configurará en una etapa posterior.</p>
+        <p class="muted small" style="margin-bottom:0">Tu nombre y objetivo se guardan en este dispositivo. Tus insignias se guardan en este dispositivo. Podés compartir la que elijas desde Comunidad › Publicar › Logro.</p>
       </div>
       <div class="card" id="workoutReminderCard">
         <h3>Recordatorios de entrenamiento</h3>
@@ -3126,6 +3181,7 @@ function findCatalogExercise(name){
       });
     }
     const changed=JSON.stringify(unlocks)!==JSON.stringify(state.badgeUnlocks||{});state.badgeUnlocks=unlocks;
+    if(changed)window.dispatchEvent(new CustomEvent('fittforma:badgeschange'));
     return {changed,newlyUnlocked,upgraded,revoked,catalog};
   }
   function badgeCategoryMatches(item,category){
@@ -3214,6 +3270,20 @@ function findCatalogExercise(name){
     if(!top.length){root.innerHTML='<span class="muted small">Todavía no obtuviste insignias. Registrá una marca en Progreso › Insignias.</span>';return;}
     root.innerHTML=top.map(entry=>{const rank=BadgeEngine.rankForLevel((Number(entry.level)||1)-1),item=catalog.find(x=>x.id===entry.exerciseId)||{};return `<div class="profile-badge-chip">${BadgeEngine.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:BadgeEngine.glyphFor(item),size:36})}<span>${esc(entry.exerciseName)}<small>${esc(rank.label)} · ${hasGpsEvidence(entry)?'Con ruta GPS':'Declarada'}</small></span></div>`;}).join('');
   }
+  // Insignias que se pueden compartir en Comunidad: el nivel más alto por desafío.
+  // Solo se envía lo necesario; la evidencia nunca puede ser 'verificada' (ver migración v41).
+  window.FittFormaShareableBadges=function(){
+    const catalog=getBadgeCatalog(),best=new Map();
+    for(const entry of Object.values(state.badgeUnlocks||{})){
+      const item=catalog.find(x=>!x.customPlaceholder&&x.id===entry.exerciseId);if(!item)continue;
+      const prev=best.get(item.id);if(!prev||Number(entry.level)>Number(prev.entry.level))best.set(item.id,{item,entry});
+    }
+    return [...best.values()].sort((a,b)=>Number(b.entry.level)-Number(a.entry.level)).map(({item,entry})=>{
+      const level=Math.min(12,Math.max(1,Number(entry.level)||1)),rank=BadgeEngine.rankForLevel(level-1),gps=hasGpsEvidence(entry)&&item.measure==='km';
+      const exerciseId=String(item.id).toLowerCase().replace(/[^a-z0-9-]/g,'-').slice(0,80);
+      return {key:item.id+':'+level,label:`${item.name} · ${rank.label}${gps?' · GPS':''}`,payload:{exerciseId,exerciseName:String(item.name).slice(0,72),category:item.category||'',rank:rank.key,level,threshold:Number(entry.threshold),measure:item.measure,evidence:gps?'gps_device':'declared',earnedAt:/^\d{4}-\d{2}-\d{2}$/.test(String(entry.earnedAt))?entry.earnedAt:dateKey()}};
+    });
+  };
   // La insignia más cercana a subir de nivel, para Inicio.
   function closestNextBadge(){
     let best=null;
