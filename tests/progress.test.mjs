@@ -71,3 +71,20 @@ test('el analizador tolera historial vacío o parcialmente incompleto', () => {
   const bodyweight = JSON.parse(JSON.stringify(context.deriveExerciseRecords([{ exercises: [{ name: 'Plancha', entries: [{ reps: '30', weight: '' }] }] }])));
   assert.equal(bodyweight[0].bestReps, 30);
 });
+
+
+test('los récords nuevos ignoran series anotadas pero no marcadas como completadas y mantienen compatibilidad con el historial antiguo', () => {
+  const records = context.deriveExerciseRecords([
+    { date: '2026-10-10', exercises: [{ name: 'Press de banca', entries: [
+      { reps: '25', weight: '150', done: false },
+      { reps: '8', weight: '60', done: true }
+    ]}] },
+    { date: '2026-09-01', exercises: [{ name: 'Sentadilla', entries: [{ reps: '12', weight: '40' }] }] }
+  ]);
+  const bench = records.find(row => row.name === 'Press de banca');
+  assert.equal(bench.bestWeight, 60);
+  assert.equal(bench.bestReps, 8);
+  const squat = records.find(row => row.name === 'Sentadilla');
+  assert.equal(squat.bestWeight, 40);
+  assert.equal(squat.bestReps, 12);
+});

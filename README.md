@@ -1,72 +1,53 @@
-# FittForma AI v40.2 — entrenamiento, nutrición y comunidad
+# FittForma AI — v41.0
 
+Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
+compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
+servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
 
-## Cambios de navegación móvil en v40.2
+## Novedades v41.0
 
-- Barra inferior con Inicio, Entrenar, Progreso, Comunidad y Perfil.
-- Entrenador IA, Correr y Nutrición quedan en el menú secundario “Más”.
-- Instalación PWA accesible desde ese menú y caché estática versionada a v40.2.
-- Verificación automatizada: 73 pruebas aprobadas, 0 fallidas.
-- Auditoría: `AUDITORIA_PUNTO_3_FittForma_AI_v40_2.md`.
+- **Navegación**: 5 destinos en móvil (Inicio · Entrenar · Progreso · Comunidad · Perfil);
+  Nutrición, Coach IA y Correr con GPS en el menú «Más». En escritorio (≥1024 px), barra lateral fija
+  con sección «Herramientas» y un Inicio a dos columnas.
+- **Insignias**: reglas en un único lugar (`achievements.js`), categorías por disciplina, topes de
+  plausibilidad, sin duplicados del día, mensajes concretos («Te faltan 3 repeticiones para Plata I»),
+  galería con medallas SVG por rango, detalle de los 12 niveles con fecha de obtención y lista de
+  marcas con borrado (que quita las insignias que dependían de ellas). Ver `docs/INSIGNIAS.md`.
+- **Sin falsas verificaciones**: los estados son «Declarada» o «Con ruta GPS» (comprobación en el
+  dispositivo). Ninguna insignia se presenta como verificada.
+- **Progreso** en cuatro secciones: Resumen · Insignias · Historial · Peso.
+- **Inicio** muestra la insignia más cercana a subir de nivel con su avance real.
+- **Comunidad**: publicaciones de texto (con foto opcional) y de logros, vista previa de lo que se
+  comparte y para quién, edición del texto propio e indicador de mensajes sin leer. Requiere la
+  migración `supabase/migrations/2026-10-17_v41_posts_achievements_unread.sql`; sin ella la app sigue
+  funcionando con transformaciones y lo explica en pantalla.
+- Correcciones: `renderProgress` ya no falla con sesiones sin `exercises`; capa CSS final con tokens
+  y controles de formulario coherentes; se quitaron emojis usados como iconos.
 
-FittForma AI es una PWA móvil para organizar rutinas, registrar series y actividades, seguir el progreso y usar un entrenador IA opcional. La comunidad en línea depende de configurar un proyecto propio de Supabase y probar las políticas con cuentas reales.
-
-## Cambios técnicos de v40.2
-
-- El inicio del backend valida `PORT` y escucha explícitamente en `0.0.0.0`, como requiere Render.
-- El límite de la IA identifica por separado clientes que llegan a través del proxy de Render cuando `TRUST_RENDER_CLIENT_IP=true`; en desarrollo local queda desactivado. Sigue siendo un límite en memoria, por lo que no reemplaza cuotas persistentes por cuenta ni un almacén distribuido.
-- El estado local intenta recuperar copias anteriores si la clave principal de almacenamiento está corrupta o no tiene el formato esperado. Si logra recuperarla, intenta migrarla a la clave actual.
-- Inicio/cierre de sesión y guardado/carga en Supabase muestran errores de conexión de forma controlada; si la carga remota falla al procesarse, se conserva el estado local en memoria.
-- Se actualiza el nombre de caché PWA para que instalaciones existentes vuelvan a descargar los recursos de esta revisión.
-
-## Qué incluye v40.2
-
-- Biblioteca de ejercicios, rutinas, registro de series, recuperación de sesión, GPS, historial, estadísticas, seguimiento de peso y registro nutricional.
-- Entrenador IA y análisis de foto de comida a través del backend. Requiere `GEMINI_API_KEY` en las variables de entorno del servidor.
-- Comunidad con perfiles públicos/privados, publicaciones de progreso, fotos almacenadas en un bucket privado, reacciones, comentarios, solicitudes de seguimiento y chat privado con seguimiento mutuo aceptado.
-- **Feed orgánico equilibrado:** combina recencia, actividad sostenida durante 30 días, interacciones con topes y un pequeño impulso de descubrimiento para cuentas con pocos seguidores. Cada autor recibe una penalización gradual por publicaciones adicionales en el ranking, para evitar que una sola cuenta ocupe toda la parte superior. Pro es un distintivo; no ordena por encima de otras publicaciones ni implica que se haya verificado un pago.
-- **Bloqueo de usuarios aplicado en la base de datos:** el bloqueo corta los seguimientos en ambos sentidos y evita ver perfiles, publicaciones, comentarios, archivos y mensajes entre esas cuentas. También se puede desbloquear desde el perfil; el seguimiento no se restaura solo.
-- **Seguridad del chat:** límite de hasta 10 mensajes por minuto y 100 por día por cuenta, con contador del lado del servidor y bloqueo transaccional por cuenta para evitar carreras con envíos simultáneos; también permite eliminar una conversación para ambas personas. La lista de bloqueados conserva nombre y usuario para poder reconocerlos.
-- Retos personales de constancia basados en las rutinas y actividades registradas esta semana: 3 rutinas, 3 días activos y 120 minutos. Son locales a este dispositivo; no son retos globales ni verificaciones independientes.
-- Tests automáticos, controles del servidor, CSP, caché PWA versionada y configuración sin secretos en el frontend.
-
-## Actualizar desde v39 o anterior
-
-1. Descargá el ZIP y subí **el contenido** a la raíz del repositorio de GitHub conectado a Render, sin crear una carpeta contenedora adicional.
-2. Conservá las variables de entorno privadas existentes en Render, especialmente `GEMINI_API_KEY`. `GEMINI_MODEL` también puede permanecer como está si ya funciona.
-3. En Supabase → SQL Editor, ejecutá el archivo completo `supabase/community.sql` de este ZIP. La actualización crea las tablas de bloqueo y control de mensajes y reemplaza la función de ranking. No compartas una clave `service_role`.
-4. Conservá tu `supabase-config.js` con la URL y la clave pública `anon`/`publishable`. Si ese archivo se reemplazó con la plantilla vacía, volvé a cargar los valores públicos de tu proyecto. Nunca pongas claves privadas en el frontend.
-5. Esperá a que Render termine el despliegue. En `/healthz` se espera `{"ok":true,"service":"fittforma-ai"}`.
-6. Probá con dos cuentas: perfiles público y privado, solicitud/aceptación, bloqueo/desbloqueo, fotos, comentarios, chat, límites y eliminación de conversación. Confirmá que las cuentas bloqueadas no se ven ni pueden escribirse.
-
-## Configurar desde cero
-
-1. Creá un proyecto Supabase.
-2. En SQL Editor ejecutá `supabase/schema.sql` para la sincronización opcional de datos locales; luego ejecutá `supabase/community.sql` para la comunidad.
-3. En `supabase-config.js`, completá `url` y `anonKey` con el endpoint y la clave pública del proyecto.
-4. En Supabase Authentication, habilitá Email y, si lo necesitás, Google OAuth. Configurá los callback/redirect URLs y agregá el dominio de Render en las URL permitidas.
-5. Subí el código a GitHub y dejá que Render despliegue.
-
-## Ejecutar las pruebas
-
-Necesitás Node.js 20 o posterior:
+## Ejecutar en local
 
 ```bash
-npm test
-node --check community.js
-node --check i18n.js
-node --check sw.js
-node --check backend/server.mjs
+npm start                 # http://localhost:8787 (sin GEMINI_API_KEY la IA queda en modo demo)
+npm test                  # pruebas automáticas (node --test)
 ```
 
-Las pruebas automáticas validan código y configuración local. No sustituyen la comprobación de RLS en un Supabase real ni la prueba visual en iPhone/Android.
+Pruebas de base de datos y de extremo a extremo: `docs/PRUEBAS.md`.
 
-## Pendientes antes de abrir al público
+## Desplegar (Render + Supabase)
 
-- La comunidad todavía requiere pruebas reales de autenticación, RLS, bloqueo, chat, almacenamiento privado y límites con dos o más cuentas.
-- Las denuncias quedan almacenadas, pero **no hay panel administrativo para revisar/resolver reportes**. Antes de abrir la comunidad hay que definir moderadores, procedimiento de respuesta y reglas de contenido.
-- Faltan recuperación de contraseña personalizada, eliminación de cuenta/descarga completa desde el servicio online, notificaciones sociales/push y avatar cargable.
-- Pro es una propuesta de producto; no hay pagos ni webhook de suscripciones conectados. No habilitar cobros ni asignar membresías desde el navegador.
-- Los espacios publicitarios están desactivados hasta configurar un proveedor real y consentimiento/política de privacidad.
-- El GPS puede interrumpirse con la app en segundo plano; los recordatorios locales tampoco garantizan entrega cuando la aplicación está cerrada.
-- La API de IA no está autenticada por cuenta. El backend aplica límites por IP en memoria; aunque v40.2 mejora la identificación de IP detrás de Render, no constituye una cuota/contabilidad persistente y debe reforzarse antes de recibir tráfico significativo.
+1. **Supabase (una sola vez, antes del deploy)**: en el SQL Editor de un proyecto de *pruebas*,
+   ejecutá `supabase/migrations/2026-10-17_v41_posts_achievements_unread.sql`. Es aditiva y
+   re-ejecutable (no borra datos). Verificá con dos cuentas reales y recién después aplicala en
+   producción. No vuelvas a ejecutar `schema.sql` ni `community.sql`.
+2. **Render**: variables `GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL` y una clave pública
+   (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`). Nunca `service_role`/`sb_secret_`.
+3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v41-0`
+   y la app ofrece actualizar.
+
+## Documentación
+
+- `docs/INSIGNIAS.md` — reglas, umbrales y evidencia de las insignias.
+- `docs/PRUEBAS.md` — cómo correr las pruebas unitarias, SQL/RLS y E2E.
+- `ESTADO_Y_PENDIENTES.md` — estado y límites conocidos.
+- `CHANGELOG.md` — historial de versiones.
+- `SECURITY_REVIEW.md`, `GUIA_COMPLETA_PROYECTO.md`, `GUIA_DESDE_CERO.md`, `docs/auditorias/` — material de versiones anteriores.

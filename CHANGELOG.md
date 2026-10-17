@@ -1,45 +1,101 @@
-## v40.2 — rediseño de navegación móvil (15 de octubre de 2026)
+# FittForma AI — Registro de cambios
 
-- La barra inferior móvil ahora prioriza cinco destinos directos: Inicio, Entrenar, Progreso, Comunidad y Perfil.
-- Se movieron Entrenador IA, Correr y Nutrición al menú secundario accesible desde la cabecera, junto con la instalación PWA.
-- Se reforzaron los estados activos, `aria-current`, el control `aria-expanded` y los focos visibles para navegación por teclado.
-- Se versionó la caché del service worker y los paquetes a v40.2 para facilitar la actualización de la PWA.
-- Se añadieron pruebas de regresión para comprobar el orden de la navegación móvil y la accesibilidad de las secciones secundarias.
+## v41.0 — Navegación de 5 destinos, insignias con reglas únicas y comunidad ampliada (17 de octubre de 2026)
 
-## v40.2 — estabilización técnica (15 de octubre de 2026)
+- Base: se incorporó el ZIP v40.21 sobre el repositorio (que contenía v40.2); se retiraron solo assets que v40.21 ya no usaba.
+- Navegación: 5 destinos móviles; Nutrición, Coach IA y Correr con GPS en «Más». Escritorio ≥1024 px con barra lateral e Inicio a dos columnas.
+- Insignias: catálogo, categorías, umbrales, topes de plausibilidad, deduplicación, mensajes de progreso y medallas SVG en `achievements.js`. Galería, detalle de 12 niveles con fecha, lista de marcas con borrado y revocación. Estados «Declarada» y «Con ruta GPS»; ninguno se presenta como verificado.
+- Progreso: secciones Resumen, Insignias, Historial y Peso. Inicio: próxima insignia con avance real.
+- Comunidad: publicaciones de texto (foto opcional) y de logros con vista previa, edición del texto propio, mensajes sin leer. Migración aditiva `supabase/migrations/2026-10-17_v41_posts_achievements_unread.sql`; sin ella la app degrada a transformaciones y lo indica.
+- Corregido: `renderProgress` con sesiones sin `exercises`; el pie de página no coincidía con su traducción; grilla antigua de Progreso en escritorio.
+- Diseño: capa final de tokens, controles de formulario coherentes, cabecera de posts y subpestañas de Comunidad sin cortes en móvil, sin emojis como iconos.
+- Pruebas: 169 automáticas (`npm test`), 44 comprobaciones SQL/RLS (`npm run test:sql`) y 22 pasos E2E de Comunidad contra PostgREST local.
 
-- Corregido el cálculo de IP para rate limiting detrás del proxy de Render, con confianza explícita en los encabezados de edge solo cuando `TRUST_RENDER_CLIENT_IP=true`.
-- Añadida validación de `PORT`, limpieza de la clave Gemini y bind explícito a `0.0.0.0`.
-- La carga de estado local intenta recuperar claves de versiones anteriores si la clave vigente está corrupta o es incompatible.
-- El SQL base elimina condicionalmente las políticas de sincronización antes de recrearlas, permitiendo volver a aplicar el esquema sin el error de políticas duplicadas.
-- Inicio/cierre de sesión y sincronización con Supabase ahora capturan fallos de red; si falla el procesamiento de la copia remota se conserva el estado local anterior.
-- Renovado el nombre de caché del Service Worker para forzar actualización en instalaciones PWA existentes.
-- Ampliadas pruebas automáticas para separación de IP por proxy y recuperación/manejo de errores.
+## v40.21 — Nueva navegación y diseño visual de app móvil
 
-**Alcance:** se modifica el código y se valida localmente. No se considera reemplazo de un rate limiter distribuido, autenticación por cuenta, pruebas RLS de Supabase real o pruebas en teléfono físico.
+- Inicio nuevo con datos reales: saludo, objetivo semanal con anillo, tira de la semana, entrenamiento de hoy con botón que arranca la sesión, accesos de color (Entrenar, Nutrición, Coach IA, Correr con GPS, Progreso, Comunidad), anillos de kcal/proteína/agua, hábitos marcables e insignias.
+- Barra inferior de seis pestañas (Inicio · Entrenar · Nutrición · Progreso · Comunidad · Perfil) con etiquetas legibles; Coach y Correr salen del menú «Más».
+- Entrenar agrupa Sesión · Ejercicios · Rutinas · Correr · Coach con una fila de subpestañas.
+- Biblioteca de ejercicios en filas con foto y chips de grupo muscular (el selector original queda oculto como respaldo).
+- Nutrición: «Resumen de hoy» e Hidratación primero en móvil, con anillo de calorías.
+- Sistema visual común (azul oscuro con brillo celeste, tarjetas con degradado, botones y chips unificados, burbujas del Coach).
+- Corregido: «Ver mi plan» llevaba a una vista equivocada; CSS inválido `font:… inherit`.
+- Conserva insignias (v40.20) y Comunidad por secciones (v40.19). Sin cambios en SQL ni backend.
+- 157 pruebas automáticas; capturas en Chromium móvil a 360/390/412 px y escritorio.
 
-## v40.0 — revisión de seguridad social y ranking equilibrado
-- Ranking orgánico pondera actividad de 30 días, días activos, interacción, recencia y descubrimiento de cuentas pequeñas; limita actividad masiva, excluye publicaciones de más de 90 días y diversifica por autor.
-- Pro queda como distintivo informativo, sin prioridad automática en publicaciones orgánicas.
-- Bloqueo aplicado a través de RLS en perfiles, publicaciones, likes, comentarios, fotos, seguimientos y chat. Al bloquear se eliminan los seguimientos de ambos sentidos y se guarda una etiqueta de nombre/usuario para reconocer la cuenta al desbloquear.
-- Chat con límites en la base de datos (10 mensajes/minuto, 100/día por cuenta), bloqueo transaccional por usuario contra envíos paralelos y eliminación de conversación para ambas personas.
-- Se indica que los progresos publicados son autodeclarados/no verificados y se añaden retos personales semanales locales.
-- Se alinean etiquetas de versión, traducciones, caché PWA y documentación.
+## v40.20 — Insignias personales y retos medibles
 
-## v39.0 — ranking orgánico por actividad
-- El feed incorpora actividad, interacciones limitadas, recencia y una pequeña ponderación de seguidores.
-- Se elimina la prioridad automática de Pro sobre publicaciones orgánicas.
-
-## v38.0 — chat mutuo
-- Chat privado condicionado a seguimiento mutuo aceptado; estado de Pro protegido en la base de datos.
-
-## v37.0 — comunidad inicial
-- Perfiles, publicaciones de transformaciones, fotos en bucket privado, likes, comentarios, seguimientos y denuncias.
-
-## v36.1 — recordatorios y compatibilidad móvil
-- Preferencias de recordatorios locales, traducciones y ajustes de PWA.
+- Nuevo centro de insignias en Progreso con 12 niveles por desafío: Bronce, Plata, Oro y Diamante, tres niveles por rango.
+- Desafíos para ejercicios medibles de la biblioteca (repeticiones, isometrías y cardio), marcas de ejercicios personalizados, distancias de correr/caminar/ciclismo y constancia por días activos.
+- El progreso considera la mejor serie guardada en entrenamientos y los récords personales declarados; las marcas manuales no se presentan como verificadas.
+- Las carreras GPS válidas según controles básicos de plausibilidad pueden actualizar insignias con distintivo GPS; registros manuales de distancia solo cuentan como logro personal.
+- Insignias integradas con el estado de usuario existente (exportación, importación, guardado local y sincronización explícita). Sin cambios al esquema SQL.
+- Vista previa de insignias en Perfil. La publicación de insignias en Comunidad se deja para una fase posterior.
+- El service worker precarga `achievements.js` y usa caché `fittforma-ai-static-v40-20`.
+- La verificación de código local es necesaria, pero la integración con credenciales reales y dispositivos físicos sigue pendiente.
 
 
-## Revisión integral adicional (14-10-2026)
-- Añadida prueba automatizada `tests/syntax.test.mjs` para ejecutar `node --check` en los archivos JS/MJS del proyecto y validar los scripts inline de `index.html`.
-- Actualizada la auditoría para distinguir pruebas locales de verificaciones todavía pendientes en Supabase/Render y dispositivos reales.
+## v40.19 — Comunidad por secciones y corrección de PGRST201
+
+- El feed referencia explícitamente `community_posts_user_id_fkey`; los comentarios, `community_comments_user_id_fkey`.
+- Se añadió una recuperación no destructiva que consulta publicaciones y perfiles por separado si PostgREST sigue informando una relación ambigua o falta el nombre de FK esperado.
+- Comunidad ahora tiene cinco paneles internos: Feed, Explorar, Publicar, Mensajes y Mi perfil. La búsqueda muestra resultados dentro de Explorar; el feed principal queda separado.
+- Pestañas adaptadas a móvil, estados ARIA y navegación por teclado.
+- Caché de PWA y versiones actualizadas a `0.40.19` / `fittforma-ai-static-v40-19`.
+
+# Cambios recientes
+
+## v40.18 — actualización de la PWA y auditoría independiente
+- **Service worker:** el `index.html`, los `.js`, `.json`, `.css` y `supabase-config.js` se piden primero a la red (con tiempo máximo de 5 s) y solo se usa la copia guardada sin conexión. Antes se servía primero la copia guardada, de modo que una versión nueva podía no verse hasta limpiar los datos del sitio. Las imágenes siguen con copia guardada primero.
+- **Aviso de actualización:** si se instala un service worker nuevo, aparece «Hay una versión nueva» con los botones Actualizar y Después. No recarga solo, para no cortar un entrenamiento.
+- **Perfil → Versión de la app:** muestra la versión y el botón «Buscar actualización», que consulta al servidor y recarga si hay otra versión.
+- Versión `0.40.18` / caché `fittforma-ai-static-v40-18` en paquetes, backend, navegador, traducciones y pruebas.
+- 6 pruebas nuevas (`tests/pwa-update.test.mjs`); una de ellas falla con el service worker de la v40.17, como debe. `npm test`: 136 aprobadas, 0 fallidas.
+- No se modificó el esquema SQL de Supabase ni la lógica de Gemini.
+
+## v40.17 — auditoría previa a producción
+- `npm test`: 130 aprobadas, 0 fallidas; la misma suite pasa desde el ZIP extraído.
+- Diagnóstico de Supabase consulta en solo lectura cinco tablas principales, las RPC `search_community_profiles` y `community_ranked_post_ids`, y, con sesión iniciada, mensajes, bloqueos y sincronización de cuenta.
+- Validación de configuración pública alineada entre backend/navegador: HTTPS, host de proyecto `*.supabase.co`, sin credenciales/query/fragmento/ruta adicional y clave pública anon/publishable válida.
+- Errores distinguen configuración ausente, tabla o RPC faltante, red/CDN y RLS/permisos. No se escriben datos durante el diagnóstico.
+- Se corrigieron asociaciones engañosas para ciclismo indoor/exterior y flexiones de rodilla/curls femorales, que ahora usan referencias apropiadas de familia.
+- Se añadieron tipos explícitos a los botones que carecían de ellos y una prueba que impide regresiones de ese tipo.
+- Se confirmó que los 45 recursos del precaché existen; se revisaron 213 assets y 24 imágenes rasterizadas activas sin duplicados exactos ni pares perceptualmente casi idénticos según el umbral utilizado.
+- La integración real de Render/Supabase/Gemini y los dispositivos físicos sigue pendiente de prueba del usuario.
+
+# CHANGELOG — FittForma AI
+
+## v40.16 — diagnóstico de conexión y estabilización de la auditoría
+- Añadida una ruta de diagnóstico visible desde Comunidad: permite repetir la inicialización de Supabase y hacer una consulta de solo lectura a `community_profiles`.
+- `/api/public-config` devuelve solo los valores de conexión públicos permitidos y metadatos diagnósticos: versión, tipo de clave pública y motivo si la configuración está ausente/inválida. Nunca devuelve Gemini ni claves de servidor.
+- El backend acepta `SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`; ambas opciones pasan validación para rechazar `service_role`/`sb_secret_`.
+- `supabase-js` intenta un segundo CDN si el primero no carga.
+- Corregidas fechas diarias de Comunidad y límites de anuncios para usar calendario local en vez de UTC, que podía desplazar el día en Uruguay.
+- La exportación de datos retarda la revocación de la URL Blob para evitar cortar descargas.
+- Se amplió la suite a **124 pruebas aprobadas, 0 fallidas**; las mismas pruebas se repiten desde el ZIP extraído.
+- Mantiene las mejoras visuales y la limpieza de duplicados de imágenes de v40.15.
+- Pendiente de aceptación externa: credenciales reales de Supabase/Gemini, pruebas RLS y dos cuentas, Render y teléfono físico.
+
+## v40.14 — Punto 10: auditoría final y corrección de configuración de Supabase
+- El frontend puede obtener la configuración pública de Supabase desde `GET /api/public-config` usando `SUPABASE_URL` y `SUPABASE_ANON_KEY` (o `SUPABASE_PUBLISHABLE_KEY`) configuradas en Render.
+- El backend devuelve únicamente la URL del proyecto y una clave publicable/anon válida; no serializa variables de entorno completas, GEMINI_API_KEY ni SUPABASE_SERVICE_ROLE_KEY.
+- Se rechazan claves `sb_secret_` y JWT cuyo claim `role` no sea exactamente `anon`; el cliente local también valida el claim de las claves JWT antiguas.
+- La Comunidad muestra un mensaje concreto cuando la configuración falta, en lugar de culpar directamente al esquema SQL.
+- Caché PWA, cabeceras de versión y paquetes actualizados a v40.14 / 0.40.14.
+- Pruebas locales: consultar `AUDITORIA_PUNTO_10_FittForma_AI_v40_13.md`.
+
+# Cambios de FittForma AI
+
+## v40.12 — Punto 9: GPS, recordatorios y preparación de monetización
+- Suite `npm test`: 114 pruebas aprobadas, 0 fallidas.
+- Se añadió la descarga de recordatorios recurrentes en formato iCalendar (.ics), construidos a partir de los días y hora guardados. El calendario puede avisar aunque FittForma esté cerrada, pero el evento no detecta si se registró una sesión en la app.
+- La creación del .ics valida que los recordatorios estén activados, que haya días elegidos y que la hora sea válida; incluye aviso 10 minutos antes y usa la hora local elegida.
+- La exportación GPX ahora solicita confirmación explícita porque el archivo contiene coordenadas precisas. La descarga sigue siendo iniciada por el usuario y se genera localmente.
+- Se revisa la preparación de monetización: Google Ad Manager permanece desactivado y Pro no acepta pagos ni aparenta tener suscripciones verificadas. La integración de pagos reales sigue pendiente de elegir y configurar un proveedor.
+- Se actualizó versión y caché PWA para que el navegador solicite recursos de v40.12.
+
+## Versiones anteriores
+- v40.11: nutrición, progreso e historial de hábitos.
+- v40.10: comunidad.
+- v40.9: entrenador IA y mejoras visuales/progresión.
+- v40.8: entrenamiento en vivo.

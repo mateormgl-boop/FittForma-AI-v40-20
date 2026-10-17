@@ -18,6 +18,7 @@ const root=rootCandidates.find(candidate=>existsSync(path.join(candidate,'index.
 const rawPort=String(process.env.PORT||'8787');
 const port=Number(rawPort);
 if(!Number.isInteger(port)||port<0||port>65535)throw new Error(`PORT debe ser un entero entre 0 y 65535; se recibió ${JSON.stringify(rawPort)}.`);
+const appVersion='0.41.0';
 const apiKey=String(process.env.GEMINI_API_KEY||'').trim(), model=String(process.env.GEMINI_MODEL||'gemini-3.8-flash').trim()||'gemini-3.8-flash';
 const trustRenderClientIp=String(process.env.TRUST_RENDER_CLIENT_IP||'').toLowerCase()==='true';
 // If the primary model temporarily returns 503, try a lighter official model automatically.
@@ -43,9 +44,10 @@ async function askGemini({system, user, history=[], imageDataUrl=null, maxTokens
     const attempts=modelIndex===0?2:1; // retry the selected model once, then use the lighter fallback
     for(let attempt=0;attempt<attempts;attempt++){
       const generationConfig={maxOutputTokens:maxTokens,responseMimeType:'application/json'};
-      // Gemini 3.6/3.8 accept thinkingLevel; the lightweight fallback uses standard generation settings.
+      // Gemini 3.6/3.8 aceptan thinkingLevel. En las familias Gemini 3/4 no enviar
+      // parámetros legacy de sampling como temperature; los modelos anteriores sí pueden usarlo.
       if(/^gemini-3\.(6|8)-/.test(currentModel)) generationConfig.thinkingConfig={thinkingLevel:'low'};
-      else generationConfig.temperature=0.3;
+      else if(!/^gemini-[34](?:[.-])/.test(currentModel)) generationConfig.temperature=0.3;
       const geminiUrl=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(currentModel)}:generateContent`;
       let response;
       try{response=await fetch(geminiUrl,{method:'POST',signal:AbortSignal.timeout(30000),headers:{'x-goog-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({systemInstruction:{parts:[{text:system}]},contents,generationConfig})});}
@@ -100,7 +102,7 @@ const MAX_TRACKED_CLIENTS=5000;
 const PUBLIC_ROOT_FILES=new Set([
   '/index.html','/i18n.js','/community.js','/ads-config.js','/ads.js','/membership-config.js',
   '/manifest.json','/icon.svg','/icon-180.png','/icon-192.png','/icon-512.png',
-  '/supabase-config.js','/sw.js'
+  '/supabase-config.js','/achievements.js','/sw.js'
 ]);
 const CSP=[
   "default-src 'self'",
@@ -160,10 +162,30 @@ function rateLimited(req){
   return old.count>12;
 }
 function isJsonObject(value){return value!==null&&typeof value==='object'&&!Array.isArray(value);}
+
+function validSupabasePublicConfig(rawUrl, rawKey){
+  const url=String(rawUrl||'').trim();
+  const key=String(rawKey||'').trim();
+  let parsed;
+  try{parsed=new URL(url);}catch{return null;}
+  if(parsed.protocol!=='https:'||!/^[a-z0-9-]+\.supabase\.co$/i.test(parsed.hostname)||parsed.username||parsed.password||parsed.search||parsed.hash||(parsed.pathname!==''&&parsed.pathname!=='/'))return null;
+  // Publishable keys are designed for browser use. Legacy anon JWTs are accepted only
+  // when their role claim is exactly `anon`; service_role/secret keys are never returned.
+  if(!key||/PEGAR_|TU-PROYECTO|service_role|sb_secret_/i.test(key))return null;
+  let publicKey=false;
+  if(/^sb_publishable_[A-Za-z0-9_-]{20,}$/.test(key))publicKey=true;
+  else if(key.startsWith('eyJ')){
+    const parts=key.split('.');
+    if(parts.length===3){try{const payload=JSON.parse(Buffer.from(parts[1],'base64url').toString('utf8'));publicKey=payload?.role==='anon';}catch{publicKey=false;}}
+  }
+  if(!publicKey)return null;
+  return {url:parsed.origin,anonKey:key};
+}
 function isPublicAssetPath(requested){
   if(PUBLIC_ROOT_FILES.has(requested))return true;
   if(!requested.startsWith('/assets/'))return false;
   const relative=requested.slice('/assets/'.length);
+  if(relative.startsWith('exercises/unverified-generated/'))return false;
   if(!relative||relative.split('/').some(part=>!part||part==='.'||part==='..'||part.startsWith('.')))return false;
   return ['.svg','.webp','.png','.jpg','.jpeg','.ico'].includes(path.posix.extname(relative).toLowerCase());
 }
@@ -195,8 +217,21 @@ const server=http.createServer(async(req,res)=>{try{
   if(req.method==='POST'&&req.headers.origin){try{if(new URL(req.headers.origin).host!==String(req.headers.host||''))return send(req,res,403,{error:'Origen no permitido.'});}catch{return send(req,res,403,{error:'Origen no válido.'});}}
   if(!['GET','POST','HEAD'].includes(req.method))return send(req,res,405,{error:'Método no permitido.'});
   if(req.method==='POST'&&String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase()!=='application/json')return send(req,res,415,{error:'El servidor espera JSON.'});
-  if(req.method==='GET'&&url.pathname==='/api/status')return send(req,res,200,{service:'FittForma AI Coach',provider:'Gemini',configured:Boolean(apiKey),model:apiKey?model:null,fallbackModels:apiKey?fallbackModels:[],mode:apiKey?'ai':'demo',frontendAvailable:existsSync(path.join(root,'index.html'))});
-  if(req.method==='GET'&&url.pathname==='/healthz')return send(req,res,200,{ok:true,service:'fittforma-ai'});
+  if(req.method==='GET'&&url.pathname==='/api/public-config'){
+    const projectUrl=String(process.env.SUPABASE_URL||'').trim();
+    const anonKey=String(process.env.SUPABASE_ANON_KEY||'').trim();
+    const publishableKey=String(process.env.SUPABASE_PUBLISHABLE_KEY||'').trim();
+    const config=validSupabasePublicConfig(projectUrl,anonKey)||validSupabasePublicConfig(projectUrl,publishableKey);
+    // Only public project URL + publishable/anon key may be sent to the browser.
+    // Never expose Gemini, service_role, secret keys or arbitrary environment variables.
+    const missing=config?[]:[...(projectUrl?[]:['SUPABASE_URL']), 'SUPABASE_ANON_KEY o SUPABASE_PUBLISHABLE_KEY (clave pública publishable/anon; no usar service_role)'];
+    let validUrl=false;try{const u=new URL(projectUrl);validUrl=u.protocol==='https:'&&/^[a-z0-9-]+\.supabase\.co$/i.test(u.hostname)&&!u.username&&!u.password&&!u.search&&!u.hash&&(u.pathname===''||u.pathname==='/');}catch{}
+    const issue=config?null:(!projectUrl?'missing_project_url':(!validUrl?'invalid_project_url':(!anonKey&&!publishableKey?'missing_public_key':'invalid_public_key')));
+    const keyType=config?(String(config.anonKey).startsWith('sb_publishable_')?'publishable':'legacy_anon'):null;
+    return send(req,res,200,{version:appVersion,supabase:config?{configured:true,...config,keyType}:{configured:false,url:null,anonKey:null,keyType:null},missing,issue});
+  }
+  if(req.method==='GET'&&url.pathname==='/api/status')return send(req,res,200,{service:'FittForma AI Coach',version:appVersion,provider:'Gemini',configured:Boolean(apiKey),model:apiKey?model:null,fallbackModels:apiKey?fallbackModels:[],mode:apiKey?'ai':'demo',supabaseConfigured:Boolean(validSupabasePublicConfig(process.env.SUPABASE_URL,process.env.SUPABASE_ANON_KEY)||validSupabasePublicConfig(process.env.SUPABASE_URL,process.env.SUPABASE_PUBLISHABLE_KEY)),frontendAvailable:existsSync(path.join(root,'index.html'))});
+  if(req.method==='GET'&&url.pathname==='/healthz')return send(req,res,200,{ok:true,service:'fittforma-ai',version:appVersion});
   if(req.method==='POST'&&url.pathname==='/api/meal-photo'){
     if(rateLimited(req)){res.setHeader('Retry-After','60');return send(req,res,429,{error:'Demasiadas solicitudes. Esperá un minuto.'});}
     let body;try{body=await readBody(req,4_000_000);}catch(e){return send(req,res,e.message==='too_large'?413:400,{error:e.message==='too_large'?'La imagen es demasiado grande. Elegí una foto más liviana.':'Solicitud de imagen inválida.'});}

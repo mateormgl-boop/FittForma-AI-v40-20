@@ -1,10 +1,11 @@
-/* FittForma AI v32.0 — Google Ad Manager web ads. Ads stay off until configured. */
+/* FittForma AI v41.0 — Google Ad Manager web ads. Ads stay off until configured. */
 (() => {
   const config = window.FittFormaAdsConfig || {};
   const DAILY_KEY = 'fittforma-ai-ad-usage-v1';
   const FREE_DAILY = 6, REWARD_CREDITS = 3, MAX_REWARDS_DAILY = 3;
   let gptPromise = null, rewardedSlot = null, rewardedReady = null, rewardGranted = false;
-  const dateKey = () => new Date().toISOString().slice(0,10);
+  // El contador diario sigue la fecha local del usuario; UTC adelantaba el día en Uruguay durante la noche.
+  const dateKey = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
   const configured = () => Boolean(config.enabled && config.networkCode && config.rewardedSlot);
   const adsConfigured = () => Boolean(config.enabled && config.networkCode && Object.values(config.displaySlots || {}).some(Boolean));
   function usage(){
