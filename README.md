@@ -1,8 +1,14 @@
-# FittForma AI — v41.0
+# FittForma AI — v42.0
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v42.0
+
+- 6 secciones (Inicio · Entrenar · Nutrición · Progreso · Comunidad · Perfil) y FittAI.
+- Rutinas propias, entrenamiento libre, sesiones y comidas editables, Nutrición en pestañas y Perfil agrupado.
+- Detalle y matriz de funciones: `docs/AUDITORIA_v42.md`.
 
 ## Novedades v41.0
 
@@ -32,6 +38,7 @@ npm test                  # pruebas automáticas (node --test)
 ```
 
 Pruebas de base de datos y de extremo a extremo: `docs/PRUEBAS.md`.
+Integración entre secciones en navegador (con `npm start` en otra terminal): `node tests/e2e/integration.e2e.mjs`.
 
 ## Desplegar (Render + Supabase)
 

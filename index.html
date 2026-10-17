@@ -2011,14 +2011,14 @@
         <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
         <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">41.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">42.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
       </details>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 41.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 42.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -2045,7 +2045,7 @@
   <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true">›</span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow">›</span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V41.0</p>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V42.0</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -4254,7 +4254,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.41.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.40.21. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.42.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.40.21. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -4720,7 +4720,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.41.0';
+  const APP_VERSION='0.42.0';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');

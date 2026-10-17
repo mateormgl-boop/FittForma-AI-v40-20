@@ -35,9 +35,9 @@ test('feed search results render inside Explore and clearing the query does not 
 
 test('version, backend and service-worker cache match v41.0',async()=>{
  const a=JSON.parse(await read('package.json')),b=JSON.parse(await read('backend/package.json'));
- assert.equal(a.version,'0.41.0');assert.equal(b.version,'0.41.0');
+ assert.equal(a.version,'0.42.0');assert.equal(b.version,'0.42.0');
  const server=await read('backend/server.mjs'),html=await read('index.html'),sw=await read('sw.js');
- assert.match(server,/0\.41\.0/);assert.match(html,/Versión 41\.0/);assert.match(sw,/fittforma-ai-static-v41-0/);
+ assert.match(server,/0\.42\.0/);assert.match(html,/Versión 42\.0/);assert.match(sw,/fittforma-ai-static-v42-0/);
 });
 
 test('la navegación y los títulos principales de Comunidad están traducidos en los seis idiomas',async()=>{

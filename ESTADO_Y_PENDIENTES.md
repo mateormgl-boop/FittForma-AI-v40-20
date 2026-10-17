@@ -1,3 +1,8 @@
+## v42.0 — Estado
+
+Ver `docs/AUDITORIA_v42.md` (matriz completa). Verificado: 175 pruebas automáticas, 55 comprobaciones de integración en Chromium (móvil y escritorio), 44 SQL/RLS locales, 22 pasos E2E de Comunidad y barrido visual sin desbordes ni errores.
+Pendiente: notificaciones internas, medidas corporales y fotos de progreso privadas, moderación de denuncias, borrado de cuenta. No verificable aquí: Supabase real, Gemini, Render, GPS/cámara en teléfono y PWA instalada.
+
 ## v41.0 — Estado
 
 **Verificado en este entorno**

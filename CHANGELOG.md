@@ -1,5 +1,15 @@
 # FittForma AI — Registro de cambios
 
+## v42.0 — Seis secciones, rutinas propias y entrenamiento libre (17 de octubre de 2026)
+
+- Navegación de 6 secciones: Inicio, Entrenar, Nutrición, Progreso, Comunidad y Perfil. FittAI (antes Coach) en Entrenar, «Más» y la barra lateral.
+- Inicio: saludo según la hora, acciones rápidas que ejecutan la función real (siguiente sesión, comida, +1 agua, correr, insignias, FittAI).
+- Entrenar: rutinas propias con CRUD completo y plantillas desde el plan; entrenamiento libre; agregar/quitar series y ejercicios en curso; descanso automático; lanzador también tras guardar.
+- Nutrición en pestañas (Hoy · Registrar · Objetivos · Historial) y edición de comidas sin duplicar.
+- Progreso: corregir o eliminar sesiones, con recálculo de insignias.
+- Perfil: cabecera con estadísticas reales y grupos plegables; un solo nombre visible.
+- Pruebas: 175 automáticas, 55 comprobaciones de integración en navegador, 44 SQL/RLS y 22 E2E de Comunidad. Informe: `docs/AUDITORIA_v42.md`.
+
 ## v41.0 — Navegación de 5 destinos, insignias con reglas únicas y comunidad ampliada (17 de octubre de 2026)
 
 - Base: se incorporó el ZIP v40.21 sobre el repositorio (que contenía v40.2); se retiraron solo assets que v40.21 ya no usaba.
