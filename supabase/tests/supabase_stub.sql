@@ -17,5 +17,10 @@ alter table storage.objects enable row level security;
 create or replace function storage.foldername(name text) returns text[] language sql immutable as
 $$ select (string_to_array(name,'/'))[1:greatest(array_length(string_to_array(name,'/'),1)-1,0)] $$;
 grant usage on schema public, auth, storage to anon, authenticated;
+-- Igual que Supabase: lo que se crea en public queda con todos los permisos para anon/authenticated
+-- (las restricciones reales dependen de RLS y de los revoke explícitos de cada script).
+alter default privileges in schema public grant all on tables to anon, authenticated;
+alter default privileges in schema public grant all on functions to anon, authenticated;
+alter default privileges in schema public grant all on sequences to anon, authenticated;
 grant execute on function auth.uid() to anon, authenticated;
 grant select, insert, delete on storage.objects to anon, authenticated;
