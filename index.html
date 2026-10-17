@@ -1450,6 +1450,33 @@
     .profile-stats small{color:var(--ff-muted);font-size:11px}
     @media(min-width:1200px){#view-nutrition .view-panel:not([hidden]){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 var(--ff-s4);align-items:start}}
     @media(prefers-reduced-motion:reduce){.ff-group>summary::after{transition:none}}
+    /* v42 — Entrenar: lanzador, rutinas propias y edición de sesión */
+    .train-launch h3{margin:4px 0 12px}
+    .train-launch-main{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:14px;margin-bottom:12px;border-radius:var(--ff-r-md);border:1px solid rgba(26,167,255,.45);background:linear-gradient(135deg,rgba(30,91,255,.28),rgba(26,167,255,.10));color:var(--ff-text);text-align:left}
+    .train-launch-main small{display:block;color:var(--ff-muted);font-size:12px}.train-launch-main strong{display:block;font-size:18px}.train-launch-main em{font-style:normal;color:#c5d3ee;font-size:13px}
+    .train-launch-list{margin-bottom:12px}.train-launch-row{width:100%;background:none;border-left:0;border-right:0;border-top:0;color:var(--ff-text);text-align:left}
+    .train-launch-row b{display:block}.train-launch-row small{color:var(--ff-muted)}
+    .session-ex-tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+    .routine-row{flex-wrap:wrap}.routine-row>div:first-child{flex:1 1 200px;min-width:0}
+    .routine-editor{margin-top:var(--ff-s4);padding-top:var(--ff-s4);border-top:1px solid var(--ff-line)}
+    .routine-ex-list{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-direction:column;gap:8px}
+    .routine-ex-head,.routine-ex-row{display:grid;grid-template-columns:minmax(0,2.4fr) 62px 72px 66px 72px auto;gap:6px;align-items:center}
+    .routine-ex-head{font-size:11px;color:var(--ff-muted);margin:8px 0 4px}
+    .routine-ex-row input{min-width:0;width:100%;padding:8px}
+    .rx-field{display:block;min-width:0}.rx-field span{display:none;font-size:11px;color:var(--ff-muted);margin-bottom:3px}
+    .routine-ex-actions{display:flex;gap:2px}
+    .icon-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--ff-line);background:transparent;color:#c5d3ee}
+    .icon-btn:disabled{opacity:.35}
+    .routine-template{margin-top:12px}.routine-template label{display:block;font-size:13px;color:var(--ff-muted);margin-bottom:6px}
+    .history-actions{display:flex;flex-wrap:wrap;align-items:center;gap:6px;justify-content:flex-end}
+    .history-item{flex-wrap:wrap}.history-edit{flex:1 1 100%;margin-top:8px}
+    @media(max-width:560px){
+      .routine-ex-head{display:none}
+      .rx-field span{display:block}
+      .routine-ex-row{grid-template-columns:repeat(4,minmax(0,1fr));padding:10px;border:1px solid var(--ff-line);border-radius:var(--ff-r-md)}
+      .routine-ex-row>input:first-child{grid-column:1/-1}
+      .routine-ex-actions{grid-column:1/-1;justify-content:flex-end}
+    }
     /* v41 — Comunidad: tipos de publicación, logros y no leídos */
     .community-kind{display:inline-block;margin-bottom:6px;color:var(--ff-muted);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
     .community-achievement{display:flex;align-items:center;gap:var(--ff-s3);padding:var(--ff-s3);margin:4px 0 8px;border-radius:var(--ff-r-md);border:1px solid rgba(26,167,255,.35);background:rgba(26,167,255,.07)}
@@ -1582,6 +1609,8 @@
     <button type="button" class="subnav-item" data-subview="coach">FittAI</button>
   </nav>
       <div class="section-head"><div><h2>Tu plan de entrenamiento</h2><p>Rutinas con biblioteca ampliada de ejercicios de gimnasio, casa y peso corporal.</p></div></div>
+      <div class="card" id="myRoutinesCard"><div class="section-head"><div><div class="eyebrow">Mis rutinas</div><h3>Rutinas propias</h3><p class="muted small">Creá, editá, duplicá y reordená tus rutinas. Son independientes del plan generado.</p></div><button class="btn" id="newRoutine" type="button">+ Nueva rutina</button></div><div id="routineList"></div><div id="routineEditor" class="routine-editor" hidden></div></div>
+      <datalist id="exerciseNameList"></datalist>
       <div class="card planner-card">
         <div class="section-head"><div><div class="eyebrow">Tu semana</div><h3>Organizá tus próximos entrenamientos</h3><p>Planificá gimnasio, correr, caminar o descanso. Lo que registrás se refleja en el calendario.</p></div><span class="tag" id="plannerWeekLabel">Esta semana</span></div>
         <div id="weeklyActivityStrip" class="calendar-days" aria-label="Actividad de esta semana"></div>
@@ -2051,7 +2080,7 @@
   const PREVIOUS_V3_STORAGE = 'fittforma-ai-v3';
   const PREVIOUS_STORAGE = 'fittforma-ai-v2';
   const LEGACY_STORAGE = 'forma-prototype-v1';
-  const defaults = {plannedActivities:[],mealFavorites:[],habitLogs:{},waterLogs:{},badgeRecords:[],badgeUnlocks:{},profile:{goal:'fitness',level:'beginner',days:'3',equipment:'gym',duration:'30',name:'',age:'',heightCm:'',currentWeightKg:'',targetWeightKg:'',activityLevel:'light'},sessions:[],plan:null,meals:[],weights:[],activities:[],water:{date:'',count:0},nutritionGoals:{calories:2400,protein:120,carbs:280,fat:80,water:8},chat:[],proposal:null,planHistory:[],runningPlan:'starter',reminders:{enabled:false,time:'18:00',days:[1,3,5],missedEnabled:true,missedTime:'21:00',lastTrainingNoticeDate:'',lastMissedNoticeDate:''}};
+  const defaults = {routines:[],plannedActivities:[],mealFavorites:[],habitLogs:{},waterLogs:{},badgeRecords:[],badgeUnlocks:{},profile:{goal:'fitness',level:'beginner',days:'3',equipment:'gym',duration:'30',name:'',age:'',heightCm:'',currentWeightKg:'',targetWeightKg:'',activityLevel:'light'},sessions:[],plan:null,meals:[],weights:[],activities:[],water:{date:'',count:0},nutritionGoals:{calories:2400,protein:120,carbs:280,fat:80,water:8},chat:[],proposal:null,planHistory:[],runningPlan:'starter',reminders:{enabled:false,time:'18:00',days:[1,3,5],missedEnabled:true,missedTime:'21:00',lastTrainingNoticeDate:'',lastMissedNoticeDate:''}};
   let state = loadState();
   let activeSession = null;
   let lastWorkoutSummary = null;
@@ -3030,13 +3059,189 @@ function findCatalogExercise(name){
     if(restEndAt){clearInterval(restInterval);restInterval=setInterval(refreshRestTimer,250);}
     persistActiveSessionDraft();toast('Sesión recuperada en pausa. Revisá los datos y tocá “Reanudar” cuando estés listo.');
   }
+  // ---------- v42: sesiones desde plan, rutina propia o entrenamiento libre ----------
+  const ROUTINE_LIMITS={exercises:30,sets:10,rest:600,weight:1000,name:60,notes:300};
+  function libraryExerciseIndex(){
+    const map=new Map();
+    for(const e of Object.values(library).flat()){const key=normalizeExerciseName(e?.name||'');if(key&&!map.has(key))map.set(key,e);}
+    return map;
+  }
+  function exerciseMetaByName(name){
+    const found=libraryExerciseIndex().get(normalizeExerciseName(name));
+    return {group:found?.group||'Personalizado',kind:found?.kind||'strength'};
+  }
+  function buildSessionExercises(list){
+    return (Array.isArray(list)?list:[]).map(e=>{
+      const sets=Math.min(ROUTINE_LIMITS.sets,Math.max(1,Math.round(Number(e?.sets)||3)));
+      const meta=e?.group?{group:e.group,kind:e.kind||'strength'}:exerciseMetaByName(e?.name);
+      return {...e,name:String(e?.name||'Ejercicio').slice(0,72),group:meta.group,kind:meta.kind,sets,reps:String(e?.reps||'8-12').slice(0,12),targetWeight:e?.weight?String(e.weight):'',rest:Math.min(ROUTINE_LIMITS.rest,Math.max(0,Number(e?.rest)||0)),entries:Array.from({length:sets},()=>({reps:'',weight:'',done:false}))};
+    });
+  }
+  function beginSession(meta,exercises){
+    if(activeSession){toast('Ya hay una sesión en curso. Retomá o guardá esa sesión antes de iniciar otra.');switchView('train');return false;}
+    clearActiveSessionDraft();resetRestTimer();lastWorkoutSummary=null;
+    activeSession={dayIndex:Number.isInteger(meta.dayIndex)?meta.dayIndex:null,routineId:meta.routineId||null,free:Boolean(meta.free),title:String(meta.title||'Entrenamiento').slice(0,80),date:dateKey(),startedAt:Date.now(),segmentStartedAt:Date.now(),elapsedMs:0,pausedAt:0,pauseReason:'',restEndAt:0,notes:'',exercises:buildSessionExercises(exercises)};
+    persistActiveSessionDraft();renderTrain();switchView('train');return true;
+  }
+  function nextPlanDayIndex(){
+    const plan=state.plan&&Array.isArray(state.plan.days)&&state.plan.days.length?state.plan:null;if(!plan)return -1;
+    const titles=plan.days.map(day=>day.title);
+    const newest=[...(state.sessions||[])].filter(x=>titles.includes(x.title)).sort((a,b)=>String(b.date).localeCompare(String(a.date))||(Number(b.id)||0)-(Number(a.id)||0))[0];
+    return newest?(titles.indexOf(newest.title)+1)%titles.length:0;
+  }
+  function startRoutine(id){
+    const routine=(state.routines||[]).find(r=>String(r.id)===String(id));if(!routine){toast('No se encontró la rutina.');return;}
+    if(beginSession({routineId:routine.id,title:routine.name},routine.exercises))toast(`Empezaste «${routine.name}».`);
+  }
+  function startFreeWorkout(){if(beginSession({free:true,title:'Entrenamiento libre'},[]))toast('Agregá ejercicios a medida que entrenás.');}
+  function trainLauncherMarkup(){
+    const next=nextPlanDayIndex(),day=next>=0?state.plan.days[next]:null,routines=(state.routines||[]).slice(0,6);
+    return `<div class="card train-launch"><div class="eyebrow">Empezar a entrenar</div><h3>¿Qué vas a entrenar hoy?</h3>`+
+      (day?`<button type="button" class="train-launch-main" data-start-plan-day="${next}"><span><small>Siguiente sesión de tu plan</small><strong>${esc(day.title)}</strong><em>${day.exercises.length} ejercicios</em></span><span class="btn">Empezar</span></button>`:'')+
+      (routines.length?`<div class="train-launch-list"><strong>Mis rutinas</strong>${routines.map(r=>`<button type="button" class="ff-list-row train-launch-row" data-start-routine="${esc(String(r.id))}"><span><b>${esc(r.name)}</b><small>${r.exercises.length} ejercicios</small></span><span class="link-btn">Iniciar</span></button>`).join('')}</div>`:'')+
+      `<div class="btn-row"><button type="button" class="btn ${day||routines.length?'secondary':''}" id="startFreeWorkout">Entrenamiento libre</button><button type="button" class="btn ghost" id="goPlan">${state.plan||routines.length?'Rutinas y plan':'Crear una rutina'}</button></div>`+
+      (!day&&!routines.length?'<p class="muted small">Todavía no tenés un plan ni rutinas propias. Podés entrenar libre y agregar ejercicios sobre la marcha.</p>':'')+`</div>`;
+  }
+  function bindTrainLauncher(root){
+    root.querySelectorAll('[data-start-plan-day]').forEach(b=>b.onclick=()=>startWorkout(Number(b.dataset.startPlanDay)));
+    root.querySelectorAll('[data-start-routine]').forEach(b=>b.onclick=()=>startRoutine(b.dataset.startRoutine));
+    if($('startFreeWorkout'))$('startFreeWorkout').onclick=startFreeWorkout;
+    if($('goPlan'))$('goPlan').onclick=()=>switchView('routines');
+  }
+  // Edición de la sesión en curso: series y ejercicios.
+  function sessionAddSet(ei){const ex=activeSession?.exercises?.[ei];if(!ex)return;if(ex.entries.length>=ROUTINE_LIMITS.sets){toast(`Máximo ${ROUTINE_LIMITS.sets} series por ejercicio.`);return;}ex.entries.push({reps:'',weight:'',done:false});ex.sets=ex.entries.length;persistActiveSessionDraft();renderTrain();}
+  function sessionRemoveSet(ei){const ex=activeSession?.exercises?.[ei];if(!ex||ex.entries.length<=1)return;const last=ex.entries[ex.entries.length-1];if(last.done||String(last.reps||'').trim()||String(last.weight||'').trim()){if(!confirm('La última serie tiene datos. ¿Quitarla igual?'))return;}ex.entries.pop();ex.sets=ex.entries.length;persistActiveSessionDraft();renderTrain();}
+  function sessionRemoveExercise(ei){const ex=activeSession?.exercises?.[ei];if(!ex)return;const hasData=ex.entries.some(x=>x.done||String(x.reps||'').trim()||String(x.weight||'').trim());if(!confirm(hasData?`«${ex.name}» tiene series registradas. ¿Quitarlo de esta sesión?`:`¿Quitar «${ex.name}» de esta sesión?`))return;activeSession.exercises.splice(ei,1);persistActiveSessionDraft();renderTrain();}
+  function sessionAddExercise(name){
+    const clean=String(name||'').trim().slice(0,72);if(clean.length<2){toast('Escribí o elegí el nombre del ejercicio.');return false;}
+    if(!activeSession)return false;if(activeSession.exercises.length>=ROUTINE_LIMITS.exercises){toast('Llegaste al máximo de ejercicios por sesión.');return false;}
+    activeSession.exercises.push(...buildSessionExercises([{name:clean,sets:3,reps:'10'}]));persistActiveSessionDraft();renderTrain();toast(`Agregaste ${clean}.`);return true;
+  }
+  function sessionExerciseToolsMarkup(e,ei){return `<div class="session-ex-tools"><button type="button" class="btn ghost btn-sm" data-session-add-set="${ei}">+ Serie</button>${e.entries.length>1?`<button type="button" class="btn ghost btn-sm" data-session-remove-set="${ei}">− Serie</button>`:''}<button type="button" class="btn ghost btn-sm" data-session-remove-ex="${ei}">Quitar ejercicio</button></div>`;}
+  function sessionAddExerciseMarkup(){return `<div class="card session-add-card"><div class="eyebrow">${activeSession?.free&&!activeSession.exercises.length?'Entrenamiento libre':'Agregar a esta sesión'}</div><h3>${activeSession?.exercises.length?'¿Sumás otro ejercicio?':'Agregá tu primer ejercicio'}</h3><form id="sessionAddExerciseForm" class="chat-form"><label class="sr-only" for="sessionAddExerciseName">Ejercicio</label><input id="sessionAddExerciseName" list="exerciseNameList" maxlength="72" placeholder="Ej. Sentadillas" autocomplete="off"><button class="btn" type="submit">Agregar</button></form><p class="muted small">Elegí de la biblioteca o escribí uno propio. No se guarda como rutina salvo que vos lo hagas.</p></div>`;}
+  function bindSessionEditing(root){
+    root.querySelectorAll('[data-session-add-set]').forEach(b=>b.onclick=()=>sessionAddSet(Number(b.dataset.sessionAddSet)));
+    root.querySelectorAll('[data-session-remove-set]').forEach(b=>b.onclick=()=>sessionRemoveSet(Number(b.dataset.sessionRemoveSet)));
+    root.querySelectorAll('[data-session-remove-ex]').forEach(b=>b.onclick=()=>sessionRemoveExercise(Number(b.dataset.sessionRemoveEx)));
+    const form=$('sessionAddExerciseForm');if(form)form.onsubmit=e=>{e.preventDefault();if(sessionAddExercise($('sessionAddExerciseName').value))$('sessionAddExerciseName')?.focus();};
+  }
+
+  // ---------- v42: rutinas propias (CRUD) ----------
+  let routineDraft=null,routineDraftDirty=false;
+  function fillExerciseDatalist(){
+    const list=$('exerciseNameList');if(!list||list.childElementCount)return;
+    list.innerHTML=[...new Set(Object.values(library).flat().map(e=>String(e?.name||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).map(n=>`<option value="${esc(n)}"></option>`).join('');
+  }
+  function renderRoutines(){
+    const root=$('routineList');if(!root)return;fillExerciseDatalist();
+    const routines=Array.isArray(state.routines)?state.routines:[];
+    const planDays=state.plan?.days||[];
+    const templates=planDays.length?`<div class="routine-template"><label for="routineTemplateDay">Usar un día del plan como plantilla</label><div class="chat-form"><select id="routineTemplateDay">${planDays.map((d,i)=>`<option value="${i}">${esc(d.title)} · ${d.exercises.length} ejercicios</option>`).join('')}</select><button type="button" class="btn secondary" id="routineFromTemplate">Usar</button></div><small class="muted">Se crea una copia editable; el plan no cambia.</small></div>`:'';
+    root.innerHTML=(routines.length?`<ul class="ff-list">${routines.map(r=>`<li class="ff-list-row routine-row"><div><strong>${esc(r.name)}</strong><small>${r.exercises.length} ejercicios${r.notes?` · ${esc(r.notes.slice(0,60))}`:''}</small></div><div class="btn-row"><button type="button" class="btn btn-sm" data-routine-start="${esc(String(r.id))}">Iniciar</button><button type="button" class="btn ghost btn-sm" data-routine-edit="${esc(String(r.id))}">Editar</button><button type="button" class="btn ghost btn-sm" data-routine-duplicate="${esc(String(r.id))}">Duplicar</button><button type="button" class="btn ghost btn-sm" data-routine-delete="${esc(String(r.id))}">Eliminar</button></div></li>`).join('')}</ul>`:'<div class="empty"><strong>Todavía no tenés rutinas propias</strong><p>Armá una con los ejercicios que quieras, o partí de un día de tu plan.</p></div>')+templates;
+    renderRoutineEditor();
+  }
+  function openRoutineEditor(draft){
+    if(routineDraft&&routineDraftDirty&&!confirm('Tenés cambios sin guardar en la rutina que estás editando. ¿Descartarlos?'))return;
+    routineDraft=structuredClone(draft);routineDraftDirty=false;renderRoutineEditor();
+    $('routineEditor')?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+    setTimeout(()=>$('routineName')?.focus(),60);
+  }
+  function renderRoutineEditor(){
+    const root=$('routineEditor');if(!root)return;
+    if(!routineDraft){root.hidden=true;root.innerHTML='';return;}
+    root.hidden=false;const d=routineDraft;
+    root.innerHTML=`<form id="routineForm" novalidate><div class="section-head"><div><div class="eyebrow">${d.id?'Editar rutina':'Nueva rutina'}</div><h3>${d.id?esc(d.name||'Rutina'):'Armá tu rutina'}</h3></div></div>
+      <div class="field"><label for="routineName">Nombre</label><input id="routineName" maxlength="${ROUTINE_LIMITS.name}" required placeholder="Ej. Pierna y glúteos" value="${esc(d.name||'')}"></div>
+      <div class="field"><label for="routineNotes">Notas (opcional)</label><textarea id="routineNotes" maxlength="${ROUTINE_LIMITS.notes}" rows="2" placeholder="Calentamiento, indicaciones…">${esc(d.notes||'')}</textarea></div>
+      <div class="routine-ex-head" aria-hidden="true"><span>Ejercicio</span><span>Series</span><span>Reps</span><span>Kg</span><span>Desc. (s)</span><span></span></div>
+      <ol class="routine-ex-list">${d.exercises.map((e,i)=>`<li class="routine-ex-row"><input aria-label="Ejercicio ${i+1}" list="exerciseNameList" maxlength="72" data-rx="${i}" data-rk="name" value="${esc(e.name||'')}" placeholder="Ejercicio"><label class="rx-field"><span>Series</span><input aria-label="Series de ${esc(e.name||'ejercicio')}" type="number" min="1" max="${ROUTINE_LIMITS.sets}" step="1" inputmode="numeric" data-rx="${i}" data-rk="sets" value="${esc(String(e.sets??3))}"></label><label class="rx-field"><span>Reps</span><input aria-label="Repeticiones de ${esc(e.name||'ejercicio')}" maxlength="12" data-rx="${i}" data-rk="reps" value="${esc(String(e.reps??'10'))}" placeholder="10 o 8-12"></label><label class="rx-field"><span>Kg</span><input aria-label="Kilos de ${esc(e.name||'ejercicio')}" type="number" min="0" max="${ROUTINE_LIMITS.weight}" step="0.5" inputmode="decimal" data-rx="${i}" data-rk="weight" value="${esc(String(e.weight??''))}" placeholder="—"></label><label class="rx-field"><span>Desc. (s)</span><input aria-label="Descanso en segundos de ${esc(e.name||'ejercicio')}" type="number" min="0" max="${ROUTINE_LIMITS.rest}" step="5" inputmode="numeric" data-rx="${i}" data-rk="rest" value="${esc(String(e.rest??60))}"></label><span class="routine-ex-actions"><button type="button" class="icon-btn" data-rmove="${i}:-1" aria-label="Subir ${esc(e.name||'ejercicio')}" ${i===0?'disabled':''}>↑</button><button type="button" class="icon-btn" data-rmove="${i}:1" aria-label="Bajar ${esc(e.name||'ejercicio')}" ${i===d.exercises.length-1?'disabled':''}>↓</button><button type="button" class="icon-btn" data-rremove="${i}" aria-label="Quitar ${esc(e.name||'ejercicio')}">✕</button></span></li>`).join('')}</ol>
+      ${d.exercises.length?'':'<p class="muted small">Agregá al menos un ejercicio.</p>'}
+      <button type="button" class="btn secondary" id="routineAddExercise" ${d.exercises.length>=ROUTINE_LIMITS.exercises?'disabled':''}>+ Agregar ejercicio</button>
+      <p class="community-status" id="routineStatus" role="status" aria-live="polite"></p>
+      <div class="btn-row"><button type="submit" class="btn">Guardar rutina</button><button type="button" class="btn ghost" id="routineCancel">Cancelar</button></div></form>`;
+    const form=$('routineForm');
+    $('routineName').oninput=e=>{d.name=e.target.value;routineDraftDirty=true;};
+    $('routineNotes').oninput=e=>{d.notes=e.target.value;routineDraftDirty=true;};
+    form.querySelectorAll('[data-rx]').forEach(inp=>inp.oninput=()=>{d.exercises[Number(inp.dataset.rx)][inp.dataset.rk]=inp.value;routineDraftDirty=true;});
+    form.querySelectorAll('[data-rmove]').forEach(b=>b.onclick=()=>{const [i,dir]=b.dataset.rmove.split(':').map(Number),j=i+dir;if(j<0||j>=d.exercises.length)return;[d.exercises[i],d.exercises[j]]=[d.exercises[j],d.exercises[i]];routineDraftDirty=true;renderRoutineEditor();form.ownerDocument.querySelector(`[data-rmove="${j}:${dir}"]`)?.focus();});
+    form.querySelectorAll('[data-rremove]').forEach(b=>b.onclick=()=>{d.exercises.splice(Number(b.dataset.rremove),1);routineDraftDirty=true;renderRoutineEditor();});
+    $('routineAddExercise').onclick=()=>{d.exercises.push({name:'',sets:3,reps:'10',weight:'',rest:60});routineDraftDirty=true;renderRoutineEditor();const inputs=document.querySelectorAll('[data-rk="name"]');inputs[inputs.length-1]?.focus();};
+    $('routineCancel').onclick=()=>{if(routineDraftDirty&&!confirm('¿Descartar los cambios de esta rutina?'))return;routineDraft=null;routineDraftDirty=false;renderRoutineEditor();};
+    form.onsubmit=e=>{e.preventDefault();saveRoutineDraft();};
+  }
+  function validateRoutine(d){
+    const name=String(d.name||'').trim();if(name.length<2)return {ok:false,msg:'Poné un nombre de al menos 2 caracteres.'};
+    const exercises=[];
+    for(const [i,e] of d.exercises.entries()){
+      const ex=String(e.name||'').trim();if(!ex)return {ok:false,msg:`Completá el nombre del ejercicio ${i+1} o quitalo.`};
+      const sets=Number(e.sets);if(!Number.isInteger(sets)||sets<1||sets>ROUTINE_LIMITS.sets)return {ok:false,msg:`${ex}: las series deben ser un entero entre 1 y ${ROUTINE_LIMITS.sets}.`};
+      const reps=String(e.reps??'').trim();if(!/^\d{1,3}(\s*-\s*\d{1,3})?(\s*(s|seg|min))?$/i.test(reps))return {ok:false,msg:`${ex}: escribí las repeticiones como 10, 8-12 o 30 s.`};
+      const weightText=String(e.weight??'').trim(),weight=weightText===''?'':Number(weightText);if(weight!==''&&(!Number.isFinite(weight)||weight<0||weight>ROUTINE_LIMITS.weight))return {ok:false,msg:`${ex}: el peso debe estar entre 0 y ${ROUTINE_LIMITS.weight} kg.`};
+      const rest=Number(e.rest??0);if(!Number.isFinite(rest)||rest<0||rest>ROUTINE_LIMITS.rest)return {ok:false,msg:`${ex}: el descanso debe estar entre 0 y ${ROUTINE_LIMITS.rest} segundos.`};
+      const meta=exerciseMetaByName(ex);
+      exercises.push({name:ex.slice(0,72),group:meta.group,kind:meta.kind,sets,reps:reps.slice(0,12),weight:weight===''?'':weight,rest:Math.round(rest)});
+    }
+    if(!exercises.length)return {ok:false,msg:'Agregá al menos un ejercicio.'};
+    if(exercises.length>ROUTINE_LIMITS.exercises)return {ok:false,msg:`Máximo ${ROUTINE_LIMITS.exercises} ejercicios por rutina.`};
+    return {ok:true,value:{name:name.slice(0,ROUTINE_LIMITS.name),notes:String(d.notes||'').trim().slice(0,ROUTINE_LIMITS.notes),exercises}};
+  }
+  function saveRoutineDraft(){
+    const check=validateRoutine(routineDraft);if(!check.ok){$('routineStatus').textContent=check.msg;return;}
+    state.routines=Array.isArray(state.routines)?state.routines:[];
+    const now=new Date().toISOString();
+    if(routineDraft.id){const i=state.routines.findIndex(r=>String(r.id)===String(routineDraft.id));if(i<0){$('routineStatus').textContent='Esa rutina ya no existe. Guardala como nueva.';routineDraft.id=null;return;}state.routines[i]={...state.routines[i],...check.value,updatedAt:now};}
+    else state.routines.unshift({id:'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),...check.value,createdAt:now,updatedAt:now});
+    if(!save()){$('routineStatus').textContent='No se pudo guardar en este dispositivo. Tus cambios siguen en el formulario.';return;}
+    routineDraft=null;routineDraftDirty=false;renderRoutines();renderTrain();toast('Rutina guardada.');
+  }
+  function initRoutines(){
+    const card=$('myRoutinesCard');if(!card)return;
+    $('newRoutine').onclick=()=>openRoutineEditor({id:null,name:'',notes:'',exercises:[{name:'',sets:3,reps:'10',weight:'',rest:60}]});
+    card.addEventListener('click',e=>{
+      const t=e.target.closest('button');if(!t)return;
+      const find=id=>(state.routines||[]).find(r=>String(r.id)===String(id));
+      if(t.dataset.routineStart)startRoutine(t.dataset.routineStart);
+      else if(t.dataset.routineEdit){const r=find(t.dataset.routineEdit);if(r)openRoutineEditor(r);}
+      else if(t.dataset.routineDuplicate){const r=find(t.dataset.routineDuplicate);if(r){const now=new Date().toISOString();state.routines.unshift({...structuredClone(r),id:'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:(r.name+' (copia)').slice(0,ROUTINE_LIMITS.name),createdAt:now,updatedAt:now});save();renderRoutines();renderTrain();toast('Rutina duplicada.');}}
+      else if(t.dataset.routineDelete){const r=find(t.dataset.routineDelete);if(r&&confirm(`¿Eliminar la rutina «${r.name}»? Tu historial de entrenamientos no se modifica.`)){state.routines=state.routines.filter(x=>x!==r);if(routineDraft&&String(routineDraft.id)===String(r.id)){routineDraft=null;routineDraftDirty=false;}save();renderRoutines();renderTrain();toast('Rutina eliminada.');}}
+      else if(t.id==='routineFromTemplate'){const day=state.plan?.days?.[Number($('routineTemplateDay').value)];if(day)openRoutineEditor({id:null,name:day.title.slice(0,ROUTINE_LIMITS.name),notes:'',exercises:day.exercises.map(x=>({name:x.name,sets:x.sets,reps:String(x.reps||'10').replace(/[^\d\s\-segmin]/gi,'').trim()||'10',weight:'',rest:60}))});}
+    });
+    renderRoutines();
+  }
+
+  // ---------- v42: corregir o eliminar sesiones del historial ----------
+  function badgeIdsForSession(session){
+    const names=new Set((session?.exercises||[]).map(e=>BadgeEngine.normalizeName(e?.name)));
+    return [...getBadgeCatalog().filter(i=>names.has(BadgeEngine.normalizeName(i.name))).map(i=>i.id),'consistency-active-days'];
+  }
+  function initSessionHistoryEditing(){
+    const root=$('historyList');if(!root)return;
+    root.addEventListener('click',e=>{
+      const b=e.target.closest('button');if(!b)return;
+      const id=b.dataset.sessionEdit||b.dataset.sessionDelete||b.dataset.sessionCancel||'';const session=(state.sessions||[]).find(s=>String(s.id)===String(id));
+      if(b.dataset.sessionDelete&&session){
+        if(!confirm(`¿Eliminar «${session.title}» del ${prettyDate(session.date)}? Se recalculan tus estadísticas e insignias.`))return;
+        state.sessions=state.sessions.filter(s=>s!==session);const delta=syncBadgeUnlocks(badgeIdsForSession(session));save();renderAll();toast(delta.revoked.length?`Sesión eliminada · se quitaron ${delta.revoked.length} insignia(s) que dependían de ella.`:'Sesión eliminada.');
+      }else if(b.dataset.sessionEdit&&session){
+        const item=b.closest('.history-item');if(!item||item.querySelector('form'))return;
+        item.insertAdjacentHTML('beforeend',`<form class="history-edit" data-session-form="${esc(String(session.id))}"><div class="grid2"><div class="field"><label>Fecha</label><input type="date" name="date" required max="${dateKey()}" value="${esc(session.date)}"></div><div class="field"><label>Minutos</label><input type="number" name="minutes" min="1" max="600" step="1" required value="${esc(String(session.minutes||1))}"></div></div><div class="field"><label>Notas</label><input name="notes" maxlength="180" value="${esc(session.notes||'')}"></div><div class="btn-row"><button class="btn btn-sm" type="submit">Guardar cambios</button><button class="btn ghost btn-sm" type="button" data-session-cancel="${esc(String(session.id))}">Cancelar</button></div></form>`);
+        item.querySelector('form input')?.focus();
+      }else if(b.dataset.sessionCancel){b.closest('form')?.remove();}
+    });
+    root.addEventListener('submit',e=>{
+      const form=e.target.closest('[data-session-form]');if(!form)return;e.preventDefault();
+      const session=(state.sessions||[]).find(s=>String(s.id)===form.dataset.sessionForm);if(!session)return;
+      const date=form.elements.date.value,minutes=Number(form.elements.minutes.value);
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>dateKey()){toast('Elegí una fecha válida que no sea futura.');return;}
+      if(!Number.isInteger(minutes)||minutes<1||minutes>600){toast('Los minutos deben ser un entero entre 1 y 600.');return;}
+      Object.assign(session,{date,minutes,notes:form.elements.notes.value.trim().slice(0,180),editedAt:new Date().toISOString()});
+      syncBadgeUnlocks(['consistency-active-days']);save();renderAll();toast('Sesión actualizada.');
+    });
+  }
   function startWorkout(dayIndex){
     if(!state.plan){toast('Primero creá una rutina.');return;}
-    if(activeSession){toast('Ya hay una sesión en curso. Retomá o guardá esa sesión antes de iniciar otra.');switchView('train');return;}
     const day=state.plan.days[dayIndex];if(!day){toast('No se encontró esa sesión del plan.');return;}
-    clearActiveSessionDraft();resetRestTimer();lastWorkoutSummary=null;
-    activeSession={dayIndex,title:day.title,date:dateKey(),startedAt:Date.now(),segmentStartedAt:Date.now(),elapsedMs:0,pausedAt:0,pauseReason:'',restEndAt:0,notes:'',exercises:day.exercises.map(e=>({...e,entries:Array.from({length:e.sets},()=>({reps:'',weight:'',done:false}))}))};
-    persistActiveSessionDraft();renderTrain();switchView('train');
+    beginSession({dayIndex,title:day.title},day.exercises);
   }
   function renderTrain(){
     const root=$('trainContent');if(!root)return;
@@ -3045,24 +3250,25 @@ function findCatalogExercise(name){
       if(lastWorkoutSummary){
         const x=lastWorkoutSummary;
         root.innerHTML=`<div class="card workout-live-card"><div class="eyebrow">ENTRENAMIENTO GUARDADO</div><h2 style="margin:5px 0">${esc(x.title)}</h2><p class="muted small">${prettyDate(x.date)} · Sesión guardada en tu historial.</p><div class="workout-summary-grid"><div class="workout-summary-metric"><small>Tiempo total</small><strong>${formatWorkoutDuration(x.minutes*60)}</strong></div><div class="workout-summary-metric"><small>Series completadas</small><strong>${x.completedSets}/${x.totalSets}</strong></div><div class="workout-summary-metric"><small>Ejercicios con datos</small><strong>${x.completedExercises}/${x.totalExercises}</strong></div><div class="workout-summary-metric"><small>Volumen registrado</small><strong>${x.volumeKg.toLocaleString('es-UY',{maximumFractionDigits:1})} kg</strong></div></div><div class="workout-summary-check">✓ Tu sesión está guardada en este dispositivo. ${x.recordedSets>x.completedSets?`${x.recordedSets-x.completedSets} serie(s) tenían datos pero no quedaron marcadas como completadas.`:'Las series marcadas como listas quedaron registradas.'}</div><div class="btn-row" style="margin-top:14px"><button class="btn full" id="summaryGoProgress" type="button">Ver mi progreso</button><button class="btn ghost full" id="summaryGoPlan" type="button">Volver al plan</button></div></div>`;
+        root.insertAdjacentHTML('beforeend',trainLauncherMarkup());bindTrainLauncher(root);
         $('summaryGoProgress').onclick=()=>switchView('progress');$('summaryGoPlan').onclick=()=>switchView('routines');return;
       }
-      root.innerHTML=`<div class="card empty"><strong>¿Listo para entrenar?</strong><p>Elegí una sesión de tu plan para registrar tus series y repeticiones.</p><button type="button" class="btn" id="goPlan">Ver mi plan</button></div>`;
-      $('goPlan').onclick=()=>switchView('routines');return;
+      root.innerHTML=trainLauncherMarkup();bindTrainLauncher(root);return;
     }
     root.innerHTML=`<div class="card workout-live-card"><div class="workout-live-title-row"><div><div class="eyebrow">SESIÓN EN CURSO</div><h2 style="margin:5px 0">${esc(activeSession.title)}</h2><p class="muted small">${prettyDate(activeSession.date)} · Registrá tus series y mantené una técnica controlada.</p></div><div class="workout-duration-badge ${activeSession.pausedAt?'is-paused':''}" id="workoutDurationBadge"><span>Tiempo activo</span><strong id="workoutElapsedDisplay">${formatWorkoutDuration(Math.floor(activeSessionElapsedMs()/1000))}</strong><small id="workoutStateBadge">${activeSession.pausedAt?'EN PAUSA':'EN CURSO'}</small></div></div><div class="workout-session-controls"><button class="btn secondary" type="button" id="toggleWorkoutPause">${activeSession.pausedAt?'Reanudar sesión':'Pausar sesión'}</button><button class="btn ghost" type="button" id="leaveWorkoutForLater">Salir y guardar para retomar</button></div><p class="workout-pause-status" id="workoutPauseStatus" role="status">${activeSession.pausedAt?'La sesión está en pausa. El tiempo activo no avanza.':'El tiempo activo incluye el descanso entre series.'}</p><div id="workoutAutosaveStatus" class="workout-autosave-status" role="status">Borrador guardado automáticamente en este dispositivo.</div><div class="workout-progress-head"><span id="workoutProgressText">0 series completadas</span><span class="muted small" id="workoutProgressCount">0%</span></div><div class="progressbar"><span id="workoutProgressBar" style="width:0%"></span></div></div>`+
     `<div class="card rest-timer-card"><div class="rest-timer-copy"><div class="eyebrow">DESCANSO ENTRE SERIES</div><strong id="restTimerDisplay">${formatRestTime(restEndAt?Math.max(0,Math.ceil((restEndAt-Date.now())/1000)):0)}</strong><small id="restTimerStatus" class="muted">${restEndAt>Date.now()?'Descanso en curso':'Recuperá antes de la próxima serie.'}</small></div><div class="rest-timer-controls"><div class="field"><label for="restSeconds">Duración</label><select id="restSeconds"><option value="30">30 s</option><option value="60" selected>60 s</option><option value="90">90 s</option><option value="120">120 s</option></select></div><button class="btn secondary" type="button" id="startRestTimer">Iniciar descanso</button><button class="btn ghost" type="button" id="resetRestTimer">Reiniciar</button></div></div>`+
-    activeSession.exercises.map((e,ei)=>`<div class="card"><div class="train-exercise-head">${exercisePhoto(e.name,e.group,true,e.kind)}<div><h3>${esc(e.name)}</h3><p class="muted small">${esc(e.group)} · Objetivo: ${e.sets} × ${esc(e.reps)}</p><button class="btn ghost" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${esc(state.profile.equipment)}">Ver técnica y postura</button></div></div>${lastPerformanceMarkup(e)}`+
+    activeSession.exercises.map((e,ei)=>`<div class="card"><div class="train-exercise-head">${exercisePhoto(e.name,e.group,true,e.kind)}<div><h3>${esc(e.name)}</h3><p class="muted small">${esc(e.group)} · Objetivo: ${e.entries.length} × ${esc(e.reps)}${e.targetWeight?` · ${esc(e.targetWeight)} kg`:''}${e.rest?` · descanso ${esc(String(e.rest))} s`:''}</p><button class="btn ghost" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${esc(state.profile.equipment)}">Ver técnica y postura</button></div></div>${lastPerformanceMarkup(e)}`+
     (e.kind==='cardio'?`<div class="field"><label>Minutos completados</label><input type="number" min="0" max="300" step="1" inputmode="numeric" data-e="${ei}" data-s="0" data-k="reps" placeholder="Ej. 10" value="${esc(e.entries[0]?.reps||'')}"></div><label class="cardio-complete"><input type="checkbox" data-done="1" data-e="${ei}" data-s="0" ${e.entries[0]?.done?'checked':''}><span>Marcar actividad como completada</span></label>`:
-    e.entries.map((entry,si)=>`<div class="setrow"><span class="setnum">Serie ${si+1}</span><input aria-label="Repeticiones serie ${si+1} de ${esc(e.name)}" type="number" min="0" max="200" step="1" inputmode="numeric" placeholder="Reps" data-e="${ei}" data-s="${si}" data-k="reps" value="${esc(entry.reps)}"><input aria-label="Peso serie ${si+1} de ${esc(e.name)} en kg" type="number" min="0" max="1000" step="0.5" inputmode="decimal" placeholder="Kg (opcional)" data-e="${ei}" data-s="${si}" data-k="weight" value="${esc(entry.weight)}"><label class="set-check"><input aria-label="Marcar serie ${si+1} como completada" type="checkbox" data-done="1" data-e="${ei}" data-s="${si}" ${entry.done?'checked':''}><span>Listo</span></label></div>`).join(''))+'</div>').join('')+
+    e.entries.map((entry,si)=>`<div class="setrow"><span class="setnum">Serie ${si+1}</span><input aria-label="Repeticiones serie ${si+1} de ${esc(e.name)}" type="number" min="0" max="200" step="1" inputmode="numeric" placeholder="Reps" data-e="${ei}" data-s="${si}" data-k="reps" value="${esc(entry.reps)}"><input aria-label="Peso serie ${si+1} de ${esc(e.name)} en kg" type="number" min="0" max="1000" step="0.5" inputmode="decimal" placeholder="Kg (opcional)" data-e="${ei}" data-s="${si}" data-k="weight" value="${esc(entry.weight)}"><label class="set-check"><input aria-label="Marcar serie ${si+1} como completada" type="checkbox" data-done="1" data-e="${ei}" data-s="${si}" ${entry.done?'checked':''}><span>Listo</span></label></div>`).join(''))+sessionExerciseToolsMarkup(e,ei)+'</div>').join('')+sessionAddExerciseMarkup()+
     `<div class="card"><div class="field"><label for="sessionNotes">Notas (opcional)</label><input id="sessionNotes" maxlength="180" placeholder="¿Cómo te sentiste?"></div><div class="btn-row"><button class="btn full" id="finishWorkout" type="button">Finalizar y guardar</button><button class="btn ghost full" id="cancelWorkout" type="button">Cancelar y descartar sesión</button></div></div>`;
     root.querySelectorAll('input[data-e]:not([data-done])').forEach(inp=>inp.addEventListener('input',()=>{const e=Number(inp.dataset.e),s=Number(inp.dataset.s),k=inp.dataset.k;activeSession.exercises[e].entries[s][k]=inp.value;persistActiveSessionDraft();}));
-    root.querySelectorAll('input[data-done]').forEach(inp=>inp.addEventListener('change',()=>{const e=Number(inp.dataset.e),s=Number(inp.dataset.s);activeSession.exercises[e].entries[s].done=inp.checked;updateWorkoutProgress();persistActiveSessionDraft();if(inp.checked)toast('Serie marcada como completada.');}));
+    root.querySelectorAll('input[data-done]').forEach(inp=>inp.addEventListener('change',()=>{const e=Number(inp.dataset.e),s=Number(inp.dataset.s);activeSession.exercises[e].entries[s].done=inp.checked;updateWorkoutProgress();persistActiveSessionDraft();const restAfter=Number(activeSession.exercises[e].rest)||0;if(inp.checked&&restAfter>0)startRestTimer(restAfter);else if(inp.checked)toast('Serie marcada como completada.');}));
     $('sessionNotes').value=activeSession.notes||'';$('sessionNotes').addEventListener('input',()=>{activeSession.notes=$('sessionNotes').value;persistActiveSessionDraft();});
     $('startRestTimer').onclick=()=>startRestTimer(Number($('restSeconds').value)||60);
     $('resetRestTimer').onclick=resetRestTimer;
     $('toggleWorkoutPause').onclick=()=>{if(!activeSession)return;if(activeSession.pausedAt)resumeWorkout();else pauseWorkout();updateWorkoutClock();};
     $('leaveWorkoutForLater').onclick=()=>{if(!activeSession)return;if(!activeSession.pausedAt)pauseWorkout();persistActiveSessionDraft();switchView('plan');toast('Sesión guardada en pausa. Volvé a Entrenar para retomarla.');};
+    bindSessionEditing(root);fillExerciseDatalist();
     updateWorkoutProgress();updateWorkoutClock();
     if(workoutClockInterval)clearInterval(workoutClockInterval);workoutClockInterval=setInterval(updateWorkoutClock,1000);
     $('finishWorkout').onclick=finishWorkout;
@@ -3419,7 +3625,7 @@ function findCatalogExercise(name){
     const physical=state.profile||{},currentKg=Number(physical.currentWeightKg),targetKg=Number(physical.targetWeightKg);
     const weightGoalHtml=Number.isFinite(currentKg)&&currentKg>0&&Number.isFinite(targetKg)&&targetKg>0?`<div class="notice"><strong>Tu objetivo de peso:</strong> ${currentKg.toFixed(1)} kg actuales → ${targetKg.toFixed(1)} kg objetivo. ${Math.abs(targetKg-currentKg)<0.1?'Estás en el peso que definiste como meta.':`Diferencia: ${Math.abs(targetKg-currentKg).toFixed(1)} kg ${targetKg>currentKg?'por ganar para la meta':'por bajar para la meta'}.`} El peso diario puede fluctuar; mirá la tendencia a lo largo de las semanas.</div>`:'';
     $('progressSummary').innerHTML=`<div class="stats" style="margin:12px 0 0"><div class="stat"><strong>${total}</strong><small>Rutinas completadas</small></div><div class="stat"><strong>${activeDays}</strong><small>Días activos</small></div><div class="stat"><strong>${totalSets}</strong><small>Registros de series</small></div></div>${weightGoalHtml}<p class="muted small">Tiempo total registrado: ${mins} minutos entre rutinas y actividades al aire libre. El tiempo de las rutinas se estima desde que abriste la sesión hasta que la guardaste.</p>`;
-    $('historyList').innerHTML=state.sessions.length?state.sessions.slice(0,30).map(s=>`<div class="history-item"><div><strong>${esc(s.title)}</strong><small>${prettyDate(s.date)} · ${Array.isArray(s.exercises)?s.exercises.length:0} ejercicios · ${Number(s.minutes)||0} min</small>${s.notes?`<div class="muted small">${esc(s.notes)}</div>`:''}</div><span class="tag">${setsOf(s)} series</span></div>`).join(''):'<div class="empty"><strong>Todavía no hay sesiones</strong><p>Cuando guardes tu primer entrenamiento, aparecerá acá.</p><button class="btn" type="button" data-goto-view="train">Empezar un entrenamiento</button></div>';
+    $('historyList').innerHTML=state.sessions.length?state.sessions.slice(0,30).map(s=>`<div class="history-item"><div><strong>${esc(s.title)}</strong><small>${prettyDate(s.date)} · ${Array.isArray(s.exercises)?s.exercises.length:0} ejercicios · ${Number(s.minutes)||0} min</small>${s.notes?`<div class="muted small">${esc(s.notes)}</div>`:''}${s.editedAt?'<div class="muted small">Editada</div>':''}</div><div class="history-actions"><span class="tag">${setsOf(s)} series</span><button class="btn ghost btn-sm" type="button" data-session-edit="${esc(String(s.id))}">Editar</button><button class="btn ghost btn-sm" type="button" data-session-delete="${esc(String(s.id))}">Eliminar</button></div></div>`).join(''):'<div class="empty"><strong>Todavía no hay sesiones</strong><p>Cuando guardes tu primer entrenamiento, aparecerá acá.</p><button class="btn" type="button" data-goto-view="train">Empezar un entrenamiento</button></div>';
     renderWeeklyActivityChart();
     renderConsistencyChallenges();
     renderTrainingInsights();
@@ -3699,7 +3905,7 @@ function findCatalogExercise(name){
     $('calorieBar').style.width=Math.min(100,g.calories?cal/g.calories*100:0)+'%';{const pct=g.calories?Math.min(1,cal/g.calories):0;$('nutriRingArc').style.strokeDashoffset=String(326.7*(1-pct));$('nutriRingValue').textContent=Math.round(cal);$('nutriRingTitle').textContent=g.calories?`Objetivo: ${Math.round(g.calories)} kcal`:'Sin objetivo definido';$('nutriRingText').textContent=meals.length?`${Math.round(pct*100)}% de tu objetivo diario · ${meals.length} ${meals.length===1?'comida':'comidas'}`:'Registrá tu primera comida.';}$('calorieCaption').textContent=`${Math.max(0,Math.round(g.calories-cal))} kcal estimadas restantes para tu objetivo diario.`;
     const carbTarget=Number.isFinite(Number(g.carbs))?Number(g.carbs):280,fatTarget=Number.isFinite(Number(g.fat))?Number(g.fat):80;const macroProgress=[['protein',pro,g.protein||120,'proteinCaption'],['carb',carbs,carbTarget,'carbCaption'],['fat',fat,fatTarget,'fatCaption']];
     for(const [prefix,amount,target,captionId] of macroProgress){$(captionId).textContent=`${Math.round(amount)} / ${Math.round(target)} g`;$(`${prefix}Bar`).style.width=Math.min(100,target?amount/target*100:0)+'%';}
-    $('mealList').innerHTML=meals.length?meals.slice().reverse().map(m=>{const favorite=(state.mealFavorites||[]).some(f=>f.sourceId===m.id||f.name===m.name);return `<div class="history-item"><div><strong>${esc(m.name)}</strong><small>${esc(m.type)} · ${Math.round(m.calories)} kcal · ${Math.round(m.protein)} g P · ${Math.round(Number(m.carbs||0))} g C · ${Math.round(Number(m.fat||0))} g G</small><div class="meal-list-actions"><button class="btn ghost toggleMealFavorite" type="button" data-id="${esc(String(m.id))}">${favorite?'★ Guardada':'☆ Guardar favorita'}</button></div></div><button type="button" class="btn ghost removeMeal" data-id="${esc(String(m.id))}" aria-label="Eliminar ${esc(m.name)}">Quitar</button></div>`;}).join(''):'<div class="empty"><strong>Sin comidas registradas</strong><p>Agregá lo que comiste para ver tu resumen.</p><button class="btn" type="button" data-home-quick="meal">Registrar una comida</button></div>';
+    $('mealList').innerHTML=meals.length?meals.slice().reverse().map(m=>{const favorite=(state.mealFavorites||[]).some(f=>f.sourceId===m.id||f.name===m.name);return `<div class="history-item"><div><strong>${esc(m.name)}</strong><small>${esc(m.type)} · ${Math.round(m.calories)} kcal · ${Math.round(m.protein)} g P · ${Math.round(Number(m.carbs||0))} g C · ${Math.round(Number(m.fat||0))} g G</small><div class="meal-list-actions"><button class="btn ghost toggleMealFavorite" type="button" data-id="${esc(String(m.id))}">${favorite?'★ Guardada':'☆ Guardar favorita'}</button></div></div><button type="button" class="btn ghost editMeal" data-id="${esc(String(m.id))}" aria-label="Editar ${esc(m.name)}">Editar</button><button type="button" class="btn ghost removeMeal" data-id="${esc(String(m.id))}" aria-label="Eliminar ${esc(m.name)}">Quitar</button></div>`;}).join(''):'<div class="empty"><strong>Sin comidas registradas</strong><p>Agregá lo que comiste para ver tu resumen.</p><button class="btn" type="button" data-home-quick="meal">Registrar una comida</button></div>';
     document.querySelectorAll('.toggleMealFavorite').forEach(b=>b.addEventListener('click',()=>{const meal=state.meals.find(m=>String(m.id)===b.dataset.id);if(!meal)return;state.mealFavorites=state.mealFavorites||[];const idx=state.mealFavorites.findIndex(f=>f.sourceId===meal.id||f.name===meal.name);if(idx>=0){state.mealFavorites.splice(idx,1);toast('Comida quitada de favoritas.');}else{state.mealFavorites.push({id:Date.now(),sourceId:meal.id,name:meal.name,calories:Number(meal.calories)||0,protein:Number(meal.protein)||0,carbs:Number(meal.carbs)||0,fat:Number(meal.fat)||0,type:meal.type||'Almuerzo'});toast('Comida guardada en favoritas.');}save();renderNutrition();}));
     renderMealFavorites();
     $('waterCount').textContent=state.water.count;$('waterGoalText').textContent=g.water;
@@ -4248,7 +4454,7 @@ function findCatalogExercise(name){
     const empty=$('homeEmpty');if(empty)empty.hidden=!!(sessions.length||activities.length||meals.length||water||unlocked.length);
   }
   function renderAll(){renderAllBase();renderHome();}
-  function renderAllBase(){renderStats();renderPlan();renderProgress();renderProfile();renderNutrition();renderCoach();renderWeights();renderActivities();renderRunningPlan();renderRunningHistory();renderPlanner();}
+  function renderAllBase(){renderRoutines();renderStats();renderPlan();renderProgress();renderProfile();renderNutrition();renderCoach();renderWeights();renderActivities();renderRunningPlan();renderRunningHistory();renderPlanner();}
   // v42: pestañas internas reutilizables (Nutrición y futuras vistas). Progreso conserva las suyas.
   function showViewTab(view,name,focus=false){
     const root=$('view-'+view);if(!root)return;
@@ -4465,7 +4671,20 @@ function findCatalogExercise(name){
   });
   $('saveNutritionGoals').addEventListener('click',()=>{state.nutritionGoals={calories:Math.max(800,Math.min(6000,Number($('calorieGoal').value)||2400)),protein:Math.max(20,Math.min(400,Number($('proteinGoal').value)||120)),carbs:Math.max(0,Math.min(800,Number($('carbGoal').value)||0)),fat:Math.max(0,Math.min(300,Number($('fatGoal').value)||0)),water:Math.max(1,Math.min(20,Number($('waterGoal').value)||8))};save();renderNutrition();toast('Objetivos nutricionales guardados.');});
   $('mealName').addEventListener('input',autoEstimateMeal);for(const id of ['mealCalories','mealProtein','mealCarbs','mealFat'])$(id).addEventListener('input',()=>{$(id).dataset.manual='1';});
-  $('mealForm').addEventListener('submit',e=>{e.preventDefault();state.meals.push({id:Date.now(),date:dateKey(),name:$('mealName').value.trim(),calories:Number($('mealCalories').value),protein:Number($('mealProtein').value),carbs:Number($('mealCarbs').value)||0,fat:Number($('mealFat').value)||0,type:$('mealType').value});save();$('mealForm').reset();for(const id of ['mealCalories','mealProtein','mealCarbs','mealFat'])$(id).dataset.manual='0';lastAutoMealName='';$('mealEstimateStatus').textContent='Al escribir alimentos conocidos, FittForma estima calorías y macronutrientes automáticamente. Revisá los valores antes de guardar.';renderNutrition();toast('Comida registrada.');});
+  $('mealForm').addEventListener('submit',e=>{e.preventDefault();const values={name:$('mealName').value.trim(),calories:Number($('mealCalories').value),protein:Number($('mealProtein').value),carbs:Number($('mealCarbs').value)||0,fat:Number($('mealFat').value)||0,type:$('mealType').value};if(!values.name||!Number.isFinite(values.calories)||values.calories<0||values.calories>10000||!Number.isFinite(values.protein)||values.protein<0||values.protein>500){toast('Revisá el nombre, las calorías (0–10000) y las proteínas (0–500 g).');return;}const editing=editingMealId&&state.meals.find(m=>String(m.id)===String(editingMealId));if(editing)Object.assign(editing,values,{editedAt:new Date().toISOString()});else state.meals.push({id:Date.now(),date:dateKey(),...values});const wasEditing=Boolean(editing);setMealEditing(null);if(!save())return;$('mealForm').reset();for(const id of ['mealCalories','mealProtein','mealCarbs','mealFat'])$(id).dataset.manual='0';lastAutoMealName='';$('mealEstimateStatus').textContent='Al escribir alimentos conocidos, FittForma estima calorías y macronutrientes automáticamente. Revisá los valores antes de guardar.';renderNutrition();renderHome();toast(wasEditing?'Comida actualizada.':'Comida registrada.');if(wasEditing)showViewTab('nutrition','hoy');});
+  let editingMealId=null;
+  function setMealEditing(meal){
+    editingMealId=meal?meal.id:null;const btn=$('mealForm').querySelector('button[type="submit"]');
+    if(btn)btn.textContent=meal?'Guardar cambios':'Guardar comida';
+    let cancel=$('mealEditCancel');
+    if(meal){
+      $('mealName').value=meal.name||'';$('mealCalories').value=meal.calories??'';$('mealProtein').value=meal.protein??'';$('mealCarbs').value=meal.carbs??'';$('mealFat').value=meal.fat??'';if(meal.type)$('mealType').value=meal.type;
+      for(const id of ['mealCalories','mealProtein','mealCarbs','mealFat'])$(id).dataset.manual='1';
+      if(!cancel){btn.insertAdjacentHTML('afterend','<button class="btn ghost full" id="mealEditCancel" type="button">Cancelar edición</button>');$('mealEditCancel').onclick=()=>{setMealEditing(null);$('mealForm').reset();};}
+      $('mealEstimateStatus').textContent=`Editando «${meal.name}». Al guardar se reemplaza el registro; no se crea uno nuevo.`;
+    }else if(cancel)cancel.remove();
+  }
+  $('mealList').addEventListener('click',e=>{const b=e.target.closest('.editMeal');if(!b)return;const meal=state.meals.find(m=>String(m.id)===b.dataset.id);if(!meal)return;setMealEditing(meal);showViewTab('nutrition','registrar');$('mealName').focus();});
   $('addWater').addEventListener('click',()=>{const key=dateKey();if(!state.waterLogs||typeof state.waterLogs!=='object'||Array.isArray(state.waterLogs))state.waterLogs={};if(!state.water||state.water.date!==key)state.water={date:key,count:Math.max(0,Number(state.waterLogs[key])||0)};state.water.count=Math.min(30,state.water.count+1);state.waterLogs[key]=state.water.count;save();renderNutrition();});
   $('removeWater').addEventListener('click',()=>{const key=dateKey();if(!state.waterLogs||typeof state.waterLogs!=='object'||Array.isArray(state.waterLogs))state.waterLogs={};if(!state.water||state.water.date!==key)state.water={date:key,count:Math.max(0,Number(state.waterLogs[key])||0)};state.water.count=Math.max(0,state.water.count-1);state.waterLogs[key]=state.water.count;save();renderNutrition();});
   $('weightForm').addEventListener('submit',e=>{e.preventDefault();const kg=Number($('weightInput').value);state.weights.push({id:Date.now(),date:dateKey(),kg});state.weights.sort((a,b)=>a.date.localeCompare(b.date));state.profile.currentWeightKg=String(kg);save();syncBodyProfileForm();renderProfile();$('weightInput').value='';renderWeights();renderProgress();toast('Peso registrado y perfil actualizado.');});
@@ -4544,7 +4763,7 @@ function findCatalogExercise(name){
   document.querySelectorAll('[data-library-mode]').forEach(b=>b.addEventListener('click',()=>{libraryMode=b.dataset.libraryMode;renderExerciseLibrary();}));
   document.querySelectorAll('.addMealIdea').forEach(b=>b.addEventListener('click',()=>{switchView('nutrition');$('mealName').value=b.dataset.name;$('mealCalories').value=b.dataset.cal;$('mealProtein').value=b.dataset.pro;$('mealCarbs').value=b.dataset.carbs||'';$('mealFat').value=b.dataset.fat||'';$('mealType').value='Almuerzo';$('mealName').focus();}));
   $('exerciseSearch').addEventListener('input',renderExerciseLibrary);$('exerciseGroupFilter').addEventListener('change',renderExerciseLibrary);$('exerciseFavoritesOnly').addEventListener('click',()=>{exerciseFavoritesOnly=!exerciseFavoritesOnly;renderExerciseLibrary();});
-  initBadgeCenter();initProgressTabs();document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});initViewTabs();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
+  initBadgeCenter();initProgressTabs();document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});initViewTabs();initRoutines();initSessionHistoryEditing();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
   setTimeout(()=>checkWorkoutReminders(),1200);setInterval(()=>{if(document.visibilityState==='visible')checkWorkoutReminders();},30000);window.addEventListener('focus',()=>{renderReminderSettings();checkWorkoutReminders();});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){renderReminderSettings();checkWorkoutReminders();}});
   document.addEventListener('visibilitychange',()=>{if(!activeSession)return;if(document.visibilityState==='hidden'&&!activeSession.pausedAt){activeSession.elapsedMs=activeSessionElapsedMs(activeSession);activeSession.segmentStartedAt=Date.now();activeSession.pausedAt=Date.now();activeSession.pauseReason='background';persistActiveSessionDraft();}else if(document.visibilityState==='visible'&&activeSession.pausedAt&&activeSession.pauseReason==='background'){activeSession.pausedAt=0;activeSession.pauseReason='';activeSession.segmentStartedAt=Date.now();persistActiveSessionDraft();updateWorkoutClock();}});
   window.addEventListener('pagehide',()=>{if(activeSession)persistActiveSessionDraft();});
