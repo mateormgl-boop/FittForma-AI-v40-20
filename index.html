@@ -1692,7 +1692,7 @@
   <link rel="stylesheet" href="./design.css">
 </head>
 <body>
-<svg class="ff-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><linearGradient id="ffMedalBronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0b27a"/><stop offset=".55" stop-color="#b8692f"/><stop offset="1" stop-color="#7a3f17"/></linearGradient><linearGradient id="ffMedalSilver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f7fb"/><stop offset=".5" stop-color="#b9c3d1"/><stop offset="1" stop-color="#7d8898"/></linearGradient><linearGradient id="ffMedalGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a8"/><stop offset=".5" stop-color="#f2b822"/><stop offset="1" stop-color="#b07805"/></linearGradient><linearGradient id="ffMedalDiamond" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e4fbff"/><stop offset=".45" stop-color="#7fd8f7"/><stop offset="1" stop-color="#5b5cf0"/></linearGradient>
+<svg class="ff-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><linearGradient id="ffFaceBronze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c46f33"/><stop offset="1" stop-color="#6e3412"/></linearGradient><linearGradient id="ffFaceSilver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aa6b8"/><stop offset="1" stop-color="#4f5a6c"/></linearGradient><linearGradient id="ffFaceGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e7a514"/><stop offset="1" stop-color="#8a5a00"/></linearGradient><linearGradient id="ffFaceDiamond" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3fa2f5"/><stop offset="1" stop-color="#2b33c9"/></linearGradient><linearGradient id="ffMedalBronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0b27a"/><stop offset=".55" stop-color="#b8692f"/><stop offset="1" stop-color="#7a3f17"/></linearGradient><linearGradient id="ffMedalSilver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f7fb"/><stop offset=".5" stop-color="#b9c3d1"/><stop offset="1" stop-color="#7d8898"/></linearGradient><linearGradient id="ffMedalGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a8"/><stop offset=".5" stop-color="#f2b822"/><stop offset="1" stop-color="#b07805"/></linearGradient><linearGradient id="ffMedalDiamond" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e4fbff"/><stop offset=".45" stop-color="#7fd8f7"/><stop offset="1" stop-color="#5b5cf0"/></linearGradient>
   <linearGradient id="ffGradNutri" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22c993"/><stop offset="1" stop-color="#0a7a50"/></linearGradient>
   <linearGradient id="ffGradBrand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#19b8ff"/><stop offset="1" stop-color="#6a4cf2"/></linearGradient>
 </defs></svg>
@@ -2012,7 +2012,8 @@
         </form>
         <div id="badgeRecordList" class="achievement-panel" hidden></div>
         <div class="ff-evidence-legend" aria-label="Qué significa cada estado">
-          <p><span class="ff-evidence">Declarada</span> Marca que anotaste vos (manual o en una sesión). Cuenta para tu progreso personal; nadie la comprobó.</p>
+          <p><span class="ff-evidence">Declarada</span> Marca que anotaste vos a mano (registro manual o marca declarada). Cuenta para tu progreso personal; nadie la comprobó.</p>
+          <p><span class="ff-evidence">Registrada en sesión</span> Sale de las series que marcaste como completadas en un entrenamiento de la app. Tampoco es una verificación independiente.</p>
           <p><span class="ff-evidence is-gps">Con ruta GPS</span> Distancia registrada con GPS que pasó controles básicos en tu dispositivo (precisión, velocidad, saltos). Aporta evidencia, pero no es una verificación independiente.</p>
           <p class="muted small">FittForma todavía no verifica marcas en el servidor; por eso ninguna insignia se muestra como “verificada”.</p>
         </div>
@@ -3611,7 +3612,7 @@ function findCatalogExercise(name){
   const BADGE_CHALLENGE_ALIASES=new Map([['Flexiones clásicas','Flexiones'],['Sentadilla al aire','Sentadillas'],['Zancada hacia atrás sin peso','Zancadas'],['Elevación de talones con apoyo','Elevación de talones'],['Crunch abdominal controlado','Abdominales'],['Plancha con rodillas al pecho lenta','Escaladores'],['Equilibrio a una pierna con apoyo cercano','Equilibrio a una pierna']].map(([a,b])=>[BadgeEngine.normalizeName(a),b]));
   function badgeKeyForExercise(name){const canon=FittFormaTraining.canonicalName(name),key=BadgeEngine.normalizeName(canon);return BadgeEngine.normalizeName(BADGE_CHALLENGE_ALIASES.get(key)||canon);}
   function getBadgeCatalog(){
-    const catalog=[...CORE_BADGE_EXERCISES];
+    const catalog=[...CORE_BADGE_EXERCISES,...BadgeEngine.LOAD_CHALLENGES];
     const seen=new Set(catalog.map(item=>BadgeEngine.normalizeName(item.name)));
     for(const exercise of Object.values(library).flat()){
       const name=String(exercise?.name||'').trim();if(!name)continue;
@@ -3642,6 +3643,29 @@ function findCatalogExercise(name){
   function matchesActivityType(activity,type){return BadgeEngine.normalizeName(activity?.type)===BadgeEngine.normalizeName(type);}
   function hasGpsEvidence(entry){return Boolean(entry&&(entry.evidence==='gps_device'||(entry.verified&&entry.source==='gps')));}
   function getBadgeMetric(item){
+    const num=v=>{const n=Number.parseFloat(String(v??'').trim().replace(',','.'));return Number.isFinite(n)?n:0;};
+    // v49: marca con carga = mejor serie completada (reps ≥ 1) ÷ peso corporal del perfil. Nunca el volumen.
+    if(item.measure==='bw'){
+      let best={kg:0,reps:0,date:'',manual:false};
+      for(const session of (state.sessions||[]))for(const exercise of (Array.isArray(session?.exercises)?session.exercises:[])){
+        if(BadgeEngine.loadChallengeFor(exercise?.name)?.id!==item.id)continue;
+        for(const entry of (Array.isArray(exercise?.entries)?exercise.entries:[])){if(entry?.done===false)continue;const kg=num(entry?.weight),reps=num(entry?.reps);if(reps<1||kg<=0||kg>500)continue;if(kg>best.kg)best={kg,reps,date:String(session?.date||''),manual:session?.type==='manual'};}
+      }
+      const bw=num(state.profile?.currentWeightKg);
+      if(bw<30||bw>300)return {value:0,gpsValue:0,source:'none',evidence:'declared',date:dateKey(),needsBodyweight:true,bestKg:best.kg,bestReps:best.reps};
+      return {value:best.kg?Math.floor(best.kg/bw*100)/100:0,gpsValue:0,source:best.manual?'manual':best.kg?'session':'none',evidence:best.manual?'declared':'session',date:best.date||dateKey(),bestKg:best.kg,bestReps:best.reps};
+    }
+    // v49: entrenamientos completos (las sesiones parciales no suman) y racha más larga de días seguidos.
+    if(item.measure==='sessions'){
+      const done=(state.sessions||[]).filter(x=>x&&x.status!=='partial'&&Array.isArray(x.exercises)&&x.exercises.length);
+      return {value:done.length,gpsValue:0,source:'session',evidence:done.some(x=>x.type!=='manual')?'session':'declared',date:done[0]?.date||dateKey()};
+    }
+    if(item.measure==='streak'){
+      const days=[...new Set([...(state.sessions||[]).filter(x=>x?.status!=='partial'),...(state.activities||[])].map(x=>String(x?.date||'').slice(0,10)).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)))].sort();
+      let longest=0,run=0,prev=null,end='';
+      for(const d of days){const t=Date.parse(d+'T12:00:00Z');run=prev!==null&&t-prev===86400000?run+1:1;prev=t;if(run>longest){longest=run;end=d;}}
+      return {value:longest,gpsValue:0,source:'consistency',evidence:'declared',date:end||dateKey()};
+    }
     if(item.activityType){
       const entries=(state.activities||[]).filter(a=>matchesActivityType(a,item.activityType)&&Number(a.distance)<=BadgeEngine.maxPlausible(item));
       const best=entries.reduce((current,a)=>Number(a.distance)>Number(current?.distance||0)?a:current,null);
@@ -3669,7 +3693,7 @@ function findCatalogExercise(name){
     }
     const manualValue=Number(recordBest?.value)||0,fromSession=Number(sessionBest.value)||0;
     const isManual=manualValue>=fromSession&&manualValue>0;
-    return {value:Math.max(manualValue,fromSession),gpsValue:0,source:isManual?'manual':fromSession?'session':'none',evidence:'declared',date:isManual?(recordBest.date||dateKey()):(sessionBest.date||dateKey())};
+    return {value:Math.max(manualValue,fromSession),gpsValue:0,source:isManual?'manual':fromSession?'session':'none',evidence:!isManual&&fromSession?'session':'declared',date:isManual?(recordBest.date||dateKey()):(sessionBest.date||dateKey())};
   }
   // revokeIds: desafíos cuyas insignias se recalculan desde cero (p. ej. tras borrar una marca).
   // Para el resto, las insignias obtenidas se conservan aunque registros antiguos se recorten.
@@ -3683,7 +3707,7 @@ function findCatalogExercise(name){
         const badgeId=badgeIdFor(item,index),previous=unlocks[badgeId];
         if(Number(metric.value)<Number(threshold)){if(previous&&revokeSet.has(item.id)){delete unlocks[badgeId];revoked.push(previous);}return;}
         const gps=Number(metric.gpsValue)>=Number(threshold);
-        const candidate={id:badgeId,exerciseId:item.id,exerciseName:item.name,level:index+1,rank:BadgeEngine.rankForLevel(index).name,threshold,measure:item.measure,evidence:gps?'gps_device':'declared',source:gps?'gps':metric.source,earnedAt:previous?.earnedAt||metric.date||dateKey()};
+        const candidate={id:badgeId,exerciseId:item.id,exerciseName:item.name,level:index+1,rank:BadgeEngine.rankForLevel(index).name,threshold,measure:item.measure,evidence:gps?'gps_device':metric.evidence==='session'?'session':'declared',source:gps?'gps':metric.source,earnedAt:previous?.earnedAt||metric.date||dateKey()};
         if(!previous){unlocks[badgeId]=candidate;newlyUnlocked.push(candidate);}
         else if(gps&&!hasGpsEvidence(previous)){unlocks[badgeId]={...previous,...candidate,earnedAt:previous.earnedAt||candidate.earnedAt};upgraded.push(unlocks[badgeId]);}
         else if(revokeSet.has(item.id)&&!gps&&hasGpsEvidence(previous)){const {verified,...rest}=previous;unlocks[badgeId]={...rest,evidence:'declared',source:metric.source};}
@@ -3735,9 +3759,9 @@ function findCatalogExercise(name){
     const valueLabel=metric.value>0?formatBadgeValue(metric.value,item.measure):'Todavía sin marca';
     const evidence=metric.value>0&&item.measure!=='days'?`<span class="ff-evidence ${metric.evidence==='gps_device'?'is-gps':''}">${esc(BadgeEngine.evidenceLabel(metric.evidence))}</span>`:'';
     root.innerHTML=`<div class="achievement-title-row"><div class="achievement-hero-medal">${badgeMedalFor(item,progress.highest,{size:64})}</div><div><div class="eyebrow">${esc(BadgeEngine.categoryLabel(item.category))}</div><h3>${esc(item.name)}</h3><p class="achievement-value"><strong>${esc(valueLabel)}</strong>${evidence}</p><p class="muted small">${rank?`Rango actual: ${esc(rank.label)}`:'Sin rango todavía'}</p></div></div>
-      <div class="achievement-progress-head"><span>${esc(BadgeEngine.nextStepMessage(metric.value,thresholds,item.measure))}</span><strong>${Math.max(0,progress.highest+1)}/12</strong></div><div class="achievement-progress" role="progressbar" aria-label="Avance hacia el próximo nivel de ${esc(item.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.pct}"><span style="width:${progress.pct}%"></span></div>
-      <ol class="achievement-milestones" aria-label="Niveles del desafío">${thresholds.map((threshold,index)=>{const rankInfo=BadgeEngine.rankForLevel(index),entry=unlocks[badgeIdFor(item,index)],unlocked=Boolean(entry),gps=hasGpsEvidence(entry);return `<li class="achievement-milestone rank-${rankInfo.key} ${unlocked?'unlocked':'locked'}">${BadgeEngine.medalSvg({rankKey:rankInfo.key,numeral:rankInfo.numeral,glyph:BadgeEngine.glyphFor(item),category:item.category,locked:!unlocked,size:34})}<strong>${esc(rankInfo.label)}</strong><small>${esc(formatBadgeValue(threshold,item.measure))}</small><span class="achievement-status ${gps?'verified':''}">${unlocked?`${gps?'Con ruta GPS':'Declarada'} · ${esc(prettyDate(entry.earnedAt))}`:'Bloqueada'}</span></li>`;}).join('')}</ol>
-      <p class="muted small achievement-rule">${item.measure==='km'?'Cada nivel mide la distancia de una sola actividad, no la suma de varias.':item.measure==='days'?'Se cuentan días distintos con actividad registrada, no la cantidad de ejercicios.':item.measure==='seconds'?'Se cuenta el tiempo sostenido en una única serie.':'Se cuenta la mejor serie de un mismo movimiento, no la suma de varias series.'} Máximo admitido por serie: ${esc(formatBadgeValue(BadgeEngine.maxPlausible(item),item.measure))}.</p>`;
+      ${metric.needsBodyweight?`<p class="notice small">Cargá tu peso corporal en Perfil para calcular esta insignia${metric.bestKg?` (tu mejor serie registrada: ${esc(String(metric.bestKg))} kg × ${esc(String(metric.bestReps))})`:''}.</p>`:''}<div class="achievement-progress-head"><span>${esc(metric.needsBodyweight?'Necesita tu peso corporal.':BadgeEngine.nextStepMessage(metric.value,thresholds,item.measure))}</span><strong>${Math.max(0,progress.highest+1)}/12</strong></div><div class="achievement-progress" role="progressbar" aria-label="Avance hacia el próximo nivel de ${esc(item.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.pct}"><span style="width:${progress.pct}%"></span></div>
+      <ol class="achievement-milestones" aria-label="Niveles del desafío">${thresholds.map((threshold,index)=>{const rankInfo=BadgeEngine.rankForLevel(index),entry=unlocks[badgeIdFor(item,index)],unlocked=Boolean(entry),gps=hasGpsEvidence(entry);return `<li class="achievement-milestone rank-${rankInfo.key} ${unlocked?'unlocked':'locked'}">${BadgeEngine.medalSvg({rankKey:rankInfo.key,numeral:rankInfo.numeral,glyph:BadgeEngine.glyphFor(item),category:item.category,locked:!unlocked,size:34})}<strong>${esc(rankInfo.label)}</strong><small>${esc(formatBadgeValue(threshold,item.measure))}</small><span class="achievement-status ${gps?'verified':''}">${unlocked?`${esc(BadgeEngine.evidenceLabel(gps?'gps_device':entry.evidence))} · ${esc(prettyDate(entry.earnedAt))}`:'Bloqueada'}</span></li>`;}).join('')}</ol>
+      <p class="muted small achievement-rule">${item.measure==='bw'?'Cada nivel compara el peso de tu mejor serie completada (al menos 1 repetición) con tu peso corporal. No cuenta el volumen total de la sesión.':item.measure==='sessions'?'Se cuentan entrenamientos completos; las sesiones parciales no suman.':item.measure==='streak'?'Se cuenta la racha más larga de días seguidos con actividad registrada.':item.measure==='km'?'Cada nivel mide la distancia de una sola actividad, no la suma de varias.':item.measure==='days'?'Se cuentan días distintos con actividad registrada, no la cantidad de ejercicios.':item.measure==='seconds'?'Se cuenta el tiempo sostenido en una única serie.':'Se cuenta la mejor serie de un mismo movimiento, no la suma de varias series.'} Máximo admitido por serie: ${esc(formatBadgeValue(BadgeEngine.maxPlausible(item),item.measure))}.</p>`;
   }
   function renderBadgeRecords(item){
     const root=$('badgeRecordList');if(!root)return;
@@ -3807,7 +3831,7 @@ function findCatalogExercise(name){
     const best=new Map();for(const entry of valid)if(!best.has(entry.exerciseId))best.set(entry.exerciseId,entry);
     const top=[...best.values()].slice(0,6);
     if(!top.length){root.innerHTML='<span class="muted small">Todavía no obtuviste insignias. Registrá una marca en Progreso › Insignias.</span>';return;}
-    root.innerHTML=top.map(entry=>{const rank=BadgeEngine.rankForLevel((Number(entry.level)||1)-1),item=catalog.find(x=>x.id===entry.exerciseId)||{};return `<div class="profile-badge-chip">${BadgeEngine.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:BadgeEngine.glyphFor(item),size:36})}<span>${esc(entry.exerciseName)}<small>${esc(rank.label)} · ${hasGpsEvidence(entry)?'Con ruta GPS':'Declarada'}</small></span></div>`;}).join('');
+    root.innerHTML=top.map(entry=>{const rank=BadgeEngine.rankForLevel((Number(entry.level)||1)-1),item=catalog.find(x=>x.id===entry.exerciseId)||{};return `<div class="profile-badge-chip">${BadgeEngine.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:BadgeEngine.glyphFor(item),category:item.category,size:36})}<span>${esc(entry.exerciseName)}<small>${esc(rank.label)} · ${esc(BadgeEngine.evidenceLabel(hasGpsEvidence(entry)?'gps_device':entry.evidence))}</small></span></div>`;}).join('');
   }
   // Insignias que se pueden compartir en Comunidad: el nivel más alto por desafío.
   // Solo se envía lo necesario; la evidencia nunca puede ser 'verificada' (ver migración v41).
@@ -3820,7 +3844,7 @@ function findCatalogExercise(name){
     return [...best.values()].sort((a,b)=>Number(b.entry.level)-Number(a.entry.level)).map(({item,entry})=>{
       const level=Math.min(12,Math.max(1,Number(entry.level)||1)),rank=BadgeEngine.rankForLevel(level-1),gps=hasGpsEvidence(entry)&&item.measure==='km';
       const exerciseId=String(item.id).toLowerCase().replace(/[^a-z0-9-]/g,'-').slice(0,80);
-      return {key:item.id+':'+level,label:`${item.name} · ${rank.label}${gps?' · GPS':''}`,payload:{exerciseId,exerciseName:String(item.name).slice(0,72),category:item.category||'',rank:rank.key,level,threshold:Number(entry.threshold),measure:item.measure,evidence:gps?'gps_device':'declared',earnedAt:/^\d{4}-\d{2}-\d{2}$/.test(String(entry.earnedAt))?entry.earnedAt:dateKey()}};
+      return {key:item.id+':'+level,label:`${item.name} · ${rank.label}${gps?' · GPS':''}`,payload:{exerciseId,exerciseName:String(item.name).slice(0,72),category:item.category||'',rank:rank.key,level,threshold:Number(entry.threshold),measure:item.measure,evidence:gps?'gps_device':entry.evidence==='session'?'session':'declared',earnedAt:/^\d{4}-\d{2}-\d{2}$/.test(String(entry.earnedAt))?entry.earnedAt:dateKey()}};
     });
   };
   // La insignia más cercana a subir de nivel, para Inicio.
@@ -3863,7 +3887,7 @@ function findCatalogExercise(name){
       const delta=syncBadgeUnlocks();save();renderBadgeSelector(item.id);renderBadgeCenter();renderProfileBadgesPreview();form.reset();
       const improved=check.value>before&&before>0;
       const message=delta.newlyUnlocked.length?`Marca guardada. Obtuviste ${BadgeEngine.rankForLevel(delta.newlyUnlocked[delta.newlyUnlocked.length-1].level-1).label}${delta.newlyUnlocked.length>1?` y ${delta.newlyUnlocked.length-1} nivel(es) más`:''}.`:improved?'Tu mejor marca personal mejoró.':'Marca guardada como declarada.';
-      $('badgeRecordStatus').textContent=message;toast(message);
+      $('badgeRecordStatus').textContent=message;toast(message);celebrateBadges(delta.newlyUnlocked);
     });
     $('profileViewBadges')?.addEventListener('click',()=>showBadges());
   }
@@ -3878,15 +3902,16 @@ function findCatalogExercise(name){
   // nunca se repite al recargar: depende de newlyUnlocked, que solo trae insignias que no existían.
   const celebratedBadges=new Set();
   function celebrateBadges(newly){
-    const fresh=(Array.isArray(newly)?newly:[]).filter(b=>b&&!celebratedBadges.has(b.id));if(!fresh.length)return;
-    fresh.forEach(b=>celebratedBadges.add(b.id));
+    // v49: marca persistente «celebratedAt»: la pantalla no vuelve a aparecer al recargar ni al restaurar una copia.
+    const fresh=(Array.isArray(newly)?newly:[]).filter(b=>b&&!celebratedBadges.has(b.id)&&!state.badgeUnlocks?.[b.id]?.celebratedAt);if(!fresh.length)return;
+    const stamp=new Date().toISOString();fresh.forEach(b=>{celebratedBadges.add(b.id);if(state.badgeUnlocks?.[b.id])state.badgeUnlocks[b.id]={...state.badgeUnlocks[b.id],celebratedAt:stamp};});save();
     const top=FittFormaTraining.highestPerChallenge(Object.fromEntries(fresh.map(b=>[b.id,b]))).sort((a,b)=>b.level-a.level);
     const best=top[0],others=top.length-1,item=getBadgeCatalog().find(i=>i.id===best.exerciseId)||{category:'custom',name:best.exerciseName};
     const rank=BadgeEngine.rankForLevel(best.level-1),dlg=$('badgeCelebration');if(!dlg)return;
     $('badgeCelebrationMedal').innerHTML=badgeMedalFor(item,best.level-1,{size:132,title:rank.label});
     $('badgeCelebrationRank').textContent=rank.label;
     $('badgeCelebrationName').textContent=best.exerciseName;
-    $('badgeCelebrationDetail').textContent=`${BadgeEngine.categoryLabel(item.category)} · ${formatBadgeValue(best.threshold,best.measure)}${best.evidence==='gps_device'?' · con ruta GPS':' · marca declarada'}`;
+    $('badgeCelebrationDetail').textContent=`${BadgeEngine.categoryLabel(item.category)} · ${formatBadgeValue(best.threshold,best.measure)} · ${BadgeEngine.evidenceLabel(best.evidence).toLowerCase()}`;
     $('badgeCelebrationMore').textContent=others>0?`También subiste de nivel en ${others} desafío${others===1?'':'s'} más. Lo ves en Progreso › Insignias.`:'';
     dlg.dataset.rank=rank.key;
     if(typeof dlg.showModal==='function'&&!dlg.open)dlg.showModal();else dlg.setAttribute('open','');
@@ -5350,7 +5375,7 @@ function findCatalogExercise(name){
     // Un peso nuevo también queda en el historial (una medición por día; se reemplaza la del día si existe).
     if(current&&current!==previousWeight){state.weights=Array.isArray(state.weights)?state.weights:[];const today=dateKey(),i=state.weights.findIndex(w=>w.date===today);if(i>=0)state.weights[i]={...state.weights[i],kg:Number(current)};else state.weights.push({id:Date.now(),date:today,kg:Number(current)});state.weights.sort((a,b)=>a.date.localeCompare(b.date));}
     if($('profileWeightUnit'))$('profileWeightUnit').value='kg';document.querySelectorAll('[data-weight-unit]').forEach(x=>x.textContent='kg');
-    save();syncBodyProfileForm();renderProfile();renderWeights();renderProgress();renderHydration?.();toast('Datos físicos guardados.');
+    const badgeDelta=current!==previousWeight?syncBadgeUnlocks():null;save();syncBodyProfileForm();renderProfile();renderWeights();renderProgress();renderHydration?.();if(badgeDelta?.newlyUnlocked?.length)notifyBadgeChanges(badgeDelta,'Datos físicos guardados');else toast('Datos físicos guardados.');
   });
   function syncTrainingPrefs(){const p=state.profile||{};for(const [id,k] of [['prefGoal','goal'],['prefLevel','level'],['prefDays','days'],['prefEquipment','equipment'],['prefDuration','duration']]){const el=$(id);if(el)el.value=String(p[k]??defaults.profile[k]);}}
   $('trainingPrefsForm')?.addEventListener('submit',e=>{

@@ -126,3 +126,59 @@ test('imágenes: una foto compartida solo entre variantes declaradas de la misma
 test('entrenamiento diario: se mantiene cada 12 horas (decisión confirmada)', () => {
   assert.equal(T.DAILY_COOLDOWN_MS, 12 * 60 * 60 * 1000);
 });
+
+// ---------- Etapa 3: insignias ----------
+vm.runInContext(await read('achievements.js'), sandbox);
+const E = sandbox.window.FittFormaBadgeEngine;
+
+test('insignias: emblema hexagonal con marco distinto por rango y símbolo propio por actividad', () => {
+  const shapes = new Set(['bronze', 'silver', 'gold', 'diamond'].map(r => E.medalSvg({ rankKey: r, glyph: 'bench' }).match(/class="ff-medal-shape" d="([^"]+)"/)[1]));
+  assert.equal(shapes.size, 4, 'cada rango tiene su propio marco');
+  const symbols = { 'exercise-dominadas': 'pullup', 'exercise-flexiones': 'pushup', 'exercise-sentadillas': 'squat', 'exercise-abdominales': 'abs', 'exercise-plancha-frontal': 'plank', 'activity-running': 'run', 'load-press-banca': 'bench', 'consistency-streak': 'flame' };
+  const all = [...E.CORE_EXERCISES, ...E.ACTIVITY_CHALLENGES, ...E.LOAD_CHALLENGES];
+  for (const [id, glyph] of Object.entries(symbols)) assert.equal(E.glyphFor(all.find(x => x.id === id)), glyph, id);
+  assert.equal(E.glyphFor({ name: 'Elevaciones laterales', group: 'Hombros', category: 'strength' }), 'shoulders');
+  assert.equal(E.glyphFor({ name: 'Curl de bíceps con mancuernas', group: 'Brazos', category: 'strength' }), 'biceps');
+  for (const g of new Set(Object.values(E.SYMBOL_BY_ID))) assert.ok(E.GLYPHS[g], `símbolo sin dibujo: ${g}`);
+  assert.match(E.medalSvg({ rankKey: 'gold', numeral: 'III', glyph: 'bench' }), /(class="ff-medal-pip"[^>]*>.*){3}/);
+});
+
+test('insignias por carga: mejor serie ÷ peso corporal, umbrales crecientes y sin carga manual', () => {
+  for (const c of E.LOAD_CHALLENGES) {
+    const t = E.thresholdsForExercise(c);
+    assert.equal(t.length, 12, c.name);
+    for (let i = 1; i < 12; i++) assert.ok(t[i] > t[i - 1], `${c.name} nivel ${i + 1}`);
+    assert.ok(E.maxPlausible(c) >= t[11]);
+    assert.equal(E.validateRecord(c, 100, [], '2026-10-18').ok, false, 'se calcula con las series, no se declara a mano');
+  }
+  assert.equal(E.loadChallengeFor('Press de banca con barra')?.id, 'load-press-banca');
+  assert.equal(E.loadChallengeFor('Press de banca con mancuernas'), null, 'mancuernas: el peso por mano no es comparable');
+  assert.equal(E.loadChallengeFor('Peso muerto rumano'), null, 'el rumano es otro ejercicio');
+  assert.equal(E.loadChallengeFor('Sentadilla con barra')?.id, 'load-sentadilla');
+  // 80 kg con 80 kg de peso corporal = 1,00× → Oro II en press de banca.
+  const p = E.progressForValue(1.0, E.thresholdsForExercise(E.LOAD_CHALLENGES[0]));
+  assert.equal(E.rankForLevel(p.highest).label, 'Oro II');
+  assert.equal(E.formatValue(1, 'bw'), '1,00 × tu peso corporal');
+});
+
+test('insignias: fuente honesta (manual, sesión o GPS) y nunca «verificada»', () => {
+  assert.equal(E.evidenceLabel('declared'), 'Declarada');
+  assert.equal(E.evidenceLabel('session'), 'Registrada en sesión');
+  assert.equal(E.evidenceLabel('gps_device'), 'Con ruta GPS');
+  assert.doesNotMatch(html, /evidence:'verified'/);
+  for (const m of ['sessions', 'streak']) assert.equal(E.validateRecord(E.ACTIVITY_CHALLENGES.find(x => x.measure === m), 5, [], '2026-10-18').ok, false);
+});
+
+test('insignias: historial, mejor nivel, celebración única y máximo de 3 destacadas', () => {
+  assert.match(html, /const catalog=\[\.\.\.CORE_BADGE_EXERCISES,\.\.\.BadgeEngine\.LOAD_CHALLENGES\]/);
+  assert.match(html, /!state\.badgeUnlocks\?\.\[b\.id\]\?\.celebratedAt/, 'la celebración se marca como vista y no se repite');
+  assert.match(html, /celebratedAt:stamp/);
+  assert.match(html, /\$\('badgeRecordStatus'\)\.textContent=message;toast\(message\);celebrateBadges\(delta\.newlyUnlocked\)/, 'también al guardar una marca manual');
+  const unlocks = { 'load-press-banca:1': { exerciseId: 'load-press-banca', level: 1, earnedAt: '2026-10-01' }, 'load-press-banca:8': { exerciseId: 'load-press-banca', level: 8, earnedAt: '2026-10-18' }, 'activity-running:3': { exerciseId: 'activity-running', level: 3, earnedAt: '2026-10-10' }, 'exercise-flexiones:5': { exerciseId: 'exercise-flexiones', level: 5, earnedAt: '2026-10-11' }, 'consistency-streak:2': { exerciseId: 'consistency-streak', level: 2, earnedAt: '2026-10-12' } };
+  const top = T.highestPerChallenge(unlocks);
+  assert.equal(top.length, 4, 'una por desafío');
+  assert.equal(top.find(x => x.exerciseId === 'load-press-banca').level, 8, 'running no reemplaza fuerza y el mejor nivel es el más alto');
+  assert.ok(T.featuredBadges(unlocks, []).length <= 3);
+  assert.ok(T.featuredBadges(unlocks, ['activity-running:3', 'activity-running:3', 'exercise-flexiones:5', 'load-press-banca:8', 'consistency-streak:2']).length <= 3, 'nunca más de 3 ni repetidas');
+  assert.equal(Object.keys(unlocks).length, 5, 'el historial no se borra al calcular el mejor nivel');
+});

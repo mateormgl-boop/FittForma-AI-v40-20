@@ -13,7 +13,8 @@ const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 page.on('dialog', d => d.accept());
 await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
-await page.addInitScript(() => { localStorage.setItem('fittforma-welcome-v1', '1'); setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d && d.open) d.close(); }, 50); });
+// La pantalla de logro se registra (para comprobar que aparece una sola vez) y se cierra para seguir.
+await page.addInitScript(() => { localStorage.setItem('fittforma-welcome-v1', '1'); window.__celebrations = JSON.parse(sessionStorage.getItem('cel') || '[]'); setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d && d.open) { window.__celebrations.push(document.getElementById('badgeCelebrationName')?.textContent + ' · ' + document.getElementById('badgeCelebrationRank')?.textContent); sessionStorage.setItem('cel', JSON.stringify(window.__celebrations)); d.close(); } }, 50); });
 await page.goto(APP + '/'); await page.evaluate(k => localStorage.removeItem(k), KEY); await page.reload(); await page.waitForTimeout(600);
 const st = () => page.evaluate(k => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
 const go = async v => { await page.click(`.mobile-nav-item[data-mobile-view="${v}"]`); await page.waitForTimeout(250); };
@@ -79,6 +80,30 @@ const manual = s.sessions.find(x => x.type === 'manual');
 step('Registro manual: un peso por serie', manual && manual.exercises[0].entries.map(e => e.weight).join(',') === '40,45,50', JSON.stringify(manual?.exercises?.[0]?.entries));
 step('Registro manual: volumen real (1060 kg)', manual?.volumeKg === 1060, String(manual?.volumeKg));
 step('Registro atrasado ubicado por fecha, no como el más reciente', s.sessions[0].type !== 'manual' && s.sessions[s.sessions.length - 1].type === 'manual');
+
+// 6. Insignia por carga: 80 kg en press de banca con 80 kg de peso corporal = 1,00× → Oro II.
+await page.evaluate(k => { const s = JSON.parse(localStorage.getItem(k)); s.profile = { ...(s.profile || {}), currentWeightKg: 80 }; localStorage.setItem(k, JSON.stringify(s)); sessionStorage.setItem('cel', '[]'); }, KEY);
+await page.reload(); await page.waitForTimeout(600);
+await go('train'); await page.click('#startFreeWorkout'); await page.waitForTimeout(200);
+await addExercise('Press de banca con barra');
+await setRow(0, 0, 80, 3);
+await page.evaluate(() => document.getElementById('finishWorkout').click()); await page.waitForTimeout(800);
+s = await st();
+const loadUnlocks = Object.values(s.badgeUnlocks || {}).filter(u => u.exerciseId === 'load-press-banca').sort((a, b) => a.level - b.level);
+step('Press de banca 80 kg × 3 con 80 kg corporales → hasta Oro II', loadUnlocks.length === 8 && loadUnlocks[7].rank === 'Oro', loadUnlocks.map(u => u.level).join(','));
+step('El historial conserva Bronce I a Oro I', loadUnlocks.slice(0, 7).every((u, i) => u.level === i + 1));
+// Niveles 1–4 ya los daba el registro manual de 50 kg (0,62×): quedan como «declarada». 5–8 salen de la sesión.
+step('Fuente honesta: manual = declarada; sesión = registrada en sesión', loadUnlocks.slice(0, 4).every(u => u.evidence === 'declared') && loadUnlocks.slice(4).every(u => u.evidence === 'session'), loadUnlocks.map(u => u.evidence).join(','));
+let cel = await page.evaluate(() => window.__celebrations);
+step('Pantalla de logro con la insignia nueva más alta', cel.some(c => /Press de banca · carga · Oro II/.test(c)), cel.join(' | '));
+step('La celebración queda marcada como vista', loadUnlocks.slice(4).every(u => u.celebratedAt));
+const celCount = cel.length;
+await page.reload(); await page.waitForTimeout(800); await go('profile'); await go('progress'); await page.waitForTimeout(300);
+cel = await page.evaluate(() => window.__celebrations);
+step('Al recargar y abrir el perfil no se repite', cel.length === celCount, `${celCount} → ${cel.length}`);
+const featured = await page.$$eval('#featuredBadges .ff-medal', n => n.length);
+step('Perfil: como máximo 3 insignias destacadas', featured > 0 && featured <= 3, String(featured));
+step('El emblema destacado usa el símbolo de la actividad', await page.$$eval('#featuredBadges svg', n => n.some(x => /ff-medal--gold/.test(x.getAttribute('class')))));
 
 step('Sin errores de página', errors.length === 0, errors.join(' | '));
 await browser.close();

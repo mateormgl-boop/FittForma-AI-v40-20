@@ -1,4 +1,4 @@
-# Sistema de insignias — reglas (v41.0)
+# Sistema de insignias — reglas (v41.0, ampliado en v49)
 
 Fuente única de reglas: `achievements.js` (`window.FittFormaBadgeEngine`). La interfaz
 (Progreso, Inicio, Perfil y Comunidad) no define umbrales ni categorías propias.
@@ -61,3 +61,80 @@ FittForma todavía no verifica marcas en el servidor. Por eso:
   "Ruta GPS según el dispositivo del autor".
 - Una verificación real requeriría validar la ruta en el servidor (función con clave de servicio)
   y guardar el resultado en una columna que el cliente no pueda escribir. No está implementado.
+
+## v49: diseño del emblema
+
+- **Forma:** hexágono con relieve. El marco cambia por rango, para que se distinga también sin color:
+  - Bronce: liso.
+  - Plata: biselado.
+  - Oro: con puntas y laureles.
+  - Diamante: gema facetada con destellos.
+- **Nivel I–III:** 1 a 3 marcas debajo del emblema. En la pantalla de logro se ve además el número romano.
+- **Símbolo:** cada desafío tiene el suyo (`SYMBOL_BY_ID` en `achievements.js`):
+  - Press de banca: barra y banco.
+  - Dominadas: barra fija.
+  - Flexiones, sentadillas, abdominales y plancha: la figura del ejercicio.
+  - Running: corredor.
+  - Racha: llama.
+  - Entrenamientos: mancuerna con tilde.
+
+  Los ejercicios de la biblioteca toman el símbolo por movimiento o grupo (bíceps, tríceps, hombros, glúteos, piernas).
+- **Tamaño:** se lee desde 24 px.
+- **Color de la categoría:** queda como un anillo interior.
+
+## v49: insignias por marca con carga (peso y repeticiones)
+
+| Desafío | Ejercicios que cuentan | Bronce I → Diamante III (× peso corporal) |
+|---|---|---|
+| Press de banca · carga | Press de banca (con barra) | 0,30 · 0,40 · 0,50 · 0,60 · 0,70 · 0,80 · 0,90 · 1,00 · 1,15 · 1,30 · 1,50 · 1,75 |
+| Sentadilla con barra · carga | Sentadilla con barra / trasera | 0,40 · 0,50 · 0,65 · 0,80 · 0,95 · 1,10 · 1,25 · 1,40 · 1,60 · 1,80 · 2,00 · 2,40 |
+| Peso muerto · carga | Peso muerto (con barra / convencional) | 0,50 · 0,65 · 0,80 · 1,00 · 1,15 · 1,30 · 1,50 · 1,70 · 1,90 · 2,10 · 2,40 · 2,80 |
+| Press militar · carga | Press militar (con barra / de pie) | 0,20 · 0,25 · 0,30 · 0,40 · 0,45 · 0,50 · 0,60 · 0,70 · 0,80 · 0,90 · 1,00 · 1,15 |
+
+**Criterio:**
+- **Qué se mide:** el peso de la **mejor serie válida** dividido el peso corporal cargado en Perfil.
+- **Serie válida:**
+  - marcada como completada;
+  - al menos 1 repetición;
+  - peso mayor que 0 y hasta 500 kg.
+- **Lo que no cuenta:** el volumen de la sesión (series × reps × kg). Tampoco se suman series.
+- **Sin peso corporal:** si no está cargado en Perfil, **no se asigna nivel**. La app pide cargarlo y muestra la mejor serie registrada.
+- **Variantes excluidas:**
+  - Mancuernas: el peso por mano no es comparable con la barra.
+  - Peso muerto rumano: es otro ejercicio.
+- **Cambios de peso corporal:** si el peso corporal cambia, las insignias ya obtenidas **no se quitan**, porque son historial. Solo cambia el cálculo de los niveles siguientes.
+- **Origen de los umbrales:** son una **propuesta configurable** (tabla `LOAD_CHALLENGES` en `achievements.js`). Se basan en rangos habituales de fuerza relativa para población general:
+  - Diamante III: un nivel avanzado de un aficionado entrenado.
+  - Bronce: lo alcanzable al empezar con técnica.
+
+  No son estándares oficiales. Se pueden ajustar sin cambiar los IDs.
+- **Marca manual:** no se puede declarar a mano en el formulario de insignias. Se calcula con las series de los entrenamientos y con los registros manuales de entrenamiento.
+
+## v49: constancia
+
+| Desafío | Métrica | Bronce I → Diamante III |
+|---|---|---|
+| Entrenamientos completados | sesiones completas (las parciales no suman) | 1 · 3 · 5 · 10 · 15 · 20 · 30 · 40 · 50 · 75 · 100 · 150 |
+| Racha de días activos | racha más larga de días seguidos con entrenamiento o actividad | 2 · 3 · 4 · 5 · 7 · 10 · 14 · 21 · 30 · 45 · 60 · 90 |
+
+**Ritmo de carrera:** no tiene insignia todavía. Hace falta definir distancias de referencia y validar el ritmo con GPS; queda pendiente.
+
+## v49: de dónde sale cada marca (nunca «verificada»)
+
+| Etiqueta | Origen |
+|---|---|
+| Declarada | Marca anotada a mano (registro manual o formulario de insignias). |
+| Registrada en sesión | Series marcadas como completadas en un entrenamiento de la app. |
+| Con ruta GPS | Distancia con GPS que pasa los controles básicos del dispositivo. |
+
+Ninguna de las tres es una verificación independiente. La base de datos rechaza `verified` en los logros compartidos (`supabase/migrations/2026-10-22_v49_badges.sql` amplía las medidas y la fuente `session`).
+
+## v49: historial, mejor nivel y pantalla de logro
+
+- **Historial completo** (`state.badgeUnlocks`): al subir de nivel se conservan todos los niveles anteriores. Obtener Plata I no borra Bronce.
+- **Mejor nivel por desafío** (`FittFormaTraining.highestPerChallenge`): una insignia de running no reemplaza una de fuerza.
+- **Pantalla de logro:**
+  - Se muestra solo al desbloquear algo nuevo: al terminar un entrenamiento o una carrera, al guardar una marca manual o al cargar un peso corporal que habilita un nivel.
+  - Cada desbloqueo celebrado guarda `celebratedAt`, así que no reaparece al recargar ni al abrir el perfil.
+  - El desbloqueo usa el id `desafío:nivel`, así que no se duplica.
+- **Destacadas:** como máximo 3, elegidas por la persona entre las obtenidas. Sin elección, se completan con las de mayor nivel; no hay repetidas.

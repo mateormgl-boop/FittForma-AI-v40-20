@@ -539,3 +539,20 @@ body{font-feature-settings:"cv11","ss01"}
 }
 #exerciseModalProgression .exercise-progression-step strong{display:block;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--t-blue)}
 @media(min-width:900px){.set-table{max-width:760px}}
+
+/* ---------- v49: emblema hexagonal ---------- */
+.ff-medal .ff-medal-inner{stroke:rgba(255,255,255,.35)!important;stroke-width:.9!important}
+.ff-medal--bronze .ff-medal-inner{fill:url(#ffFaceBronze)!important}
+.ff-medal--silver .ff-medal-inner{fill:url(#ffFaceSilver)!important}
+.ff-medal--gold .ff-medal-inner{fill:url(#ffFaceGold)!important}
+.ff-medal--diamond .ff-medal-inner{fill:url(#ffFaceDiamond)!important}
+.ff-medal .ff-medal-ring{fill:none;stroke:var(--medal-hue);stroke-width:1.3;opacity:.95}
+.ff-medal .ff-medal-shine{fill:none;stroke:rgba(255,255,255,.6);stroke-width:1;stroke-linecap:round;stroke-linejoin:round}
+.ff-medal .ff-medal-facet{fill:none;stroke:rgba(255,255,255,.45);stroke-width:.7}
+.ff-medal .ff-medal-glyph{stroke-width:2.5!important;stroke-linecap:round;stroke-linejoin:round}
+.ff-medal .ff-medal-glyph .gf{fill:#fff;stroke:none}
+.ff-medal .ff-medal-pip{fill:var(--text-2);opacity:1}
+.ff-medal--gold .ff-medal-pip{fill:#f2b822}.ff-medal--diamond .ff-medal-pip{fill:#7fd8f7}.ff-medal--silver .ff-medal-pip{fill:#b9c3d1}.ff-medal--bronze .ff-medal-pip{fill:#d4884a}
+.ff-medal:not(.is-locked){filter:drop-shadow(0 2px 3px rgba(0,0,0,.28))}
+.ff-medal.is-locked .ff-medal-ring,.ff-medal.is-locked .ff-medal-shine{stroke:var(--ff-border)}
+.ff-medal.is-locked .ff-medal-glyph .gf{fill:var(--text-3)}
