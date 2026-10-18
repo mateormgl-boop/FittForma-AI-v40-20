@@ -1,5 +1,8 @@
 // Integración entre secciones en un navegador real (Chromium + Playwright), sin servicios externos.
 // Requiere `npm start` en otra terminal. Uso: APP_URL=http://localhost:8787 node tests/e2e/integration.e2e.mjs
+
+// v48: la pantalla de logro es modal; las pruebas la registran y la cierran para seguir navegando.
+const CLOSE_CELEBRATION = () => { window.__celebrations = []; setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d && d.open) { window.__celebrations.push(document.getElementById('badgeCelebrationName')?.textContent || ''); d.close(); } }, 50); };
 import { createRequire } from 'module';
 const require = createRequire((process.env.PLAYWRIGHT_DIR || '/opt/node-tools/node_modules') + '/');
 const { chromium } = require('playwright');
@@ -30,6 +33,7 @@ for (const [w, h, label] of [[390, 844, 'móvil'], [1366, 900, 'escritorio']]) {
   page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|leaflet|unpkg|jsdelivr/i.test(m.text()) && !(/status of 503/.test(m.text()) && /\/api\/coach/.test(m.location()?.url || ''))) errors.push(m.text()); });
   page.on('dialog', d => d.accept());
   await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
+  await page.addInitScript(CLOSE_CELEBRATION);
   await page.addInitScript(() => localStorage.setItem('fittforma-welcome-v1', '1'));
   await page.goto(APP + '/'); await page.evaluate(k => localStorage.removeItem(k), KEY); await page.reload(); await page.waitForTimeout(500);
   const st = () => page.evaluate(k => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
@@ -111,7 +115,7 @@ for (const [w, h, label] of [[390, 844, 'móvil'], [1366, 900, 'escritorio']]) {
   s = await st(); const key = await page.evaluate(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; });
   step('Agua: +2 −1 persiste tras recargar', Number(s.waterLogs?.[key]) === 1, s.waterLogs?.[key]);
   await go('plan');
-  step('Inicio muestra el agua', (await text('#homeWaterVal')) === '1');
+  step('Inicio muestra el agua en ml', (await text('#homeWaterVal')) === '250 ml');
 
   // Caso 3: running manual
   await go('train'); await page.click('.view.active [data-subview="running"]');

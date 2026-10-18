@@ -7,6 +7,9 @@
 import { createRequire } from 'module';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+
+// v48: la pantalla de logro es modal; las pruebas la registran y la cierran para seguir navegando.
+const CLOSE_CELEBRATION = () => { window.__celebrations = []; setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d && d.open) { window.__celebrations.push(document.getElementById('badgeCelebrationName')?.textContent || ''); d.close(); } }, 50); };
 import { execFileSync } from 'node:child_process';
 const require = createRequire((process.env.PLAYWRIGHT_DIR || '/opt/node-tools/node_modules') + '/');
 const { chromium } = require('playwright');
@@ -41,7 +44,8 @@ const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 const errors = []; page.on('pageerror', e => errors.push('PAGEERR ' + e.message));
 page.on('console', m => { if (m.type() === 'error' && !/leaflet|ERR_FAILED|unpkg/i.test(m.text())) errors.push(m.text()); });
 page.on('dialog', d => d.type() === 'prompt' ? d.accept('ELIMINAR') : /dispositivo/.test(d.message()) ? d.dismiss() : d.accept());
-await page.addInitScript(s => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('fittforma-ai-v4', s); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(seed));
+await page.addInitScript(CLOSE_CELEBRATION);
+  await page.addInitScript(s => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('fittforma-ai-v4', s); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(seed));
 await page.route(/unpkg\.com/, r => r.abort());
 await page.addInitScript(() => localStorage.setItem('fittforma-welcome-v1', '1'));
 await page.route(/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js/, r => r.fulfill({ contentType: 'text/javascript', headers: { 'access-control-allow-origin': '*' }, body: fs.readFileSync(process.env.SUPABASE_UMD) }));

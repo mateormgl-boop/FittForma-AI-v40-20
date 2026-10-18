@@ -28,7 +28,7 @@ test('v42: Nutrición en pestañas y Perfil en grupos sin perder IDs', () => {
 });
 
 test('v42: rutinas propias con CRUD, validación y plantilla desde el plan', () => {
-  assert.match(html, /const defaults = \{.{0,40}routines:\[\],/);
+  assert.match(html, /const defaults = \{[^\n]*routines:\[\],/);
   for (const fn of ['renderRoutines', 'openRoutineEditor', 'validateRoutine', 'saveRoutineDraft', 'initRoutines', 'startRoutine']) assert.match(html, new RegExp(`function ${fn}\\(`), fn);
   for (const attr of ['data-routine-start', 'data-routine-edit', 'data-routine-duplicate', 'data-routine-delete', 'data-rmove', 'data-rremove']) assert.match(html, new RegExp(attr));
   assert.match(html, /routineFromTemplate/);
@@ -38,7 +38,8 @@ test('v42: rutinas propias con CRUD, validación y plantilla desde el plan', () 
 test('v42: sesiones desde plan, rutina o libre, editables en curso', () => {
   assert.match(html, /function beginSession\(meta,exercises\)/);
   assert.match(html, /function startFreeWorkout\(\)/);
-  assert.match(html, /beginSession\(\{dayIndex,title:day\.title\},day\.exercises\)/);
+  assert.match(html, /beginSession\(\{type:'plan_extra',dayIndex,title:day\.title\},day\.exercises\)/);
+  assert.match(html, /beginSession\(\{type:'daily',dailySeq:st\.seq\+1,dayIndex:st\.nextIndex,title:day\.title\},day\.exercises\)/);
   for (const attr of ['data-session-add-set', 'data-session-remove-set', 'data-session-remove-ex']) assert.match(html, new RegExp(attr));
   assert.match(html, /if\(inp\.checked&&restAfter>0\)startRestTimer\(restAfter\)/);
   assert.match(html, /entries:Array\.from\(\{length:sets\},\(\)=>\(\{reps:'',weight:'',done:false\}\)\)/, 'el peso objetivo no precarga series para no guardar sesiones vacías');

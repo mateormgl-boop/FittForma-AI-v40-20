@@ -108,7 +108,8 @@ test('al finalizar se guardan métricas de la sesión y se muestra el resumen an
   assert.match(html, /volumeKg:summary\.volumeKg/);
   assert.match(html, /id="summaryGoProgress"/);
   assert.match(html, /id="summaryGoPlan"/);
-  assert.match(html, /switchView\('train'\);toast\('Sesión guardada/);
+  assert.match(html, /switchView\('train'\);toast\(notice\)/);
+  assert.match(html, /notice='Sesión guardada\. ¡Buen trabajo!'/);
 });
 
 test('el service worker y los paquetes están alineados con v41.0 para refrescar la PWA', async () => {

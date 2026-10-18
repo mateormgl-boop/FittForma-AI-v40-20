@@ -96,7 +96,8 @@ test('hidratación e historial de hábitos sobreviven carga local, importación 
   assert.match(html, /waterLogs:parsed\.waterLogs&&typeof parsed\.waterLogs==='object'/);
   assert.match(html, /habitLogs:data\.habitLogs&&typeof data\.habitLogs==='object'/);
   assert.match(html, /waterLogs:data\.waterLogs&&typeof data\.waterLogs==='object'/);
-  assert.match(html, /state\.waterLogs\[key\]=state\.water\.count/);
+  assert.match(html, /function addWater\(ml,label\)/, 'v48: el agua se registra en ml por entrada');
+  assert.match(html, /state\.waterLogs\[d\]=Math\.round\(ml\/h\.glassMl\*10\)\/10/, 'waterLogs se deriva de los registros para compatibilidad');
   assert.match(html, /state\.habitLogs\[key\]=log/);
   assert.match(html, /JSON\.stringify\(state,null,2\)/);
 });

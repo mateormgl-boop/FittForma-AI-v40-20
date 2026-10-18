@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, access } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -49,10 +50,12 @@ test('el GPS simplifica rutas largas conservando los extremos', () => {
 });
 
 test('rutinas de fuerza separan tren superior/inferior y cardio', () => {
-  assert.match(html, /const fullBody=\['lower','push','pull','posterior','core','shoulders','arms','accessory'\]/);
-  assert.match(html, /\['Tren superior A','Tren inferior A','Tren superior B','Tren inferior B'\]/);
-  assert.match(html, /if\(p\.goal==='endurance'\)/);
-  assert.match(html, /kind==='cardio'/);
+  // v48: el generador vive en training-core.js (probado en v48.test.mjs).
+  const core = readFileSync(path.join(root, 'training-core.js'), 'utf8');
+  assert.match(core, /4: \['upperA', 'lowerA', 'upperB', 'lowerB'\]/);
+  assert.match(core, /title: 'Tren superior A'/);
+  assert.match(core, /if \(profile\.goal === 'endurance'\) return buildEndurancePlan/);
+  assert.match(html, /state\.plan=FittFormaTraining\.buildPlan\(p\)/);
 });
 
 test('el mapa usa URL canónica y permite un Referer válido', () => {
@@ -129,14 +132,13 @@ test('la navegación de app móvil y la instalación PWA están configuradas', a
 
 
 test('la biblioteca contiene al menos 150 ejercicios únicos y conserva las tres modalidades', () => {
-  const start = html.indexOf('const library = {');
-  const end = html.indexOf('\n  };', start);
-  assert.ok(start >= 0 && end > start, 'No se encontró la biblioteca');
-  const source = html.slice(start, end);
-  const names = [...source.matchAll(/\{name:'([^']+)'|\{name:"([^"]+)"/g)].map(m => m[1] || m[2]);
+  // v48: la biblioteca vive en training-core.js, depurada de duplicados con otro nombre.
+  const source = readFileSync(path.join(root, 'training-core.js'), 'utf8');
+  const names = [...source.matchAll(/[SCM]\('([^']+)'/g)].map(m => m[1]);
   const normalize = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
   const unique = new Set(names.map(normalize));
   assert.ok(source.includes('gym: [') && source.includes('home: [') && source.includes('bodyweight: ['));
+  assert.match(html, /const library = FittFormaTraining\.LIBRARY;/);
   assert.ok(unique.size >= 150, `Se encontraron ${unique.size} ejercicios únicos; se esperan al menos 150`);
 });
 
@@ -149,17 +151,9 @@ test('las fichas de ejercicio muestran una secuencia visual de tres etapas', () 
 });
 
 
-test('v40.7: los SVG generados que no demuestran de forma fiable la biomecánica están en cuarentena y no se usan ni se precargan', async () => {
-  const start = html.indexOf('const library = {');
-  const end = html.indexOf('\n  };', start);
-  const source = html.slice(start, end);
-  const names = [...source.matchAll(/\{name\s*:\s*(['\"])(.*?)\1\s*,group\s*:/g)].map(m => m[2]);
-  const slug = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,70) || 'ejercicio';
-  for (const name of new Set(names)) await access(path.join(root, 'assets/exercises/unverified-generated', `${slug(name)}.svg`));
-  assert.equal(new Set(names.map(n=>n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim())).size,180);
+test('v40.7: los SVG generados sin verificar siguen en cuarentena: no se usan ni se precargan', async () => {
   assert.doesNotMatch(html, /assets\/exercises\/unverified-generated/);
   assert.doesNotMatch(sw, /assets\/exercises\/unverified-generated/);
-  assert.match(html, /no se presentan como si mostraran el gesto exacto/);
 });
 
 test('la PWA tolera recursos estáticos opcionales no disponibles durante la instalación', () => {

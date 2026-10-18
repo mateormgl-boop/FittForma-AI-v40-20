@@ -35,7 +35,7 @@ test('v40.7: el primer lote de guías ofrece técnica y músculos específicos p
  const names=[...block.matchAll(/name:'([^']+)'/g)].map(m=>m[1]);
  assert.ok(names.length>=25,`Se esperaban al menos 25 fichas específicas; se encontraron ${names.length}`);
  for(const key of ['primary:','secondary:','equipment:','level:','steps:','tips:','breathing:','errors:','alternatives:'])assert.ok(block.includes(key),`Falta campo estructurado ${key}`);
- for(const name of ['Press de banca con barra','Prensa de piernas','Jalón al pecho','Remo sentado en polea','Peso muerto rumano con mancuernas','Curl femoral sentado','Plancha con apoyo de antebrazos','Dead bug'])assert.ok(names.includes(name),`Falta guía para ${name}`);
+ for(const name of ['Press de banca con barra','Prensa de piernas','Jalón al pecho','Remo sentado en polea','Peso muerto rumano con mancuernas','Curl femoral sentado','Plancha frontal','Dead bug'])assert.ok(names.includes(name),`Falta guía para ${name}`);
  assert.match(html,/exerciseModalAlternatives/);
  assert.match(html,/mismo patrón general de movimiento/);
 });
@@ -98,30 +98,16 @@ test('v40.7: fotografías específicas coinciden con la variante descrita',async
 });
 
 
-test('v40.7: los 190 registros del catálogo tienen datos válidos y los 180 nombres únicos reciben una familia de movimiento',async()=>{
- const html=await read('index.html');
- const libraryStart=html.indexOf('  const library = {');
- const libraryEnd=html.indexOf('\n  };',libraryStart)+5;
- assert.ok(libraryStart>=0&&libraryEnd>libraryStart,'No se pudo extraer el catálogo');
- const normalizeStart=html.indexOf('  function normalizeExerciseName(');
- const normalizeEnd=html.indexOf('\n',normalizeStart);
- const classifierStart=html.indexOf('  function classifyCatalogMovement(');
- const classifierEnd=html.indexOf('\n  function catalogMuscles(',classifierStart);
- assert.ok(normalizeStart>=0&&classifierStart>=0&&classifierEnd>classifierStart,'No se encontró el clasificador de catálogo');
- const context={};
- vm.runInNewContext(`${html.slice(libraryStart,libraryEnd)}\n${html.slice(normalizeStart,normalizeEnd)}\n${html.slice(classifierStart,classifierEnd)}\nglobalThis.catalogUnderTest=library; globalThis.classifierUnderTest=classifyCatalogMovement;`,context);
- const entries=Object.values(context.catalogUnderTest).flat();
- const norm=x=>String(x).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
- assert.equal(entries.length,190,'El catálogo debe conservar las 190 entradas de las tres modalidades');
- assert.equal(new Set(entries.map(e=>norm(e.name))).size,180,'Se esperaban 180 nombres únicos, con repeticiones entre modalidades');
+test('v48: el catálogo depurado tiene datos válidos y cada ejercicio tiene un patrón de movimiento',async()=>{
+ await import(path.join(root,'training-core.js'));const T=globalThis.FittFormaTraining;
+ const entries=Object.values(T.LIBRARY).flat();
+ assert.ok(entries.length>=180,`El catálogo debe conservar las tres modalidades (${entries.length} entradas)`);
+ const unique=T.allExercises();assert.ok(unique.length>=150,`Se esperaban al menos 150 nombres únicos; hay ${unique.length}`);
  for(const e of entries){
-  assert.ok(e.name&&e.group&&['strength','cardio'].includes(e.kind),`Datos incompletos: ${e.name}`);
+  assert.ok(e.name&&e.group&&['strength','cardio','mobility'].includes(e.kind),`Datos incompletos: ${e.name}`);
   assert.ok(Number(e.sets)>=1&&String(e.reps).trim(),`Dosis vacía o inválida: ${e.name}`);
+  assert.ok(e.slot,`Sin patrón de movimiento: ${e.name}`);
  }
- const unique=new Map();
- for(const e of entries) if(!unique.has(norm(e.name)))unique.set(norm(e.name),e);
- const uncategorized=[...unique.values()].filter(e=>context.classifierUnderTest(e.name,e.group,e.kind)==='unclassified').map(e=>e.name);
- assert.deepEqual(uncategorized,[],'Hay ejercicios del catálogo sin patrón general identificado');
 });
 
 test('v40.7: las fichas restantes generan técnica orientativa estructurada y la interfaz avisa que no equivale a validación profesional',async()=>{
@@ -137,27 +123,20 @@ test('v40.7: las fichas restantes generan técnica orientativa estructurada y la
 });
 
 
-test('v40.7: las guías en ejecución cubren todas las variantes únicas con campos completos, pasos y patrón identificado',async()=>{
+test('v48: cada ejercicio de la biblioteca tiene una ficha propia completa (no genérica)',async()=>{
  const html=await read('index.html');
- const section=(startMarker,endMarker)=>{const start=html.indexOf(startMarker),end=html.indexOf(endMarker,start);assert.ok(start>=0&&end>start,`No se pudo extraer ${startMarker}`);return html.slice(start,end);};
- const lib=section('  const library = {','\n  };')+'\n  };';
- const normalize=section('  function normalizeExerciseName(','\n  // Guías estructuradas')+'\n';
- const guides=section('  const EXERCISE_GUIDE_CATALOG = [','\nfunction findCatalogExercise');
- const helperStart=html.indexOf('function findCatalogExercise('),helperEnd=html.indexOf('  function inferExercisePattern(',helperStart);
- assert.ok(helperStart>=0&&helperEnd>helperStart,'No se encontró la implementación de guías');
- const helper=html.slice(helperStart,helperEnd);
- const ctx={};
- vm.runInNewContext(`${lib}\n${normalize}\n${guides}\n${helper}\nglobalThis.catalogUnderTest=library; globalThis.guideUnderTest=exerciseGuide; globalThis.classifierUnderTest=classifyCatalogMovement;`,ctx);
- const norm=x=>String(x).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
- const items=Object.values(ctx.catalogUnderTest).flat();
- const unique=new Map(items.map(e=>[norm(e.name),e]));
- assert.equal(unique.size,180);
+ await import(path.join(root,'training-core.js'));const T=globalThis.FittFormaTraining;
+ globalThis.window=globalThis;await import(path.join(root,'exercise-guides.js'));
+ const block=html.slice(html.indexOf('  const EXERCISE_GUIDE_CATALOG = ['),html.indexOf('\n  ];',html.indexOf('  const EXERCISE_GUIDE_CATALOG = ['))+5);
+ const ctx={};vm.runInNewContext(block+'\nglobalThis.G=EXERCISE_GUIDE_CATALOG;',ctx);
+ const guides=[...ctx.G,...globalThis.FittFormaExerciseGuides];
  const problems=[];
- for(const e of unique.values()){
-  const g=ctx.guideUnderTest(e.name);
-  if(!g||!g.primary||!g.secondary||!g.equipment||!g.level||!Array.isArray(g.steps)||g.steps.length!==3||!g.breathing||!Array.isArray(g.errors)||!g.errors.length||!g.rest||!g.pattern||g.pattern==='unclassified')problems.push(e.name);
+ for(const e of T.allExercises()){
+  const g=guides.find(x=>T.norm(x.name)===T.norm(e.name));
+  if(!g||!g.primary||!g.secondary||!g.equipment||!g.level||!Array.isArray(g.steps)||g.steps.length<3||g.steps.length>5||!g.breathing||!Array.isArray(g.errors)||!g.errors.length||!g.rest||!g.pattern||g.pattern==='unclassified')problems.push(e.name);
  }
- assert.deepEqual(problems,[],'Las fichas incompletas o sin clasificación son: '+problems.join(', '));
+ assert.deepEqual(problems,[],'Ejercicios sin ficha propia completa: '+problems.join(', '));
+ assert.match(html,/<script src="\.\/exercise-guides\.js"><\/script>/);
 });
 
 

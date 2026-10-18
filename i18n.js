@@ -324,6 +324,8 @@
     [/^Render está ejecutando la versión (.+), pero esta app espera (.+)\. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy\.$/,(m,i)=>[`Render is running version ${m[1]}, but this app expects ${m[2]}. Check that GitHub received the update and that Render finished the last deploy.`,`O Render está executando a versão ${m[1]}, mas este app espera ${m[2]}. Confirme que o GitHub recebeu a atualização e que o Render terminou o último deploy.`,`Render exécute la version ${m[1]}, mais cette app attend ${m[2]}. Vérifie que GitHub a reçu la mise à jour et que Render a terminé le dernier déploiement.`,`Render sta eseguendo la versione ${m[1]}, ma questa app si aspetta la ${m[2]}. Verifica che GitHub abbia ricevuto l’aggiornamento e che Render abbia completato l’ultimo deploy.`,`Render führt Version ${m[1]} aus, diese App erwartet aber ${m[2]}. Prüfe, ob GitHub das Update erhalten und Render das letzte Deployment abgeschlossen hat.`][i]],
     [/^Nivel (\d+)$/,(m,i)=>[`Level ${m[1]}`,`Nível ${m[1]}`,`Niveau ${m[1]}`,`Livello ${m[1]}`,`Stufe ${m[1]}`][i]]
   ];
+  // v48: patrones dinámicos adicionales definidos en i18n-v48.js: [regex, (match, langIndex, translateString) => texto].
+  for(const entry of (Array.isArray(window.FittFormaI18nDynamic)?window.FittFormaI18nDynamic:[]))if(Array.isArray(entry)&&entry[0] instanceof RegExp&&typeof entry[1]==='function')DYN.push([entry[0],(m,i)=>entry[1](m,i,translateString)]);
   function translateDynamic(source){
     const i=L.indexOf(active);if(i<0)return null;
     for(const [re,fn] of DYN){const m=String(source).match(re);if(m)return fn(m,i);}

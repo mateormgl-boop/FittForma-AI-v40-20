@@ -100,7 +100,7 @@ const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=u
 const limits=new Map();
 const MAX_TRACKED_CLIENTS=5000;
 const PUBLIC_ROOT_FILES=new Set([
-  '/index.html','/i18n.js','/i18n-extra.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js',
+  '/index.html','/i18n.js','/i18n-extra.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js','/training-core.js','/exercise-guides.js',
   '/manifest.json','/icon.svg','/icon-180.png','/icon-192.png','/icon-512.png',
   '/supabase-config.js','/achievements.js','/sw.js'
 ]);
@@ -284,6 +284,8 @@ const server=http.createServer(async(req,res)=>{try{
     return send(req,res,200,{version:appVersion,supabase:config?{configured:true,...config,keyType}:{configured:false,url:null,anonKey:null,keyType:null},missing,issue});
   }
   if(req.method==='GET'&&url.pathname==='/api/status')return send(req,res,200,{service:'FittForma AI Coach',version:appVersion,provider:'Gemini',configured:Boolean(apiKey),model:apiKey?model:null,fallbackModels:apiKey?fallbackModels:[],mode:apiKey?'ai':'demo',supabaseConfigured:Boolean(validSupabasePublicConfig(process.env.SUPABASE_URL,process.env.SUPABASE_ANON_KEY)||validSupabasePublicConfig(process.env.SUPABASE_URL,process.env.SUPABASE_PUBLISHABLE_KEY)),frontendAvailable:existsSync(path.join(root,'index.html'))});
+  // v48: hora del servidor para el entrenamiento diario (la hora del teléfono puede cambiarse).
+  if(req.method==='GET'&&url.pathname==='/api/time')return send(req,res,200,{now:new Date().toISOString()});
   if(req.method==='GET'&&url.pathname==='/healthz')return send(req,res,200,{ok:true,service:'fittforma-ai',version:appVersion});
   if(req.method==='POST'&&url.pathname==='/api/meal-photo'){
     if(rateLimited(req)){res.setHeader('Retry-After','60');return send(req,res,429,{error:'Demasiadas solicitudes. Esperá un minuto.'});}
