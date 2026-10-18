@@ -454,3 +454,88 @@ body{font-feature-settings:"cv11","ss01"}
 .membership-status{margin:10px 0;padding:10px 12px;border-radius:12px;background:var(--ff-panel-2)}
 /* v48: en el celular la notificación queda por encima del botón «+» (antes lo tapaba). */
 @media(max-width:760px){body:not(.welcome-open) .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}}
+
+/* ---------- v49: mapa muscular ---------- */
+:root{--anat-body:#22314d;--anat-muscle:#33456a;--anat-edge:#0b1222;--anat-primary:#ef4444;--anat-secondary:#f59e0b}
+:root[data-theme="light"]{--anat-body:#d3dbe8;--anat-muscle:#b6c2d6;--anat-edge:#f3f6fb;--anat-primary:#dc2626;--anat-secondary:#d97706}
+.anatomy-map{display:block;width:100%;height:auto}
+.anatomy-map .am-body{fill:var(--anat-body)}
+.anatomy-map .am-m{fill:var(--anat-muscle);stroke:var(--anat-edge);stroke-width:.6;transition:fill .25s ease}
+.anatomy-map .am-m.is-primary{fill:var(--anat-primary)}
+.anatomy-map .am-m.is-secondary{fill:var(--anat-secondary);opacity:.85}
+.anatomy-map .am-cap{font-size:9px;font-weight:700;fill:var(--text-3)}
+.anatomy-sm .am-cap{display:none}
+.am-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.am-dot.is-primary{background:var(--anat-primary)}.am-dot.is-secondary{background:var(--anat-secondary)}
+
+/* ---------- v49: ficha del ejercicio ---------- */
+.exercise-sheet-top{align-items:flex-start;gap:10px}
+.exercise-group-pill{margin-left:auto;align-self:center;padding:6px 12px;border-radius:999px;background:var(--mod-soft,rgba(63,107,255,.16));color:var(--t-blue);font-size:12px;font-weight:800;white-space:nowrap}
+.exercise-group-pill:empty{display:none}
+.exercise-sheet-hero{display:grid;grid-template-columns:minmax(150px,230px) 1fr;gap:16px;align-items:center;margin:8px 0 12px;padding:12px;border:1px solid var(--ff-border);border-radius:18px;background:var(--ff-panel-2)}
+.exercise-sheet-muscles{margin:0;display:grid;gap:12px}
+.exercise-sheet-muscles dt{font-size:12px;font-weight:700;color:var(--text-3);margin:0 0 3px}
+.exercise-sheet-muscles dd{margin:0;font-size:15px;font-weight:800;color:var(--text);line-height:1.3}
+.exercise-sheet-chips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px}
+.sheet-chip{display:flex;flex-direction:column;gap:2px;min-width:0;padding:9px 11px;border:1px solid var(--ff-border);border-radius:14px;background:var(--ff-panel)}
+.sheet-chip small{font-size:11px;font-weight:700;color:var(--text-3)}
+.sheet-chip b{font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.exercise-sheet-start{margin:0 0 12px;padding:12px 14px;border-left:3px solid var(--t-blue);border-radius:12px;background:var(--ff-panel-2)}
+.exercise-sheet-start h3{margin:0 0 4px;font-size:14px}.exercise-sheet-start p{margin:0;color:var(--text-2);font-size:14px;line-height:1.45}
+#exerciseModalProgression{display:grid;grid-template-columns:1fr;gap:8px}
+#exerciseModalProgression .exercise-progression-step{display:flex;gap:10px;align-items:flex-start;padding:10px 12px}
+#exerciseModalProgression .exercise-progression-step p{margin:2px 0 0;font-size:14px;line-height:1.45;color:var(--text)}
+#exerciseModalProgression .step-number{flex:0 0 24px;width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:#2f6bff;color:#fff;font-size:12px;font-weight:800}
+.exercise-sheet-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.exercise-sheet-columns h3{display:flex;align-items:center;gap:7px;font-size:14px}
+.sheet-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--t-blue);color:var(--t-blue);font-size:12px;font-weight:900}
+.exercise-sheet-columns ul{margin:0;padding-left:18px}.exercise-sheet-columns li{font-size:13px;color:var(--text-2);margin:3px 0}
+.exercise-sheet-dose{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin:4px 0 12px;padding:11px 14px;border:1px solid var(--ff-border);border-radius:14px;background:var(--ff-panel-2)}
+.exercise-sheet-dose span{display:flex;gap:6px;align-items:baseline}.exercise-sheet-dose small{color:var(--text-3);font-size:12px;font-weight:700}.exercise-sheet-dose b{font-size:14px;color:var(--text)}
+.exercise-sheet-dose em{margin-left:auto;font-style:normal;font-size:12px;color:var(--t-blue);font-weight:700}
+@media(max-width:620px){
+  .exercise-sheet-hero{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .exercise-sheet-hero .anatomy-map{max-width:240px}
+  .exercise-sheet-chips{grid-template-columns:1fr 1fr}.exercise-sheet-chips .sheet-chip:last-child{grid-column:1/-1}
+  .exercise-sheet-columns{grid-template-columns:1fr}
+}
+
+/* ---------- v49: entrenamiento en curso ---------- */
+.workout-muscle-chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 6px}
+.workout-muscle-chips span{padding:4px 10px;border-radius:999px;background:var(--mod-soft);color:var(--t-blue);font-size:12px;font-weight:800}
+.workout-live-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
+.workout-live-stats div{padding:10px;border:1px solid var(--ff-border);border-radius:14px;background:var(--ff-panel-2);min-width:0}
+.workout-live-stats small{display:block;font-size:11px;font-weight:700;color:var(--text-3)}
+.workout-live-stats strong{display:block;margin-top:2px;font-size:18px;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+#workoutPrCount{color:var(--t-amber)}
+.workout-exercise{position:relative;transition:border-color .25s ease,box-shadow .25s ease}
+.workout-exercise.is-complete{border-color:rgba(34,201,147,.55);box-shadow:0 0 0 1px rgba(34,201,147,.25) inset}
+.workout-exercise.is-complete .train-exercise-head h3::after{content:'✓';margin-left:8px;color:var(--ok);font-size:.9em}
+.workout-exercise .train-exercise-head{display:grid;grid-template-columns:64px minmax(0,1fr) 92px;align-items:center}
+.wx-main{min-width:0}.wx-main .btn-sm{margin-top:4px}
+.wx-map .anatomy-map{width:92px}
+.set-table{display:grid;gap:6px;margin:10px 0 4px}
+.set-table .set-head,.set-table .setrow{display:grid;grid-template-columns:30px minmax(52px,1fr) minmax(0,1fr) minmax(0,1fr) 40px;gap:6px;align-items:center}
+.set-table .set-head{padding:0 4px;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3)}
+.set-table .set-head span:last-child,.set-table .set-head span:first-child{text-align:center}
+.set-table .setrow{padding:6px 4px;border-radius:12px;transition:background .2s ease}
+.set-table .setrow.is-done{background:rgba(34,201,147,.1)}
+.set-table .setnum{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--ff-panel-2);color:var(--text);font-size:12px;font-weight:800}
+.set-table .setrow.is-done .setnum{background:var(--ok);color:#03241a}
+.set-table .set-prev{font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.set-table .set-empty{text-align:center;color:var(--text-3)}
+.set-table .setrow input[type=number]{width:100%;min-width:0;text-align:center;font-variant-numeric:tabular-nums}
+.set-table .set-check span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.set-table .set-check input{width:24px;height:24px}
+.set-table .set-pr{grid-column:2/-1;justify-self:start;padding:2px 9px;border-radius:999px;background:rgba(255,198,107,.16);color:var(--t-amber);font-size:11px;font-weight:800;animation:pr-pop .35s ease-out}
+.set-table .set-pr::before{content:'★ ';}
+@keyframes pr-pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.set-table .set-pr{animation:none}}
+@media(max-width:420px){
+  .workout-live-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .workout-exercise .train-exercise-head{grid-template-columns:56px minmax(0,1fr) 70px}
+  .wx-map .anatomy-map{width:70px}
+  .set-table .set-head,.set-table .setrow{grid-template-columns:28px minmax(44px,.9fr) minmax(0,1fr) minmax(0,1fr) 34px;gap:5px}
+}
+#exerciseModalProgression .exercise-progression-step strong{display:block;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--t-blue)}
+@media(min-width:900px){.set-table{max-width:760px}}
