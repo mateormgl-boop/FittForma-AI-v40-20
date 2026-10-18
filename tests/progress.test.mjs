@@ -69,7 +69,10 @@ test('el analizador tolera historial vacío o parcialmente incompleto', () => {
   assert.equal(empty.current.items, 0);
   assert.equal(empty.month.activeDays, 0);
   const bodyweight = JSON.parse(JSON.stringify(context.deriveExerciseRecords([{ exercises: [{ name: 'Plancha', entries: [{ reps: '30', weight: '' }] }] }])));
-  assert.equal(bodyweight[0].bestReps, 30);
+  // v49: la plancha se mide en tiempo (segundos), no en repeticiones.
+  assert.equal(bodyweight[0].measure, 'seconds');
+  assert.equal(bodyweight[0].bestSeconds, 30);
+  assert.equal(bodyweight[0].bestReps, 0);
 });
 
 

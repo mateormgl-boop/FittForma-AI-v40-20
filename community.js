@@ -233,10 +233,10 @@
   function achievementCard(a){
     const E=window.FittFormaBadgeEngine,level=Math.min(12,Math.max(1,Number(a?.level)||1));
     const rank=E?E.rankForLevel(level-1):{label:String(a?.rank||''),key:String(a?.rank||'bronze'),numeral:''};
-    const medal=E?E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({category:a?.category}),size:56,title:rank.label}):'';
+    const medal=E?E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:a?.exerciseId,name:a?.exerciseName,category:a?.category,measure:a?.measure}),category:a?.category,size:56,title:rank.label}):'';
     const goal=E?E.formatValue(a?.threshold,a?.measure):String(a?.threshold??'');
     const gps=a?.evidence==='gps_device';
-    return `<div class="community-achievement">${medal}<div class="community-achievement-copy"><small>Insignia obtenida</small><strong>${esc(a?.exerciseName||'Desafío')} · ${esc(rank.label)}</strong><span>Meta del nivel: ${esc(goal)} · ${esc(dateLabel(a?.earnedAt))}</span><span class="ff-evidence ${gps?'is-gps':''}">${gps?'Ruta GPS según el dispositivo del autor':'Declarada por el autor'}</span></div></div>`;
+    return `<div class="community-achievement">${medal}<div class="community-achievement-copy"><small>Insignia obtenida</small><strong>${esc(a?.exerciseName||'Desafío')} · ${esc(rank.label)}</strong><span>Meta del nivel: ${esc(goal)} · ${esc(dateLabel(a?.earnedAt))}</span><span class="ff-evidence ${gps?'is-gps':''}">${gps?'Ruta GPS según el dispositivo del autor':a?.evidence==='session'?'Registrada en una sesión del autor':'Declarada por el autor'}</span></div></div>`;
   }
   function startEditPost(button){
     const id=button.dataset.communityEditPost,article=button.closest('[data-community-post]');if(!article||article.querySelector('.community-edit-form'))return;
