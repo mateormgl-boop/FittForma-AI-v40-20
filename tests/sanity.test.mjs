@@ -67,8 +67,8 @@ test('todos los botones estáticos y de plantillas declaran su tipo para no envi
 });
 
 test('versiones visibles del pie de página y traducciones están alineadas', () => {
-  assert.match(html, /Versión 47\.0/);
-  assert.match(i18n, /VERSION 47\.0 · ONLINE FITNESS COMMUNITY/);
+  assert.match(html, /Versión 48\.0/);
+  assert.match(i18n, /VERSION 48\.0 · ONLINE FITNESS COMMUNITY/);
   assert.doesNotMatch(html, /Versión 26\.0|Versión 25\.0|Versión 24\.0|Versión 23\.0/);
   assert.doesNotMatch(i18n, /Version 23\.0|Versão 23\.0|Versione 23\.0/);
 });
@@ -142,7 +142,7 @@ test('v40.7: los SVG generados sin verificar siguen en cuarentena: no se usan ni
 
 test('la PWA tolera recursos estáticos opcionales no disponibles durante la instalación', () => {
   assert.match(sw, /Promise\.allSettled\(ASSETS\.map\(asset=>cache\.add\(asset\)\)\)/);
-  assert.match(sw, /fittforma-ai-static-v47-0/);
+  assert.match(sw, /fittforma-ai-static-v48-0/);
 });
 
 test('los estilos móviles protegen desbordamientos y el scroll de menús/modales', () => {
@@ -241,9 +241,12 @@ test('v32 deja la publicidad desactivada hasta configurar unidades reales', asyn
   const config = await read('ads-config.js');
   const ads = await read('ads.js');
   assert.match(config, /enabled: false/);
-  assert.match(ads, /FREE_DAILY = 6, REWARD_CREDITS = 3, MAX_REWARDS_DAILY = 3/);
-  assert.match(ads, /rewardedSlotGranted/);
-  assert.match(ads, /current\.credits\+=REWARD_CREDITS/);
+  // v48: las cuotas y recompensas las concede el servidor (/api/rewards/*), no el navegador.
+  const core = await read('monetization-core.js');
+  assert.match(core, /enabled: false/);
+  assert.match(core, /freePerDay: 6, plusPerDay: 40, creditsPerRewardedVideo: 3, maxRewardedVideosPerDay: 3/);
+  assert.match(ads, /\/api\/rewards\/claim/);
+  assert.doesNotMatch(ads, /credits\s*\+=/);
   assert.match(html, /id="adSlotHome"/);
   assert.match(html, /id="adSlotNutrition"/);
   assert.match(html, /Ver anuncio y obtener 3 consultas/);
@@ -266,7 +269,7 @@ test('v33 presenta Free/Pro sin simular pagos ni activar membresías desde el cl
   assert.match(html, /id="membershipStatus">Plan gratuito · activo/);
   assert.match(html, /precio orientativo, aún no definitivo/);
   assert.match(html, /No se hará ningún cobro desde esta pantalla/);
-  assert.match(html, /No se realizó ningún cobro/);
+  assert.match(html, /no se hace ningún cobro/);
   assert.match(html, /membership-config\.js/);
   assert.match(sw, /"\.\/membership-config\.js"/);
   assert.match(config, /Nunca conceder Pro por una bandera local/);
@@ -315,14 +318,14 @@ test('v36.1 mantiene válidos los metadatos y las traducciones del perfil/Pro', 
   const manifest = JSON.parse(await read('manifest.json'));
   const rootPackage = JSON.parse(await read('package.json'));
   const backendPackage = JSON.parse(await read('backend/package.json'));
-  assert.equal(rootPackage.version, '0.47.0');
-  assert.equal(backendPackage.version, '0.47.0');
+  assert.equal(rootPackage.version, '0.48.0');
+  assert.equal(backendPackage.version, '0.48.0');
   assert.equal(manifest.theme_color, '#f3f6fb');
   assert.equal(manifest.background_color, '#f3f6fb');
-  assert.match(i18n, /VERSION 47\.0 · ONLINE FITNESS COMMUNITY/i);
+  assert.match(i18n, /VERSION 48\.0 · ONLINE FITNESS COMMUNITY/i);
   assert.match(server, /GEMINI_MODEL\|\|'gemini-3\.8-flash'/);
   assert.match(await read('render.yaml'), /value: gemini-3\.8-flash/);
-  assert.match(sw, /const CACHE = 'fittforma-ai-static-v47-0'/);
+  assert.match(sw, /const CACHE = 'fittforma-ai-static-v48-0'/);
 });
 
 
@@ -350,7 +353,7 @@ test('v36.1 conserva identidad visual propia y perfil local editable', () => {
   assert.match(html, /identityForm/);
   assert.match(html, /displayName/);
   assert.match(html, /focusGoal/);
-  assert.match(sw, /fittforma-ai-static-v47-0/);
+  assert.match(sw, /fittforma-ai-static-v48-0/);
 });
 
 
@@ -367,7 +370,7 @@ test('v36.1 incluye preferencias completas de recordatorios y estado de permisos
   assert.match(html, /Notification\.requestPermission\(\)/);
   assert.match(html, /registration\.showNotification/);
   assert.match(sw, /notificationclick/);
-  assert.match(sw, /fittforma-ai-static-v47-0/);
+  assert.match(sw, /fittforma-ai-static-v48-0/);
 });
 
 test('v36.1 evita avisos duplicados y no marca entrenamientos como pendientes si hubo actividad', () => {

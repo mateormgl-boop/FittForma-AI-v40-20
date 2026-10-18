@@ -42,7 +42,7 @@ Preparación (resumen):
 
 1. Base `ff_e2e` con `supabase/tests/supabase_stub.sql`, `schema.sql`, `community.sql` y la migración;
    rol `authenticator` (`login noinherit`) con `grant anon, authenticated to authenticator`;
-   migraciones v41, v43 y v44 aplicadas (el script crea los usuarios de prueba).
+   migraciones v41, v43, v44 y v48 aplicadas (el script crea los usuarios de prueba).
 2. PostgREST 12 con `db-anon-role = "anon"` y un `jwt-secret` guardado en un archivo.
 3. `npm start` en otra terminal.
 4. Ejecutar:
@@ -53,10 +53,23 @@ SUPABASE_UMD=/ruta/node_modules/@supabase/supabase-js/dist/umd/supabase.js \
 PGHOST=... PGPORT=... PGUSER=... node tests/e2e/community.e2e.mjs
 ```
 
+### Monetización (v48)
+
+`tests/e2e/monetization.e2e.mjs` levanta su propio backend (puerto 8811) con `MONETIZATION_ENABLED=true`,
+`ADS_PROVIDER=test` y Gemini simulado (`tests/e2e/fixtures/mock-gemini.mjs`), y una pasarela local (puerto 3400)
+que imita `/auth/v1/user` y reenvía `/rest/v1` a PostgREST. Recorre 47 pasos: banners e intersticiales (con reloj
+controlado: nunca durante un entrenamiento, el chat de IA ni antes del intervalo), IA agotada → video
+aceptado/cerrado/sin inventario/con error/completado, fotos 1-2-3 con borrador conservado y sin publicación
+automática, bloqueo de la base para una 4.ª foto, Plus sin anuncios, error de red y métricas confirmadas.
+Requisitos extra: migraciones v48 aplicadas en `ff_e2e` y `grant service_role to authenticator` (solo en la base
+local de pruebas). No necesita `npm start`.
+
 ## 4. Pendiente manual (no automatizable aquí)
 
 - Supabase real con dos cuentas: RLS, OAuth de Google, confirmación por correo, Storage y URLs firmadas.
 - Gemini con clave válida (cuotas, idioma, propuestas).
+- Anuncios reales de Google Ad Manager (cuenta, bloques, consentimiento) y compras reales de Google Play (necesita
+  la app de Android): ver `docs/MONETIZACION.md`.
 - Teléfonos físicos: instalación PWA, GPS en exterior, notificaciones, cámara para código de barras.
 
 ## 4. Flujos críticos e idiomas (navegador)

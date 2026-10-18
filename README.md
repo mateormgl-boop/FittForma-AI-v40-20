@@ -1,8 +1,14 @@
-# FittForma AI — v47.0
+# FittForma AI — v48.0
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v48.0
+
+- Rutinas que cambian de verdad con el objetivo, el nivel, el equipo y los días. Biblioteca de 156 ejercicios con imagen propia y una ficha de técnica.
+- Una sesión diaria cada 12 h, controlada con la hora del servidor. Sesiones extra y manuales separadas. Insignias rediseñadas, con hasta 3 destacadas. Perfil e hidratación completos.
+- Publicidad, videos recompensados y FittForma AI Plus, **apagados por defecto**. Cómo activarlos: `docs/MONETIZACION.md`.
 
 ## Novedades v47.0
 
@@ -78,13 +84,17 @@ Pruebas en navegador (con `npm start` en otra terminal): `npm run test:e2e` (int
    `schema.sql` ni `community.sql`. Para nombrar moderadores (no se puede desde la app):
    `insert into public.community_moderators(user_id) values ('UUID-DEL-USUARIO');`
 2. **Render**: variables `GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL` y una clave pública
-   (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`). Nunca `service_role`/`sb_secret_`.
-3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v47-0`
+   (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`). Nunca `service_role`/`sb_secret_` como clave pública.
+   Opcional desde v48: `SUPABASE_SERVICE_ROLE_KEY` **solo como variable del servidor**, para los contadores de
+   monetización; nunca llega al navegador.
+3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v48-0`
    y la app ofrece actualizar.
 
 ## Documentación
 
-- `docs/DESPLIEGUE.md` — pasos para publicar v47 en Render y comprobarlo.
+- `docs/DESPLIEGUE.md` — pasos para publicar v48 en Render y comprobarlo.
+- `docs/MONETIZACION.md` — anuncios, recompensas, Plus: variables, pasos externos, límites y costos.
+- `docs/AUDITORIA_v48.md` — auditoría integral v48 (problemas encontrados).
 - `DESIGN.md` — sistema visual (temas, colores por sección, componentes).
 - `docs/INSIGNIAS.md` — reglas, umbrales y evidencia de las insignias.
 - `docs/SEGURIDAD_v44.md` — revisión de seguridad de la Etapa 6.

@@ -20,3 +20,12 @@ services:
         value: gemini-3.8-flash
       - key: TRUST_RENDER_CLIENT_IP
         value: "true"
+      # v48 — monetización (apagada por defecto). Detalle en docs/MONETIZACION.md.
+      - key: MONETIZATION_ENABLED
+        value: "false"
+      - key: ADS_PROVIDER
+        value: none
+      - key: APP_TIMEZONE
+        value: America/Montevideo
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

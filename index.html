@@ -1802,6 +1802,7 @@
           <div class="field library-group-field"><label for="exerciseGroupFilter">Grupo muscular</label><select id="exerciseGroupFilter"><option value="all">Todos los grupos</option><option>Piernas</option><option>Pecho</option><option>Espalda</option><option>Hombros</option><option>Brazos</option><option>Core</option><option>Glúteos</option><option>Cardio</option></select></div>
         </div>
         <div class="btn-row library-extra-filters"><button class="btn ghost" id="exerciseFavoritesOnly" type="button" aria-pressed="false">Mostrar favoritos</button><span id="exerciseResultCount" class="muted small" aria-live="polite"></span></div>
+        <aside class="ad-slot ad-slot-inline" id="adSlotExplore" aria-label="Publicidad"><span class="ad-slot-label">Publicidad</span><div class="ad-slot-content" id="adContentExplore"></div></aside>
         <div id="exerciseLibraryResults" class="exercise-library-grid" aria-live="polite"></div>
         <p class="muted small exercise-credit">Todas las tarjetas usan ilustraciones locales con el mismo estilo visual. Cada ejercicio muestra una referencia asociada al movimiento o grupo muscular; las ilustraciones orientan y no sustituyen una demostración técnica detallada.</p>
       </section>
@@ -2046,6 +2047,7 @@
         <div class="community-panel-heading"><div><h3>Lo que está pasando</h3><p class="muted small">Transformaciones y avances de perfiles que podés ver.</p></div><button class="btn secondary" id="communityRefresh" type="button">Actualizar feed</button></div>
         <div class="community-feed-tools"><label for="communityFeedSort">Ordenar por</label><select id="communityFeedSort"><option value="activity">Actividad de la comunidad</option><option value="recent">Más recientes</option><option value="likes">Más me gusta</option></select></div>
         <div id="communityFeedStatus" class="community-status" role="status" aria-live="polite">Preparando comunidad…</div>
+        <aside class="ad-slot ad-slot-inline" id="adSlotCommunity" aria-label="Publicidad"><span class="ad-slot-label">Publicidad</span><div class="ad-slot-content" id="adContentCommunity"></div></aside>
         <div id="communityFeed" class="community-feed"><div class="empty"><strong>Tu comunidad empieza acá</strong><p>Explorá perfiles o compartí tu primera transformación.</p></div></div>
       </section>
 
@@ -2244,29 +2246,29 @@
       <details class="ff-group">
         <summary><span><strong>Membresía</strong><small>Plan gratuito y FittForma Pro</small></span></summary>
         <div class="card membership-card" id="membershipCard">
-        <div class="membership-head"><div><div class="eyebrow">Tu membresía</div><h3>FittForma Pro</h3><p class="muted small">Una propuesta de beneficios para la futura suscripción. La versión gratuita seguirá siendo útil.</p></div><span class="membership-status" id="membershipStatus">Plan gratuito · activo</span></div>
+        <div class="membership-head"><div><div class="eyebrow">Tu membresía</div><h3>FittForma AI Plus</h3><p class="muted small">Una propuesta de beneficios para la futura suscripción. La versión gratuita seguirá siendo útil.</p></div><span class="membership-status" id="membershipStatus">Plan gratuito · activo</span></div>
         <div class="membership-price">US$ 5,99 <small>/ mes · precio orientativo, aún no definitivo</small></div>
         <div class="membership-grid">
           <div class="membership-tier"><h4>Gratis</h4><ul><li>Rutinas y biblioteca de ejercicios</li><li>Registro de sesiones y actividad</li><li>Seguimiento nutricional básico</li><li>Historial local y estadísticas</li><li>Acceso a la IA según límites gratuitos</li></ul></div>
-          <div class="membership-tier pro"><h4>Pro · beneficios propuestos</h4><ul><li>Experiencia sin anuncios</li><li>Mayor disponibilidad del entrenador IA</li><li>Personalización y análisis avanzados</li><li>Estadísticas ampliadas de progreso</li><li>Herramientas nutricionales avanzadas</li></ul></div>
+          <div class="membership-tier pro"><h4>Plus · beneficios</h4><ul><li>Experiencia sin anuncios</li><li>Mayor disponibilidad del entrenador IA</li><li>Personalización y análisis avanzados</li><li>Estadísticas ampliadas de progreso</li><li>Herramientas nutricionales avanzadas</li></ul></div>
         </div>
         <p class="membership-note">Los beneficios y el precio son una propuesta de producto, no una oferta de compra activa. Todavía no hay proveedor de pagos conectado ni suscripciones verificadas. No se hará ningún cobro desde esta pantalla.</p>
-        <button class="btn full" id="membershipInfoButton" type="button">Consultar estado de Pro</button>
-        <p id="membershipMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0">La contratación se habilitará después de integrar y probar los pagos.</p>
+        <p class="membership-status" id="membershipStatus" role="status" aria-live="polite">Consultando tu plan…</p><div class="btn-row"><button class="btn" id="plusBuyGooglePlay" type="button" hidden>Suscribirme con Google Play</button><button class="btn ghost" id="plusRestore" type="button" hidden>Restaurar compra</button><button class="btn secondary" id="membershipInfoButton" type="button">Actualizar estado</button></div>
+        <p id="membershipMessage" class="muted small" style="margin:10px 0 0">Plus solo se activa cuando Google Play (app de Android) confirma la compra y el servidor la verifica. En la web todavía no hay pagos: no se hace ningún cobro.</p>
       </div>
       </details>
       <details class="ff-group">
         <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
         <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">47.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">48.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
       </details>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 47.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 48.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -2293,7 +2295,7 @@
   <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V47.0</p>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V48.0</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -2361,6 +2363,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 <script src="./ads-config.js"></script>
+<script src="./monetization-core.js"></script>
 <script src="./ads.js"></script>
 <script src="./membership-config.js"></script>
 <script src="./training-core.js"></script>
@@ -2378,6 +2381,7 @@
   const defaults = {daily:{seq:0,lastCompletedAt:'',nextAvailableAt:'',history:[]},hydration:{goalMl:2000,glassMl:250,entries:[]},featuredBadges:[],mealPlan:{},routines:[],bodyMeasures:[],notifications:[],coachShareData:true,plannedActivities:[],mealFavorites:[],habitLogs:{},waterLogs:{},badgeRecords:[],badgeUnlocks:{},profile:{goal:'fitness',level:'beginner',days:'3',equipment:'gym',duration:'30',name:'',age:'',heightCm:'',currentWeightKg:'',targetWeightKg:'',activityLevel:'light'},sessions:[],plan:null,meals:[],weights:[],activities:[],water:{date:'',count:0},nutritionGoals:{calories:2400,protein:120,carbs:280,fat:80,water:8},chat:[],proposal:null,planHistory:[],runningPlan:'starter',reminders:{enabled:false,time:'18:00',days:[1,3,5],missedEnabled:true,missedTime:'21:00',lastTrainingNoticeDate:'',lastMissedNoticeDate:''}};
   let state = loadState();
   let activeSession = null;
+  let pendingAdBreak = ''; // v48: pausa natural pendiente para evaluar un intersticial
   let lastWorkoutSummary = null;
   let restEndAt = 0, restInterval = null, workoutClockInterval = null;
   let deferredInstall = null;
@@ -2478,7 +2482,11 @@
   }
   function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));return true;}catch(e){toast('No se pudo guardar. Exportá tus datos para no perderlos.');return false;}}
   function toast(msg){const el=$('toast');el.textContent=msg;el.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.style.display='none',2600);}
-  $('membershipInfoButton').addEventListener('click',()=>{const msg='Pro todavía no se puede contratar: falta conectar y verificar el proveedor de pagos. No se realizó ningún cobro.';$('membershipMessage').textContent=msg;toast(msg);});
+  // v48: el estado de Plus lo consulta ads.js en el servidor (/api/entitlements).
+  // v48: lo que necesita la publicidad para no interrumpir: actividades en curso y token de la cuenta.
+  window.toast=msg=>toast(msg);
+  window.FittFormaActivities=()=>{const a=[];if(activeSession)a.push('workout');if(restEndAt>Date.now())a.push('rest-timer');if(gpsWatchId!==null&&gpsWatchId!==undefined)a.push('gps-running');if(finishingWorkout)a.push('saving');const v=document.querySelector('.view.active')?.id||'';if(v==='view-coach')a.push('ai-chat');const f=document.activeElement;if(f&&f.closest?.('#mealForm,#view-nutrition form'))a.push('meal-logging');if(f&&f.closest?.('#cloudAuthForm'))a.push('login');if(document.querySelector('dialog[open],.ad-overlay,.exercise-modal:not([hidden])'))a.push('dialog-open');if(document.querySelector('#communityPostForm [type=file]')?.files?.length)a.push('photo-upload');return a;};
+  window.FittFormaAuthHeader=async()=>{try{if(!supabaseClient||!cloudUser)return {};const {data}=await supabaseClient.auth.getSession();const tk=data?.session?.access_token;return tk?{Authorization:'Bearer '+tk}:{};}catch{return {};}};
   function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function dateKey(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   // v45: las fechas siguen el idioma elegido (las demás traducciones las hace i18n.js).
@@ -2953,7 +2961,7 @@ function findCatalogExercise(name){
     if(distance/(minutes/60)>30){toast('La velocidad calculada parece inusual. Revisá la distancia y el tiempo.');return;}
     const paceSecondsPerKm=minutes*60/distance;
     state.activities.push({id:Date.now(),type:'Correr',date,distance:Number(distance.toFixed(2)),minutes:Number(minutes.toFixed(1)),durationSeconds:Math.round(minutes*60),paceSecondsPerKm:Number(paceSecondsPerKm.toFixed(1)),pace:paceTextFromSeconds(paceSecondsPerKm),source:'manual-run',notes});
-    const badgeDelta=syncBadgeUnlocks();save();$('runLogForm').reset();$('runDate').value=dateKey();updateRunPacePreview();renderActivities();renderStats();renderProgress();renderPlanner();notifyBadgeChanges(badgeDelta,'Carrera guardada.');
+    pendingAdBreak='run-saved';const badgeDelta=syncBadgeUnlocks();save();$('runLogForm').reset();$('runDate').value=dateKey();updateRunPacePreview();renderActivities();renderStats();renderProgress();renderPlanner();notifyBadgeChanges(badgeDelta,'Carrera guardada.');
   }
   function renderPlan(){
     const p=state.profile;
@@ -3437,7 +3445,7 @@ function findCatalogExercise(name){
       state.daily={...state.daily,seq:daily.seq,lastCompletedAt:daily.completedAt,nextAvailableAt:daily.nextAvailableAt,history:[...(state.daily?.history||[]),{seq:daily.seq,dayIndex:session.dayIndex,title:session.title,sessionId:savedSession.id,startedAt:savedSession.startedAt,completedAt:daily.completedAt,nextAvailableAt:daily.nextAvailableAt,status:'completed',source:daily.source,completedSets:summary.completedSets,totalSets:summary.totalSets,rewardXp:50}].slice(-2000)};
     }
     state.sessions.unshift(savedSession);lastWorkoutSummary={...summary,minutes,title:savedSession.title,date:savedSession.date,type,status,dailySeq:savedSession.dailySeq};activeSession=null;clearActiveSessionDraft();resetRestTimer();if(workoutClockInterval){clearInterval(workoutClockInterval);workoutClockInterval=null;}
-    const badgeDelta=syncBadgeUnlocks();save();renderAll();renderTrain();switchView('train');toast(notice);celebrateBadges(badgeDelta.newlyUnlocked);
+    const badgeDelta=syncBadgeUnlocks();save();renderAll();renderTrain();switchView('train');toast(notice);celebrateBadges(badgeDelta.newlyUnlocked);pendingAdBreak='workout-saved';
   }
 
   function streak(){
@@ -4273,7 +4281,7 @@ function findCatalogExercise(name){
     save();renderCoach();$('coachInput').value='';
     let backendUnavailable=false;
     try{
-      const response=await fetch('/api/coach',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(state.coachShareData===false?{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:false,language:window.FittFormaI18n?.getLanguage?.()||'es'}:{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:true,...coachExtraContext(),profile:(({avatar,...rest})=>rest)(state.profile||{}),goals:state.nutritionGoals,plan:state.plan,sessions:(state.sessions||[]).slice(0,5).map(s=>({date:s.date,title:s.title,minutes:s.minutes,notes:s.notes,exercises:(s.exercises||[]).slice(0,8).map(e=>({name:e.name,entries:(e.entries||[]).slice(0,6).map(x=>({reps:x.reps,weight:x.weight,done:x.done}))}))})),activities:(state.activities||[]).slice(-5).reverse().map(a=>({date:a.date,type:a.type,distance:a.distance,minutes:a.minutes,pace:a.pace})),weights:(state.weights||[]).slice(-5).reverse().map(w=>({date:w.date,kg:w.kg??w.weight})),language:window.FittFormaI18n?.getLanguage?.()||'es'})});
+      const response=await fetch('/api/coach',{method:'POST',headers:{'Content-Type':'application/json',...(await window.FittFormaAuthHeader())},body:JSON.stringify(state.coachShareData===false?{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:false,language:window.FittFormaI18n?.getLanguage?.()||'es'}:{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:true,...coachExtraContext(),profile:(({avatar,...rest})=>rest)(state.profile||{}),goals:state.nutritionGoals,plan:state.plan,sessions:(state.sessions||[]).slice(0,5).map(s=>({date:s.date,title:s.title,minutes:s.minutes,notes:s.notes,exercises:(s.exercises||[]).slice(0,8).map(e=>({name:e.name,entries:(e.entries||[]).slice(0,6).map(x=>({reps:x.reps,weight:x.weight,done:x.done}))}))})),activities:(state.activities||[]).slice(-5).reverse().map(a=>({date:a.date,type:a.type,distance:a.distance,minutes:a.minutes,pace:a.pace})),weights:(state.weights||[]).slice(-5).reverse().map(w=>({date:w.date,kg:w.kg??w.weight})),language:window.FittFormaI18n?.getLanguage?.()||'es'})});
       const data=await response.json().catch(()=>({}));
       if(response.ok){
         if(window.FittFormaAds)window.FittFormaAds.recordCoachSuccess();
@@ -4282,6 +4290,8 @@ function findCatalogExercise(name){
         if(data.proposal)state.proposal={id:Date.now(),status:'pending',title:String(data.proposal.title||'Propuesta del entrenador').slice(0,100),description:String(data.proposal.description||'Revisá esta propuesta antes de aplicarla.').slice(0,1200),kind:['routine','nutrition','recovery','general'].includes(data.proposal.kind)?data.proposal.kind:'general',days:[2,3,4,5].includes(Number(data.proposal.days))?String(data.proposal.days):state.profile.days,duration:[20,30,45,60].includes(Number(data.proposal.duration))?String(data.proposal.duration):state.profile.duration};
         save();renderCoach();return;
       }
+      // v48: cuota diaria del servidor agotada → el mensaje vuelve al cuadro de texto y se ofrecen opciones.
+      if(response.status===429&&data.code==='ai_quota'){state.chat.pop();save();renderCoach();$('coachInput').value=msg;window.FittFormaAds?.showAiQuota(data.quota);toast(data.error);return;}
       if(response.status===503&&/Falta configurar GEMINI_API_KEY/.test(data.error||'')){backendUnavailable=true;}
       else {if(response.status===502&&$('coachConnection'))$('coachConnection').textContent='El servidor respondió, pero Gemini falló: revisá la clave, el modelo y los límites de la API.';if(response.status===429&&$('coachConnection'))$('coachConnection').textContent='Se alcanzó un límite temporal. Esperá un poco y probá de nuevo.';state.chat.push({role:'assistant',text:data.error||'No se pudo consultar el entrenador. Probá de nuevo más tarde.',at:new Date().toISOString()});save();renderCoach();return;}
     }catch(e){backendUnavailable=true;}
@@ -4495,7 +4505,7 @@ function findCatalogExercise(name){
     if(saveActivity&&gpsMeters>=30&&seconds>=30){
       const km=gpsMeters/1000,minutes=seconds/60,paceSecondsPerKm=seconds/km;
       state.activities.push({id:Date.now(),type:gpsType,date:gpsSessionDate||dateKey(),distance:Number(km.toFixed(3)),minutes:Number(minutes.toFixed(2)),durationSeconds:seconds,pace:gpsType==='Bicicleta'?null:paceTextFromSeconds(paceSecondsPerKm),paceSecondsPerKm:gpsType==='Bicicleta'?null:Number(paceSecondsPerKm.toFixed(1)),source:'gps',route:gpsPoints.slice(),splits:gpsSplits.slice(0,100)});
-      const badgeDelta=syncBadgeUnlocks();save();renderActivities();renderRunningHistory();renderStats();renderProgress();renderPlanner();$('gpsStatus').textContent='Actividad GPS guardada en este dispositivo. Si se registró con señal imprecisa, distancia y ritmo pueden variar.';notifyBadgeChanges(badgeDelta,'Actividad GPS guardada.');
+      pendingAdBreak='run-saved';const badgeDelta=syncBadgeUnlocks();save();renderActivities();renderRunningHistory();renderStats();renderProgress();renderPlanner();$('gpsStatus').textContent='Actividad GPS guardada en este dispositivo. Si se registró con señal imprecisa, distancia y ritmo pueden variar.';notifyBadgeChanges(badgeDelta,'Actividad GPS guardada.');
     }else if(saveActivity){$('gpsStatus').textContent='La sesión fue demasiado corta o tuvo poca señal para guardar una distancia confiable. Podés probar de nuevo o registrar los datos manualmente.';toast('No se guardó: faltan datos GPS suficientes.');}
     else $('gpsStatus').textContent='Seguimiento detenido sin guardar la actividad.';
     clearGpsDraft();gpsStartedAt=0;gpsPaused=false;gpsPausedMs=0;gpsPauseAt=0;gpsLastPoint=null;gpsRetryNeeded=false;gpsUi();updateGpsMapRoute(false);
@@ -4588,7 +4598,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.47.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.47.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.48.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.48.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -5077,6 +5087,9 @@ function findCatalogExercise(name){
     if(kind==='water'){$('addWater')?.click();renderHome();toast(`Agua registrada: ${waterMl()} de ${hydro().goalMl} ml hoy. Podés corregirlo en Nutrición › Hoy.`);return;}
   }
   function switchView(name){
+    // v48: un intersticial solo se evalúa al cambiar de sección (nunca en medio de una actividad) y,
+    // después de guardar un entrenamiento o una carrera, recién cuando la persona sale del resumen.
+    if(window.FittFormaAds&&name!==document.querySelector('.view.active')?.id?.replace('view-','')){const ev=pendingAdBreak||'section-change';pendingAdBreak='';setTimeout(()=>window.FittFormaAds.maybeInterstitial(ev),400);}
     const trainViews=['exercises','routines','running','coach'];
     const hasTab=[...document.querySelectorAll('.tab')].some(b=>b.dataset.view===name);
     const navName=hasTab?name:(trainViews.includes(name)?'train':name);
@@ -5392,7 +5405,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.47.0';
+  const APP_VERSION='0.48.0';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');

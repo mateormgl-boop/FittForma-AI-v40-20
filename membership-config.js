@@ -8,5 +8,8 @@ window.FittFormaMembershipConfig = Object.freeze({
   provider: 'not-configured',
   proposedPrice: { amount: 5.99, currency: 'USD', interval: 'month', final: false },
   freeDailyAiQuestions: 6,
+  // v48: identificadores PÚBLICOS de la suscripción en Google Play Console (ej. 'fittforma_plus_monthly').
+  // Vacío = no se ofrece la compra. El precio lo informa Google Play; nunca se escribe acá.
+  googlePlayProductIds: [],
   proBenefits: ['ad-free', 'higher-ai-allowance', 'advanced-personalization', 'advanced-progress', 'advanced-nutrition']
 });

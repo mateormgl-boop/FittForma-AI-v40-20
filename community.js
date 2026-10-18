@@ -139,7 +139,7 @@
       }
       const outputRoot=searchTerm&&$('communitySearchPosts')?$('communitySearchPosts'):$('communityFeed');
       if(outputRoot)outputRoot.innerHTML=markup.join('')||(searchTerm?'<div class="empty"><strong>No hay publicaciones que coincidan</strong><p>Probá otra búsqueda o seguí explorando perfiles.</p></div>':'<div class="empty"><strong>Tu feed está vacío por ahora</strong><p>Seguí perfiles desde Explorar o compartí tu primer logro.</p><button class="btn" type="button" data-community-go="publish">Crear una publicación</button></div>');
-      status(`${posts.length} publicación(es) cargadas.`);connectionStatus('Supabase responde correctamente: el feed de Comunidad se pudo consultar.');bindFeedActions(outputRoot||$('communityFeed'));
+      status(`${posts.length} publicación(es) cargadas.`);window.dispatchEvent(new CustomEvent('fittforma:feedrendered'));connectionStatus('Supabase responde correctamente: el feed de Comunidad se pudo consultar.');bindFeedActions(outputRoot||$('communityFeed'));
     }catch(error){const message=friendlySupabaseError(error,'cargar el feed de la comunidad');status(message);connectionStatus(message);}
     finally{loading=false;}
   }
@@ -161,17 +161,32 @@
   async function uploadImage(file,path){
     const processed=await prepareImage(file);const options={cacheControl:'600',upsert:false,contentType:'image/jpeg'};const {error}=await client.storage.from(bucket).upload(path,processed,options);if(error)throw error;return path;
   }
+  // v48: fotos por día. La base aplica el límite (si está activo); acá solo se avisa antes de subir y se ofrece
+  // el video voluntario. El formulario nunca se borra y la foto no se publica sola después del video.
+  async function photoGate(statusId){
+    let q;try{const r=await client.rpc('my_photo_quota');if(r.error||!r.data)return true;q=r.data;}catch{return true;}
+    if(!q.enabled||q.posted<q.allowed)return true;
+    if(q.plan==='plus'){setStatus(statusId,'Llegaste al máximo de fotos de hoy. Tu publicación sigue en el formulario: podés publicarla mañana.');return false;}
+    const ent=window.FittFormaAds?.entitlements?.(),canVideo=Boolean(ent?.ads?.rewardedAvailable)&&(ent?.photos?.extraLeft??0)>0;
+    if(!canVideo){setStatus(statusId,'Ya publicaste las fotos gratuitas de hoy. Tu publicación sigue en el formulario: podés publicarla mañana.');return false;}
+    setStatus(statusId,'Ya publicaste tus fotos gratuitas de hoy. Mirá un video voluntario para publicar una más; tu foto y tu texto siguen en el formulario.');
+    if(await window.FittFormaAds.earnPhoto()){photoUnlocked=true;setStatus(statusId,'Listo: tocá «Publicar» para publicar tu foto.');}
+    return false;
+  }
+  let photoUnlocked=false;
+  const photoLimitError=error=>/photo_daily_limit/.test(String(error?.message||''));
   async function createPost(e){e.preventDefault();if(!authReady()){setStatus('communityPostStatus',authHint());return;}
     const beforeFile=$('communityBeforePhoto').files?.[0],afterFile=$('communityAfterPhoto').files?.[0],start=$('communityStartDate').value,end=$('communityEndDate').value;
     if(!beforeFile||!afterFile){setStatus('communityPostStatus','Elegí una foto de antes y una de después.');return;}
     if(!start||!end||end<start||end>localDateKey()){setStatus('communityPostStatus','Revisá las fechas: la final debe ser igual o posterior a la inicial y no futura.');return;}
+    if(!(await photoGate('communityPostStatus')))return;
     const btn=$('communityPublish');btn.disabled=true;setStatus('communityPostStatus','Subiendo fotos…');let beforePath='',afterPath='';
     try{
       const postId=crypto.randomUUID();beforePath=await uploadImage(beforeFile,`${user.id}/${postId}/before.jpg`);afterPath=await uploadImage(afterFile,`${user.id}/${postId}/after.jpg`);
       const profile=await ensureProfile();const visibility=profile.visibility==='public'&&$('communityPostPublic').checked?'public':'followers';
       const {error}=await client.from('community_posts').insert({id:postId,user_id:user.id,description:$('communityPostDescription').value.trim(),exercises_text:$('communityPostExercises').value.trim(),nutrition_text:$('communityPostNutrition').value.trim(),running_text:$('communityPostRunning').value.trim(),start_date:start,end_date:end,before_path:beforePath,after_path:afterPath,visibility});
-      if(error)throw error;$('communityPostForm').reset();setStatus('communityPostStatus','¡Transformación publicada!');showCommunitySubView('feed');await loadFeed();
-    }catch(error){if(beforePath||afterPath){try{await client.storage.from(bucket).remove([beforePath,afterPath].filter(Boolean));}catch{}}setStatus('communityPostStatus',`No se pudo publicar: ${error.message||'revisá las políticas de Supabase.'}`);}
+      if(error)throw error;if(photoUnlocked){photoUnlocked=false;window.FittFormaAds?.refresh?.(true);fetch('/api/metrics',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'photo_after_reward'})}).catch(()=>{});}$('communityPostForm').reset();setStatus('communityPostStatus','¡Transformación publicada!');showCommunitySubView('feed');await loadFeed();
+    }catch(error){if(beforePath||afterPath){try{await client.storage.from(bucket).remove([beforePath,afterPath].filter(Boolean));}catch{}}if(photoLimitError(error)){setStatus('communityPostStatus','Ya publicaste las fotos de hoy. Tu publicación sigue en el formulario.');photoGate('communityPostStatus');return;}setStatus('communityPostStatus',`No se pudo publicar: ${error.message||'revisá las políticas de Supabase.'}`);}
     finally{btn.disabled=false;}
   }
   async function toggleLike(postId){if(!authReady())return alert(authHint());const {data,error}=await client.from('community_likes').select('post_id').eq('post_id',postId).eq('user_id',user.id).maybeSingle();if(error){status(error.message);return;}const result=data?await client.from('community_likes').delete().eq('post_id',postId).eq('user_id',user.id):await client.from('community_likes').insert({post_id:postId,user_id:user.id});if(result.error)status(`No se pudo actualizar el me gusta: ${result.error.message}`);else await loadFeed();}
@@ -290,7 +305,7 @@
       if(postKind==='text'){
         const body=$('communityTextBody').value.trim(),file=$('communityTextImage').files?.[0];
         if(!body)throw new Error('Escribí el texto de la publicación.');
-        if(file){if(!$('communityTextPhotoConsent').checked)throw new Error('Confirmá que tenés derecho a publicar la foto.');setStatus('communityComposeStatus','Subiendo foto…');imagePath=await uploadImage(file,`${user.id}/${postId}/image.jpg`);}
+        if(file){if(!$('communityTextPhotoConsent').checked)throw new Error('Confirmá que tenés derecho a publicar la foto.');if(!(await photoGate('communityComposeStatus'))){button.disabled=false;return;}setStatus('communityComposeStatus','Subiendo foto…');imagePath=await uploadImage(file,`${user.id}/${postId}/image.jpg`);}
         row={id:postId,user_id:user.id,post_kind:'text',description:body,image_path:imagePath,visibility};
       }else{
         const badge=shareableBadges().find(x=>x.key===$('communityAchievementSelect').value);
@@ -299,10 +314,12 @@
       }
       const {error}=await client.from('community_posts').insert(row);
       if(error)throw error;
+      if(imagePath&&photoUnlocked){photoUnlocked=false;window.FittFormaAds?.refresh?.(true);fetch('/api/metrics',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'photo_after_reward'})}).catch(()=>{});}
       (postKind==='text'?$('communityTextPostForm'):$('communityAchievementPostForm')).reset();
       setStatus('communityComposeStatus','Publicado.');renderPostPreview();showCommunitySubView('feed');await loadFeed();
     }catch(error){
       if(imagePath){try{await client.storage.from(bucket).remove([imagePath]);}catch(cleanupError){console.warn('No se pudo limpiar la foto subida:',cleanupError);}}
+      if(photoLimitError(error)){setStatus('communityComposeStatus','Ya publicaste las fotos de hoy. Tu publicación sigue en el formulario.');photoGate('communityComposeStatus');return;}
       setStatus('communityComposeStatus',error?.code?friendlySupabaseError(error,'publicar'):`No se pudo publicar: ${error.message}`);
     }finally{button.disabled=!authReady()||schemaV41===false;}
   }
