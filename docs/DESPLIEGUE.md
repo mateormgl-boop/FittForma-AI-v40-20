@@ -1,19 +1,24 @@
-# Despliegue de FittForma AI v47.0 (Etapa 9)
+# Despliegue de FittForma AI v48.0
 
-Esta guía es la lista de pasos para publicar v47.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v48.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
-## Qué cambia en v47.0
+## Qué cambia en v48.0
 
-- Rediseño completo con tema claro (por defecto) y oscuro, colores por sección y el logo nuevo.
-- Archivo nuevo `design.css` (servido por el backend y precargado por el service worker).
-- Sin cambios de base de datos: **v47 no trae migraciones nuevas**.
+- Planificador de rutinas nuevo (`training-core.js`), biblioteca con imagen propia y guía por ejercicio
+  (`exercise-media.js`, `exercise-guides.js`, `assets/exercises/`), progresión diaria cada 12 h controlada
+  con hora del servidor, sesiones extra/manuales, insignias rediseñadas, perfil e hidratación completos.
+- Publicidad, recompensas y Plus (`monetization-core.js`, `ads.js`, `backend/monetization.mjs`): **apagado por
+  defecto**. Qué configurar para activarlo: `docs/MONETIZACION.md`.
+- **Dos migraciones nuevas** (aditivas): `2026-10-20_v48_daily_training.sql` y `2026-10-21_v48_monetization.sql`.
+- Variable nueva recomendada (solo servidor): `SUPABASE_SERVICE_ROLE_KEY`, para guardar contadores y comprobantes
+  en la base. Sin ella todo funciona, pero los contadores de monetización quedan en memoria.
 
 ## 1. Antes de desplegar
 
 1. Revisar el PR en GitHub y mirar las capturas de las pruebas visuales.
 2. Correr las pruebas en una máquina con Node 20 o más reciente:
-   - `npm test` (200 pruebas automáticas).
+   - `npm test` (209 pruebas automáticas).
    - Con `npm start` en otra terminal: `APP_URL=http://localhost:8787 npm run test:e2e`.
    - Opcional, con Postgres y PostgREST locales: `npm run test:sql` y `tests/e2e/community.e2e.mjs`
      (cómo prepararlos en `docs/PRUEBAS.md`).
@@ -28,6 +33,9 @@ un proyecto de **pruebas** y después en producción:
 1. `supabase/migrations/2026-10-17_v41_posts_achievements_unread.sql`
 2. `supabase/migrations/2026-10-18_v43_moderation_account_deletion.sql`
 3. `supabase/migrations/2026-10-19_v44_security_hardening.sql`
+4. `supabase/migrations/2026-10-20_v48_daily_training.sql` (entrenamiento diario cada 12 h, idempotente)
+5. `supabase/migrations/2026-10-21_v48_monetization.sql` (contadores, comprobantes, Google Play; el límite de
+   fotos queda **desactivado** hasta `update public.monetization_settings set photo_limit_enabled = true`)
 
 No volver a ejecutar `schema.sql` ni `community.sql`. RLS queda activado en todas las tablas: no
 desactivarlo para resolver errores.

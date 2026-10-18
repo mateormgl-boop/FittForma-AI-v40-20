@@ -1,5 +1,55 @@
 # FittForma AI — Registro de cambios
 
+## v48.0 — Auditoría integral y monetización (18 de octubre de 2026)
+
+**Entrenamiento**
+- Planificador nuevo (`training-core.js`) con 156 ejercicios canónicos.
+- El objetivo, el nivel, el equipo y los días cambian la rutina de verdad: series, repeticiones, descansos, orden y balance empuje/tracción.
+- Se eliminaron los duplicados y la movilidad ya no se trata como fuerza.
+- Biblioteca con imagen propia y correcta por ejercicio:
+  - 224 fotos WebP de free-exercise-db (Unlicense).
+  - 44 ilustraciones SVG originales.
+- Ficha con posición inicial, pasos, respiración, errores comunes y músculos (`exercise-guides.js`).
+- Progresión diaria: una sesión diaria cada **12 h**, controlada con la hora del servidor y sin duplicados (RPC `complete_daily_training`, idempotente).
+- Las sesiones extra, propias, libres y manuales no desbloquean la siguiente sesión diaria. Una sesión parcial no cuenta.
+
+**Insignias, perfil e hidratación**
+- Medallas rediseñadas por rango.
+- Pantalla de logro y hasta 3 insignias destacadas en el perfil.
+- Criterios más exigentes para los ejercicios fáciles.
+- Perfil:
+  - Peso en kg o lb.
+  - Altura validada.
+  - Historial de peso.
+  - Preferencias de entrenamiento.
+- Hidratación completa:
+  - Registro en ml.
+  - Botones rápidos.
+  - Deshacer.
+  - Meta recomendada.
+  - Recordatorio.
+  - Semana.
+
+**Monetización** (apagada por defecto; ver `docs/MONETIZACION.md`)
+- Banners en Inicio, Comunidad y Explorar.
+- Intersticiales solo en pausas naturales, cada 5–10 min de uso activo. Nunca durante un entrenamiento, el GPS, las comidas, la IA, el inicio de sesión, un pago, una foto o un guardado.
+- Videos recompensados voluntarios para:
+  - IA: +3 consultas.
+  - Fotos en Comunidad: +1 foto, con el borrador conservado y sin publicación automática.
+- Los videos recompensados usan un comprobante de un solo uso validado en el servidor.
+- La cuota de IA se aplica en el servidor y se devuelve si Gemini falla. El límite de fotos lo aplica la base.
+- Plus («FittForma AI Plus», antes «Pro»): sin anuncios y con más IA y más fotos. Se verifica en el servidor con Google Play (subscriptionsv2, acknowledge y RTDN).
+- Los precios no cambiaron.
+- La CSP permite los dominios de Google solo si se configura Ad Manager.
+- Corregido: las métricas de anuncios compartían el límite por minuto con la IA y con los canjes. Ahora tienen límites separados.
+
+**Pruebas**
+- 209 automáticas.
+- 115 de integración.
+- 47 E2E de monetización.
+- 33 de Comunidad.
+- 133 SQL/RLS.
+
 ## v47.0 — Rediseño completo y Etapa 9: entrega (17 de octubre de 2026)
 
 - Diseño nuevo según las referencias claras y oscuras: tema claro por defecto y tema oscuro, elegibles en el encabezado y en Perfil; color propio por sección (Inicio, Entrenar, Correr, Nutrición, Progreso, Comunidad, Perfil, FittAI).

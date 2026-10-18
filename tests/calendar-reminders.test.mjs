@@ -77,6 +77,8 @@ test('el día de comunidad y anuncios usa fecha local, no UTC', async () => {
   const ads = await read('ads.js');
   assert.match(community, /const localDateKey=\(date=new Date\(\)\)=>`\$\{date\.getFullYear\(\)\}/);
   assert.doesNotMatch(community, /new Date\(\)\.toISOString\(\)\.slice\(0,10\)/);
-  assert.match(ads, /const dateKey = \(date = new Date\(\)\) => `\$\{date\.getFullYear\(\)\}/);
-  assert.doesNotMatch(ads, /new Date\(\)\.toISOString\(\)\.slice\(0,10\)/);
+  // v48: el día de los límites de anuncios lo decide el servidor con la zona horaria de la app.
+  assert.doesNotMatch(ads, /toISOString\(\)\.slice\(0, ?10\)/);
+  const monetization = await read('backend/monetization.mjs');
+  assert.match(monetization, /Intl\.DateTimeFormat\('en-CA', \{ timeZone: TZ/);
 });

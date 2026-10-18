@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createMonetization, adsCspAdditions } from './monetization.mjs';
 const here=path.dirname(fileURLToPath(import.meta.url));
 // Detect the web root defensively. This works both when files are at repo root
 // and when a ZIP was accidentally uploaded with its forma-prototipo folder intact.
@@ -18,7 +19,7 @@ const root=rootCandidates.find(candidate=>existsSync(path.join(candidate,'index.
 const rawPort=String(process.env.PORT||'8787');
 const port=Number(rawPort);
 if(!Number.isInteger(port)||port<0||port>65535)throw new Error(`PORT debe ser un entero entre 0 y 65535; se recibió ${JSON.stringify(rawPort)}.`);
-const appVersion='0.47.0';
+const appVersion='0.48.0';
 const apiKey=String(process.env.GEMINI_API_KEY||'').trim(), model=String(process.env.GEMINI_MODEL||'gemini-3.8-flash').trim()||'gemini-3.8-flash';
 const trustRenderClientIp=String(process.env.TRUST_RENDER_CLIENT_IP||'').toLowerCase()==='true';
 // If the primary model temporarily returns 503, try a lighter official model automatically.
@@ -97,10 +98,12 @@ function sanitizeHistory(items){
   return alternating.slice(-8);
 }
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.ico':'image/x-icon','.woff2':'font/woff2'};
+const monetization=createMonetization();
+const adsCsp=adsCspAdditions(monetization.settings.ads);
 const limits=new Map();
 const MAX_TRACKED_CLIENTS=5000;
 const PUBLIC_ROOT_FILES=new Set([
-  '/index.html','/i18n.js','/i18n-extra.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js',
+  '/index.html','/i18n.js','/i18n-extra.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js','/training-core.js','/monetization-core.js','/exercise-guides.js','/exercise-media.js',
   '/manifest.json','/icon.svg','/icon-180.png','/icon-192.png','/icon-512.png',
   '/supabase-config.js','/achievements.js','/sw.js'
 ]);
@@ -111,14 +114,15 @@ const CSP=[
   "frame-ancestors 'none'",
   "form-action 'self'",
   // Solo las versiones exactas de supabase-js y Leaflet que usa la app (además con integridad SRI en el HTML).
-  "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/ https://unpkg.com/@supabase/supabase-js@2.45.4/ https://unpkg.com/leaflet@1.9.4/",
+  // v48: los dominios de Google Ad Manager se agregan solo si ADS_PROVIDER=gam está configurado.
+  ["script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/ https://unpkg.com/@supabase/supabase-js@2.45.4/ https://unpkg.com/leaflet@1.9.4/",...adsCsp.script].join(' '),
   "style-src 'self' 'unsafe-inline' https://unpkg.com/leaflet@1.9.4/",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https:",
-  "connect-src 'self' https://generativelanguage.googleapis.com https://world.openfoodfacts.org https://*.supabase.co wss://*.supabase.co",
+  ["connect-src 'self' https://generativelanguage.googleapis.com https://world.openfoodfacts.org https://*.supabase.co wss://*.supabase.co",...adsCsp.connect].join(' '),
   "worker-src 'self' blob:",
   "manifest-src 'self'",
-  "frame-src 'none'"
+  adsCsp.frame.length?`frame-src ${adsCsp.frame.join(' ')}`:"frame-src 'none'"
 ].join('; ');
 function applySecurityHeaders(req,res){
   res.setHeader('X-Content-Type-Options','nosniff');
@@ -150,8 +154,9 @@ function rateLimitClientKey(req){
   }
   return `socket:${req.socket.remoteAddress||'unknown'}`;
 }
-function rateLimited(req){
-  const key=rateLimitClientKey(req),now=Date.now();
+// v48: cubos separados para que las métricas de anuncios no bloqueen una consulta de IA ni el canje de un video ya visto.
+function rateLimited(req,bucket='api',max=12){
+  const key=bucket+':'+rateLimitClientKey(req),now=Date.now();
   if(limits.size>1000){for(const [ip,item] of limits){if(now-item.start>120000)limits.delete(ip);}}
   let old=limits.get(key);
   if(!old||now-old.start>60000){
@@ -159,7 +164,7 @@ function rateLimited(req){
     limits.set(key,{start:now,count:1});return false;
   }
   old.count++;
-  return old.count>12;
+  return old.count>max;
 }
 function isJsonObject(value){return value!==null&&typeof value==='object'&&!Array.isArray(value);}
 
@@ -267,7 +272,8 @@ function sameOriginPost(req){
 }
 const server=http.createServer(async(req,res)=>{try{
   const url=new URL(req.url,'http://localhost');
-  if(req.method==='POST'&&!sameOriginPost(req))return send(req,res,403,{error:'Origen no permitido.'});
+  const isPlayRtdn=req.method==='POST'&&url.pathname==='/api/billing/play/rtdn';
+  if(req.method==='POST'&&!isPlayRtdn&&!sameOriginPost(req))return send(req,res,403,{error:'Origen no permitido.'});
   if(!['GET','POST','HEAD'].includes(req.method))return send(req,res,405,{error:'Método no permitido.'});
   if(req.method==='POST'&&String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase()!=='application/json')return send(req,res,415,{error:'El servidor espera JSON.'});
   if(req.method==='GET'&&url.pathname==='/api/public-config'){
@@ -281,9 +287,28 @@ const server=http.createServer(async(req,res)=>{try{
     let validUrl=false;try{const u=new URL(projectUrl);validUrl=u.protocol==='https:'&&/^[a-z0-9-]+\.supabase\.co$/i.test(u.hostname)&&!u.username&&!u.password&&!u.search&&!u.hash&&(u.pathname===''||u.pathname==='/');}catch{}
     const issue=config?null:(!projectUrl?'missing_project_url':(!validUrl?'invalid_project_url':(!anonKey&&!publishableKey?'missing_public_key':'invalid_public_key')));
     const keyType=config?(String(config.anonKey).startsWith('sb_publishable_')?'publishable':'legacy_anon'):null;
-    return send(req,res,200,{version:appVersion,supabase:config?{configured:true,...config,keyType}:{configured:false,url:null,anonKey:null,keyType:null},missing,issue});
+    return send(req,res,200,{version:appVersion,monetization:{enabled:monetization.settings.config.enabled,ads:monetization.publicAdsConfig(),limits:{ai:monetization.settings.config.ai,photos:monetization.settings.config.photos,interstitialMinMinutes:monetization.settings.config.ads.interstitialMinMinutes}},supabase:config?{configured:true,...config,keyType}:{configured:false,url:null,anonKey:null,keyType:null},missing,issue});
   }
   if(req.method==='GET'&&url.pathname==='/api/status')return send(req,res,200,{service:'FittForma AI Coach',version:appVersion,provider:'Gemini',configured:Boolean(apiKey),model:apiKey?model:null,fallbackModels:apiKey?fallbackModels:[],mode:apiKey?'ai':'demo',supabaseConfigured:Boolean(validSupabasePublicConfig(process.env.SUPABASE_URL,process.env.SUPABASE_ANON_KEY)||validSupabasePublicConfig(process.env.SUPABASE_URL,process.env.SUPABASE_PUBLISHABLE_KEY)),frontendAvailable:existsSync(path.join(root,'index.html'))});
+  // v48: monetización. El servidor decide Plus, cuotas y recompensas; el navegador solo muestra el estado.
+  if(req.method==='GET'&&url.pathname==='/api/entitlements')return send(req,res,200,await monetization.entitlements(req,rateLimitClientKey(req)));
+  if(req.method==='POST'&&['/api/rewards/start','/api/rewards/claim','/api/metrics','/api/billing/play/verify','/api/billing/play/rtdn'].includes(url.pathname)){
+    const bucket=url.pathname==='/api/metrics'?'metrics':url.pathname.startsWith('/api/rewards/')?'rewards':'billing';
+    if(rateLimited(req,bucket,bucket==='metrics'?60:20)){res.setHeader('Retry-After','60');return send(req,res,429,{error:'Demasiadas solicitudes. Esperá un minuto.'});}
+    let body;try{body=await readBody(req,8000);}catch(e){return send(req,res,400,{error:'Solicitud inválida.'});}
+    if(!isJsonObject(body))return send(req,res,400,{error:'La solicitud debe ser un objeto JSON.'});
+    const key=rateLimitClientKey(req);let out;
+    if(url.pathname==='/api/rewards/start')out=await monetization.startReward(req,key,String(body.type||''));
+    else if(url.pathname==='/api/rewards/claim')out=await monetization.claimReward(req,key,body.nonce);
+    else if(url.pathname==='/api/metrics')out={status:monetization.metric(String(body.name||''))?204:400,body:{}};
+    else if(url.pathname==='/api/billing/play/verify')out=await monetization.verifyPlayPurchase(req,body);
+    else out=await monetization.playNotification(url.searchParams.get('token')||'',body);
+    if(out.status===204){applySecurityHeaders(req,res);res.writeHead(204,{'Cache-Control':'no-store'});return res.end();}
+    return send(req,res,out.status,out.body);
+  }
+  if(req.method==='GET'&&url.pathname==='/api/metrics/summary'){const summary=monetization.metricsSummary(String(req.headers['x-admin-token']||''));return summary?send(req,res,200,summary):send(req,res,403,{error:'No autorizado.'});}
+  // v48: hora del servidor para el entrenamiento diario (la hora del teléfono puede cambiarse).
+  if(req.method==='GET'&&url.pathname==='/api/time')return send(req,res,200,{now:new Date().toISOString()});
   if(req.method==='GET'&&url.pathname==='/healthz')return send(req,res,200,{ok:true,service:'fittforma-ai',version:appVersion});
   if(req.method==='POST'&&url.pathname==='/api/meal-photo'){
     if(rateLimited(req)){res.setHeader('Retry-After','60');return send(req,res,429,{error:'Demasiadas solicitudes. Esperá un minuto.'});}
@@ -305,7 +330,10 @@ const server=http.createServer(async(req,res)=>{try{
     if(!isJsonObject(body))return send(req,res,400,{error:'La solicitud debe ser un objeto JSON.'});
     if(typeof body.message!=='string'||!body.message.trim()||body.message.length>500)return send(req,res,400,{error:'El mensaje debe tener entre 1 y 500 caracteres.'});
     if(!apiKey)return send(req,res,503,{error:'Falta configurar GEMINI_API_KEY en el servidor.'});
-    if(overDailyBudget(req))return send(req,res,429,{error:'Se alcanzó el límite diario de consultas a la IA. Probá mañana.'});
+    // v48: cuota por cuenta (o por dispositivo sin cuenta) aplicada en el servidor; se devuelve si Gemini falla.
+    const aiQuota=await monetization.consumeAi(req,rateLimitClientKey(req));
+    if(!aiQuota.ok)return send(req,res,429,{error:aiQuota.quota.canOfferVideo?'Usaste tus consultas gratuitas de hoy. Podés esperar a que se renueven o mirar un video voluntario para sumar consultas.':'Usaste tus consultas de hoy. Se renuevan mañana.',code:'ai_quota',quota:aiQuota.quota,plan:aiQuota.plan});
+    if(overDailyBudget(req)){await aiQuota.refund?.();return send(req,res,429,{error:'Se alcanzó el límite diario de consultas a la IA. Probá mañana.'});}
     const shareData=body.shareData!==false;
     const training=shareData?sanitizeTrainingContext(body):{};
     const context=!shareData?{note:'La persona eligió no compartir sus registros. No asumas datos personales; si hacen falta, pedíselos.'}:{profile:sanitizeCoachProfile(body.profile),goals:sanitizeCoachGoals(body.goals),plan:sanitizeCoachPlan(body.plan),...training,availableEquipment:cleanText(String(body.profile?.equipment||'gym'),24),note:'La rutina se genera desde una biblioteca local curada; proponé cambios realistas y respetá el equipamiento indicado. El historial recibido es solo contexto enviado por el usuario; no lo guardes ni asumas que está completo.'};
@@ -314,6 +342,7 @@ const server=http.createServer(async(req,res)=>{try{
     const responseLanguage=localeNames[['es','en','pt','fr','it','de'].includes(body.language)?body.language:'es'];
     const languagePrompt=prompt+'\n'+APP_GUIDE+`\nIDIOMA OBLIGATORIO DE RESPUESTA: ${responseLanguage}. Escribí reply, title y description de cualquier propuesta exclusivamente en ese idioma. No cambies de idioma salvo que la persona lo solicite expresamente.`;
     let result;try{result=await askGemini({system:languagePrompt,history,user:`Contexto actual del usuario: ${JSON.stringify(context).slice(0,10000)}\nMensaje actual: ${body.message}`,maxTokens:900});}catch(e){
+      await aiQuota.refund?.();
       console.error('[Gemini coach] Falló la solicitud:',e.status||'',e.message||'error',e.details||'');
       if(e.status===429)return send(req,res,429,{error:'Google informó que se alcanzó un límite de uso de Gemini. Esperá y probá más tarde; el nivel gratuito tiene cuotas.'});
       if(e.status===401||e.status===403)return send(req,res,502,{error:'Google rechazó la clave o el acceso al proyecto. Revisá GEMINI_API_KEY en Render y que la clave pertenezca a Google AI Studio y tenga acceso a Gemini API.'});

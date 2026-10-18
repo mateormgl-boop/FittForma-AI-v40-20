@@ -1692,7 +1692,7 @@
   <link rel="stylesheet" href="./design.css">
 </head>
 <body>
-<svg class="ff-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs>
+<svg class="ff-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><linearGradient id="ffMedalBronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0b27a"/><stop offset=".55" stop-color="#b8692f"/><stop offset="1" stop-color="#7a3f17"/></linearGradient><linearGradient id="ffMedalSilver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f7fb"/><stop offset=".5" stop-color="#b9c3d1"/><stop offset="1" stop-color="#7d8898"/></linearGradient><linearGradient id="ffMedalGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a8"/><stop offset=".5" stop-color="#f2b822"/><stop offset="1" stop-color="#b07805"/></linearGradient><linearGradient id="ffMedalDiamond" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e4fbff"/><stop offset=".45" stop-color="#7fd8f7"/><stop offset="1" stop-color="#5b5cf0"/></linearGradient>
   <linearGradient id="ffGradNutri" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22c993"/><stop offset="1" stop-color="#0a7a50"/></linearGradient>
   <linearGradient id="ffGradBrand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#19b8ff"/><stop offset="1" stop-color="#6a4cf2"/></linearGradient>
 </defs></svg>
@@ -1802,6 +1802,7 @@
           <div class="field library-group-field"><label for="exerciseGroupFilter">Grupo muscular</label><select id="exerciseGroupFilter"><option value="all">Todos los grupos</option><option>Piernas</option><option>Pecho</option><option>Espalda</option><option>Hombros</option><option>Brazos</option><option>Core</option><option>Glúteos</option><option>Cardio</option></select></div>
         </div>
         <div class="btn-row library-extra-filters"><button class="btn ghost" id="exerciseFavoritesOnly" type="button" aria-pressed="false">Mostrar favoritos</button><span id="exerciseResultCount" class="muted small" aria-live="polite"></span></div>
+        <aside class="ad-slot ad-slot-inline" id="adSlotExplore" aria-label="Publicidad"><span class="ad-slot-label">Publicidad</span><div class="ad-slot-content" id="adContentExplore"></div></aside>
         <div id="exerciseLibraryResults" class="exercise-library-grid" aria-live="polite"></div>
         <p class="muted small exercise-credit">Todas las tarjetas usan ilustraciones locales con el mismo estilo visual. Cada ejercicio muestra una referencia asociada al movimiento o grupo muscular; las ilustraciones orientan y no sustituyen una demostración técnica detallada.</p>
       </section>
@@ -1943,7 +1944,19 @@
       </nav>
       <div class="view-panel" role="tabpanel" data-view-panel="hoy">
       <div class="card nutrition-summary-card"><div class="section-head"><div><h3>Resumen de hoy</h3><p>Basado en lo que registraste.</p></div><span class="tag" id="nutritionDate"></span></div><div class="nutri-hero"><div class="nutri-ring" aria-hidden="true"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"></circle><circle class="fg" id="nutriRingArc" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle></svg><div><b id="nutriRingValue">0</b><small>kcal</small></div></div><div class="nutri-hero-copy"><strong id="nutriRingTitle">Tu día de comidas</strong><p id="nutriRingText">Registrá tu primera comida.</p></div><div class="macro-progress"><div><div class="macro-progress-label"><span>Proteínas</span><strong id="proteinCaption">0 / 120 g</strong></div><div class="progressbar"><span id="proteinBar" style="width:0%"></span></div></div><div><div class="macro-progress-label"><span>Carbohidratos</span><strong id="carbCaption">0 / 280 g</strong></div><div class="progressbar"><span id="carbBar" style="width:0%"></span></div></div><div><div class="macro-progress-label"><span>Grasas</span><strong id="fatCaption">0 / 80 g</strong></div><div class="progressbar"><span id="fatBar" style="width:0%"></span></div></div></div></div><div class="stats"><div class="stat"><strong id="todayCalories">0</strong><small>kcal registradas</small></div><div class="stat"><strong id="todayProtein">0 g</strong><small>Proteínas</small></div><div class="stat"><strong id="todayCarbs">0 g</strong><small>Carbohidratos</small></div><div class="stat"><strong id="todayFat">0 g</strong><small>Grasas</small></div><div class="stat"><strong id="mealsCount">0</strong><small>Comidas</small></div></div><div class="progressbar nutri-hide"><span id="calorieBar" style="width:0%"></span></div><p class="muted small" id="calorieCaption">Registrá tu primera comida.</p><div id="mealList"></div></div>
-      <div class="card hydration-card"><h3>Hidratación</h3><p class="muted small">Registrá vasos de agua; el objetivo es configurable y no reemplaza las necesidades individuales.</p><div class="water-row"><strong><span id="waterCount">0</span> / <span id="waterGoalText">8</span> vasos</strong><div class="btn-row"><button type="button" class="btn secondary" id="addWater">+ 1 vaso</button><button type="button" class="btn ghost" id="removeWater">− 1 vaso</button></div></div><div class="field"><label for="waterGoal">Objetivo de vasos por día</label><input id="waterGoal" type="number" min="1" max="20" value="8"></div></div>
+      <div class="card hydration-card" id="hydrationCard">
+        <div class="section-head"><div><h3>Hidratación</h3><p class="muted small">Registrá lo que tomás en ml. El objetivo es orientativo y lo podés ajustar: las necesidades varían según la persona, el clima y la actividad.</p></div><span class="tag" id="hydroDate"></span></div>
+        <div class="hydro-main">
+          <div class="hydro-bottle" role="img" id="hydroBottle" aria-label="Progreso de hidratación"><svg viewBox="0 0 80 150" aria-hidden="true"><defs><clipPath id="hydroClip"><path d="M28 6h24v14c0 4 12 10 12 24v92a8 8 0 0 1-8 8H24a8 8 0 0 1-8-8V44c0-14 12-20 12-24z"/></clipPath></defs><path class="hydro-shell" d="M28 6h24v14c0 4 12 10 12 24v92a8 8 0 0 1-8 8H24a8 8 0 0 1-8-8V44c0-14 12-20 12-24z"/><g clip-path="url(#hydroClip)"><rect class="hydro-water" id="hydroWater" x="0" y="150" width="80" height="150"/><path class="hydro-wave" id="hydroWave" d="M0 150 q10 -5 20 0 t20 0 t20 0 t20 0 v10 H0z"/></g><path class="hydro-cap" d="M26 2h28v8H26z"/></svg></div>
+          <div class="hydro-copy"><strong class="hydro-total"><span id="waterMlToday">0</span> <small>/ <span id="waterGoalMlText">2000</span> ml</small></strong><span class="hydro-pct" id="waterPct">0 %</span><p class="muted small" id="waterRemaining">Todavía sin registros hoy.</p><p class="sr-only"><span id="waterCount">0</span> vasos de <span id="waterGoalText">8</span></p></div>
+        </div>
+        <div class="hydro-quick" role="group" aria-label="Agregar agua"><button type="button" class="btn secondary" id="addWater">+ 1 vaso (<span id="glassMlLabel">250</span> ml)</button><button type="button" class="btn secondary" data-water-add="500">+ 500 ml</button><button type="button" class="btn ghost" id="removeWater">Deshacer último</button></div>
+        <form class="hydro-custom chat-form" id="waterCustomForm"><label class="sr-only" for="waterCustomMl">Cantidad en ml</label><input id="waterCustomMl" type="number" min="10" max="2000" step="10" inputmode="numeric" placeholder="Otra cantidad (ml)"><button class="btn" type="submit">Agregar</button></form>
+        <details class="hydro-details"><summary>Registros de hoy</summary><ul class="ff-list hydro-entries" id="waterEntries"></ul><button type="button" class="btn ghost btn-sm" id="waterResetToday">Reiniciar el contador de hoy</button><p class="muted small">Reiniciar borra solo los registros de hoy; los días anteriores se conservan.</p></details>
+        <details class="hydro-details"><summary>Objetivo y tamaño del vaso</summary><div class="grid2"><div class="field"><label for="waterGoalMl">Objetivo diario (ml)</label><input id="waterGoalMl" type="number" min="500" max="6000" step="50" inputmode="numeric"></div><div class="field"><label for="glassMl">Tamaño del vaso</label><select id="glassMl"><option value="150">150 ml</option><option value="200">200 ml</option><option value="250">250 ml</option><option value="300">300 ml</option><option value="330">330 ml (lata)</option><option value="350">350 ml</option><option value="400">400 ml</option><option value="500">500 ml (botella)</option></select></div></div><p class="muted small" id="waterSuggestion"></p><div class="btn-row"><button type="button" class="btn btn-sm" id="saveWaterSettings">Guardar</button><button type="button" class="btn ghost btn-sm" id="useWaterSuggestion" hidden>Usar la referencia</button></div><input id="waterGoal" type="hidden"></details>
+        <details class="hydro-details"><summary>Recordatorio de agua (opcional)</summary><label class="hydro-reminder-toggle"><input type="checkbox" id="waterReminderEnabled"> <span>Avisarme si voy atrasado con el agua</span></label><div class="grid2"><div class="field"><label for="waterReminderFrom">Desde</label><input type="time" id="waterReminderFrom" value="09:00"></div><div class="field"><label for="waterReminderTo">Hasta</label><input type="time" id="waterReminderTo" value="21:00"></div></div><p class="muted small">Como máximo un aviso cada 2 horas y 4 por día, solo si estás por debajo de lo esperado a esa hora. Funciona mientras la app está abierta y con las notificaciones permitidas (Perfil › Recordatorios); no hay avisos enviados desde un servidor.</p><button type="button" class="btn btn-sm" id="saveWaterReminder">Guardar recordatorio</button></details>
+        <div class="hydro-history"><div class="section-head"><div><h4>Últimos 7 días</h4><p class="muted small" id="waterWeekSummary"></p></div></div><div class="hydro-week" id="waterWeek"></div></div>
+      </div>
       </div>
       <div class="view-panel" role="tabpanel" data-view-panel="registrar" hidden>
       <div class="card"><h3>Registrar una comida</h3><form id="mealForm"><div class="field"><label for="mealName">¿Qué comiste? Escribilo con cantidades</label><input id="mealName" maxlength="120" required placeholder="Ej. 2 huevos, 2 panes y 1 vaso de leche"><p id="mealEstimateStatus" class="muted small" aria-live="polite">Al escribir alimentos conocidos, FittForma estima calorías y macronutrientes automáticamente. Revisá los valores antes de guardar.</p></div><div class="grid2"><div class="field"><label for="mealCalories">Calorías (kcal)</label><input id="mealCalories" type="number" min="0" max="10000" required placeholder="Autoestimación"></div><div class="field"><label for="mealProtein">Proteínas (g)</label><input id="mealProtein" type="number" min="0" max="500" step="0.1" required placeholder="Autoestimación"></div><div class="field"><label for="mealCarbs">Carbohidratos (g)</label><input id="mealCarbs" type="number" min="0" max="1000" step="0.1" placeholder="Opcional"></div><div class="field"><label for="mealFat">Grasas (g)</label><input id="mealFat" type="number" min="0" max="500" step="0.1" placeholder="Opcional"></div></div><div class="field"><label for="mealType">Momento</label><select id="mealType"><option>Desayuno</option><option>Almuerzo</option><option>Merienda</option><option>Cena</option><option>Colación</option></select></div><button class="btn full" type="submit">Guardar comida</button></form></div>
@@ -2034,6 +2047,7 @@
         <div class="community-panel-heading"><div><h3>Lo que está pasando</h3><p class="muted small">Transformaciones y avances de perfiles que podés ver.</p></div><button class="btn secondary" id="communityRefresh" type="button">Actualizar feed</button></div>
         <div class="community-feed-tools"><label for="communityFeedSort">Ordenar por</label><select id="communityFeedSort"><option value="activity">Actividad de la comunidad</option><option value="recent">Más recientes</option><option value="likes">Más me gusta</option></select></div>
         <div id="communityFeedStatus" class="community-status" role="status" aria-live="polite">Preparando comunidad…</div>
+        <aside class="ad-slot ad-slot-inline" id="adSlotCommunity" aria-label="Publicidad"><span class="ad-slot-label">Publicidad</span><div class="ad-slot-content" id="adContentCommunity"></div></aside>
         <div id="communityFeed" class="community-feed"><div class="empty"><strong>Tu comunidad empieza acá</strong><p>Explorá perfiles o compartí tu primera transformación.</p></div></div>
       </section>
 
@@ -2119,7 +2133,8 @@
     <section class="view" id="view-profile">
       <div class="section-hero hero-profile"><div><h2>Tu perfil</h2><p>Tus datos, objetivos y configuración.</p></div></div>
       <div class="card" id="profileIdentityCard">
-        <div class="profile-identity-row"><div class="profile-avatar-wrap"><div class="profile-avatar" id="profileAvatar" aria-hidden="true" data-avatar>FF</div><label class="avatar-edit" for="avatarInput" title="Cambiar foto de perfil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span class="sr-only">Cambiar foto de perfil</span></label><input id="avatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden></div><div class="profile-identity-copy"><h3 id="profileDisplayName">Tu perfil FittForma</h3><p class="muted small" id="profileDisplayGoal">Tu progreso, a tu manera</p></div></div>
+        <div class="profile-identity-row"><div class="profile-avatar-wrap"><div class="profile-avatar" id="profileAvatar" aria-hidden="true" data-avatar>FF</div><label class="avatar-edit" for="avatarInput" title="Cambiar foto de perfil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span class="sr-only">Cambiar foto de perfil</span></label><input id="avatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden></div><div class="profile-identity-copy"><div class="profile-name-row"><h3 id="profileDisplayName">Tu perfil FittForma</h3><div class="featured-badges" id="featuredBadges" aria-label="Insignias destacadas"></div></div><p class="muted small" id="profileDisplayGoal">Tu progreso, a tu manera</p></div></div>
+        <div class="featured-picker" id="featuredPicker" hidden></div>
         <div class="profile-level" id="profileLevel"></div>
         <button class="link-btn" id="avatarRemove" type="button" hidden>Quitar foto de perfil</button>
         <div class="profile-stats" id="profileStats" aria-label="Tu actividad"></div>
@@ -2137,13 +2152,14 @@
         <summary><span><strong>Objetivos y datos físicos</strong><small>Peso, altura, actividad y preferencias de entrenamiento</small></span></summary>
         <div class="card" id="bodyProfileCard">
         <h3>Datos físicos y objetivo de peso</h3>
-        <p class="muted small">Estos datos permiten calcular una referencia nutricional inicial. Podés dejarlos incompletos y completar el perfil más adelante.</p>
+        <p class="muted small">Estos datos permiten calcular referencias de nutrición e hidratación. Ninguno es obligatorio. Son privados: se guardan en este dispositivo y en tu copia privada en la nube si iniciás sesión; nunca se muestran en Comunidad.</p>
         <form id="bodyProfileForm">
           <div class="grid2">
             <div class="field"><label for="profileAge">Edad (años)</label><input id="profileAge" type="number" min="13" max="100" inputmode="numeric" placeholder="Ej. 25"></div>
-            <div class="field"><label for="profileHeight">Altura (cm)</label><input id="profileHeight" type="number" min="100" max="250" step="0.5" inputmode="decimal" placeholder="Ej. 175"></div>
-            <div class="field"><label for="profileCurrentWeight">Peso actual (kg)</label><input id="profileCurrentWeight" type="number" min="25" max="350" step="0.1" inputmode="decimal" placeholder="Ej. 72.5"></div>
-            <div class="field"><label for="profileTargetWeight">Peso al que querés llegar (kg)</label><input id="profileTargetWeight" type="number" min="25" max="350" step="0.1" inputmode="decimal" placeholder="Ej. 76"></div>
+            <div class="field"><label for="profileHeight">Altura (cm)</label><input id="profileHeight" type="number" min="1" max="250" step="0.01" inputmode="decimal" placeholder="Ej. 175 (o 1,75 m)" aria-describedby="profileHeightHint"><small class="muted" id="profileHeightHint">En centímetros. Si escribís metros (1,75) lo convertimos.</small></div>
+            <div class="field"><label for="profileWeightUnit">Unidad de peso</label><select id="profileWeightUnit"><option value="kg" selected>Kilogramos (kg)</option><option value="lb">Libras (lb)</option></select></div>
+            <div class="field"><label for="profileCurrentWeight">Peso actual (<span data-weight-unit>kg</span>)</label><input id="profileCurrentWeight" type="number" min="25" max="350" step="0.1" inputmode="decimal" placeholder="Ej. 72.5"></div>
+            <div class="field"><label for="profileTargetWeight">Peso al que querés llegar (<span data-weight-unit>kg</span>)</label><input id="profileTargetWeight" type="number" min="25" max="350" step="0.1" inputmode="decimal" placeholder="Ej. 76"></div>
             <div class="field"><label for="profileActivityLevel">Actividad habitual</label><select id="profileActivityLevel"><option value="sedentary">Mayormente sentado/a</option><option value="light" selected>Ligera (1–3 días/semana)</option><option value="moderate">Moderada (3–5 días/semana)</option><option value="high">Alta (6–7 días/semana)</option></select></div>
           </div>
           <button class="btn full" id="saveBodyProfile" type="submit">Guardar datos físicos</button>
@@ -2152,7 +2168,15 @@
       </div>
         <div class="card">
         <h3>Preferencias de entrenamiento</h3>
-        <p class="muted small">Modificá tus preferencias en “Mi plan” y tocá “Crear mi rutina”. No hace falta ingresar información médica ni datos sensibles.</p>
+        <p class="muted small">Definen tu plan: objetivo, nivel, días, equipamiento y duración. No hace falta ingresar información médica.</p>
+        <form id="trainingPrefsForm" class="grid2">
+          <div class="field"><label for="prefGoal">Objetivo</label><select id="prefGoal"><option value="fitness">Ponerme en forma</option><option value="muscle">Ganar masa muscular</option><option value="strength">Ganar fuerza</option><option value="endurance">Mejorar resistencia</option><option value="habit">Crear el hábito</option></select></div>
+          <div class="field"><label for="prefLevel">Nivel</label><select id="prefLevel"><option value="beginner">Principiante</option><option value="intermediate">Intermedio</option><option value="advanced">Avanzado</option></select></div>
+          <div class="field"><label for="prefDays">Días por semana</label><select id="prefDays"><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+          <div class="field"><label for="prefEquipment">Equipamiento</label><select id="prefEquipment"><option value="gym">Gimnasio completo</option><option value="home">Casa con poco equipo</option><option value="bodyweight">Solo peso corporal</option></select></div>
+          <div class="field"><label for="prefDuration">Minutos por sesión</label><select id="prefDuration"><option value="20">20</option><option value="30">30</option><option value="45">45</option><option value="60">60</option></select></div>
+          <div class="field pref-submit"><button class="btn" type="submit">Guardar y actualizar mi plan</button></div>
+        </form>
         <div id="profileSummary"></div>
       </div>
       </details>
@@ -2222,29 +2246,29 @@
       <details class="ff-group">
         <summary><span><strong>Membresía</strong><small>Plan gratuito y FittForma Pro</small></span></summary>
         <div class="card membership-card" id="membershipCard">
-        <div class="membership-head"><div><div class="eyebrow">Tu membresía</div><h3>FittForma Pro</h3><p class="muted small">Una propuesta de beneficios para la futura suscripción. La versión gratuita seguirá siendo útil.</p></div><span class="membership-status" id="membershipStatus">Plan gratuito · activo</span></div>
+        <div class="membership-head"><div><div class="eyebrow">Tu membresía</div><h3>FittForma AI Plus</h3><p class="muted small">Una propuesta de beneficios para la futura suscripción. La versión gratuita seguirá siendo útil.</p></div><span class="membership-status" id="membershipStatus">Plan gratuito · activo</span></div>
         <div class="membership-price">US$ 5,99 <small>/ mes · precio orientativo, aún no definitivo</small></div>
         <div class="membership-grid">
           <div class="membership-tier"><h4>Gratis</h4><ul><li>Rutinas y biblioteca de ejercicios</li><li>Registro de sesiones y actividad</li><li>Seguimiento nutricional básico</li><li>Historial local y estadísticas</li><li>Acceso a la IA según límites gratuitos</li></ul></div>
-          <div class="membership-tier pro"><h4>Pro · beneficios propuestos</h4><ul><li>Experiencia sin anuncios</li><li>Mayor disponibilidad del entrenador IA</li><li>Personalización y análisis avanzados</li><li>Estadísticas ampliadas de progreso</li><li>Herramientas nutricionales avanzadas</li></ul></div>
+          <div class="membership-tier pro"><h4>Plus · beneficios</h4><ul><li>Experiencia sin anuncios</li><li>Mayor disponibilidad del entrenador IA</li><li>Personalización y análisis avanzados</li><li>Estadísticas ampliadas de progreso</li><li>Herramientas nutricionales avanzadas</li></ul></div>
         </div>
         <p class="membership-note">Los beneficios y el precio son una propuesta de producto, no una oferta de compra activa. Todavía no hay proveedor de pagos conectado ni suscripciones verificadas. No se hará ningún cobro desde esta pantalla.</p>
-        <button class="btn full" id="membershipInfoButton" type="button">Consultar estado de Pro</button>
-        <p id="membershipMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0">La contratación se habilitará después de integrar y probar los pagos.</p>
+        <p class="membership-status" id="membershipStatus" role="status" aria-live="polite">Consultando tu plan…</p><div class="btn-row"><button class="btn" id="plusBuyGooglePlay" type="button" hidden>Suscribirme con Google Play</button><button class="btn ghost" id="plusRestore" type="button" hidden>Restaurar compra</button><button class="btn secondary" id="membershipInfoButton" type="button">Actualizar estado</button></div>
+        <p id="membershipMessage" class="muted small" style="margin:10px 0 0">Plus solo se activa cuando Google Play (app de Android) confirma la compra y el servidor la verifica. En la web todavía no hay pagos: no se hace ningún cobro.</p>
       </div>
       </details>
       <details class="ff-group">
         <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
         <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">47.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">48.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
       </details>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 47.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 48.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -2271,7 +2295,7 @@
   <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V47.0</p>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V48.0</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -2324,13 +2348,27 @@
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<dialog class="badge-celebration" id="badgeCelebration" aria-labelledby="badgeCelebrationTitle">
+  <div class="badge-celebration-glow" aria-hidden="true"></div>
+  <p class="badge-celebration-kicker" id="badgeCelebrationTitle">¡Nueva insignia!</p>
+  <div class="badge-celebration-medal" id="badgeCelebrationMedal"></div>
+  <strong class="badge-celebration-rank" id="badgeCelebrationRank"></strong>
+  <h2 class="badge-celebration-name" id="badgeCelebrationName"></h2>
+  <p class="badge-celebration-detail" id="badgeCelebrationDetail"></p>
+  <p class="badge-celebration-more" id="badgeCelebrationMore"></p>
+  <div class="btn-row"><button type="button" class="btn" id="badgeCelebrationClose">¡Genial!</button><button type="button" class="btn ghost" id="badgeCelebrationView">Ver mis insignias</button></div>
+</dialog>
 <script src="./community.js"></script>
 <script src="./supabase-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 <script src="./ads-config.js"></script>
+<script src="./monetization-core.js"></script>
 <script src="./ads.js"></script>
 <script src="./membership-config.js"></script>
+<script src="./training-core.js"></script>
+<script src="./exercise-guides.js"></script>
+<script src="./exercise-media.js"></script>
 <script src="./achievements.js"></script>
 <script>
 (() => {
@@ -2340,9 +2378,10 @@
   const PREVIOUS_V3_STORAGE = 'fittforma-ai-v3';
   const PREVIOUS_STORAGE = 'fittforma-ai-v2';
   const LEGACY_STORAGE = 'forma-prototype-v1';
-  const defaults = {mealPlan:{},routines:[],bodyMeasures:[],notifications:[],coachShareData:true,plannedActivities:[],mealFavorites:[],habitLogs:{},waterLogs:{},badgeRecords:[],badgeUnlocks:{},profile:{goal:'fitness',level:'beginner',days:'3',equipment:'gym',duration:'30',name:'',age:'',heightCm:'',currentWeightKg:'',targetWeightKg:'',activityLevel:'light'},sessions:[],plan:null,meals:[],weights:[],activities:[],water:{date:'',count:0},nutritionGoals:{calories:2400,protein:120,carbs:280,fat:80,water:8},chat:[],proposal:null,planHistory:[],runningPlan:'starter',reminders:{enabled:false,time:'18:00',days:[1,3,5],missedEnabled:true,missedTime:'21:00',lastTrainingNoticeDate:'',lastMissedNoticeDate:''}};
+  const defaults = {daily:{seq:0,lastCompletedAt:'',nextAvailableAt:'',history:[]},hydration:{goalMl:2000,glassMl:250,entries:[]},featuredBadges:[],mealPlan:{},routines:[],bodyMeasures:[],notifications:[],coachShareData:true,plannedActivities:[],mealFavorites:[],habitLogs:{},waterLogs:{},badgeRecords:[],badgeUnlocks:{},profile:{goal:'fitness',level:'beginner',days:'3',equipment:'gym',duration:'30',name:'',age:'',heightCm:'',currentWeightKg:'',targetWeightKg:'',activityLevel:'light'},sessions:[],plan:null,meals:[],weights:[],activities:[],water:{date:'',count:0},nutritionGoals:{calories:2400,protein:120,carbs:280,fat:80,water:8},chat:[],proposal:null,planHistory:[],runningPlan:'starter',reminders:{enabled:false,time:'18:00',days:[1,3,5],missedEnabled:true,missedTime:'21:00',lastTrainingNoticeDate:'',lastMissedNoticeDate:''}};
   let state = loadState();
   let activeSession = null;
+  let pendingAdBreak = ''; // v48: pausa natural pendiente para evaluar un intersticial
   let lastWorkoutSummary = null;
   let restEndAt = 0, restInterval = null, workoutClockInterval = null;
   let deferredInstall = null;
@@ -2352,204 +2391,8 @@
   let supabaseClient = null, supabaseAuthSubscription = null, cloudUser = null, menuDraft = null, barcodeStream = null, barcodeScanActive = false;
   let gpsMapTilesFailed=false;
 
-  const library = {
-    gym: [
-      {name:'Prensa de piernas',group:'Piernas',sets:3,reps:'8–12',kind:'strength'},
-      {name:'Press de pecho en máquina',group:'Pecho',sets:3,reps:'8–12',kind:'strength'},
-      {name:'Jalón al pecho',group:'Espalda',sets:3,reps:'8–12',kind:'strength'},
-      {name:'Peso muerto rumano con mancuernas',group:'Piernas',sets:2,reps:'8–10',kind:'strength'},
-      {name:'Remo sentado en polea',group:'Espalda',sets:2,reps:'10–12',kind:'strength'},
-      {name:'Press de hombros en máquina',group:'Hombros',sets:2,reps:'8–12',kind:'strength'},
-      {name:'Puente de glúteos',group:'Glúteos',sets:3,reps:'10–15',kind:'strength'},
-      {name:'Curl de bíceps con mancuernas',group:'Brazos',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Extensión de tríceps en polea',group:'Brazos',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Sentarse y levantarse de un banco',group:'Piernas',sets:2,reps:'8–12',kind:'strength'},
-      {name:'Press inclinado con mancuernas',group:'Pecho',sets:2,reps:'8–12',kind:'strength'},
-      {name:'Sentadilla goblet',group:'Piernas',sets:3,reps:'8–12',kind:'strength'},
-      {name:'Sentadilla hack en máquina',group:'Piernas',sets:3,reps:'8–12',kind:'strength'},
-      {name:'Curl femoral en máquina',group:'Piernas',sets:3,reps:'10–15',kind:'strength'},
-      {name:'Extensión de cuádriceps',group:'Piernas',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Hip thrust con barra o máquina',group:'Glúteos',sets:3,reps:'8–12',kind:'strength'},
-      {name:'Abducción de cadera en máquina',group:'Glúteos',sets:2,reps:'12–20',kind:'strength'},
-      {name:'Press de banca con barra',group:'Pecho',sets:3,reps:'6–10',kind:'strength'},
-      {name:'Aperturas en polea',group:'Pecho',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Remo con mancuerna a una mano',group:'Espalda',sets:3,reps:'8–12 por lado',kind:'strength'},
-      {name:'Remo con pecho apoyado',group:'Espalda',sets:3,reps:'8–12',kind:'strength'},
-      {name:'Dominadas asistidas',group:'Espalda',sets:3,reps:'6–10',kind:'strength'},
-      {name:'Face pull en polea',group:'Hombros',sets:2,reps:'12–15',kind:'strength'},
-      {name:'Elevaciones laterales',group:'Hombros',sets:2,reps:'12–20',kind:'strength'},
-      {name:'Curl martillo',group:'Brazos',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Extensión de tríceps por encima de la cabeza',group:'Brazos',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Plancha frontal',group:'Core',sets:2,reps:'20–40 seg',kind:'strength'},
-      {name:'Crunch en polea',group:'Core',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Bicicleta estática',group:'Cardio',sets:1,reps:'8–20 min',kind:'cardio'},
-      {name:'Cinta con inclinación suave',group:'Cardio',sets:1,reps:'8–20 min',kind:'cardio'},
-      {name:"Sentadilla frontal con barra",group:"Piernas",sets:3,reps:"6–10",kind:"strength"},
-      {name:"Sentadilla en multipower",group:"Piernas",sets:3,reps:"8–12",kind:"strength"},
-      {name:"Prensa de piernas unilateral",group:"Piernas",sets:2,reps:"10–12 por lado",kind:"strength"},
-      {name:"Peso muerto convencional con barra",group:"Piernas",sets:3,reps:"5–8",kind:"strength"},
-      {name:"Peso muerto con trap bar",group:"Piernas",sets:3,reps:"6–10",kind:"strength"},
-      {name:"Buenos días con barra ligera",group:"Piernas",sets:2,reps:"10–12",kind:"strength"},
-      {name:"Extensión de cadera en polea",group:"Glúteos",sets:2,reps:"12–15",kind:"strength"},
-      {name:"Patada de glúteo en polea",group:"Glúteos",sets:2,reps:"12–15 por lado",kind:"strength"},
-      {name:"Curl femoral sentado",group:"Piernas",sets:3,reps:"10–15",kind:"strength"},
-      {name:"Curl femoral tumbado",group:"Piernas",sets:3,reps:"10–15",kind:"strength"},
-      {name:"Elevación de talones de pie en máquina",group:"Piernas",sets:3,reps:"10–15",kind:"strength"},
-      {name:"Elevación de talones sentado",group:"Piernas",sets:3,reps:"12–20",kind:"strength"},
-      {name:"Aductores en máquina",group:"Piernas",sets:2,reps:"12–20",kind:"strength"},
-      {name:"Extensión lumbar en banco",group:"Espalda",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Jalón al pecho con agarre neutro",group:"Espalda",sets:3,reps:"8–12",kind:"strength"},
-      {name:"Jalón con brazos rectos en polea",group:"Espalda",sets:2,reps:"12–15",kind:"strength"},
-      {name:"Remo con barra",group:"Espalda",sets:3,reps:"6–10",kind:"strength"},
-      {name:"Remo en máquina con pecho apoyado",group:"Espalda",sets:3,reps:"8–12",kind:"strength"},
-      {name:"Remo unilateral en polea",group:"Espalda",sets:2,reps:"10–12 por lado",kind:"strength"},
-      {name:"Pullover en polea",group:"Espalda",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Dominadas asistidas con agarre neutro",group:"Espalda",sets:3,reps:"6–10",kind:"strength"},
-      {name:"Press de banca con mancuernas",group:"Pecho",sets:3,reps:"8–12",kind:"strength"},
-      {name:"Press declinado en máquina",group:"Pecho",sets:2,reps:"8–12",kind:"strength"},
-      {name:"Aperturas con mancuernas en banco",group:"Pecho",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Cruce de poleas alto a bajo",group:"Pecho",sets:2,reps:"12–15",kind:"strength"},
-      {name:"Cruce de poleas bajo a alto",group:"Pecho",sets:2,reps:"12–15",kind:"strength"},
-      {name:"Press militar con mancuernas",group:"Hombros",sets:3,reps:"8–12",kind:"strength"},
-      {name:"Elevación frontal con mancuernas",group:"Hombros",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Pájaros en máquina inversa",group:"Hombros",sets:2,reps:"12–15",kind:"strength"},
-      {name:"Encogimientos con mancuernas",group:"Hombros",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Curl predicador en máquina",group:"Brazos",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Curl de bíceps en polea baja",group:"Brazos",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Curl concentrado con mancuerna",group:"Brazos",sets:2,reps:"10–12 por lado",kind:"strength"},
-      {name:"Curl inverso con barra Z",group:"Brazos",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Fondos asistidos en máquina",group:"Brazos",sets:2,reps:"8–12",kind:"strength"},
-      {name:"Press francés con barra Z",group:"Brazos",sets:2,reps:"10–12",kind:"strength"},
-      {name:"Extensión de tríceps con cuerda",group:"Brazos",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Extensión de tríceps unilateral en polea",group:"Brazos",sets:2,reps:"10–15 por lado",kind:"strength"},
-      {name:"Elevación de rodillas en silla romana",group:"Core",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Pallof press en polea",group:"Core",sets:2,reps:"10–12 por lado",kind:"strength"},
-      {name:"Crunch en máquina",group:"Core",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Plancha lateral",group:"Core",sets:2,reps:"20–40 seg por lado",kind:"strength"},
-      {name:"Caminata del granjero con mancuernas",group:"Core",sets:3,reps:"20–40 m",kind:"strength"},
-      {name:"Elíptica a ritmo moderado",group:"Cardio",sets:1,reps:"10–20 min",kind:"cardio"},
-      {name:"Remo ergómetro suave",group:"Cardio",sets:1,reps:"8–15 min",kind:"cardio"},
-      {name:"Escaladora a ritmo cómodo",group:"Cardio",sets:1,reps:"8–15 min",kind:"cardio"},
-      {name:"Abdominales en banco declinado",group:"Core",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Pájaros con mancuernas inclinado",group:"Hombros",sets:2,reps:"12–15",kind:"strength"},
-      {name:"Press de pecho en polea de pie",group:"Pecho",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Rotación externa de hombro con polea",group:"Hombros",sets:2,reps:"12–15 por lado",kind:"strength"}
-    ],
-    home: [
-      {name:'Sentadilla a una silla',group:'Piernas',sets:2,reps:'8–12',kind:'strength'},
-      {name:'Flexiones inclinadas contra una mesa firme',group:'Pecho',sets:2,reps:'6–12',kind:'strength'},
-      {name:'Remo con banda elástica',group:'Espalda',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Puente de glúteos',group:'Glúteos',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Press de hombros con mancuernas livianas',group:'Hombros',sets:2,reps:'8–12',kind:'strength'},
-      {name:'Bird-dog controlado',group:'Core',sets:2,reps:'6–10 por lado',kind:'strength'},
-      {name:'Marcha en el lugar',group:'Cardio',sets:1,reps:'5–10 min',kind:'cardio'},
-      {name:'Elevación de talones con apoyo',group:'Piernas',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Curl de bíceps con banda o mancuernas',group:'Brazos',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Caminata a ritmo cómodo',group:'Cardio',sets:1,reps:'10–20 min',kind:'cardio'},
-      {name:'Sentadilla dividida con apoyo',group:'Piernas',sets:2,reps:'8–10 por lado',kind:'strength'},
-      {name:'Peso muerto rumano con mancuernas',group:'Piernas',sets:2,reps:'8–12',kind:'strength'},
-      {name:'Zancada hacia atrás',group:'Piernas',sets:2,reps:'8–10 por lado',kind:'strength'},
-      {name:'Flexiones desde rodillas',group:'Pecho',sets:2,reps:'6–12',kind:'strength'},
-      {name:'Press de pecho con banda',group:'Pecho',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Remo con mochila cargada con seguridad',group:'Espalda',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Pull-apart con banda',group:'Espalda',sets:2,reps:'12–20',kind:'strength'},
-      {name:'Elevaciones laterales con botellas',group:'Hombros',sets:2,reps:'12–15',kind:'strength'},
-      {name:'Curl de bíceps con banda',group:'Brazos',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Extensión de tríceps con banda',group:'Brazos',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Dead bug',group:'Core',sets:2,reps:'6–10 por lado',kind:'strength'},
-      {name:'Plancha lateral con rodillas apoyadas',group:'Core',sets:2,reps:'15–25 seg por lado',kind:'strength'},
-      {name:'Buenos días sin peso',group:'Piernas',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Subidas a escalón bajo y estable',group:'Piernas',sets:2,reps:'8–10 por lado',kind:'strength'},
-      {name:'Bicicleta suave',group:'Cardio',sets:1,reps:'10–20 min',kind:'cardio'},
-      {name:'Baile o cardio de bajo impacto',group:'Cardio',sets:1,reps:'5–15 min',kind:'cardio'},
-      {name:"Sentadilla goblet con mancuerna",group:"Piernas",sets:3,reps:"8–12",kind:"strength"},
-      {name:"Peso muerto rumano a una pierna con apoyo",group:"Piernas",sets:2,reps:"8–10 por lado",kind:"strength"},
-      {name:"Hip thrust con sofá firme",group:"Glúteos",sets:3,reps:"10–15",kind:"strength"},
-      {name:"Patada de glúteo en cuadrupedia",group:"Glúteos",sets:2,reps:"12–15 por lado",kind:"strength"},
-      {name:"Abducción de cadera acostado de lado",group:"Glúteos",sets:2,reps:"12–20 por lado",kind:"strength"},
-      {name:"Curl femoral deslizante con toalla",group:"Piernas",sets:2,reps:"8–12",kind:"strength"},
-      {name:"Elevación de talones a una pierna con apoyo",group:"Piernas",sets:2,reps:"10–15 por lado",kind:"strength"},
-      {name:"Flexiones clásicas",group:"Pecho",sets:3,reps:"6–15",kind:"strength"},
-      {name:"Flexiones con manos elevadas",group:"Pecho",sets:2,reps:"8–15",kind:"strength"},
-      {name:"Press de pecho con mancuernas en el suelo",group:"Pecho",sets:3,reps:"8–12",kind:"strength"},
-      {name:"Aperturas con mancuernas en el suelo",group:"Pecho",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Remo con mancuerna apoyado en silla firme",group:"Espalda",sets:3,reps:"8–12 por lado",kind:"strength"},
-      {name:"Pullover con mancuerna en el suelo",group:"Espalda",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Pájaros con mancuernas livianas",group:"Hombros",sets:2,reps:"12–15",kind:"strength"},
-      {name:"Press Arnold sentado con mancuernas",group:"Hombros",sets:2,reps:"8–12",kind:"strength"},
-      {name:"Elevación frontal con botellas",group:"Hombros",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Curl martillo con mancuernas",group:"Brazos",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Curl de bíceps alternado sentado",group:"Brazos",sets:2,reps:"10–15 por lado",kind:"strength"},
-      {name:"Extensión de tríceps por encima de la cabeza con mancuerna",group:"Brazos",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Patada de tríceps con mancuerna",group:"Brazos",sets:2,reps:"10–15 por lado",kind:"strength"},
-      {name:"Plancha con apoyo de antebrazos",group:"Core",sets:2,reps:"15–40 seg",kind:"strength"},
-      {name:"Plancha con toque de hombros desde rodillas",group:"Core",sets:2,reps:"8–12 por lado",kind:"strength"},
-      {name:"Crunch abdominal controlado",group:"Core",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Elevación de piernas flexionadas",group:"Core",sets:2,reps:"8–12",kind:"strength"},
-      {name:"Plancha con rodillas al pecho lenta",group:"Core",sets:2,reps:"8–12 por lado",kind:"strength"},
-      {name:"Superman alternado",group:"Espalda",sets:2,reps:"8–12 por lado",kind:"strength"},
-      {name:"Remo con banda elástica sentado",group:"Espalda",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Pull-through con banda elástica",group:"Glúteos",sets:2,reps:"12–15",kind:"strength"},
-      {name:"Paso lateral con banda por encima de rodillas",group:"Glúteos",sets:2,reps:"10–15 pasos por lado",kind:"strength"},
-      {name:"Caminata en intervalos dentro de casa",group:"Cardio",sets:1,reps:"10–20 min",kind:"cardio"},
-      {name:"Subir y bajar un escalón estable",group:"Cardio",sets:1,reps:"5–12 min",kind:"cardio"},
-      {name:"Shadow boxing de bajo impacto",group:"Cardio",sets:1,reps:"5–12 min",kind:"cardio"},
-      {name:"Movilidad de cadera en el suelo",group:"Piernas",sets:1,reps:"5–8 min",kind:"strength"},
-      {name:"Estiramiento de flexores de cadera",group:"Piernas",sets:1,reps:"20–30 seg por lado",kind:"strength"},
-      {name:"Gato-vaca para movilidad de columna",group:"Espalda",sets:1,reps:"6–10 repeticiones",kind:"strength"}
-    ],
-    bodyweight: [
-      {name:'Sentadilla a una silla',group:'Piernas',sets:2,reps:'8–12',kind:'strength'},
-      {name:'Flexiones contra la pared',group:'Pecho',sets:2,reps:'6–12',kind:'strength'},
-      {name:'Puente de glúteos',group:'Glúteos',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Bird-dog controlado',group:'Core',sets:2,reps:'6–10 por lado',kind:'strength'},
-      {name:'Elevación de talones con apoyo',group:'Piernas',sets:2,reps:'10–15',kind:'strength'},
-      {name:'Marcha en el lugar',group:'Cardio',sets:1,reps:'5–10 min',kind:'cardio'},
-      {name:'Plancha elevada contra una mesa firme',group:'Core',sets:2,reps:'15–30 seg',kind:'strength'},
-      {name:'Caminata a ritmo cómodo',group:'Cardio',sets:1,reps:'10–20 min',kind:'cardio'},
-      {name:'Sentadilla parcial a una silla',group:'Piernas',sets:2,reps:'8–12',kind:'strength'},
-      {name:'Zancada estática asistida',group:'Piernas',sets:2,reps:'6–10 por lado',kind:'strength'},
-      {name:'Flexiones contra una pared',group:'Pecho',sets:2,reps:'8–15',kind:'strength'},
-      {name:'Flexiones inclinadas sobre una superficie firme',group:'Pecho',sets:2,reps:'6–12',kind:'strength'},
-      {name:'Remo isométrico con toalla segura',group:'Espalda',sets:2,reps:'15–25 seg',kind:'strength'},
-      {name:'Elevación de brazos en Y boca abajo',group:'Espalda',sets:2,reps:'8–12',kind:'strength'},
-      {name:'Bird-dog',group:'Core',sets:2,reps:'6–10 por lado',kind:'strength'},
-      {name:'Dead bug',group:'Core',sets:2,reps:'6–10 por lado',kind:'strength'},
-      {name:'Plancha lateral con rodillas apoyadas',group:'Core',sets:2,reps:'15–25 seg por lado',kind:'strength'},
-      {name:'Marcha elevando rodillas',group:'Cardio',sets:1,reps:'5–10 min',kind:'cardio'},
-      {name:'Paso lateral de bajo impacto',group:'Cardio',sets:1,reps:'5–10 min',kind:'cardio'},
-      {name:"Sentadilla al aire",group:"Piernas",sets:3,reps:"8–15",kind:"strength"},
-      {name:"Sentadilla isométrica en pared",group:"Piernas",sets:2,reps:"15–40 seg",kind:"strength"},
-      {name:"Zancada hacia atrás sin peso",group:"Piernas",sets:2,reps:"8–12 por lado",kind:"strength"},
-      {name:"Zancada lateral asistida",group:"Piernas",sets:2,reps:"8–10 por lado",kind:"strength"},
-      {name:"Puente de glúteos a una pierna asistido",group:"Glúteos",sets:2,reps:"8–12 por lado",kind:"strength"},
-      {name:"Elevación de cadera en marcha",group:"Glúteos",sets:2,reps:"8–12 por lado",kind:"strength"},
-      {name:"Flexiones con rodillas apoyadas",group:"Pecho",sets:3,reps:"6–12",kind:"strength"},
-      {name:"Flexiones diamante desde rodillas",group:"Pecho",sets:2,reps:"5–10",kind:"strength"},
-      {name:"Flexiones escapulares contra pared",group:"Pecho",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Fondos de tríceps con silla estable",group:"Brazos",sets:2,reps:"6–10",kind:"strength"},
-      {name:"Plancha alta",group:"Core",sets:2,reps:"15–40 seg",kind:"strength"},
-      {name:"Plancha lateral con piernas flexionadas",group:"Core",sets:2,reps:"15–30 seg por lado",kind:"strength"},
-      {name:"Bird-dog con pausa",group:"Core",sets:2,reps:"6–10 por lado",kind:"strength"},
-      {name:"Dead bug con talones alternos",group:"Core",sets:2,reps:"8–12 por lado",kind:"strength"},
-      {name:"Crunch bicicleta lento",group:"Core",sets:2,reps:"8–12 por lado",kind:"strength"},
-      {name:"Abdominales cortos",group:"Core",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Elevación de rodillas de pie",group:"Core",sets:2,reps:"10–15 por lado",kind:"strength"},
-      {name:"Marcha de puente de glúteos",group:"Core",sets:2,reps:"8–10 por lado",kind:"strength"},
-      {name:"Superman estático",group:"Espalda",sets:2,reps:"10–20 seg",kind:"strength"},
-      {name:"Retracción escapular de pie",group:"Espalda",sets:2,reps:"10–15",kind:"strength"},
-      {name:"Y-T-W boca abajo",group:"Hombros",sets:2,reps:"6–10 de cada forma",kind:"strength"},
-      {name:"Círculos de brazos controlados",group:"Hombros",sets:1,reps:"30–45 seg",kind:"strength"},
-      {name:"Elevación de talones bilateral",group:"Piernas",sets:2,reps:"12–20",kind:"strength"},
-      {name:"Marcha rápida en el lugar",group:"Cardio",sets:1,reps:"5–12 min",kind:"cardio"},
-      {name:"Paso lateral rápido sin salto",group:"Cardio",sets:1,reps:"5–10 min",kind:"cardio"},
-      {name:"Jumping jacks de bajo impacto",group:"Cardio",sets:1,reps:"5–10 min",kind:"cardio"},
-      {name:"Escaladores lentos con manos elevadas",group:"Core",sets:2,reps:"8–12 por lado",kind:"strength"},
-      {name:"Estocada estática con apoyo",group:"Piernas",sets:2,reps:"8–10 por lado",kind:"strength"},
-      {name:"Equilibrio a una pierna con apoyo cercano",group:"Piernas",sets:2,reps:"20–30 seg por lado",kind:"strength"},
-      {name:"Movilidad de tobillo contra pared",group:"Piernas",sets:1,reps:"8–12 por lado",kind:"strength"}
-    ]
-  };
+  // v48: biblioteca única con metadatos para planificar (training-core.js).
+  const library = FittFormaTraining.LIBRARY;
 
   const runningPlans = {
     starter: {
@@ -2607,6 +2450,15 @@
     out.proposal=isPlainObj(st.proposal)?st.proposal:null;
     for(const k of ['mealPlan','waterLogs','habitLogs','badgeUnlocks','nutritionGoals','reminders'])out[k]=isPlainObj(st[k])?st[k]:structuredClone(defaults[k]);
     out.water=isPlainObj(st.water)?st.water:structuredClone(defaults.water);
+    // v48: progresión diaria, hidratación por registros y selección de insignias destacadas.
+    const d=isPlainObj(st.daily)?st.daily:{};
+    out.daily={seq:Math.max(0,Math.floor(Number(d.seq)||0)),lastCompletedAt:typeof d.lastCompletedAt==='string'?d.lastCompletedAt:'',nextAvailableAt:typeof d.nextAvailableAt==='string'?d.nextAvailableAt:'',history:objList(d.history,2000)};
+    const h=isPlainObj(st.hydration)?st.hydration:{};
+    out.hydration={goalMl:Math.min(6000,Math.max(500,Math.round(Number(h.goalMl)||0)||(Number(out.nutritionGoals?.water)>0?Number(out.nutritionGoals.water)*250:2000))),glassMl:[150,200,250,300,330,350,400,500].includes(Number(h.glassMl))?Number(h.glassMl):250,reminder:isPlainObj(h.reminder)?{enabled:!!h.reminder.enabled,from:/^\d{2}:\d{2}$/.test(h.reminder.from)?h.reminder.from:'09:00',to:/^\d{2}:\d{2}$/.test(h.reminder.to)?h.reminder.to:'21:00',lastAt:typeof h.reminder.lastAt==='string'?h.reminder.lastAt:'',countDate:typeof h.reminder.countDate==='string'?h.reminder.countDate:'',count:Number(h.reminder.count)||0}:{enabled:false,from:'09:00',to:'21:00'},entries:objList(h.entries,20000,e=>typeof e.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)&&Number(e.ml)>0&&Number(e.ml)<=2000)};
+    // Vasos registrados antes de v48: se convierten una sola vez en un registro por día (vaso de 250 ml).
+    const migrated=new Set(out.hydration.entries.map(e=>e.date));
+    for(const [date,count] of Object.entries(isPlainObj(out.waterLogs)?out.waterLogs:{}))if(/^\d{4}-\d{2}-\d{2}$/.test(date)&&Number(count)>0&&!migrated.has(date))out.hydration.entries.push({id:'mig-'+date,date,ml:Math.min(2000,Math.round(Number(count))*250),at:'',source:'migrated'});
+    out.featuredBadges=(Array.isArray(st.featuredBadges)?st.featuredBadges:[]).filter(x=>typeof x==='string').slice(0,3);
     return out;
   }
   function loadState(){
@@ -2630,7 +2482,11 @@
   }
   function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));return true;}catch(e){toast('No se pudo guardar. Exportá tus datos para no perderlos.');return false;}}
   function toast(msg){const el=$('toast');el.textContent=msg;el.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.style.display='none',2600);}
-  $('membershipInfoButton').addEventListener('click',()=>{const msg='Pro todavía no se puede contratar: falta conectar y verificar el proveedor de pagos. No se realizó ningún cobro.';$('membershipMessage').textContent=msg;toast(msg);});
+  // v48: el estado de Plus lo consulta ads.js en el servidor (/api/entitlements).
+  // v48: lo que necesita la publicidad para no interrumpir: actividades en curso y token de la cuenta.
+  window.toast=msg=>toast(msg);
+  window.FittFormaActivities=()=>{const a=[];if(activeSession)a.push('workout');if(restEndAt>Date.now())a.push('rest-timer');if(gpsWatchId!==null&&gpsWatchId!==undefined)a.push('gps-running');if(finishingWorkout)a.push('saving');const v=document.querySelector('.view.active')?.id||'';if(v==='view-coach')a.push('ai-chat');const f=document.activeElement;if(f&&f.closest?.('#mealForm,#view-nutrition form'))a.push('meal-logging');if(f&&f.closest?.('#cloudAuthForm'))a.push('login');if(document.querySelector('dialog[open],.ad-overlay,.exercise-modal:not([hidden])'))a.push('dialog-open');if(document.querySelector('#communityPostForm [type=file]')?.files?.length)a.push('photo-upload');return a;};
+  window.FittFormaAuthHeader=async()=>{try{if(!supabaseClient||!cloudUser)return {};const {data}=await supabaseClient.auth.getSession();const tk=data?.session?.access_token;return tk?{Authorization:'Bearer '+tk}:{};}catch{return {};}};
   function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function dateKey(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   // v45: las fechas siguen el idioma elegido (las demás traducciones las hace i18n.js).
@@ -2640,7 +2496,7 @@
   function profileFromForm(){
     state.profile={...state.profile,goal:$('goal').value,level:$('level').value,days:$('days').value,equipment:$('equipment').value,duration:$('duration').value,name:$('name').value.trim()};
   }
-  function syncForm(){for(const k of ['goal','level','days','equipment','duration','name']) $(k).value=state.profile[k]??defaults.profile[k];syncBodyProfileForm();}
+  function syncForm(){for(const k of ['goal','level','days','equipment','duration','name']) $(k).value=state.profile[k]??defaults.profile[k];syncBodyProfileForm();syncTrainingPrefs?.();}
   function goalText(v){return ({fitness:'Ponerme en forma',muscle:'Ganar masa muscular',strength:'Ganar fuerza',endurance:'Mejorar resistencia',habit:'Crear el hábito'})[v]||'Ponerme en forma';}
   function levelText(v){return ({beginner:'Principiante',intermediate:'Intermedia',advanced:'Avanzada'})[v]||'Principiante';}
   function equipText(v){return ({gym:'Gimnasio completo',home:'Casa con poco equipo',bodyweight:'Solo peso corporal'})[v]||v;}
@@ -2675,72 +2531,10 @@
   function makePlan(){
     if(state.plan)savePlanSnapshot('Antes de crear una nueva rutina');
     profileFromForm();
-    const p=state.profile,pool=library[p.equipment]||library.gym;
-    const requestedDays=Number(p.days)||3,dayCount=Math.max(2,Math.min(5,requestedDays));
-    p.days=String(dayCount);
-    let count=Number(p.duration)<=20?4:Number(p.duration)<=30?5:Number(p.duration)<=45?6:7;
-    if(p.level==='beginner')count=Math.min(count,5);
-    const split=Array.from({length:dayCount},()=>[]);
-    if(p.goal==='endurance'){
-      const mins=Math.max(10,Number(p.duration)||30),beginner=p.level==='beginner';
-      const cardioPlan=beginner?[
-        {name:'Alternancia de trote suave y caminata',group:'Cardio',sets:1,reps:`${mins} min`,kind:'cardio'},
-        {name:'Caminata rápida de recuperación',group:'Cardio',sets:1,reps:`${Math.max(10,mins-5)}–${mins} min`,kind:'cardio'},
-        {name:'Trote suave o alternancia trote-caminata',group:'Cardio',sets:1,reps:`${mins} min`,kind:'cardio'},
-        {name:'Caminata a ritmo cómodo',group:'Cardio',sets:1,reps:`${mins} min`,kind:'cardio'},
-        {name:'Alternancia de trote suave y caminata',group:'Cardio',sets:1,reps:`${mins} min`,kind:'cardio'}
-      ]:[
-        {name:'Carrera continua a ritmo cómodo',group:'Cardio',sets:1,reps:`${mins} min`,kind:'cardio'},
-        {name:'Caminata rápida de recuperación',group:'Cardio',sets:1,reps:`${Math.max(10,mins-5)}–${mins} min`,kind:'cardio'},
-        {name:'Intervalos de trote controlado',group:'Cardio',sets:1,reps:`${mins} min incluyendo entrada en calor`,kind:'cardio'},
-        {name:'Carrera suave de recuperación',group:'Cardio',sets:1,reps:`${Math.max(10,mins-5)}–${mins} min`,kind:'cardio'},
-        {name:'Caminata a ritmo cómodo',group:'Cardio',sets:1,reps:`${mins} min`,kind:'cardio'}
-      ];
-      split.forEach((day,i)=>day.push({...cardioPlan[i%cardioPlan.length]}));
-    }else{
-      const strength=pool.filter(x=>x.kind==='strength');
-      const usage=new Map();
-      const fullBody=['lower','push','pull','posterior','core','shoulders','arms','accessory'];
-      const upper=['push','pull','shoulders','arms','core','accessory','push'];
-      const lower=['lower','posterior','lower','core','lower','posterior','accessory'];
-      const templates=dayCount<=3
-        ?Array.from({length:dayCount},()=>fullBody)
-        :dayCount===4?[upper,lower,upper,lower]
-        :[upper,lower,fullBody,upper,lower];
-      const allowedByTemplate=templates.map(t=>[...new Set(t)]);
-      const fallback={
-        lower:['posterior','core','accessory'],posterior:['lower','core','accessory'],
-        push:['shoulders','arms','pull','accessory'],pull:['shoulders','arms','push','accessory'],
-        shoulders:['push','pull','arms','accessory'],arms:['shoulders','push','pull','accessory'],
-        core:['accessory','lower','posterior'],accessory:['push','pull','shoulders','arms','lower','posterior','core']
-      };
-      split.forEach((day,dayIndex)=>{
-        const dayNames=new Set(),bucketCounts=new Map(),allowed=allowedByTemplate[dayIndex]||[...new Set(fullBody)];
-        const tryPick=(requestedBucket)=>{
-          const candidatesOrder=[requestedBucket,...(fallback[requestedBucket]||[])].filter((v,i,a)=>allowed.includes(v)&&a.indexOf(v)===i);
-          let chosenBucket=null,candidates=[];
-          for(const bucket of candidatesOrder){
-            const found=strength.filter(e=>planBucket(e)===bucket&&!dayNames.has(normalizeExerciseName(e.name)));
-            if(found.length){chosenBucket=bucket;candidates=found;break;}
-          }
-          if(!candidates.length)return false;
-          candidates.sort((a,b)=>(usage.get(normalizeExerciseName(a.name))||0)-(usage.get(normalizeExerciseName(b.name))||0));
-          const least=usage.get(normalizeExerciseName(candidates[0].name))||0;
-          const tied=candidates.filter(e=>(usage.get(normalizeExerciseName(e.name))||0)===least);
-          const chosen=tied[(dayIndex+day.length)%tied.length]||candidates[0],key=normalizeExerciseName(chosen.name);
-          dayNames.add(key);usage.set(key,(usage.get(key)||0)+1);bucketCounts.set(chosenBucket,(bucketCounts.get(chosenBucket)||0)+1);day.push({...chosen});return true;
-        };
-        for(const bucket of templates[dayIndex]){if(day.length>=count)break;tryPick(bucket);}
-        // Fill only with movement families assigned to this split, keeping upper/lower days coherent.
-        while(day.length<count&&day.length<strength.length){
-          const ranked=allowed.slice().sort((a,b)=>(bucketCounts.get(a)||0)-(bucketCounts.get(b)||0));
-          let added=false;for(const bucket of ranked){if(tryPick(bucket)){added=true;break;}}
-          if(!added)break;
-        }
-      });
-    }
-    state.plan={createdAt:new Date().toISOString(),days:split.map((exercises,i)=>({title:p.goal==='endurance'?`Resistencia · Día ${i+1}`:dayCount<=3?`Cuerpo completo · Día ${i+1}`:dayCount===4?(['Tren superior A','Tren inferior A','Tren superior B','Tren inferior B'][i]||`Día ${i+1}`):(['Tren superior A','Tren inferior A','Cuerpo completo','Tren superior B','Tren inferior B'][i]||`Día ${i+1}`),exercises:exercises.map(e=>({...e,sets:e.kind==='cardio'?1:(p.level==='beginner'?Math.min(e.sets,2):e.sets)}))}))};
-    save();renderAll();toast('¡Rutina equilibrada creada y guardada!');
+    const p=state.profile;p.days=String(Math.max(2,Math.min(5,Number(p.days)||3)));
+    // v48: el objetivo, el nivel y el equipamiento definen la división, el orden y la prescripción.
+    state.plan=FittFormaTraining.buildPlan(p);
+    save();renderAll();toast('¡Rutina creada según tu objetivo, nivel y equipamiento!');
   }
   function exerciseCue(name,group,kind){
     const n=name.toLowerCase();
@@ -2765,7 +2559,6 @@
     {name:'Flexiones clásicas',pattern:'horizontal_push',primary:'Pectoral mayor',secondary:'Tríceps, deltoides anterior y estabilizadores del tronco',equipment:'Peso corporal y superficie firme',level:'Intermedio; usar inclinación o rodillas si hace falta',steps:['Apoyá las manos apenas más abiertas que los hombros y extendé las piernas; alineá cabeza, tronco y cadera.','Flexioná los codos en diagonal hacia atrás y bajá el pecho con control, sin dejar caer la cintura.','Empujá el suelo hasta extender los brazos sin encoger los hombros ni bloquearlos bruscamente.'],tips:['Separá el suelo con las manos y mantené el cuello neutral.','Si la cadera se hunde, elevá las manos en una superficie firme o usá rodillas.','El rango termina antes de perder alineación o sentir dolor.'],breathing:'Inhalá al bajar y exhalá al empujar; no contengas el aire durante toda la serie.',errors:['Cadera hundida o demasiado elevada.','Codos abiertos casi a 90 grados si eso molesta los hombros.','Acortar el rango solo para contar más repeticiones.'],rest:'60–120 segundos',alternatives:['Flexiones con manos elevadas','Flexiones inclinadas contra una mesa firme','Press de pecho con banda']},
     {name:'Flexiones inclinadas contra una mesa firme',pattern:'horizontal_push',primary:'Pectoral mayor',secondary:'Tríceps, deltoides anterior y estabilizadores del tronco',equipment:'Mesa o banco muy estable, que no pueda deslizarse ni volcar',level:'Principiante',steps:['Asegurá la superficie contra una pared si corresponde; colocá las manos y caminá los pies hacia atrás.','Mantené el cuerpo alineado y acercá el pecho a la superficie flexionando los codos.','Empujá hasta volver sin perder la alineación del tronco.'],tips:['No uses sillas livianas, mesas plegables inestables ni superficies que se puedan mover.','Cuanto más alta la superficie, menor suele ser la carga relativa.','Progresá a una superficie más baja solo si controlás todas las repeticiones.'],breathing:'Inhalá al acercarte a la superficie y exhalá al empujar.',errors:['Apoyarse en una superficie que se desplaza.','Doblar solo la cintura y dejar atrás la cadera.','Bajar más allá del rango cómodo del hombro.'],rest:'45–90 segundos',alternatives:['Flexiones contra la pared','Flexiones desde rodillas','Flexiones clásicas']},
     {name:'Sentadilla goblet',pattern:'knee_dominant_bilateral',primary:'Cuádriceps y glúteo mayor',secondary:'Aductores, pantorrillas y musculatura del tronco como estabilizadores',equipment:'Una mancuerna o pesa rusa sostenida delante del pecho',level:'Principiante-intermedio',steps:['Separá los pies aproximadamente al ancho cómodo de hombros y sostené la carga pegada al pecho.','Llevá la cadera abajo y atrás flexionando rodillas, con toda la planta del pie apoyada y rodillas siguiendo la dirección de los pies.','Empujá el suelo para levantarte, manteniendo el tronco estable y sin hiperextender la espalda al final.'],tips:['El ancho y la orientación de los pies pueden variar según tu anatomía.','Bajá solo hasta donde puedas mantener el pie estable y el tronco controlado.','Mantené la carga cerca del cuerpo.'],breathing:'Inhalá al descender y exhalá al subir; elegí una carga que permita respirar con control.',errors:['Talones que se despegan o pies que pierden apoyo.','Rodillas colapsando hacia adentro sin control.','Sostener la carga lejos del pecho y perder equilibrio.'],rest:'60–150 segundos',alternatives:['Sentadilla a una silla','Sentadilla al aire','Prensa de piernas']},
-    {name:'Sentadilla goblet con mancuerna',pattern:'knee_dominant_bilateral',primary:'Cuádriceps y glúteo mayor',secondary:'Aductores, pantorrillas y estabilizadores del tronco',equipment:'Una mancuerna sostenida verticalmente frente al pecho',level:'Principiante-intermedio',steps:['Ubicá los pies en una posición estable y sostené una mancuerna cerca del pecho.','Descendé flexionando cadera y rodillas, con apoyo completo del pie y un rango cómodo.','Volvé a la posición inicial empujando el suelo, sin rebotar ni arquear la zona lumbar.'],tips:['No hace falta llegar a una profundidad fija; priorizá control y comodidad.','Mantené la carga cerca del pecho.','Reducí la carga si te cuesta sostener el tronco.'],breathing:'Inhalá al bajar y exhalá al subir.',errors:['Despegar los talones.','Dejar caer las rodillas hacia adentro.','Usar una carga que obliga a inclinarse o balancearse.'],rest:'60–150 segundos',alternatives:['Sentadilla a una silla','Sentadilla al aire','Zancada hacia atrás']},
     {name:'Sentadilla al aire',pattern:'knee_dominant_bilateral',primary:'Cuádriceps y glúteo mayor',secondary:'Aductores, pantorrillas y tronco estabilizador',equipment:'Peso corporal; opcionalmente silla estable como referencia',level:'Principiante',steps:['Parate con los pies en una posición cómoda y el peso distribuido sobre toda la planta.','Flexioná caderas y rodillas llevando la cadera hacia abajo; mantené las rodillas alineadas con los pies.','Volvé a pararte empujando el suelo, sin bloquear las rodillas de golpe.'],tips:['Usá una silla estable detrás como referencia de profundidad si ayuda.','Ajustá el ancho de pies a tu movilidad.','Si perdés equilibrio, reducí el rango o usá apoyo.'],breathing:'Inhalá al bajar y exhalá al levantarte, sin contener el aire de forma prolongada.',errors:['Levantar talones.','Dejar que la rodilla se desplace hacia adentro sin control.','Bajar más de lo que permite mantener equilibrio y comodidad.'],rest:'45–90 segundos',alternatives:['Sentadilla a una silla','Sentadilla parcial a una silla','Sentadilla goblet con mancuerna']},
     {name:'Sentadilla a una silla',pattern:'knee_dominant_bilateral',primary:'Cuádriceps y glúteo mayor',secondary:'Aductores, pantorrillas y tronco estabilizador',equipment:'Silla firme que no se deslice, idealmente apoyada contra una pared',level:'Principiante',steps:['Colocá una silla firme detrás y parate frente a ella con los pies a una distancia cómoda.','Llevá la cadera atrás y flexioná rodillas hasta tocar suavemente el asiento, manteniendo el control.','Levantate empujando el suelo; usá las manos como ayuda solo si es necesario y seguro.'],tips:['La silla debe estar estable y no tener ruedas.','No te dejes caer sobre el asiento.','Ajustá la altura o el rango a tu capacidad actual.'],breathing:'Inhalá al sentarte con control y exhalá al levantarte.',errors:['Dejarse caer sobre la silla.','Poner la silla sobre un piso resbaladizo.','Acercar demasiado los pies y perder equilibrio.'],rest:'45–90 segundos',alternatives:['Sentadilla parcial a una silla','Sentadilla al aire','Sentadilla goblet con mancuerna']},
     {name:'Prensa de piernas',pattern:'knee_dominant_bilateral',primary:'Cuádriceps y glúteo mayor',secondary:'Aductores e isquiotibiales como sinergistas',equipment:'Prensa de piernas ajustada al usuario',level:'Principiante-intermedio tras aprender ajustes',steps:['Ajustá respaldo y topes; apoyá pelvis y espalda contra el respaldo y pies firmes en la plataforma.','Bajá la plataforma hasta un rango cómodo en el que la pelvis no se enrolle ni se despegue.','Empujá con toda la planta del pie y evitá bloquear las rodillas de golpe.'],tips:['Aprendé a liberar y volver a colocar los seguros antes de usar peso.','La profundidad depende de tu movilidad y del diseño de la máquina.','No coloques las manos entre plataforma y cuerpo.'],breathing:'Inhalá al bajar la plataforma y exhalá al empujar; evitá contener la respiración por mucho tiempo.',errors:['Bajar tanto que la pelvis se despega del respaldo.','Bloquear las rodillas con fuerza.','Colocar los pies en el borde o usar seguros incorrectamente.'],rest:'90–150 segundos',alternatives:['Sentadilla goblet','Sentadilla al aire','Sentadilla hack en máquina']},
@@ -2779,7 +2572,6 @@
     {name:'Dominadas asistidas',pattern:'vertical_pull',primary:'Dorsal ancho',secondary:'Bíceps, braquial, romboides y trapecio',equipment:'Máquina de dominadas asistidas o banda fijada de forma segura',level:'Intermedio; la asistencia permite ajustar dificultad',steps:['Asegurá la asistencia y tomá la barra con agarre cómodo; estabilizá el cuerpo antes de empezar.','Llevá los codos hacia abajo y subí sin balanceo hasta una altura cómoda, sin forzar la barbilla sobre la barra.','Descendé lentamente hasta extender los brazos en el rango tolerado, manteniendo el control.'],tips:['Comprobá el apoyo de rodillas/pies y el mecanismo de asistencia.','Evitá el kipping o el balanceo si estás entrenando una dominada estricta.','Ajustá la asistencia para completar repeticiones controladas.'],breathing:'Exhalá durante la subida e inhalá durante el descenso.',errors:['Soltarse de la asistencia sin control.','Balancearse para superar el punto difícil.','Dejar caer el cuerpo al bajar.'],rest:'90–150 segundos',alternatives:['Jalón al pecho','Jalón al pecho con agarre neutro','Remo sentado en polea']},
     {name:'Hip thrust con barra o máquina',pattern:'hip_extension',primary:'Glúteo mayor',secondary:'Isquiotibiales y aductores como sinergistas; tronco estabilizador',equipment:'Banco firme y barra acolchada o máquina de hip thrust',level:'Principiante-intermedio tras aprender la colocación',steps:['Apoyá la parte baja de las escápulas en un banco que no se mueva, con pies firmes y carga protegida.','Elevá la cadera hasta que el tronco quede aproximadamente alineado con los muslos, sin arquear la zona lumbar.','Bajá la cadera de forma controlada; mantené las rodillas siguiendo la dirección de los pies.'],tips:['El banco debe estar estable y la barra acolchada sobre la cadera.','Arriba buscá extensión de cadera, no hiperextensión lumbar.','Ajustá la distancia de los pies para que el movimiento sea cómodo.'],breathing:'Exhalá al elevar la cadera e inhalá al bajar; no aguantes el aire de forma prolongada.',errors:['Empujar con la espalda y arquear la zona lumbar al final.','Usar un banco inestable.','Dejar que las rodillas colapsen hacia adentro.'],rest:'60–150 segundos',alternatives:['Puente de glúteos','Hip thrust con sofá firme','Extensión de cadera en polea']},
     {name:'Puente de glúteos',pattern:'hip_extension',primary:'Glúteo mayor',secondary:'Isquiotibiales y musculatura abdominal como estabilizadores',equipment:'Colchoneta o superficie firme; peso corporal',level:'Principiante',steps:['Acostate boca arriba con rodillas flexionadas, pies apoyados al ancho de caderas y brazos al costado.','Empujá con los pies y elevá la pelvis hasta alinear cadera y tronco sin arquear la espalda.','Bajá despacio hasta acercar la pelvis al suelo y repetí.'],tips:['Mantené las costillas controladas y evitá empujar con la zona lumbar.','Ajustá la distancia de los pies para sentir el trabajo en glúteos sin molestias.','Si hay dolor, reducí el rango o suspendé.'],breathing:'Exhalá al elevar la pelvis e inhalá al bajar.',errors:['Arqueo lumbar excesivo en la parte alta.','Empujar principalmente desde las puntas de los pies.','Rebotar contra el suelo.'],rest:'45–90 segundos',alternatives:['Hip thrust con barra o máquina','Hip thrust con sofá firme','Patada de glúteo en cuadrupedia']},
-    {name:'Curl femoral en máquina',pattern:'knee_flexion',primary:'Isquiotibiales',secondary:'Gastrocnemio; cadera y tronco estabilizan según la variante',equipment:'Máquina de curl femoral ajustada al cuerpo',level:'Principiante',steps:['Alineá la rodilla con el eje de giro de la máquina y ajustá el rodillo cerca de la parte baja de la pierna sin comprimir el tendón de Aquiles.','Flexioná las rodillas acercando el rodillo con control, sin levantar la cadera.','Volvé lentamente sin dejar que las placas choquen ni bloquear las rodillas con violencia.'],tips:['Ajustá respaldo y rodillo según las indicaciones de la máquina.','Usá un rango sin dolor y evita tirones.','No confundas la variante sentada con la tumbada al ajustar el equipo.'],breathing:'Exhalá al flexionar las rodillas e inhalá durante el regreso controlado.',errors:['Rodillo mal alineado con la pierna o el eje.','Levantar la cadera o arquear la espalda.','Dejar caer la carga al volver.'],rest:'60–120 segundos',alternatives:['Curl femoral sentado','Curl femoral tumbado','Curl femoral deslizante con toalla']},
     {name:'Curl femoral sentado',pattern:'knee_flexion',primary:'Isquiotibiales',secondary:'Gastrocnemio y estabilizadores de cadera',equipment:'Máquina de curl femoral sentado',level:'Principiante',steps:['Ajustá el asiento y la almohadilla para que la rodilla coincida con el eje de giro; fijá el muslo según la máquina.','Flexioná las rodillas llevando el rodillo hacia abajo/atrás sin levantar la pelvis del asiento.','Regresá despacio hasta el rango cómodo sin dejar que la carga golpee.'],tips:['Verificá el eje y la almohadilla antes de iniciar.','Mantené la espalda apoyada y el movimiento controlado.','No compenses inclinando el cuerpo.'],breathing:'Exhalá al flexionar las rodillas e inhalá al extenderlas con control.',errors:['Ajuste incorrecto de asiento o rodillos.','Despegar la pelvis del asiento.','Dar tirones con una carga excesiva.'],rest:'60–120 segundos',alternatives:['Curl femoral en máquina','Curl femoral tumbado','Curl femoral deslizante con toalla']},
     {name:'Curl femoral tumbado',pattern:'knee_flexion',primary:'Isquiotibiales',secondary:'Gastrocnemio y estabilizadores de cadera',equipment:'Máquina de curl femoral tumbado',level:'Principiante',steps:['Acostate boca abajo y alineá la rodilla con el eje; ubicá el rodillo por encima de la parte baja de la pierna.','Flexioná las rodillas sin levantar la pelvis ni arquear la zona lumbar.','Descendé lentamente hasta extender las rodillas en el rango cómodo.'],tips:['Ajustá la máquina para evitar presión incómoda.','Mantené la pelvis apoyada.','No rebotes al final del recorrido.'],breathing:'Exhalá al flexionar e inhalá al regresar.',errors:['Levantar la cadera para terminar la repetición.','Tirar de golpe.','Permitir que la carga caiga.'],rest:'60–120 segundos',alternatives:['Curl femoral en máquina','Curl femoral sentado','Curl femoral deslizante con toalla']},
     {name:'Extensión de cuádriceps',pattern:'knee_extension',primary:'Cuádriceps',secondary:'Otros grupos actúan principalmente como estabilizadores',equipment:'Máquina de extensión de rodilla',level:'Principiante',steps:['Ajustá el asiento para alinear la rodilla con el eje de la máquina y colocá el rodillo sobre la parte baja de la pierna.','Extendé las rodillas con control hasta un rango cómodo, sin dar una patada brusca.','Bajá lentamente sin dejar caer la carga ni forzar la articulación.'],tips:['La alineación y el ajuste del rodillo son prioritarios.','No hace falta bloquear la rodilla con fuerza.','Si hay dolor articular, detenete y consultá antes de insistir.'],breathing:'Exhalá al extender las rodillas e inhalá al flexionarlas durante el regreso.',errors:['Eje de la máquina desalineado con la rodilla.','Impulsar la carga con una patada.','Usar rango o carga que provoque dolor.'],rest:'60–120 segundos',alternatives:['Prensa de piernas','Sentadilla goblet','Sentadilla a una silla']},
@@ -2788,11 +2580,10 @@
     {name:'Elevaciones laterales',pattern:'shoulder_abduction',primary:'Deltoides medio',secondary:'Supraespinoso y trapecio como sinergistas según el rango',equipment:'Mancuernas livianas o polea',level:'Principiante',steps:['Parate firme con mancuernas a los lados y codos levemente flexionados.','Elevá los brazos hacia los costados hasta una altura tolerada, sin balancear el tronco ni encoger los hombros.','Bajá con control sin dejar caer las cargas.'],tips:['Usá poco peso; es normal necesitar menos carga que en otros ejercicios.','No hace falta subir por encima del rango cómodo.','Mantené cuello relajado y muñecas neutras.'],breathing:'Exhalá al elevar los brazos e inhalá al bajarlos.',errors:['Balancear el cuerpo para iniciar el movimiento.','Encoger los hombros hacia las orejas.','Elevar hasta un rango que provoque dolor.'],rest:'45–90 segundos',alternatives:['Elevaciones laterales con botellas','Rotación externa de hombro con polea','Press de hombros en máquina']},
     {name:'Curl de bíceps con mancuernas',pattern:'elbow_flexion',primary:'Bíceps braquial',secondary:'Braquial y braquiorradial',equipment:'Dos mancuernas',level:'Principiante',steps:['Parate o sentate con pies firmes, muñecas neutras y codos cerca del torso.','Flexioná los codos subiendo las mancuernas sin balancear la espalda ni mover los hombros hacia adelante.','Bajá lentamente hasta casi extender los codos sin dejar caer las cargas.'],tips:['Los codos pueden desplazarse mínimamente, pero evitá convertirlo en un balanceo.','Mantené hombros relajados.','Elegí una carga que puedas bajar lentamente.'],breathing:'Exhalá al flexionar los codos e inhalá al bajar.',errors:['Impulsarse con cadera o espalda.','Doblar las muñecas para levantar más peso.','Dejar caer la fase de bajada.'],rest:'45–90 segundos',alternatives:['Curl de bíceps con banda','Curl de bíceps en polea baja','Curl martillo']},
     {name:'Extensión de tríceps en polea',pattern:'elbow_extension',primary:'Tríceps braquial',secondary:'Ancóneo; hombro y tronco estabilizan',equipment:'Polea alta con barra o cuerda',level:'Principiante',steps:['Parate frente a la polea con pies firmes, codos cerca del cuerpo y agarre cómodo.','Extendé los codos hacia abajo sin convertir el movimiento en una inclinación del torso.','Volvé lentamente hasta flexionar los codos en un rango cómodo manteniéndolos cerca de los costados.'],tips:['Mantené los hombros quietos y evitá balancearte.','No uses tanta carga que separes los codos.','Controlá la vuelta, que suele ser la parte que se pierde.'],breathing:'Exhalá al extender los codos e inhalá al regresar.',errors:['Balancear el torso para empujar la cuerda.','Separar los codos y mover todo el hombro.','Dejar que la polea tire de los brazos de golpe.'],rest:'45–90 segundos',alternatives:['Extensión de tríceps con cuerda','Extensión de tríceps con banda','Fondos de tríceps con silla estable']},
-    {name:'Plancha con apoyo de antebrazos',pattern:'core_anti_extension',primary:'Recto abdominal y transverso abdominal como parte del sistema de estabilización',secondary:'Oblicuos, glúteos, serrato y hombros estabilizan',equipment:'Colchoneta o suelo antideslizante',level:'Principiante; acortá tiempo o elevá el apoyo si lo necesitás',steps:['Apoyá antebrazos debajo o apenas delante de los hombros y extendé las piernas, o apoyá rodillas para una variante fácil.','Alineá cabeza, tronco y pelvis; contraé suavemente abdomen y glúteos sin contener la respiración.','Mantené la posición solo mientras conserves la alineación; apoyá rodillas antes de perderla.'],tips:['Pensá en acercar suavemente costillas y pelvis sin redondear en exceso.','La duración no compensa la pérdida de postura.','Una variante más corta y limpia es mejor que sostener con dolor.'],breathing:'Respirá continua y suavemente durante toda la contracción; no aguantes el aire.',errors:['Cadera hundida o elevada en exceso.','Aguantar la respiración.','Seguir pese a dolor lumbar o temblor que impide mantener posición.'],rest:'45–75 segundos',alternatives:['Plancha frontal','Plancha elevada contra una mesa firme','Plancha lateral con piernas flexionadas']},
-    {name:'Plancha frontal',pattern:'core_anti_extension',primary:'Recto abdominal y transverso abdominal como parte de la estabilización',secondary:'Oblicuos, glúteos, serrato y hombros estabilizan',equipment:'Colchoneta o suelo antideslizante',level:'Principiante-intermedio',steps:['Colocá manos o antebrazos bajo los hombros y extendé las piernas con pies apoyados.','Mantené el cuerpo alineado, pelvis estable y respiración continua.','Terminá la serie antes de que la cadera caiga o la zona lumbar se arquee.'],tips:['Apoyá rodillas si necesitás reducir la carga.','No mires hacia arriba; mantené cuello neutral.','Progresá aumentando control antes que duración.'],breathing:'Respirá suave y continuamente; evitá aguantar el aire.',errors:['Cadera hundida.','Glúteos demasiado altos.','Contener la respiración o continuar con dolor.'],rest:'45–75 segundos',alternatives:['Plancha con apoyo de antebrazos','Plancha elevada contra una mesa firme','Dead bug']},
+    {name:'Plancha frontal',pattern:'core_anti_extension',primary:'Recto abdominal y transverso abdominal como parte del sistema de estabilización',secondary:'Oblicuos, glúteos, serrato y hombros estabilizan',equipment:'Colchoneta o suelo antideslizante',level:'Principiante; acortá tiempo o elevá el apoyo si lo necesitás',steps:['Apoyá antebrazos debajo o apenas delante de los hombros y extendé las piernas, o apoyá rodillas para una variante fácil.','Alineá cabeza, tronco y pelvis; contraé suavemente abdomen y glúteos sin contener la respiración.','Mantené la posición solo mientras conserves la alineación; apoyá rodillas antes de perderla.'],tips:['Pensá en acercar suavemente costillas y pelvis sin redondear en exceso.','La duración no compensa la pérdida de postura.','Una variante más corta y limpia es mejor que sostener con dolor.'],breathing:'Respirá continua y suavemente durante toda la contracción; no aguantes el aire.',errors:['Cadera hundida o elevada en exceso.','Aguantar la respiración.','Seguir pese a dolor lumbar o temblor que impide mantener posición.'],rest:'45–75 segundos',alternatives:['Plancha frontal','Plancha elevada contra una mesa firme','Plancha lateral con piernas flexionadas']},
     {name:'Dead bug',pattern:'core_anti_extension',primary:'Recto abdominal y transverso abdominal como estabilizadores del tronco',secondary:'Oblicuos y flexores de cadera participan según el movimiento',equipment:'Colchoneta o suelo firme',level:'Principiante',steps:['Acostate boca arriba, elevá brazos y piernas con caderas y rodillas flexionadas aproximadamente a 90 grados.','Alejá lentamente brazo y pierna contrarios sin dejar que la zona lumbar se arquee.','Volvé al centro y alterná; acortá el recorrido si perdés contacto o control lumbar.'],tips:['Mové las extremidades despacio y coordinadas.','No empujes la espalda contra el suelo con dolor; buscá posición cómoda y estable.','Empezá moviendo solo piernas o brazos si es difícil.'],breathing:'Exhalá al alejar las extremidades e inhalá al volver al centro.',errors:['Arqueo lumbar al extender la pierna.','Moverse demasiado rápido.','Usar un rango mayor al que permite controlar el tronco.'],rest:'45–75 segundos',alternatives:['Plancha con apoyo de antebrazos','Bird-dog controlado','Plancha lateral con rodillas apoyadas']},
     {name:'Bird-dog controlado',pattern:'core_anti_rotation',primary:'Erectores espinales y estabilizadores del tronco',secondary:'Glúteo mayor, deltoides y musculatura escapular de forma contralateral',equipment:'Colchoneta o suelo firme',level:'Principiante',steps:['Ponete en cuatro apoyos con manos debajo de hombros y rodillas debajo de caderas.','Extendé un brazo y la pierna contraria sin girar la pelvis ni arquear la espalda.','Volvé al centro con control y alterná lados.'],tips:['Imaginá mantener una taza sobre la pelvis: que no se incline de lado.','La pierna no necesita subir alto.','Mantené cuello neutral mirando al suelo.'],breathing:'Exhalá al extender brazo y pierna; inhalá al regresar.',errors:['Girar la cadera hacia un lado.','Elevar la pierna demasiado y arquear la espalda.','Hacerlo rápido y perder equilibrio.'],rest:'45–75 segundos',alternatives:['Dead bug','Plancha lateral con rodillas apoyadas','Plancha con apoyo de antebrazos']},
-    {name:'Zancada hacia atrás',pattern:'knee_dominant_unilateral',primary:'Cuádriceps y glúteo mayor de ambas piernas',secondary:'Aductores, pantorrillas y estabilizadores del tronco',equipment:'Peso corporal; mancuernas opcionales y apoyo cercano si hace falta',level:'Principiante-intermedio',steps:['Parate con pies al ancho de caderas y cerca de una pared o soporte si necesitás equilibrio.','Llevá una pierna hacia atrás y flexioná ambas rodillas hasta un rango cómodo, manteniendo el pie delantero estable.','Empujá con el pie delantero para volver y alterná lados sin perder equilibrio.'],tips:['El paso puede ser más largo o corto según tu movilidad; buscá estabilidad.','No hace falta tocar la rodilla trasera contra el suelo.','Usá apoyo estable si el equilibrio limita el movimiento.'],breathing:'Inhalá al bajar y exhalá al volver a pararte.',errors:['Perder el apoyo del pie delantero.','Caer bruscamente sobre la rodilla trasera.','Dejar que la rodilla delantera colapse hacia adentro.'],rest:'60–120 segundos',alternatives:['Sentadilla dividida con apoyo','Zancada estática asistida','Sentadilla a una silla']},
+    {name:'Zancada hacia atrás sin peso',pattern:'knee_dominant_unilateral',primary:'Cuádriceps y glúteo mayor de ambas piernas',secondary:'Aductores, pantorrillas y estabilizadores del tronco',equipment:'Peso corporal; mancuernas opcionales y apoyo cercano si hace falta',level:'Principiante-intermedio',steps:['Parate con pies al ancho de caderas y cerca de una pared o soporte si necesitás equilibrio.','Llevá una pierna hacia atrás y flexioná ambas rodillas hasta un rango cómodo, manteniendo el pie delantero estable.','Empujá con el pie delantero para volver y alterná lados sin perder equilibrio.'],tips:['El paso puede ser más largo o corto según tu movilidad; buscá estabilidad.','No hace falta tocar la rodilla trasera contra el suelo.','Usá apoyo estable si el equilibrio limita el movimiento.'],breathing:'Inhalá al bajar y exhalá al volver a pararte.',errors:['Perder el apoyo del pie delantero.','Caer bruscamente sobre la rodilla trasera.','Dejar que la rodilla delantera colapse hacia adentro.'],rest:'60–120 segundos',alternatives:['Sentadilla dividida con apoyo','Zancada estática asistida','Sentadilla a una silla']},
     {name:'Elevación de talones con apoyo',pattern:'calf_raise',primary:'Gastrocnemio y sóleo',secondary:'Músculos del pie y tobillo estabilizan',equipment:'Peso corporal y pared/baranda firme para apoyo',level:'Principiante',steps:['Parate con pies al ancho de caderas y tomá un apoyo firme sin colgarte de él.','Elevá ambos talones de forma vertical manteniendo peso repartido en la parte delantera del pie.','Bajá lentamente hasta el suelo o un estiramiento suave, sin rebotes.'],tips:['Mantené tobillos alineados, sin rodarlos hacia afuera.','Usá apoyo solo para equilibrarte, no para impulsarte.','Si aparece dolor en el tendón de Aquiles, frená y ajustá.'],breathing:'Exhalá al elevar los talones e inhalá al bajarlos.',errors:['Rebotar para subir más alto.','Inclinar el cuerpo o apoyarse excesivamente en las manos.','Dejar caer los talones sin control.'],rest:'45–90 segundos',alternatives:['Elevación de talones bilateral','Elevación de talones de pie en máquina','Elevación de talones a una pierna con apoyo']}
   ];
 function findCatalogExercise(name){
@@ -2915,8 +2706,8 @@ function findCatalogExercise(name){
     return {name:item.name,pattern,primary,secondary,equipment,level,steps,tips,breathing,errors,rest,alternatives,source:'catalog-generated',confidence:pattern==='unclassified'?'low':'orientative'};
   }
   function exerciseGuide(name){
-    const key=normalizeExerciseName(name);
-    const specific=EXERCISE_GUIDE_CATALOG.find(item=>normalizeExerciseName(item.name)===key);
+    const key=normalizeExerciseName(FittFormaTraining.canonicalName(name));
+    const specific=EXERCISE_GUIDE_CATALOG.find(item=>normalizeExerciseName(item.name)===key)||(window.FittFormaExerciseGuides||[]).find(item=>normalizeExerciseName(item.name)===key);
     return specific||generatedExerciseGuide(name);
   }
   function inferExercisePattern(name,group='',kind='strength'){
@@ -2948,87 +2739,24 @@ function findCatalogExercise(name){
     return 'unclassified';
   }
 
-  // Usar fotos solo cuando el gesto representado coincide de forma razonable. Para variantes distintas,
-  // mostrar una ilustración neutra de la familia muscular, nunca otra máquina/movimiento como si fuera exacto.
-  function exerciseReferenceAsset(group,kind='strength'){
-    const g=normalizeExerciseName(group||'');
-    if(kind==='cardio'||g==='cardio')return 'reference-cardio.svg';
-    if(g==='piernas'||g==='gluteos')return 'reference-legs.svg';
-    if(g==='pecho')return 'reference-push.svg';
-    if(g==='espalda')return 'reference-pull.svg';
-    if(g==='hombros')return 'reference-shoulders.svg';
-    if(g==='brazos')return 'reference-arms.svg';
-    if(g==='core')return 'reference-core.svg';
-    return 'reference-strength.svg';
-  }
-  function exerciseAssetSlug(name){return normalizeExerciseName(name).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,70)||'ejercicio';}
-  function exerciseIllustrationMeta(name,group,kind='strength'){
-    const n=normalizeExerciseName(name);
-    // Los curls femorales y las flexiones de rodilla no deben heredar una foto de curl de bíceps o flexión de brazos.
-    if(/curl.*(?:femoral|isquiotibiales|nordico|piernas?)|flexion de rodilla/.test(n)){
-      return {src:'./assets/exercises/reference-legs.svg',specific:false,personalized:false,fallback:'./assets/exercises/reference-legs.svg'};
-    }
-    // Solo marcar como imagen específica las variantes que coinciden razonablemente con la foto real.
-    // Las ilustraciones SVG generadas son esquemas de figura humana, no demostraciones biomecánicas verificadas;
-    // por eso no se presentan como si mostraran el gesto exacto hasta que se revisen una por una.
-    const exactRules=[
-      [/^peso muerto rumano con mancuernas$/, 'romanian-deadlift-dumbbells.webp'],
-      [/^flexiones inclinadas contra una mesa firme$/, 'incline-push-up-reference.webp'],
-      [/^remo sentado en polea$/, 'seated-cable-row.webp'],
-      [/^elevaciones laterales$/, 'lateral-raise.webp'],
-      [/^extension de triceps en polea$/, 'cable-triceps-pushdown.webp'],
-      [/^bird.?dog(?: controlado| con pausa)?$/, 'bird-dog-reference.webp'],
-      [/^sentadilla al aire$/, 'squat.webp'],
-      [/^flexiones clasicas$/, 'push-up.webp'],
-      [/^press de banca con mancuernas$/, 'bench-press.webp'],
-      [/^peso muerto convencional con barra$/, 'deadlift.webp'],
-      [/^jalon al pecho$/, 'lat-pulldown.webp'],
-      [/^puente de gluteos$/, 'glute-bridge.webp'],
-      [/^plancha con apoyo de antebrazos$/, 'plank.webp'],
-      [/^bicicleta estatica$/, 'cycling.webp'],
-      [/^caminata a ritmo comodo$|^caminata rapida de recuperacion$/, 'walking-outdoor.webp'],
-      [/^carrera continua a ritmo comodo$|^trote suave o alternancia trote-caminata$|^alternancia de trote suave y caminata$|^carrera suave de recuperacion$/, 'jogging.webp'],
-      [/^curl de biceps con mancuernas$/, 'curl.webp'],
-      [/^press militar con mancuernas$/, 'shoulder-press.webp']
-    ];
-    const matched=exactRules.find(([re])=>re.test(n));
-    if(matched)return {src:'./assets/exercises/'+matched[1],specific:true};
-    // Para evitar que casi todo el catálogo se vea como un muñeco esquemático,
-    // reutilizamos fotos reales como REFERENCIAS de familia, nunca como técnica exacta.
-    // El distintivo genérico permanece visible para no confundir una referencia con la variante precisa.
-    const photoReferenceRules=[
-      [/cinta con inclinacion|caminadora|treadmill/, 'treadmill-running.webp'],
-      [/bicicleta suave|ciclismo al aire libre|bicicleta al aire libre|bicicleta de ruta|ciclismo de ruta/, 'cycling-outdoor.webp'],
-      [/bicicleta estatica|bicicleta fija|ciclismo indoor|spinning|bicicleta indoor/, 'cycling.webp'],
-      [/biciclet|ciclismo/, 'cycling.webp'],
-      [/carrera|trote|jogging|sprint/, 'jogging.webp'],
-      [/caminata|marcha|paseo|senderismo/, 'walking-outdoor.webp'],
-      [/plancha/, 'plank.webp'],
-      [/bird.?dog/, 'bird-dog-reference.webp'],
-      [/zancada|estocada|lunge/, 'lunge.webp'],
-      [/puente de gluteos|hip thrust|patada de gluteo|extension de cadera|gluteo|gluteos/, 'glute-bridge.webp'],
-      [/sentadilla|squat|prensa de piernas|sentarse y levantarse|step.?up|escalon|extension de cuadriceps/, 'squat.webp'],
-      [/flexiones?|lagartijas?|push.?ups?|flexion de brazos/, 'push-up.webp'],
-      [/press de banca|press de pecho|pecho/, 'bench-press.webp'],
-      [/remo/, 'seated-cable-row.webp'],
-      [/jalon|dominada|traccion vertical/, 'lat-pulldown.webp'],
-      [/elevaciones? laterales?/, 'lateral-raise.webp'],
-      [/press militar|press arnold|press de hombros/, 'shoulder-press.webp'],
-      [/extension de triceps|triceps|press frances/, 'cable-triceps-pushdown.webp'],
-      [/curl(?!.*(?:femoral|isquiotibiales|nordico|piernas?))|biceps|antebrazo/, 'curl.webp'],
-      [/peso muerto|bisagra|buenos dias|hip hinge/, 'deadlift.webp'],
-      [/estiramiento|movilidad|calentamiento/, 'stretching.webp']
-    ];
-    const photoReference=photoReferenceRules.find(([re])=>re.test(n));
-    if(photoReference)return {src:'./assets/exercises/'+photoReference[1],specific:false,personalized:false,fallback:'./assets/exercises/'+exerciseReferenceAsset(group,kind)};
-    const generic=exerciseReferenceAsset(group,kind);
-    return {src:'./assets/exercises/'+generic,specific:false,personalized:false,fallback:'./assets/exercises/'+generic};
-  }
-  function exerciseIllustrationUrl(name,group,kind='strength'){return exerciseIllustrationMeta(name,group,kind).src;}
+  // v48: una imagen por ejercicio, desde un único mapa (exercise-media.js): fotos de inicio y final del
+  // ejercicio exacto o una ilustración propia. Nunca se muestra la foto de otro movimiento como referencia.
+  function exerciseMedia(name){const m=window.FittFormaExerciseMedia||{};return m[FittFormaTraining.canonicalName(name)]||m[String(name||'').trim()]||null;}
+  function exerciseIllustrationMeta(name){const media=exerciseMedia(name);return media?{src:'./assets/exercises/'+media.frames[0],frames:media.frames.map(f=>'./assets/exercises/'+f),kind:media.kind,credit:media.credit,family:media.family||'',specific:true}:{src:'',frames:[],kind:'none',specific:false};}
+  function exerciseIllustrationUrl(name){return exerciseIllustrationMeta(name).src;}
   function exercisePhoto(name,group,compact=false,kind='strength'){
-    const meta=exerciseIllustrationMeta(name,group,kind),sizeClass=compact?' compact':'',fallback=meta.fallback||('./assets/exercises/'+exerciseReferenceAsset(group,kind));
-    const alt=meta.specific?'Imagen de referencia del movimiento: '+name:'Imagen de referencia de la familia de movimientos: '+name+' ('+group+')';
-    return `<div class="exercise-photo${sizeClass}${meta.specific?'':' generic-reference'}${meta.personalized?' personalized-reference':''}" role="img" aria-label="Referencia visual de ${esc(name)}"><img src="${meta.src}" data-fallback="${fallback}" alt="${esc(alt)}" loading="lazy" decoding="async" onerror="if(this.dataset.fallback&&this.src!==new URL(this.dataset.fallback,location.href).href){this.src=this.dataset.fallback;this.alt='Imagen general de referencia';this.parentElement.classList.add('generic-reference');this.parentElement.classList.remove('personalized-reference');}else{this.onerror=null;this.style.display='none';this.parentElement.classList.add('exercise-photo-unavailable');this.parentElement.setAttribute('aria-label','Ilustración no disponible');}"></div>`;
+    const meta=exerciseIllustrationMeta(name),sizeClass=compact?' compact':'';
+    if(!meta.frames.length)return `<div class="exercise-photo${sizeClass} exercise-photo-unavailable" role="img" aria-label="Sin imagen: ejercicio personalizado"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg></span><small>Ejercicio personalizado</small></div>`;
+    const onerr="this.onerror=null;this.closest('.exercise-photo').classList.add('exercise-photo-unavailable');this.remove();";
+    if(meta.frames.length>1)return `<div class="exercise-photo is-sequence${sizeClass}" role="img" aria-label="${esc(name)}: posición inicial y final"><img src="${meta.frames[0]}" alt="" loading="lazy" decoding="async" onerror="${onerr}"><img class="frame-end" src="${meta.frames[1]}" alt="" loading="lazy" decoding="async" onerror="${onerr}"><span class="frame-chip" aria-hidden="true"><b>1</b><b>2</b></span></div>`;
+    return `<div class="exercise-photo is-${meta.kind}${sizeClass}" role="img" aria-label="${esc(meta.kind==='illustration'?`Ilustración de ${name}`:name)}"><img src="${meta.frames[0]}" alt="" loading="lazy" decoding="async" onerror="${onerr}"></div>`;
+  }
+  function exerciseModalMedia(name){
+    const meta=exerciseIllustrationMeta(name);
+    if(!meta.frames.length)return '<p class="muted small">Este ejercicio no es de la biblioteca: no tiene imagen. Revisá la técnica con alguien de confianza.</p>';
+    const credit=`<p class="muted small exercise-media-credit">${esc(meta.credit)}${meta.family?` · ${esc(meta.family)}`:''}</p>`;
+    if(meta.frames.length>1)return `<div class="exercise-modal-frames">${meta.frames.map((f,i)=>`<figure class="exercise-modal-image"><img src="${f}" alt="${esc(name)}: ${i?'posición final':'posición inicial'}" loading="lazy" decoding="async"><figcaption><b>${i+1}</b> ${i?'Posición final':'Posición inicial'}</figcaption></figure>`).join('')}</div>${credit}`;
+    return `<figure class="exercise-modal-image is-${meta.kind}"><img src="${meta.frames[0]}" alt="${esc(meta.kind==='illustration'?`Ilustración de ${name}: 1 inicio y 2 final`:name)}" loading="lazy" decoding="async"><figcaption>${meta.kind==='illustration'?'1 · Posición inicial  →  2 · Posición final':'Foto del ejercicio'}</figcaption></figure>${credit}`;
   }
   function exerciseMuscles(name,group){
     const guide=exerciseGuide(name);if(guide)return `Principales: ${guide.primary}; secundarios/estabilizadores: ${guide.secondary}`;
@@ -3130,19 +2858,20 @@ function findCatalogExercise(name){
     const modal=$('exerciseModal');if(!modal)return;
     $('exerciseModalTitle').textContent=name;
     $('exerciseModalDescription').textContent=`${group} · ${kind==='cardio'?'Actividad cardiovascular':'Ejercicio de fuerza y control'}`;
-    const imageMeta=exerciseIllustrationMeta(name,group,kind);$('exerciseModalImages').innerHTML=`<figure class="exercise-modal-image">${exercisePhoto(name,group,false,kind)}<figcaption>${imageMeta.specific?'Imagen de referencia asociada a esta variante; contrastá la colocación exacta con los pasos de técnica. No sustituye una revisión profesional de la técnica.':'Imagen de referencia de la familia de movimientos; no es una demostración exacta de esta variante.'}</figcaption></figure>`;
+    $('exerciseModalImages').innerHTML=exerciseModalMedia(name);
     const videoQuery=encodeURIComponent(name+' técnica correcta ejercicio');
     $('exerciseModalVideoLink').innerHTML=`<a class="btn secondary" href="https://www.youtube.com/results?search_query=${videoQuery}" target="_blank" rel="noopener noreferrer">Buscar video demostrativo ↗</a><span class="muted small" style="align-self:center">Se abre una búsqueda de videos; elegí una fuente confiable.</span>`;
-    const prescription=findExercisePrescription(name),guide=exerciseGuide(name);
-    const dose=prescription?`${prescription.sets} × ${prescription.reps}`:(kind==='cardio'?'Ritmo progresivo':'Series y repeticiones según tu plan');
+    const inPlan=(state.plan?.days||[]).flatMap(d=>d.exercises).find(e=>normalizeExerciseName(e.name)===normalizeExerciseName(FittFormaTraining.canonicalName(name)));
+    const prescription=inPlan||findExercisePrescription(FittFormaTraining.canonicalName(name)),guide=exerciseGuide(name);
+    const dose=prescription?`${prescription.sets} × ${prescription.reps}${inPlan?' (tu plan)':''}`:(kind==='cardio'?'Ritmo progresivo':'Series y repeticiones según tu plan');
     const muscleMarkup=guide?`<span class="exercise-detail-stat">Principales: ${esc(guide.primary)}</span><span class="exercise-detail-stat">Secundarios/estabilizadores: ${esc(guide.secondary)}</span>`:`<span class="exercise-detail-stat">Músculos orientativos: ${esc(exerciseMuscles(name,group))}</span>`;
     const guideStatusMarkup=guide?.source==='catalog-generated'?'<span class="exercise-detail-stat exercise-guide-caution">Guía orientativa por familia de movimiento: confirmá que coincida con esta variante concreta.</span>':'<span class="exercise-detail-stat exercise-guide-caution">Guía específica de catálogo; adaptá recorrido, carga y equipo a tu situación.</span>';
-    $('exerciseModalStats').innerHTML=`${muscleMarkup}${guideStatusMarkup}<span class="exercise-detail-stat">Equipo: ${esc(exerciseEquipment(name,equipmentMode))}</span><span class="exercise-detail-stat">Guía: ${esc(dose)}</span><span class="exercise-detail-stat">Descanso: ${esc(exerciseRest(name,kind))}</span>${guide?`<span class="exercise-detail-stat">Nivel orientativo: ${esc(guide.level)}</span>`:''}`;
+    $('exerciseModalStats').innerHTML=`${guide?.start?`<span class="exercise-detail-stat">Posición inicial: ${esc(guide.start)}</span>`:''}${muscleMarkup}${guideStatusMarkup}<span class="exercise-detail-stat">Equipo: ${esc(exerciseEquipment(name,equipmentMode))}</span><span class="exercise-detail-stat">Guía: ${esc(dose)}</span><span class="exercise-detail-stat">Descanso: ${esc(exerciseRest(name,kind))}</span>${guide?`<span class="exercise-detail-stat">Nivel orientativo: ${esc(guide.level)}</span>`:''}`;
     const alternativeData=exerciseAlternatives(name,group,kind,equipmentMode);
     const alternativesRoot=$('exerciseModalAlternatives');
     if(alternativesRoot){alternativesRoot.innerHTML=alternativeData.items.length?`<p class="muted small">Disponibles en ${esc(({gym:'gimnasio',home:'casa con equipo básico',bodyweight:'peso corporal'})[alternativeData.mode]||'la modalidad seleccionada')}; ${esc(alternativeData.basis)}. Confirmá que el equipo y el rango te resulten adecuados.</p><ul>${alternativeData.items.map(item=>`<li>${esc(item.name)} <span class="muted small">· ${esc(item.group)}</span></li>`).join('')}</ul>`:`<p class="muted small">No hay una alternativa suficientemente clara en esta modalidad. Revisá el objetivo y el equipo antes de sustituirlo.</p>`;}
     const steps=exerciseSteps(name,group,kind);
-    const progressionLabels=['Preparación','Ejecución','Regreso y control'];
+    const progressionLabels=steps.length===3?['Preparación','Ejecución','Regreso y control']:steps.map((_,i)=>i===0?'Preparación':i===steps.length-1?'Regreso y control':'Ejecución');
     $('exerciseModalProgression').innerHTML=steps.map((step,i)=>`<article class="exercise-progression-step"><span class="step-number">${i+1}</span><strong>${progressionLabels[i]||`Paso ${i+1}`}</strong><p>${esc(step)}</p></article>`).join('');
     $('exerciseModalSteps').innerHTML=steps.map(x=>`<li>${esc(x)}</li>`).join('');
     $('exerciseModalTips').innerHTML=exerciseTips(name,group,kind).map(x=>`<li>${esc(x)}</li>`).join('');
@@ -3232,7 +2961,7 @@ function findCatalogExercise(name){
     if(distance/(minutes/60)>30){toast('La velocidad calculada parece inusual. Revisá la distancia y el tiempo.');return;}
     const paceSecondsPerKm=minutes*60/distance;
     state.activities.push({id:Date.now(),type:'Correr',date,distance:Number(distance.toFixed(2)),minutes:Number(minutes.toFixed(1)),durationSeconds:Math.round(minutes*60),paceSecondsPerKm:Number(paceSecondsPerKm.toFixed(1)),pace:paceTextFromSeconds(paceSecondsPerKm),source:'manual-run',notes});
-    const badgeDelta=syncBadgeUnlocks();save();$('runLogForm').reset();$('runDate').value=dateKey();updateRunPacePreview();renderActivities();renderStats();renderProgress();renderPlanner();notifyBadgeChanges(badgeDelta,'Carrera guardada.');
+    pendingAdBreak='run-saved';const badgeDelta=syncBadgeUnlocks();save();$('runLogForm').reset();$('runDate').value=dateKey();updateRunPacePreview();renderActivities();renderStats();renderProgress();renderPlanner();notifyBadgeChanges(badgeDelta,'Carrera guardada.');
   }
   function renderPlan(){
     const p=state.profile;
@@ -3363,39 +3092,138 @@ function findCatalogExercise(name){
     return (Array.isArray(list)?list:[]).map(e=>{
       const sets=Math.min(ROUTINE_LIMITS.sets,Math.max(1,Math.round(Number(e?.sets)||3)));
       const meta=e?.group?{group:e.group,kind:e.kind||'strength'}:exerciseMetaByName(e?.name);
-      return {...e,name:String(e?.name||'Ejercicio').slice(0,72),group:meta.group,kind:meta.kind,sets,reps:String(e?.reps||'8-12').slice(0,12),targetWeight:e?.weight?String(e.weight):'',rest:Math.min(ROUTINE_LIMITS.rest,Math.max(0,Number(e?.rest)||0)),entries:Array.from({length:sets},()=>({reps:'',weight:'',done:false}))};
+      return {...e,name:String(e?.name||'Ejercicio').slice(0,72),group:meta.group,kind:meta.kind,sets,reps:String(e?.reps||'8-12').slice(0,12),targetWeight:e?.weight?String(e.weight):'',rest:Math.min(ROUTINE_LIMITS.rest,Math.max(0,Number(e?.rest)||0)),plannedSets:sets,entries:Array.from({length:sets},()=>({reps:'',weight:'',done:false}))};
     });
   }
   function beginSession(meta,exercises){
     if(activeSession){toast('Ya hay una sesión en curso. Retomá o guardá esa sesión antes de iniciar otra.');switchView('train');return false;}
     clearActiveSessionDraft();resetRestTimer();lastWorkoutSummary=null;
-    activeSession={dayIndex:Number.isInteger(meta.dayIndex)?meta.dayIndex:null,routineId:meta.routineId||null,free:Boolean(meta.free),title:String(meta.title||'Entrenamiento').slice(0,80),date:dateKey(),startedAt:Date.now(),segmentStartedAt:Date.now(),elapsedMs:0,pausedAt:0,pauseReason:'',restEndAt:0,notes:'',exercises:buildSessionExercises(exercises)};
+    activeSession={type:['daily','plan_extra','custom','free'].includes(meta.type)?meta.type:(meta.routineId?'custom':meta.free?'free':'plan_extra'),dailySeq:Number(meta.dailySeq)||0,clientSessionId:'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,8),serverStartedAt:Number.isFinite(serverNowMs())?new Date(serverNowMs()).toISOString():'',dayIndex:Number.isInteger(meta.dayIndex)?meta.dayIndex:null,routineId:meta.routineId||null,free:Boolean(meta.free),title:String(meta.title||'Entrenamiento').slice(0,80),date:dateKey(),startedAt:Date.now(),segmentStartedAt:Date.now(),elapsedMs:0,pausedAt:0,pauseReason:'',restEndAt:0,notes:'',exercises:buildSessionExercises(exercises)};
     persistActiveSessionDraft();renderTrain();switchView('train');return true;
   }
-  function nextPlanDayIndex(){
-    const plan=state.plan&&Array.isArray(state.plan.days)&&state.plan.days.length?state.plan:null;if(!plan)return -1;
-    const titles=plan.days.map(day=>day.title);
-    const newest=[...(state.sessions||[])].filter(x=>titles.includes(x.title)).sort((a,b)=>String(b.date).localeCompare(String(a.date))||(Number(b.id)||0)-(Number(a.id)||0))[0];
-    return newest?(titles.indexOf(newest.title)+1)%titles.length:0;
+  // ---------- v48: entrenamiento diario (uno cada 12 h) con hora del servidor ----------
+  // La hora del teléfono no se usa para habilitar el siguiente entrenamiento diario: se toma la del
+  // servidor (/api/time) y se avanza con performance.now(), que no cambia si se modifica el reloj.
+  let serverClock=null,dailyCountdownTimer=null,finishingWorkout=false;
+  async function syncServerTime(){
+    try{const t0=performance.now();const r=await fetch('/api/time',{cache:'no-store',headers:{Accept:'application/json'}});if(!r.ok)return false;const j=await r.json();const t1=performance.now();const ms=Date.parse(j?.now);if(!Number.isFinite(ms))return false;serverClock={serverMs:ms+(t1-t0)/2,perfMs:t1};return true;}catch{return false;}
+  }
+  function serverNowMs(){return serverClock?serverClock.serverMs+(performance.now()-serverClock.perfMs):NaN;}
+  function dailyStatusNow(){return FittFormaTraining.dailyStatus(state.daily,state.plan?.days?.length||0,serverNowMs());}
+  function nextPlanDayIndex(){const st=dailyStatusNow();return st.state==='no-plan'?-1:st.nextIndex;}
+  function dailyAvailableLabel(iso){const d=new Date(iso);return Number.isNaN(d.getTime())?'':d.toLocaleString(uiLocale(),{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}
+  function startDailyWorkout(){
+    const st=dailyStatusNow();
+    if(st.state==='cooldown'){toast(`Tu próximo entrenamiento diario se habilita en ${FittFormaTraining.formatRemaining(st.remainingMs)}.`);renderTrain();return;}
+    if(st.state==='needs-time'){toast('Conectate a internet para confirmar el horario del próximo entrenamiento diario.');syncServerTime().then(()=>renderTrain());return;}
+    if(st.state!=='available')return;
+    const day=state.plan.days[st.nextIndex];
+    if(beginSession({type:'daily',dailySeq:st.seq+1,dayIndex:st.nextIndex,title:day.title},day.exercises))toast(`Entrenamiento diario ${st.seq+1}: ${day.title}.`);
+  }
+  function startPlanExtra(dayIndex){
+    const day=state.plan?.days?.[dayIndex];if(!day){toast('No se encontró ese día del plan.');return;}
+    if(beginSession({type:'plan_extra',dayIndex,title:day.title},day.exercises))toast(`Rutina adicional: ${day.title}. No cambia tu progresión diaria.`);
   }
   function startRoutine(id){
     const routine=(state.routines||[]).find(r=>String(r.id)===String(id));if(!routine){toast('No se encontró la rutina.');return;}
-    if(beginSession({routineId:routine.id,title:routine.name},routine.exercises))toast(`Empezaste «${routine.name}».`);
+    if(beginSession({type:'custom',routineId:routine.id,title:routine.name},routine.exercises))toast(`Empezaste «${routine.name}».`);
   }
-  function startFreeWorkout(){if(beginSession({free:true,title:'Entrenamiento libre'},[]))toast('Agregá ejercicios a medida que entrenás.');}
+  function startFreeWorkout(){if(beginSession({type:'free',free:true,title:'Entrenamiento libre'},[]))toast('Agregá ejercicios a medida que entrenás.');}
+  function dailyCardMarkup(){
+    if(!state.plan?.days?.length)return '';
+    const st=dailyStatusNow(),day=state.plan.days[st.nextIndex],n=st.seq+1;
+    const head=`<div class="daily-card-head"><span class="daily-chip">Entrenamiento diario ${n}</span><small>${st.seq?`${st.seq} completado${st.seq===1?'':'s'}`:'Primer día'}</small></div>`;
+    const dayLine=`<strong>${esc(day.title)}</strong><em>${day.exercises.length} ejercicios${day.focus?` · ${esc(day.focus)}`:''}</em>`;
+    if(st.state==='available')return `<div class="daily-card is-available">${head}<button type="button" class="train-launch-main" id="startDaily"><span><small>Disponible ahora</small>${dayLine}</span><span class="btn">Empezar</span></button><p class="muted small">Para completarlo hacé al menos el 70 % de las series y una serie de cada ejercicio. El siguiente se habilita 12 horas después.</p></div>`;
+    if(st.state==='cooldown')return `<div class="daily-card is-waiting">${head}<div class="daily-wait"><span class="daily-wait-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span><div><small>Próximo: ${dayLine}</small><p>Se habilita en <b id="dailyCountdown" data-until="${esc(st.availableAt)}">${FittFormaTraining.formatRemaining(st.remainingMs)}</b> · ${esc(dailyAvailableLabel(st.availableAt))}</p></div></div><p class="muted small">Mientras tanto podés hacer una rutina adicional, una propia o un entrenamiento libre: se guardan en tu historial y no cambian esta progresión.</p></div>`;
+    return `<div class="daily-card is-waiting">${head}<div class="daily-wait"><div><small>Próximo: ${dayLine}</small><p>No pudimos confirmar el horario con el servidor. Conectate a internet para habilitar el próximo entrenamiento diario.</p></div></div><button type="button" class="btn secondary btn-sm" id="retryServerTime">Reintentar</button></div>`;
+  }
   function trainLauncherMarkup(){
-    const next=nextPlanDayIndex(),day=next>=0?state.plan.days[next]:null,routines=(state.routines||[]).slice(0,6);
-    return `<div class="card train-launch"><div class="eyebrow">Empezar a entrenar</div><h3>¿Qué vas a entrenar hoy?</h3>`+
-      (day?`<button type="button" class="train-launch-main" data-start-plan-day="${next}"><span><small>Siguiente sesión de tu plan</small><strong>${esc(day.title)}</strong><em>${day.exercises.length} ejercicios</em></span><span class="btn">Empezar</span></button>`:'')+
+    const routines=(state.routines||[]).slice(0,6),days=state.plan?.days||[];
+    return `<div class="card train-launch"><div class="eyebrow">Empezar a entrenar</div><h3>¿Qué vas a entrenar hoy?</h3>`+dailyCardMarkup()+
+      (days.length?`<details class="train-extra"><summary>Hacer un día del plan como rutina adicional</summary><div class="train-launch-list">${days.map((d,i)=>`<button type="button" class="ff-list-row train-launch-row" data-start-plan-extra="${i}"><span><b>${esc(d.title)}</b><small>${d.exercises.length} ejercicios · no cambia la progresión diaria</small></span><span class="link-btn">Iniciar</span></button>`).join('')}</div></details>`:'')+
       (routines.length?`<div class="train-launch-list"><strong>Mis rutinas</strong>${routines.map(r=>`<button type="button" class="ff-list-row train-launch-row" data-start-routine="${esc(String(r.id))}"><span><b>${esc(r.name)}</b><small>${r.exercises.length} ejercicios</small></span><span class="link-btn">Iniciar</span></button>`).join('')}</div>`:'')+
-      `<div class="btn-row"><button type="button" class="btn ${day||routines.length?'secondary':''}" id="startFreeWorkout">Entrenamiento libre</button><button type="button" class="btn ghost" id="goPlan">${state.plan||routines.length?'Rutinas y plan':'Crear una rutina'}</button></div>`+
-      (!day&&!routines.length?'<p class="muted small">Todavía no tenés un plan ni rutinas propias. Podés entrenar libre y agregar ejercicios sobre la marcha.</p>':'')+`</div>`;
+      `<div class="btn-row"><button type="button" class="btn ${days.length||routines.length?'secondary':''}" id="startFreeWorkout">Entrenamiento libre</button><button type="button" class="btn ghost" id="openManualLog">Registrar uno ya hecho</button><button type="button" class="btn ghost" id="goPlan">${state.plan||routines.length?'Rutinas y plan':'Crear una rutina'}</button></div>`+
+      (!days.length&&!routines.length?'<p class="muted small">Todavía no tenés un plan ni rutinas propias. Podés entrenar libre y agregar ejercicios sobre la marcha.</p>':'')+`</div><div id="manualLogHost"></div>`;
+  }
+  function tickDailyCountdown(){
+    const el=$('dailyCountdown');if(!el){clearInterval(dailyCountdownTimer);dailyCountdownTimer=null;return;}
+    const until=Date.parse(el.dataset.until),now=serverNowMs();if(!Number.isFinite(until)||!Number.isFinite(now))return;
+    if(now>=until){clearInterval(dailyCountdownTimer);dailyCountdownTimer=null;renderTrain();toast('Tu próximo entrenamiento diario ya está disponible.');return;}
+    el.textContent=FittFormaTraining.formatRemaining(until-now);
   }
   function bindTrainLauncher(root){
-    root.querySelectorAll('[data-start-plan-day]').forEach(b=>b.onclick=()=>startWorkout(Number(b.dataset.startPlanDay)));
+    if($('startDaily'))$('startDaily').onclick=startDailyWorkout;
+    if($('retryServerTime'))$('retryServerTime').onclick=async()=>{const ok=await syncServerTime();toast(ok?'Horario confirmado.':'Sin conexión con el servidor todavía.');renderTrain();};
+    root.querySelectorAll('[data-start-plan-extra]').forEach(b=>b.onclick=()=>startPlanExtra(Number(b.dataset.startPlanExtra)));
     root.querySelectorAll('[data-start-routine]').forEach(b=>b.onclick=()=>startRoutine(b.dataset.startRoutine));
     if($('startFreeWorkout'))$('startFreeWorkout').onclick=startFreeWorkout;
+    if($('openManualLog'))$('openManualLog').onclick=openManualLog;
     if($('goPlan'))$('goPlan').onclick=()=>switchView('routines');
+    clearInterval(dailyCountdownTimer);dailyCountdownTimer=$('dailyCountdown')?setInterval(tickDailyCountdown,1000):null;
+  }
+  // Registra el entrenamiento diario: con cuenta lo decide la base (Supabase, hora del servidor);
+  // sin cuenta se usa la hora del servidor de la app. Devuelve {ok, ...} o el motivo del rechazo.
+  async function claimDailyCompletion(session,evaluation){
+    const exercises=(session.exercises||[]).map(e=>({name:e.name,sets:e.entries.length,done:e.entries.filter(x=>x.done).length}));
+    if(supabaseClient&&cloudUser){
+      try{
+        const {data,error}=await supabaseClient.rpc('complete_daily_training',{p_client_session_id:session.clientSessionId,p_plan_day_index:session.dayIndex,p_plan_day_title:session.title,p_started_at:session.serverStartedAt||null,p_exercises:exercises,p_completed_sets:evaluation.completedSets,p_total_sets:evaluation.plannedSets});
+        if(!error&&data){if(data.server_now){const ms=Date.parse(data.server_now);if(Number.isFinite(ms))serverClock={serverMs:ms,perfMs:performance.now()};}return data.ok?{ok:true,seq:data.seq,completedAt:data.completed_at,nextAvailableAt:data.next_available_at,source:'server'}:{ok:false,reason:data.reason,nextAvailableAt:data.next_available_at,seq:data.seq};}
+        // Si la migración v48 todavía no está aplicada, se sigue con el control por hora del servidor de la app.
+        if(error&&!/complete_daily_training|function|schema cache|PGRST202/i.test(String(error.message||error.code||'')))console.warn('Entrenamiento diario en la nube:',error.message);
+      }catch(err){console.warn('Entrenamiento diario en la nube:',err);}
+    }
+    if(!serverClock)await syncServerTime();
+    const now=serverNowMs();if(!Number.isFinite(now))return {ok:false,reason:'no-time'};
+    const st=FittFormaTraining.dailyStatus(state.daily,state.plan?.days?.length||0,now);
+    if(st.state==='cooldown')return {ok:false,reason:'cooldown',nextAvailableAt:st.availableAt,seq:st.seq};
+    return {ok:true,seq:(Number(state.daily?.seq)||0)+1,completedAt:new Date(now).toISOString(),nextAvailableAt:new Date(now+FittFormaTraining.DAILY_COOLDOWN_MS).toISOString(),source:'app-server-time'};
+  }
+  async function reconcileDailyFromCloud(){
+    if(!supabaseClient||!cloudUser)return;
+    try{
+      const {data,error}=await supabaseClient.rpc('daily_training_status');if(error||!data)return;
+      const ms=Date.parse(data.server_now);if(Number.isFinite(ms))serverClock={serverMs:ms,perfMs:performance.now()};
+      const seq=Number(data.seq)||0;
+      // La base manda: si otra sesión del mismo usuario avanzó, se adopta su estado.
+      if(seq>=(Number(state.daily?.seq)||0)){state.daily={...state.daily,seq,lastCompletedAt:data.last_completed_at||'',nextAvailableAt:data.next_available_at||''};save();renderTrain();}
+    }catch{}
+  }
+  // ---------- v48: registrar un entrenamiento ya hecho (manual) ----------
+  function openManualLog(){
+    const host=$('manualLogHost');if(!host)return;fillExerciseDatalist();
+    host.innerHTML=`<form class="card manual-log" id="manualLogForm" novalidate><div class="eyebrow">Registro manual</div><h3>Registrar un entrenamiento ya hecho</h3><p class="muted small">Se guarda como «Registrado manualmente»: suma a tu historial y estadísticas, pero no avanza el entrenamiento diario.</p>
+      <div class="grid2"><div class="field"><label for="manualDate">Fecha</label><input type="date" id="manualDate" required max="${dateKey()}" min="${dateKey(new Date(Date.now()-366*86400000))}" value="${dateKey()}"></div><div class="field"><label for="manualMinutes">Minutos</label><input type="number" id="manualMinutes" min="1" max="600" step="1" inputmode="numeric" placeholder="Ej. 45" required></div></div>
+      <div class="field"><label for="manualTitle">Nombre</label><input id="manualTitle" maxlength="60" placeholder="Ej. Pierna extra" required></div>
+      <div id="manualRows"></div><button type="button" class="btn secondary btn-sm" id="manualAddRow">+ Agregar ejercicio</button>
+      <div class="field"><label for="manualNotes">Notas (opcional)</label><input id="manualNotes" maxlength="180"></div>
+      <p class="community-status" id="manualStatus" role="status" aria-live="polite"></p>
+      <div class="btn-row"><button class="btn" type="submit">Guardar en el historial</button><button class="btn ghost" type="button" id="manualCancel">Cancelar</button></div></form>`;
+    const addRow=()=>{const rows=$('manualRows');if(rows.children.length>=ROUTINE_LIMITS.exercises)return;const i=rows.children.length;rows.insertAdjacentHTML('beforeend',`<div class="manual-row"><input aria-label="Ejercicio ${i+1}" list="exerciseNameList" maxlength="72" placeholder="Ejercicio" data-m="name"><label><span>Series</span><input type="number" min="1" max="${ROUTINE_LIMITS.sets}" value="3" inputmode="numeric" data-m="sets"></label><label><span>Reps o min</span><input type="number" min="0" max="300" inputmode="numeric" data-m="reps" placeholder="10"></label><label><span>Kg o km</span><input type="number" min="0" max="1000" step="0.5" inputmode="decimal" data-m="weight" placeholder="—"></label></div>`);rows.lastElementChild.querySelector('input').focus();};
+    addRow();$('manualAddRow').onclick=addRow;$('manualCancel').onclick=()=>{host.innerHTML='';};
+    $('manualLogForm').onsubmit=e=>{e.preventDefault();saveManualLog();};
+    host.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+  }
+  function saveManualLog(){
+    const status=$('manualStatus'),date=$('manualDate').value,minutes=Number($('manualMinutes').value),title=$('manualTitle').value.trim();
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>dateKey()){status.textContent='Elegí una fecha válida que no sea futura.';return;}
+    if(!Number.isInteger(minutes)||minutes<1||minutes>600){status.textContent='Los minutos deben ser un número entero entre 1 y 600.';return;}
+    if(title.length<2){status.textContent='Poné un nombre de al menos 2 caracteres.';return;}
+    const exercises=[];
+    for(const row of $('manualRows').children){
+      const get=k=>row.querySelector(`[data-m="${k}"]`).value.trim(),name=get('name');if(!name)continue;
+      const sets=Number(get('sets')),reps=get('reps'),weight=get('weight');
+      if(!Number.isInteger(sets)||sets<1||sets>ROUTINE_LIMITS.sets){status.textContent=`${name}: las series deben ser un entero entre 1 y ${ROUTINE_LIMITS.sets}.`;return;}
+      if(reps!==''&&(!Number.isInteger(Number(reps))||Number(reps)<0||Number(reps)>300)){status.textContent=`${name}: revisá las repeticiones o minutos.`;return;}
+      if(weight!==''&&(!Number.isFinite(Number(weight))||Number(weight)<0||Number(weight)>1000)){status.textContent=`${name}: revisá el peso o la distancia.`;return;}
+      const meta=exerciseMetaByName(name);
+      exercises.push({name:name.slice(0,72),group:meta.group,kind:meta.kind,entries:Array.from({length:sets},()=>({reps,weight:meta.kind==='cardio'?'':weight,distance:meta.kind==='cardio'?weight:'',done:true}))});
+    }
+    if(!exercises.length){status.textContent='Agregá al menos un ejercicio.';return;}
+    const totalSets=exercises.reduce((n,e)=>n+e.entries.length,0);
+    state.sessions.unshift({id:Date.now(),type:'manual',status:'completed',source:'manual',date,title:title.slice(0,60),minutes,notes:$('manualNotes').value.trim().slice(0,180),completedSets:totalSets,totalSets,recordedSets:totalSets,completedExercises:exercises.length,totalExercises:exercises.length,volumeKg:0,exercises});
+    const badgeDelta=syncBadgeUnlocks();save();$('manualLogHost').innerHTML='';renderAll();renderTrain();toast('Entrenamiento registrado manualmente.');celebrateBadges(badgeDelta.newlyUnlocked);
   }
   // Edición de la sesión en curso: series y ejercicios.
   function sessionAddSet(ei){const ex=activeSession?.exercises?.[ei];if(!ex)return;if(ex.entries.length>=ROUTINE_LIMITS.sets){toast(`Máximo ${ROUTINE_LIMITS.sets} series por ejercicio.`);return;}ex.entries.push({reps:'',weight:'',done:false});ex.sets=ex.entries.length;persistActiveSessionDraft();renderTrain();}
@@ -3502,8 +3330,13 @@ function findCatalogExercise(name){
 
   // ---------- v42: corregir o eliminar sesiones del historial ----------
   function badgeIdsForSession(session){
-    const names=new Set((session?.exercises||[]).map(e=>BadgeEngine.normalizeName(e?.name)));
+    const names=new Set((session?.exercises||[]).flatMap(e=>[BadgeEngine.normalizeName(e?.name),badgeKeyForExercise(e?.name)]));
     return [...getBadgeCatalog().filter(i=>names.has(BadgeEngine.normalizeName(i.name))).map(i=>i.id),'consistency-active-days'];
+  }
+  // v48: cada sesión muestra de qué tipo es; las manuales no se presentan como verificadas.
+  function sessionTypeTag(s){
+    const label=s?.status==='partial'?'Parcial · sin recompensa':s?.type==='daily'?`Diario ${Number(s.dailySeq)||''}`.trim():s?.type==='plan_extra'?'Rutina adicional':s?.type==='custom'?'Rutina propia':s?.type==='free'?'Libre':s?.type==='manual'?'Registrado manualmente':'';
+    return label?`<span class="session-type-tag t-${esc(s.status==='partial'?'partial':s.type)}">${esc(label)}</span>`:'';
   }
   function initSessionHistoryEditing(){
     const root=$('historyList');if(!root)return;
@@ -3511,18 +3344,18 @@ function findCatalogExercise(name){
       const b=e.target.closest('button');if(!b)return;
       const id=b.dataset.sessionEdit||b.dataset.sessionDelete||b.dataset.sessionCancel||'';const session=(state.sessions||[]).find(s=>String(s.id)===String(id));
       if(b.dataset.sessionDelete&&session){
-        if(!confirm(`¿Eliminar «${session.title}» del ${prettyDate(session.date)}? Se recalculan tus estadísticas e insignias.`))return;
+        if(!confirm(`¿Eliminar «${session.title}» del ${prettyDate(session.date)}? Se recalculan tus estadísticas e insignias.${session.type==='daily'?' El entrenamiento diario ya registrado no se deshace: tu progresión y el horario del siguiente se mantienen.':''}`))return;
         state.sessions=state.sessions.filter(s=>s!==session);const delta=syncBadgeUnlocks(badgeIdsForSession(session));save();renderAll();toast(delta.revoked.length?`Sesión eliminada · se quitaron ${delta.revoked.length} insignia(s) que dependían de ella.`:'Sesión eliminada.');
       }else if(b.dataset.sessionEdit&&session){
         const item=b.closest('.history-item');if(!item||item.querySelector('form'))return;
-        item.insertAdjacentHTML('beforeend',`<form class="history-edit" data-session-form="${esc(String(session.id))}"><div class="grid2"><div class="field"><label>Fecha</label><input type="date" name="date" required max="${dateKey()}" value="${esc(session.date)}"></div><div class="field"><label>Minutos</label><input type="number" name="minutes" min="1" max="600" step="1" required value="${esc(String(session.minutes||1))}"></div></div><div class="field"><label>Notas</label><input name="notes" maxlength="180" value="${esc(session.notes||'')}"></div><div class="btn-row"><button class="btn btn-sm" type="submit">Guardar cambios</button><button class="btn ghost btn-sm" type="button" data-session-cancel="${esc(String(session.id))}">Cancelar</button></div></form>`);
+        item.insertAdjacentHTML('beforeend',`<form class="history-edit" data-session-form="${esc(String(session.id))}"><div class="grid2"><div class="field"><label>Fecha</label><input type="date" name="date" required max="${dateKey()}" value="${esc(session.date)}" ${session.type==='daily'?'disabled title="La fecha de un entrenamiento diario la fija el servidor"':''}></div><div class="field"><label>Minutos</label><input type="number" name="minutes" min="1" max="600" step="1" required value="${esc(String(session.minutes||1))}"></div></div><div class="field"><label>Notas</label><input name="notes" maxlength="180" value="${esc(session.notes||'')}"></div><div class="btn-row"><button class="btn btn-sm" type="submit">Guardar cambios</button><button class="btn ghost btn-sm" type="button" data-session-cancel="${esc(String(session.id))}">Cancelar</button></div></form>`);
         item.querySelector('form input')?.focus();
       }else if(b.dataset.sessionCancel){b.closest('form')?.remove();}
     });
     root.addEventListener('submit',e=>{
       const form=e.target.closest('[data-session-form]');if(!form)return;e.preventDefault();
       const session=(state.sessions||[]).find(s=>String(s.id)===form.dataset.sessionForm);if(!session)return;
-      const date=form.elements.date.value,minutes=Number(form.elements.minutes.value);
+      const date=session.type==='daily'?session.date:form.elements.date.value,minutes=Number(form.elements.minutes.value);
       if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>dateKey()){toast('Elegí una fecha válida que no sea futura.');return;}
       if(!Number.isInteger(minutes)||minutes<1||minutes>600){toast('Los minutos deben ser un entero entre 1 y 600.');return;}
       Object.assign(session,{date,minutes,notes:form.elements.notes.value.trim().slice(0,180),editedAt:new Date().toISOString()});
@@ -3531,8 +3364,9 @@ function findCatalogExercise(name){
   }
   function startWorkout(dayIndex){
     if(!state.plan){toast('Primero creá una rutina.');return;}
-    const day=state.plan.days[dayIndex];if(!day){toast('No se encontró esa sesión del plan.');return;}
-    beginSession({dayIndex,title:day.title},day.exercises);
+    const st=dailyStatusNow();
+    // Solo el siguiente día de la progresión, y si está disponible, cuenta como entrenamiento diario.
+    if(st.state==='available'&&dayIndex===st.nextIndex)startDailyWorkout();else startPlanExtra(dayIndex);
   }
   function renderTrain(){
     const root=$('trainContent');if(!root)return;
@@ -3581,15 +3415,39 @@ function findCatalogExercise(name){
     if(!activeSession||!activeSession.pausedAt)return;
     activeSession.pausedAt=0;activeSession.pauseReason='';activeSession.segmentStartedAt=Date.now();persistActiveSessionDraft();updateWorkoutClock();toast('Entrenamiento reanudado.');
   }
-  function finishWorkout(){
-    if(!activeSession)return;
+  async function finishWorkout(){
+    if(!activeSession||finishingWorkout)return;
     const validation=validateWorkoutSession(activeSession);if(!validation.valid){toast(validation.message);return;}
     const summary=calculateWorkoutSummary(activeSession);
     if(summary.recordedSets===0){toast('Registrá repeticiones, peso o una serie completada antes de guardar.');return;}
-    const minutes=Math.max(1,Math.round(activeSessionElapsedMs(activeSession)/60000));
-    const savedSession={id:Date.now(),date:activeSession.date,title:activeSession.title,minutes,notes:($('sessionNotes')?.value||activeSession.notes||'').trim(),completedSets:summary.completedSets,totalSets:summary.totalSets,recordedSets:summary.recordedSets,completedExercises:summary.completedExercises,totalExercises:summary.totalExercises,volumeKg:summary.volumeKg,exercises:activeSession.exercises.map(e=>({name:e.name,group:e.group,entries:e.entries.filter(x=>String(x.reps??'').trim()!==''||String(x.weight??'').trim()!==''||x.done).map(x=>({reps:x.reps,weight:x.weight,done:!!x.done}))})).filter(e=>e.entries.length)};
-    state.sessions.unshift(savedSession);lastWorkoutSummary={...summary,minutes,title:savedSession.title,date:savedSession.date};activeSession=null;clearActiveSessionDraft();resetRestTimer();if(workoutClockInterval){clearInterval(workoutClockInterval);workoutClockInterval=null;}const badgeDelta=syncBadgeUnlocks();save();renderAll();renderTrain();switchView('train');toast('Sesión guardada. ¡Buen trabajo!');if(badgeDelta.newlyUnlocked.length||badgeDelta.upgraded.length)notifyBadgeChanges(badgeDelta,'¡Nuevo logro!');
+    const session=activeSession;let type=session.type||'plan_extra',status='completed',daily=null,notice='Sesión guardada. ¡Buen trabajo!';
+    if(type==='daily'){
+      const ev=FittFormaTraining.evaluateDailyCompletion(session);
+      if(!ev.complete){
+        // Abandono o sesión corta: no se registra como entrenamiento diario completo ni da recompensa.
+        if(!confirm(`Para completar el entrenamiento diario hacé al menos el 70 % de las series y una serie de cada ejercicio (llevás ${ev.completedSets} de ${ev.plannedSets} series). ¿Guardarla como sesión parcial? No suma recompensa ni habilita el siguiente. Tocá «Cancelar» para seguir entrenando.`))return;
+        status='partial';notice='Sesión parcial guardada. El entrenamiento diario sigue disponible.';
+      }else{
+        finishingWorkout=true;const btn=$('finishWorkout');if(btn){btn.disabled=true;btn.textContent='Guardando…';}
+        try{daily=await claimDailyCompletion(session,ev);}finally{finishingWorkout=false;}
+        if(activeSession!==session)return;
+        if(!daily.ok){
+          type='plan_extra';
+          notice=daily.reason==='cooldown'?`Ya completaste un entrenamiento diario en las últimas 12 horas. Se guardó como rutina adicional; el próximo se habilita ${dailyAvailableLabel(daily.nextAvailableAt)}.`:daily.reason==='no-time'?'Sin conexión no se puede confirmar el horario: se guardó como rutina adicional.':'No se pudo confirmar el entrenamiento diario: se guardó como rutina adicional.';
+          if(daily.reason==='cooldown'&&daily.nextAvailableAt&&Number(daily.seq)>=(Number(state.daily?.seq)||0))state.daily={...state.daily,seq:Number(daily.seq)||state.daily.seq,nextAvailableAt:daily.nextAvailableAt};
+        }else notice=`¡Entrenamiento diario ${daily.seq} completado! El siguiente se habilita en 12 horas.`;
+      }
+    }
+    const minutes=Math.max(1,Math.round(activeSessionElapsedMs(session)/60000));
+    const completedAt=daily?.ok?daily.completedAt:new Date(Number.isFinite(serverNowMs())?serverNowMs():Date.now()).toISOString();
+    const savedSession={id:Date.now(),type,status,date:session.date,title:session.title,minutes,startedAt:session.serverStartedAt||new Date(session.startedAt).toISOString(),completedAt,dayIndex:session.dayIndex,routineId:session.routineId||undefined,dailySeq:daily?.ok?daily.seq:undefined,clientSessionId:session.clientSessionId,notes:($('sessionNotes')?.value||session.notes||'').trim(),completedSets:summary.completedSets,totalSets:summary.totalSets,recordedSets:summary.recordedSets,completedExercises:summary.completedExercises,totalExercises:summary.totalExercises,volumeKg:summary.volumeKg,exercises:session.exercises.map(e=>({name:e.name,group:e.group,kind:e.kind,entries:e.entries.filter(x=>String(x.reps??'').trim()!==''||String(x.weight??'').trim()!==''||String(x.distance??'').trim()!==''||x.done).map(x=>({reps:x.reps,weight:x.weight,distance:x.distance||undefined,done:!!x.done}))})).filter(e=>e.entries.length)};
+    if(daily?.ok){
+      state.daily={...state.daily,seq:daily.seq,lastCompletedAt:daily.completedAt,nextAvailableAt:daily.nextAvailableAt,history:[...(state.daily?.history||[]),{seq:daily.seq,dayIndex:session.dayIndex,title:session.title,sessionId:savedSession.id,startedAt:savedSession.startedAt,completedAt:daily.completedAt,nextAvailableAt:daily.nextAvailableAt,status:'completed',source:daily.source,completedSets:summary.completedSets,totalSets:summary.totalSets,rewardXp:50}].slice(-2000)};
+    }
+    state.sessions.unshift(savedSession);lastWorkoutSummary={...summary,minutes,title:savedSession.title,date:savedSession.date,type,status,dailySeq:savedSession.dailySeq};activeSession=null;clearActiveSessionDraft();resetRestTimer();if(workoutClockInterval){clearInterval(workoutClockInterval);workoutClockInterval=null;}
+    const badgeDelta=syncBadgeUnlocks();save();renderAll();renderTrain();switchView('train');toast(notice);celebrateBadges(badgeDelta.newlyUnlocked);pendingAdBreak='workout-saved';
   }
+
   function streak(){
     const dates=new Set([...state.sessions.map(s=>s.date),...state.activities.map(a=>a.date)]);let d=new Date(),n=0;
     if(!dates.has(dateKey(d))){d.setDate(d.getDate()-1);if(!dates.has(dateKey(d)))return 0;}
@@ -3671,14 +3529,25 @@ function findCatalogExercise(name){
   const BADGE_ACTIVITY_EXERCISES=BadgeEngine.ACTIVITY_CHALLENGES;
   const CUSTOM_BADGE_OPTION={id:'custom-exercise',name:'Otro ejercicio…',group:'Personalizados',category:'custom',measure:'reps',thresholds:BadgeEngine.GENERIC_REP_TARGETS,customPlaceholder:true};
   let badgeGalleryFilter='started';
+  // v48: variantes de la biblioteca que suman al desafío principal (evita desafíos duplicados).
+  const BADGE_CHALLENGE_ALIASES=new Map([['Flexiones clásicas','Flexiones'],['Sentadilla al aire','Sentadillas'],['Zancada hacia atrás sin peso','Zancadas'],['Elevación de talones con apoyo','Elevación de talones'],['Crunch abdominal controlado','Abdominales'],['Plancha con rodillas al pecho lenta','Escaladores'],['Equilibrio a una pierna con apoyo cercano','Equilibrio a una pierna']].map(([a,b])=>[BadgeEngine.normalizeName(a),b]));
+  function badgeKeyForExercise(name){const canon=FittFormaTraining.canonicalName(name),key=BadgeEngine.normalizeName(canon);return BadgeEngine.normalizeName(BADGE_CHALLENGE_ALIASES.get(key)||canon);}
   function getBadgeCatalog(){
     const catalog=[...CORE_BADGE_EXERCISES];
     const seen=new Set(catalog.map(item=>BadgeEngine.normalizeName(item.name)));
     for(const exercise of Object.values(library).flat()){
       const name=String(exercise?.name||'').trim();if(!name)continue;
       const normalized=BadgeEngine.normalizeName(name);if(!normalized||seen.has(normalized))continue;seen.add(normalized);
-      const measure=BadgeEngine.measureForLibraryExercise(exercise);
-      catalog.push({id:'exercise-'+BadgeEngine.slug(name),name,group:String(exercise.group||'Otros'),category:BadgeEngine.categoryForLibraryExercise(exercise,measure),measure,kind:'exercise',library:true,thresholds:BadgeEngine.thresholdsForExercise({measure})});
+      // La variante suma al desafío principal; solo se conserva el desafío viejo si ya tenía insignias (historial).
+      if(BADGE_CHALLENGE_ALIASES.has(normalized)&&!Object.values(state.badgeUnlocks||{}).some(u=>u?.exerciseId==='exercise-'+BadgeEngine.slug(name)))continue;
+      const measure=BadgeEngine.measureForLibraryExercise(exercise),id='exercise-'+BadgeEngine.slug(name);
+      // v48: las repeticiones de un ejercicio con carga no miden dificultad sin el peso: no generan desafío
+      // nuevo (se conservan los que ya tenían insignias). Los movimientos fáciles de repetir usan una escala mayor.
+      const hasHistory=Object.values(state.badgeUnlocks||{}).some(u=>u?.exerciseId===id);
+      if(exercise.load&&!hasHistory)continue;
+      if(exercise.kind==='mobility'&&!hasHistory)continue;
+      const easy=measure==='reps'&&(['glute','calf','core_flex','abduct','adduct','scap','rear_delt'].includes(exercise.slot)||exercise.level?.[1]===1);
+      catalog.push({id,name,group:String(exercise.group||'Otros'),category:BadgeEngine.categoryForLibraryExercise(exercise,measure),measure,kind:'exercise',library:true,thresholds:easy?[5,10,15,20,25,30,40,50,60,75,100,125]:BadgeEngine.thresholdsForExercise({measure})});
     }
     const knownIds=new Set(catalog.map(item=>item.id));
     for(const record of (state.badgeRecords||[])){
@@ -3713,7 +3582,7 @@ function findCatalogExercise(name){
     let sessionBest={value:0,date:'',source:'session'};
     for(const session of (state.sessions||[])){
       for(const exercise of (Array.isArray(session?.exercises)?session.exercises:[])){
-        if(BadgeEngine.normalizeName(exercise?.name)!==exact)continue;
+        if(badgeKeyForExercise(exercise?.name)!==exact&&BadgeEngine.normalizeName(exercise?.name)!==exact)continue;
         for(const entry of (Array.isArray(exercise?.entries)?exercise.entries:[])){
           if(entry?.done===false)continue;
           const raw=String(entry?.reps??'').trim().replace(',','.');const match=raw.match(/^(\d+(?:\.\d+)?)\s*(s|sec|seg|segundos?|min|minutos?)?$/i);let value=match?Number(match[1]):Number(raw);const unit=(match?.[2]||'').toLowerCase();if(Number.isFinite(value)){if(item.measure==='seconds'&&/^min/.test(unit))value*=60;else if(item.measure==='minutes'&&/^(s|sec|seg)/.test(unit))value/=60;}if(Number.isFinite(value)&&value<=cap&&value>Number(sessionBest.value||0))sessionBest={value,date:session.date||dateKey(),source:'session'};
@@ -3778,7 +3647,7 @@ function findCatalogExercise(name){
   }
   function badgeMedalFor(item,levelIndex,opts={}){
     const rank=levelIndex>=0?BadgeEngine.rankForLevel(levelIndex):null;
-    return BadgeEngine.medalSvg({rankKey:rank?rank.key:'bronze',numeral:rank?rank.numeral:'',glyph:BadgeEngine.glyphFor(item),locked:!rank,size:opts.size||48,title:opts.title||''});
+    return BadgeEngine.medalSvg({rankKey:rank?rank.key:'bronze',numeral:rank?rank.numeral:'',glyph:BadgeEngine.glyphFor(item),category:item?.category||'',locked:!rank,size:opts.size||48,title:opts.title||''});
   }
   function renderBadgeDetail(item){
     const root=$('badgeDetail');if(!root||!item)return;
@@ -3789,7 +3658,7 @@ function findCatalogExercise(name){
     const evidence=metric.value>0&&item.measure!=='days'?`<span class="ff-evidence ${metric.evidence==='gps_device'?'is-gps':''}">${esc(BadgeEngine.evidenceLabel(metric.evidence))}</span>`:'';
     root.innerHTML=`<div class="achievement-title-row"><div class="achievement-hero-medal">${badgeMedalFor(item,progress.highest,{size:64})}</div><div><div class="eyebrow">${esc(BadgeEngine.categoryLabel(item.category))}</div><h3>${esc(item.name)}</h3><p class="achievement-value"><strong>${esc(valueLabel)}</strong>${evidence}</p><p class="muted small">${rank?`Rango actual: ${esc(rank.label)}`:'Sin rango todavía'}</p></div></div>
       <div class="achievement-progress-head"><span>${esc(BadgeEngine.nextStepMessage(metric.value,thresholds,item.measure))}</span><strong>${Math.max(0,progress.highest+1)}/12</strong></div><div class="achievement-progress" role="progressbar" aria-label="Avance hacia el próximo nivel de ${esc(item.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.pct}"><span style="width:${progress.pct}%"></span></div>
-      <ol class="achievement-milestones" aria-label="Niveles del desafío">${thresholds.map((threshold,index)=>{const rankInfo=BadgeEngine.rankForLevel(index),entry=unlocks[badgeIdFor(item,index)],unlocked=Boolean(entry),gps=hasGpsEvidence(entry);return `<li class="achievement-milestone rank-${rankInfo.key} ${unlocked?'unlocked':'locked'}">${BadgeEngine.medalSvg({rankKey:rankInfo.key,numeral:rankInfo.numeral,glyph:BadgeEngine.glyphFor(item),locked:!unlocked,size:34})}<strong>${esc(rankInfo.label)}</strong><small>${esc(formatBadgeValue(threshold,item.measure))}</small><span class="achievement-status ${gps?'verified':''}">${unlocked?`${gps?'Con ruta GPS':'Declarada'} · ${esc(prettyDate(entry.earnedAt))}`:'Bloqueada'}</span></li>`;}).join('')}</ol>
+      <ol class="achievement-milestones" aria-label="Niveles del desafío">${thresholds.map((threshold,index)=>{const rankInfo=BadgeEngine.rankForLevel(index),entry=unlocks[badgeIdFor(item,index)],unlocked=Boolean(entry),gps=hasGpsEvidence(entry);return `<li class="achievement-milestone rank-${rankInfo.key} ${unlocked?'unlocked':'locked'}">${BadgeEngine.medalSvg({rankKey:rankInfo.key,numeral:rankInfo.numeral,glyph:BadgeEngine.glyphFor(item),category:item.category,locked:!unlocked,size:34})}<strong>${esc(rankInfo.label)}</strong><small>${esc(formatBadgeValue(threshold,item.measure))}</small><span class="achievement-status ${gps?'verified':''}">${unlocked?`${gps?'Con ruta GPS':'Declarada'} · ${esc(prettyDate(entry.earnedAt))}`:'Bloqueada'}</span></li>`;}).join('')}</ol>
       <p class="muted small achievement-rule">${item.measure==='km'?'Cada nivel mide la distancia de una sola actividad, no la suma de varias.':item.measure==='days'?'Se cuentan días distintos con actividad registrada, no la cantidad de ejercicios.':item.measure==='seconds'?'Se cuenta el tiempo sostenido en una única serie.':'Se cuenta la mejor serie de un mismo movimiento, no la suma de varias series.'} Máximo admitido por serie: ${esc(formatBadgeValue(BadgeEngine.maxPlausible(item),item.measure))}.</p>`;
   }
   function renderBadgeRecords(item){
@@ -3827,7 +3696,34 @@ function findCatalogExercise(name){
     const current=result.catalog.find(item=>item.id===$('badgeExerciseSelect')?.value)||CORE_BADGE_EXERCISES[0];
     renderBadgeDetail(current);renderBadgeRecords(current);
   }
+  // v48: hasta 3 insignias junto al nombre. La selección guarda desafíos (no niveles): si subís de nivel,
+  // se muestra automáticamente el nivel nuevo. Sin selección, se eligen las de mayor nivel.
+  function featuredUnlocks(){
+    const catalogIds=new Set(getBadgeCatalog().map(i=>i.id));
+    const valid=Object.fromEntries(Object.entries(state.badgeUnlocks||{}).filter(([,u])=>u&&catalogIds.has(u.exerciseId)));
+    return FittFormaTraining.featuredBadges(valid,state.featuredBadges||[]);
+  }
+  function renderFeaturedBadges(){
+    const root=$('featuredBadges');if(!root)return;
+    const list=featuredUnlocks(),catalog=getBadgeCatalog();
+    root.innerHTML=list.map(u=>{const item=catalog.find(i=>i.id===u.exerciseId)||{category:'custom'},rank=BadgeEngine.rankForLevel(u.level-1);return `<span class="featured-badge" title="${esc(u.exerciseName)} · ${esc(rank.label)}">${badgeMedalFor(item,u.level-1,{size:30,title:`${u.exerciseName} · ${rank.label}`})}</span>`;}).join('')+(Object.keys(state.badgeUnlocks||{}).length?`<button type="button" class="featured-edit" id="featuredEdit" aria-expanded="false">${(state.featuredBadges||[]).length?'Cambiar':'Elegir'}<span class="sr-only"> insignias destacadas</span></button>`:'');
+    const edit=$('featuredEdit');if(edit)edit.onclick=toggleFeaturedPicker;
+  }
+  function toggleFeaturedPicker(){
+    const box=$('featuredPicker');if(!box)return;
+    if(!box.hidden){box.hidden=true;$('featuredEdit')?.setAttribute('aria-expanded','false');return;}
+    const catalog=getBadgeCatalog(),catalogIds=new Set(catalog.map(i=>i.id));
+    const top=FittFormaTraining.highestPerChallenge(Object.fromEntries(Object.entries(state.badgeUnlocks||{}).filter(([,u])=>u&&catalogIds.has(u.exerciseId)))).sort((a,b)=>b.level-a.level);
+    const chosen=new Set((state.featuredBadges||[]).filter(id=>top.some(u=>u.exerciseId===id)));
+    box.innerHTML=`<p class="small"><strong>Elegí hasta 3 insignias para mostrar junto a tu nombre.</strong> Se muestra siempre tu mejor nivel en cada desafío.</p><div class="featured-options">${top.map(u=>{const item=catalog.find(i=>i.id===u.exerciseId)||{category:'custom'},rank=BadgeEngine.rankForLevel(u.level-1);return `<label class="featured-option"><input type="checkbox" value="${esc(u.exerciseId)}" ${chosen.has(u.exerciseId)?'checked':''}>${badgeMedalFor(item,u.level-1,{size:36})}<span><b>${esc(u.exerciseName)}</b><small>${esc(rank.label)}</small></span></label>`;}).join('')}</div><p class="muted small" id="featuredPickerStatus" role="status" aria-live="polite">Sin elegir, mostramos automáticamente tus insignias de mayor nivel.</p><div class="btn-row"><button type="button" class="btn btn-sm" id="featuredSave">Guardar</button><button type="button" class="btn ghost btn-sm" id="featuredAuto">Elegir automáticamente</button></div>`;
+    box.hidden=false;$('featuredEdit')?.setAttribute('aria-expanded','true');
+    box.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.onchange=()=>{const n=box.querySelectorAll('input:checked').length;if(n>3){cb.checked=false;$('featuredPickerStatus').textContent='Podés destacar como máximo 3 insignias.';}});
+    $('featuredSave').onclick=()=>{state.featuredBadges=[...box.querySelectorAll('input:checked')].map(x=>x.value).slice(0,3);save();box.hidden=true;renderFeaturedBadges();toast('Insignias destacadas actualizadas.');};
+    $('featuredAuto').onclick=()=>{state.featuredBadges=[];save();box.hidden=true;renderFeaturedBadges();toast('Se muestran tus insignias de mayor nivel.');};
+  }
+  window.addEventListener('fittforma:badgeschange',()=>renderFeaturedBadges());
   function renderProfileBadgesPreview(){
+    renderFeaturedBadges();
     const root=$('profileBadgeChips');if(!root)return;
     const catalog=getBadgeCatalog(),valid=Object.values(state.badgeUnlocks||{}).filter(entry=>catalog.some(item=>!item.customPlaceholder&&item.id===entry.exerciseId)).sort((a,b)=>(Number(b.level)||0)-(Number(a.level)||0)||String(b.earnedAt||'').localeCompare(String(a.earnedAt||'')));
     const best=new Map();for(const entry of valid)if(!best.has(entry.exerciseId))best.set(entry.exerciseId,entry);
@@ -3895,10 +3791,27 @@ function findCatalogExercise(name){
   }
   function showBadges(){switchView('progress');showProgressTab('badges');}
   function notifyBadgeChanges(delta,baseMessage){
-    if(!delta)return;
+    if(!delta)return;celebrateBadges(delta.newlyUnlocked);
     const count=delta.newlyUnlocked.length,upgraded=delta.upgraded.length;
     const suffix=[count?`+${count} insignia(s)`:'',upgraded?`${upgraded} insignia(s) ahora con ruta GPS`:''].filter(Boolean).join(' · ');
     toast(suffix?`${baseMessage} · ${suffix}`:baseMessage);
+  }
+  // v48: pantalla de logro. Muestra solo la insignia más alta recién obtenida (no las anteriores) y
+  // nunca se repite al recargar: depende de newlyUnlocked, que solo trae insignias que no existían.
+  const celebratedBadges=new Set();
+  function celebrateBadges(newly){
+    const fresh=(Array.isArray(newly)?newly:[]).filter(b=>b&&!celebratedBadges.has(b.id));if(!fresh.length)return;
+    fresh.forEach(b=>celebratedBadges.add(b.id));
+    const top=FittFormaTraining.highestPerChallenge(Object.fromEntries(fresh.map(b=>[b.id,b]))).sort((a,b)=>b.level-a.level);
+    const best=top[0],others=top.length-1,item=getBadgeCatalog().find(i=>i.id===best.exerciseId)||{category:'custom',name:best.exerciseName};
+    const rank=BadgeEngine.rankForLevel(best.level-1),dlg=$('badgeCelebration');if(!dlg)return;
+    $('badgeCelebrationMedal').innerHTML=badgeMedalFor(item,best.level-1,{size:132,title:rank.label});
+    $('badgeCelebrationRank').textContent=rank.label;
+    $('badgeCelebrationName').textContent=best.exerciseName;
+    $('badgeCelebrationDetail').textContent=`${BadgeEngine.categoryLabel(item.category)} · ${formatBadgeValue(best.threshold,best.measure)}${best.evidence==='gps_device'?' · con ruta GPS':' · marca declarada'}`;
+    $('badgeCelebrationMore').textContent=others>0?`También subiste de nivel en ${others} desafío${others===1?'':'s'} más. Lo ves en Progreso › Insignias.`:'';
+    dlg.dataset.rank=rank.key;
+    if(typeof dlg.showModal==='function'&&!dlg.open)dlg.showModal();else dlg.setAttribute('open','');
   }
   function showProgressTab(name,focus=false){
     const tabs=[...document.querySelectorAll('[data-progress-tab]')];if(!tabs.some(t=>t.dataset.progressTab===name))name='summary';
@@ -3922,7 +3835,7 @@ function findCatalogExercise(name){
     const physical=state.profile||{},currentKg=Number(physical.currentWeightKg),targetKg=Number(physical.targetWeightKg);
     const weightGoalHtml=Number.isFinite(currentKg)&&currentKg>0&&Number.isFinite(targetKg)&&targetKg>0?`<div class="notice"><strong>Tu objetivo de peso:</strong> ${currentKg.toFixed(1)} kg actuales → ${targetKg.toFixed(1)} kg objetivo. ${Math.abs(targetKg-currentKg)<0.1?'Estás en el peso que definiste como meta.':`Diferencia: ${Math.abs(targetKg-currentKg).toFixed(1)} kg ${targetKg>currentKg?'por ganar para la meta':'por bajar para la meta'}.`} El peso diario puede fluctuar; mirá la tendencia a lo largo de las semanas.</div>`:'';
     $('progressSummary').innerHTML=`<div class="stats" style="margin:12px 0 0"><div class="stat"><strong>${total}</strong><small>Rutinas completadas</small></div><div class="stat"><strong>${activeDays}</strong><small>Días activos</small></div><div class="stat"><strong>${totalSets}</strong><small>Registros de series</small></div></div>${weightGoalHtml}<p class="muted small">Tiempo total registrado: ${mins} minutos entre rutinas y actividades al aire libre. El tiempo de las rutinas se estima desde que abriste la sesión hasta que la guardaste.</p>`;
-    $('historyList').innerHTML=state.sessions.length?state.sessions.slice(0,30).map(s=>`<div class="history-item"><div><strong>${esc(s.title)}</strong><small>${prettyDate(s.date)} · ${Array.isArray(s.exercises)?s.exercises.length:0} ejercicios · ${Number(s.minutes)||0} min</small>${s.notes?`<div class="muted small">${esc(s.notes)}</div>`:''}${s.editedAt?'<div class="muted small">Editada</div>':''}</div><div class="history-actions"><span class="tag">${setsOf(s)} series</span><button class="btn ghost btn-sm" type="button" data-session-edit="${esc(String(s.id))}">Editar</button><button class="btn ghost btn-sm" type="button" data-session-delete="${esc(String(s.id))}">Eliminar</button></div></div>`).join(''):'<div class="empty"><strong>Todavía no hay sesiones</strong><p>Cuando guardes tu primer entrenamiento, aparecerá acá.</p><button class="btn" type="button" data-goto-view="train">Empezar un entrenamiento</button></div>';
+    $('historyList').innerHTML=state.sessions.length?state.sessions.slice(0,30).map(s=>`<div class="history-item"><div><strong>${esc(s.title)}</strong>${sessionTypeTag(s)}<small>${prettyDate(s.date)} · ${Array.isArray(s.exercises)?s.exercises.length:0} ejercicios · ${Number(s.minutes)||0} min</small>${s.notes?`<div class="muted small">${esc(s.notes)}</div>`:''}${s.editedAt?'<div class="muted small">Editada</div>':''}</div><div class="history-actions"><span class="tag">${setsOf(s)} series</span><button class="btn ghost btn-sm" type="button" data-session-edit="${esc(String(s.id))}">Editar</button><button class="btn ghost btn-sm" type="button" data-session-delete="${esc(String(s.id))}">Eliminar</button></div></div>`).join(''):'<div class="empty"><strong>Todavía no hay sesiones</strong><p>Cuando guardes tu primer entrenamiento, aparecerá acá.</p><button class="btn" type="button" data-goto-view="train">Empezar un entrenamiento</button></div>';
     renderActivityPeriod();renderProgressTiles();
     renderConsistencyChallenges();
     renderTrainingInsights();
@@ -4209,7 +4122,7 @@ function findCatalogExercise(name){
     $('mealList').innerHTML=meals.length?`<h4 class="meal-list-title">Comidas de hoy</h4>`+groups.map(([t,list])=>`<div class="meal-group"><div class="meal-group-head"><strong>${esc(t)}</strong><span>${Math.round(list.reduce((n,m)=>n+(Number(m.calories)||0),0))} kcal</span></div>${list.map(mealItem).join('')}</div>`).join(''):'<div class="empty"><img src="./assets/illustrations/meal-almuerzo.svg" alt="" width="72" height="72"><strong>Sin comidas registradas</strong><p>Agregá lo que comiste para ver tu resumen.</p><button class="btn" type="button" data-home-quick="meal">Registrar una comida</button></div>';
     document.querySelectorAll('.toggleMealFavorite').forEach(b=>b.addEventListener('click',()=>{const meal=state.meals.find(m=>String(m.id)===b.dataset.id);if(!meal)return;state.mealFavorites=state.mealFavorites||[];const idx=state.mealFavorites.findIndex(f=>f.sourceId===meal.id||f.name===meal.name);if(idx>=0){state.mealFavorites.splice(idx,1);toast('Comida quitada de favoritas.');}else{state.mealFavorites.push({id:Date.now(),sourceId:meal.id,name:meal.name,calories:Number(meal.calories)||0,protein:Number(meal.protein)||0,carbs:Number(meal.carbs)||0,fat:Number(meal.fat)||0,type:meal.type||'Almuerzo'});toast('Comida guardada en favoritas.');}save();renderNutrition();}));
     renderMealFavorites();
-    $('waterCount').textContent=state.water.count;$('waterGoalText').textContent=g.water;
+    renderHydration();
     renderNutritionWeek();
     document.querySelectorAll('.removeMeal').forEach(b=>b.addEventListener('click',()=>{state.meals=state.meals.filter(m=>String(m.id)!==b.dataset.id);save();renderNutrition();toast('Comida eliminada.');}));
   }
@@ -4355,7 +4268,7 @@ function findCatalogExercise(name){
     const from=dateKey(dayStart(6)),recent=(state.meals||[]).filter(m=>m.date>=from&&m.date<=today),days=[...new Set(recent.map(m=>m.date))];
     const byDay=days.map(d=>recent.filter(m=>m.date===d)),avg=k=>days.length?Math.round(byDay.reduce((n,list)=>n+list.reduce((x,m)=>x+(Number(m[k])||0),0),0)/days.length):null;
     const badges=(typeof window.FittFormaShareableBadges==='function'?window.FittFormaShareableBadges():[]).slice(0,10).map(b=>({name:b.payload.exerciseName,rank:b.label.split(' · ').slice(1).join(' · ')}));
-    return {nutrition:{today:{calories:sum('calories'),protein:sum('protein'),carbs:sum('carbs'),fat:sum('fat'),meals:meals.length,water:Math.max(0,Number(state.waterLogs?.[today])||0)},last7:{daysWithRecords:days.length,avgCalories:avg('calories'),avgProtein:avg('protein')}},routines:(state.routines||[]).slice(0,5).map(r=>({name:r.name,exercises:r.exercises.slice(0,10).map(e=>({name:e.name,sets:e.sets,reps:e.reps}))})),badges};
+    return {nutrition:{today:{calories:sum('calories'),protein:sum('protein'),carbs:sum('carbs'),fat:sum('fat'),meals:meals.length,water:Math.max(0,Number(state.waterLogs?.[today])||0),waterMl:waterMl(today),waterGoalMl:hydro().goalMl},last7:{daysWithRecords:days.length,avgCalories:avg('calories'),avgProtein:avg('protein')}},routines:(state.routines||[]).slice(0,5).map(r=>({name:r.name,exercises:r.exercises.slice(0,10).map(e=>({name:e.name,sets:e.sets,reps:e.reps}))})),badges};
   }
   async function sendCoach(text){
     const msg=text.trim();if(!msg)return;
@@ -4368,7 +4281,7 @@ function findCatalogExercise(name){
     save();renderCoach();$('coachInput').value='';
     let backendUnavailable=false;
     try{
-      const response=await fetch('/api/coach',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(state.coachShareData===false?{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:false,language:window.FittFormaI18n?.getLanguage?.()||'es'}:{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:true,...coachExtraContext(),profile:(({avatar,...rest})=>rest)(state.profile||{}),goals:state.nutritionGoals,plan:state.plan,sessions:(state.sessions||[]).slice(0,5).map(s=>({date:s.date,title:s.title,minutes:s.minutes,notes:s.notes,exercises:(s.exercises||[]).slice(0,8).map(e=>({name:e.name,entries:(e.entries||[]).slice(0,6).map(x=>({reps:x.reps,weight:x.weight,done:x.done}))}))})),activities:(state.activities||[]).slice(-5).reverse().map(a=>({date:a.date,type:a.type,distance:a.distance,minutes:a.minutes,pace:a.pace})),weights:(state.weights||[]).slice(-5).reverse().map(w=>({date:w.date,kg:w.kg??w.weight})),language:window.FittFormaI18n?.getLanguage?.()||'es'})});
+      const response=await fetch('/api/coach',{method:'POST',headers:{'Content-Type':'application/json',...(await window.FittFormaAuthHeader())},body:JSON.stringify(state.coachShareData===false?{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:false,language:window.FittFormaI18n?.getLanguage?.()||'es'}:{message:msg,history:(state.chat||[]).slice(0,-1).slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',text:String(m.text||'').slice(0,500)})),shareData:true,...coachExtraContext(),profile:(({avatar,...rest})=>rest)(state.profile||{}),goals:state.nutritionGoals,plan:state.plan,sessions:(state.sessions||[]).slice(0,5).map(s=>({date:s.date,title:s.title,minutes:s.minutes,notes:s.notes,exercises:(s.exercises||[]).slice(0,8).map(e=>({name:e.name,entries:(e.entries||[]).slice(0,6).map(x=>({reps:x.reps,weight:x.weight,done:x.done}))}))})),activities:(state.activities||[]).slice(-5).reverse().map(a=>({date:a.date,type:a.type,distance:a.distance,minutes:a.minutes,pace:a.pace})),weights:(state.weights||[]).slice(-5).reverse().map(w=>({date:w.date,kg:w.kg??w.weight})),language:window.FittFormaI18n?.getLanguage?.()||'es'})});
       const data=await response.json().catch(()=>({}));
       if(response.ok){
         if(window.FittFormaAds)window.FittFormaAds.recordCoachSuccess();
@@ -4377,6 +4290,8 @@ function findCatalogExercise(name){
         if(data.proposal)state.proposal={id:Date.now(),status:'pending',title:String(data.proposal.title||'Propuesta del entrenador').slice(0,100),description:String(data.proposal.description||'Revisá esta propuesta antes de aplicarla.').slice(0,1200),kind:['routine','nutrition','recovery','general'].includes(data.proposal.kind)?data.proposal.kind:'general',days:[2,3,4,5].includes(Number(data.proposal.days))?String(data.proposal.days):state.profile.days,duration:[20,30,45,60].includes(Number(data.proposal.duration))?String(data.proposal.duration):state.profile.duration};
         save();renderCoach();return;
       }
+      // v48: cuota diaria del servidor agotada → el mensaje vuelve al cuadro de texto y se ofrecen opciones.
+      if(response.status===429&&data.code==='ai_quota'){state.chat.pop();save();renderCoach();$('coachInput').value=msg;window.FittFormaAds?.showAiQuota(data.quota);toast(data.error);return;}
       if(response.status===503&&/Falta configurar GEMINI_API_KEY/.test(data.error||'')){backendUnavailable=true;}
       else {if(response.status===502&&$('coachConnection'))$('coachConnection').textContent='El servidor respondió, pero Gemini falló: revisá la clave, el modelo y los límites de la API.';if(response.status===429&&$('coachConnection'))$('coachConnection').textContent='Se alcanzó un límite temporal. Esperá un poco y probá de nuevo.';state.chat.push({role:'assistant',text:data.error||'No se pudo consultar el entrenador. Probá de nuevo más tarde.',at:new Date().toISOString()});save();renderCoach();return;}
     }catch(e){backendUnavailable=true;}
@@ -4590,7 +4505,7 @@ function findCatalogExercise(name){
     if(saveActivity&&gpsMeters>=30&&seconds>=30){
       const km=gpsMeters/1000,minutes=seconds/60,paceSecondsPerKm=seconds/km;
       state.activities.push({id:Date.now(),type:gpsType,date:gpsSessionDate||dateKey(),distance:Number(km.toFixed(3)),minutes:Number(minutes.toFixed(2)),durationSeconds:seconds,pace:gpsType==='Bicicleta'?null:paceTextFromSeconds(paceSecondsPerKm),paceSecondsPerKm:gpsType==='Bicicleta'?null:Number(paceSecondsPerKm.toFixed(1)),source:'gps',route:gpsPoints.slice(),splits:gpsSplits.slice(0,100)});
-      const badgeDelta=syncBadgeUnlocks();save();renderActivities();renderRunningHistory();renderStats();renderProgress();renderPlanner();$('gpsStatus').textContent='Actividad GPS guardada en este dispositivo. Si se registró con señal imprecisa, distancia y ritmo pueden variar.';notifyBadgeChanges(badgeDelta,'Actividad GPS guardada.');
+      pendingAdBreak='run-saved';const badgeDelta=syncBadgeUnlocks();save();renderActivities();renderRunningHistory();renderStats();renderProgress();renderPlanner();$('gpsStatus').textContent='Actividad GPS guardada en este dispositivo. Si se registró con señal imprecisa, distancia y ritmo pueden variar.';notifyBadgeChanges(badgeDelta,'Actividad GPS guardada.');
     }else if(saveActivity){$('gpsStatus').textContent='La sesión fue demasiado corta o tuvo poca señal para guardar una distancia confiable. Podés probar de nuevo o registrar los datos manualmente.';toast('No se guardó: faltan datos GPS suficientes.');}
     else $('gpsStatus').textContent='Seguimiento detenido sin guardar la actividad.';
     clearGpsDraft();gpsStartedAt=0;gpsPaused=false;gpsPausedMs=0;gpsPauseAt=0;gpsLastPoint=null;gpsRetryNeeded=false;gpsUi();updateGpsMapRoute(false);
@@ -4613,7 +4528,7 @@ function findCatalogExercise(name){
     if(!gpsStartedAt)return;persistGpsDraft(true);if(gpsWatchId!==null&&navigator.geolocation)navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;gpsLastPoint=null;if(gpsElapsedTimer)clearInterval(gpsElapsedTimer);gpsElapsedTimer=null;releaseGpsWakeLock();if(!gpsPaused){gpsPaused=true;gpsPauseAt=Date.now();}$('gpsPause').textContent='Reanudar';$('gpsStart').disabled=true;$('gpsStart').textContent='GPS pausado';$('gpsStatus').textContent='Sesión pausada para conservar el recorrido. Volvé a la app y reanudá cuando esté visible.';persistGpsDraft(true);
   }
   function setCloudStatus(message){const el=$('cloudStatus');if(el)el.textContent=message;}
-  function updateCloudControls(){const ready=!!supabaseClient,logged=!!cloudUser;if($('deleteCloudAccount'))$('deleteCloudAccount').hidden=!logged;$('cloudLogin').disabled=!ready||logged;$('cloudRegister').disabled=!ready||logged;$('cloudLogout').hidden=!logged;$('cloudDownload').disabled=!ready||!logged;$('cloudUpload').disabled=!ready||!logged;if(!ready)setCloudStatus('Sin configurar. La app sigue en modo local; configurá SUPABASE_URL y SUPABASE_ANON_KEY en Render o completá supabase-config.js con la clave pública.');else if(logged)setCloudStatus('Sesión iniciada: '+cloudUser.email+'. Elegí manualmente si querés cargar o guardar datos.');else setCloudStatus('Configuración lista. Iniciá sesión o creá una cuenta para sincronizar.');}
+  function updateCloudControls(){if(cloudUser&&cloudUser.id!==updateCloudControls.lastUser){updateCloudControls.lastUser=cloudUser.id;setTimeout(reconcileDailyFromCloud,0);}if(!cloudUser)updateCloudControls.lastUser=null;const ready=!!supabaseClient,logged=!!cloudUser;if($('deleteCloudAccount'))$('deleteCloudAccount').hidden=!logged;$('cloudLogin').disabled=!ready||logged;$('cloudRegister').disabled=!ready||logged;$('cloudLogout').hidden=!logged;$('cloudDownload').disabled=!ready||!logged;$('cloudUpload').disabled=!ready||!logged;if(!ready)setCloudStatus('Sin configurar. La app sigue en modo local; configurá SUPABASE_URL y SUPABASE_ANON_KEY en Render o completá supabase-config.js con la clave pública.');else if(logged)setCloudStatus('Sesión iniciada: '+cloudUser.email+'. Elegí manualmente si querés cargar o guardar datos.');else setCloudStatus('Configuración lista. Iniciá sesión o creá una cuenta para sincronizar.');}
   function normalizeCloudState(data){
     if(!data||typeof data!=='object'||!data.profile||!Array.isArray(data.sessions))throw new Error('Los datos de la nube no tienen un formato reconocido.');
     return sanitizeState({...structuredClone(defaults),...data,profile:{...defaults.profile,...(data.profile||{})},nutritionGoals:{...defaults.nutritionGoals,...(data.nutritionGoals||{})},reminders:{...defaults.reminders,...(data.reminders||{}),days:Array.isArray(data.reminders?.days)?data.reminders.days.filter(d=>[0,1,2,3,4,5,6].includes(Number(d))).map(Number):defaults.reminders.days.slice()},water:data.water&&typeof data.water==='object'?data.water:structuredClone(defaults.water),waterLogs:data.waterLogs&&typeof data.waterLogs==='object'&&!Array.isArray(data.waterLogs)?data.waterLogs:{},habitLogs:data.habitLogs&&typeof data.habitLogs==='object'&&!Array.isArray(data.habitLogs)?data.habitLogs:{},sessions:Array.isArray(data.sessions)?data.sessions:[],meals:Array.isArray(data.meals)?data.meals:[],weights:Array.isArray(data.weights)?data.weights:[],activities:Array.isArray(data.activities)?data.activities:[],chat:Array.isArray(data.chat)?data.chat:[],planHistory:Array.isArray(data.planHistory)?data.planHistory.slice(-8):[],badgeRecords:Array.isArray(data.badgeRecords)?data.badgeRecords.slice(-500):[],badgeUnlocks:data.badgeUnlocks&&typeof data.badgeUnlocks==='object'&&!Array.isArray(data.badgeUnlocks)?data.badgeUnlocks:{}});
@@ -4683,7 +4598,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.47.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.47.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.48.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.48.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -4842,8 +4757,9 @@ function findCatalogExercise(name){
     const fmt=v=>Math.round(v).toLocaleString('es-UY');
     set('homeKcalVal',fmt(cal));set('homeKcalLbl','de '+fmt(goals.calories||0)+' kcal');arc('homeKcalArc',goals.calories?cal/goals.calories:0);
     set('homeProtVal',fmt(pro)+' g');set('homeProtLbl','de '+fmt(goals.protein||0)+' g de proteína');arc('homeProtArc',goals.protein?pro/goals.protein:0);
-    set('homeQuickWater',water?`${water} de ${goals.water||0} vasos hoy`:'Todavía sin registrar hoy');
-    set('homeWaterVal',String(water));set('homeWaterLbl','de '+(goals.water||0)+' vasos');arc('homeWaterArc',goals.water?water/goals.water:0);
+    const wml=waterMl(todayKey),wgoal=hydro().goalMl;
+    set('homeQuickWater',wml?`${wml} de ${wgoal} ml hoy`:'Todavía sin registrar hoy');
+    set('homeWaterVal',wml>=1000?(wml/1000).toFixed(1).replace('.',',')+' L':String(wml)+' ml');set('homeWaterLbl','de '+wgoal+' ml');arc('homeWaterArc',wgoal?wml/wgoal:0);
     // Hábitos de hoy (mismos registros que Progreso)
     const habitBox=$('homeHabits');
     if(habitBox&&typeof dailyHabitDefinitions!=='undefined'){
@@ -4946,10 +4862,10 @@ function findCatalogExercise(name){
     applyAvatar();
   }
   // Nivel: fórmula pública basada en registros reales.
-  function profileXp(){const s=(state.sessions||[]).length,a=(state.activities||[]).length,b=Object.keys(state.badgeUnlocks||{}).length,h=Object.values(state.habitLogs||{}).filter(day=>day&&typeof day==='object'&&Object.values(day).some(v=>v===true)).length;return {xp:s*50+a*30+b*20+h*10,s,a,b,h};}
+  function profileXp(){const sessions=state.sessions||[],s=sessions.filter(x=>x?.status!=='partial').length,d=sessions.filter(x=>x?.type==='daily'&&x?.status!=='partial').length,sx=FittFormaTraining.sessionXp(sessions),a=(state.activities||[]).length,b=Object.keys(state.badgeUnlocks||{}).length,h=Object.values(state.habitLogs||{}).filter(day=>day&&typeof day==='object'&&Object.values(day).some(v=>v===true)).length;return {xp:sx+a*30+b*20+h*10,s,d,sx,a,b,h};}
   function renderProfileLevel(){
-    const root=$('profileLevel');if(!root)return;const {xp,s,a,b,h}=profileXp(),per=300,level=Math.floor(xp/per)+1,into=xp%per;
-    root.innerHTML=`<div class="level-row"><span class="level-badge">Nivel ${level}</span><span class="muted small">${into} / ${per} XP</span></div><div class="level-bar" role="progressbar" aria-label="Avance al nivel ${level+1}" aria-valuemin="0" aria-valuemax="${per}" aria-valuenow="${into}"><i style="width:${Math.round(into/per*100)}%"></i></div><details class="level-how"><summary>¿Cómo se calcula?</summary><p class="muted small">50 XP por entrenamiento (${s}), 30 por actividad al aire libre (${a}), 20 por insignia (${b}) y 10 por día con hábitos marcados (${h}). Cada nivel son ${per} XP. Total: ${xp} XP.</p></details>`;
+    const root=$('profileLevel');if(!root)return;const {xp,s,d,sx,a,b,h}=profileXp(),per=300,level=Math.floor(xp/per)+1,into=xp%per;
+    root.innerHTML=`<div class="level-row"><span class="level-badge">Nivel ${level}</span><span class="muted small">${into} / ${per} XP</span></div><div class="level-bar" role="progressbar" aria-label="Avance al nivel ${level+1}" aria-valuemin="0" aria-valuemax="${per}" aria-valuenow="${into}"><i style="width:${Math.round(into/per*100)}%"></i></div><details class="level-how"><summary>¿Cómo se calcula?</summary><p class="muted small">50 XP por entrenamiento diario completo (${d}), 20 por otra sesión completa (máximo 2 por día; 10 si es manual; ${sx} XP de ${s} sesiones), las sesiones parciales no suman, 30 por actividad al aire libre (${a}), 20 por insignia (${b}) y 10 por día con hábitos marcados (${h}). Cada nivel son ${per} XP. Total: ${xp} XP.</p></details>`;
   }
   // Inicio: indicadores de la semana con datos reales.
   // v47: actividad reciente de Inicio con los registros reales (sesiones, actividades al aire libre y comidas).
@@ -5168,9 +5084,12 @@ function findCatalogExercise(name){
       switchView('train');return;
     }
     if(kind==='meal'){switchView('nutrition');showViewTab('nutrition','registrar');setTimeout(()=>$('mealName')?.focus(),60);return;}
-    if(kind==='water'){$('addWater')?.click();const key=dateKey(),count=Math.max(0,Number(state.waterLogs?.[key])||0),goal=Number(state.nutritionGoals?.water)||8;renderHome();toast(`Agua registrada: ${count} de ${goal} vasos hoy. Podés corregirlo en Nutrición › Hoy.`);return;}
+    if(kind==='water'){$('addWater')?.click();renderHome();toast(`Agua registrada: ${waterMl()} de ${hydro().goalMl} ml hoy. Podés corregirlo en Nutrición › Hoy.`);return;}
   }
   function switchView(name){
+    // v48: un intersticial solo se evalúa al cambiar de sección (nunca en medio de una actividad) y,
+    // después de guardar un entrenamiento o una carrera, recién cuando la persona sale del resumen.
+    if(window.FittFormaAds&&name!==document.querySelector('.view.active')?.id?.replace('view-','')){const ev=pendingAdBreak||'section-change';pendingAdBreak='';setTimeout(()=>window.FittFormaAds.maybeInterstitial(ev),400);}
     const trainViews=['exercises','routines','running','coach'];
     const hasTab=[...document.querySelectorAll('.tab')].some(b=>b.dataset.view===name);
     const navName=hasTab?name:(trainViews.includes(name)?'train':name);
@@ -5331,15 +5250,29 @@ function findCatalogExercise(name){
     if(!('Notification' in window)||Notification.permission!=='granted'){toast('Primero tocá “Permitir notificaciones”.');return;}
     const sent=await showWorkoutNotification('FittForma AI','Las notificaciones están funcionando.','fittforma-notification-test');toast(sent?'¡Notificación de prueba enviada!':'No se pudo mostrar la notificación de prueba.');
   });
+  // v48: altura en cm o m, peso en kg o lb (se guarda siempre en kg) y el peso entra al historial.
+  $('profileWeightUnit')?.addEventListener('change',e=>{const lb=e.target.value==='lb';document.querySelectorAll('[data-weight-unit]').forEach(x=>x.textContent=lb?'lb':'kg');for(const id of ['profileCurrentWeight','profileTargetWeight']){const inp=$(id);inp.min=lb?'55':'25';inp.max=lb?'770':'350';if(inp.value){const v=Number(inp.value);inp.value=String(Math.round((lb?v*2.20462:v/2.20462)*10)/10);}}});
   $('bodyProfileForm').addEventListener('submit',e=>{
     e.preventDefault();
-    const age=$('profileAge').value.trim(),height=$('profileHeight').value.trim(),current=$('profileCurrentWeight').value.trim(),target=$('profileTargetWeight').value.trim();
-    if(age&&(Number(age)<13||Number(age)>100)){toast('Ingresá una edad entre 13 y 100 años.');return;}
-    if(height&&(Number(height)<100||Number(height)>250)){toast('Ingresá una altura entre 100 y 250 cm.');return;}
-    if(current&&(Number(current)<25||Number(current)>350)){toast('Ingresá un peso actual entre 25 y 350 kg.');return;}
-    if(target&&(Number(target)<25||Number(target)>350)){toast('Ingresá una meta de peso entre 25 y 350 kg.');return;}
-    state.profile={...state.profile,age:age?String(Number(age)):'',heightCm:height?String(Number(height)):'',currentWeightKg:current?String(Number(current)):'',targetWeightKg:target?String(Number(target)):'',activityLevel:$('profileActivityLevel').value};
-    save();renderProfile();toast('Datos físicos guardados.');
+    const lb=$('profileWeightUnit')?.value==='lb',toKg=v=>v===''?'':String(Math.round((lb?Number(v)/2.20462:Number(v))*10)/10);
+    const age=$('profileAge').value.trim();let height=$('profileHeight').value.trim().replace(',','.');const current=toKg($('profileCurrentWeight').value.trim()),target=toKg($('profileTargetWeight').value.trim());
+    if(height&&Number(height)>0&&Number(height)<3){height=String(Math.round(Number(height)*100));toast(`Altura interpretada en metros: ${height} cm.`);}
+    if(age&&(!Number.isInteger(Number(age))||Number(age)<13||Number(age)>100)){toast('Ingresá una edad entre 13 y 100 años.');return;}
+    if(height&&(Number(height)<100||Number(height)>250)){toast('Ingresá una altura entre 100 y 250 cm (o entre 1 y 2,5 m).');return;}
+    if(current&&(Number(current)<25||Number(current)>350)){toast(lb?'Ingresá un peso actual entre 55 y 770 lb.':'Ingresá un peso actual entre 25 y 350 kg.');return;}
+    if(target&&(Number(target)<25||Number(target)>350)){toast(lb?'Ingresá una meta entre 55 y 770 lb.':'Ingresá una meta de peso entre 25 y 350 kg.');return;}
+    const previousWeight=state.profile.currentWeightKg;
+    state.profile={...state.profile,age:age?String(Number(age)):'',heightCm:height?String(Number(height)):'',currentWeightKg:current,targetWeightKg:target,activityLevel:$('profileActivityLevel').value};
+    // Un peso nuevo también queda en el historial (una medición por día; se reemplaza la del día si existe).
+    if(current&&current!==previousWeight){state.weights=Array.isArray(state.weights)?state.weights:[];const today=dateKey(),i=state.weights.findIndex(w=>w.date===today);if(i>=0)state.weights[i]={...state.weights[i],kg:Number(current)};else state.weights.push({id:Date.now(),date:today,kg:Number(current)});state.weights.sort((a,b)=>a.date.localeCompare(b.date));}
+    if($('profileWeightUnit'))$('profileWeightUnit').value='kg';document.querySelectorAll('[data-weight-unit]').forEach(x=>x.textContent='kg');
+    save();syncBodyProfileForm();renderProfile();renderWeights();renderProgress();renderHydration?.();toast('Datos físicos guardados.');
+  });
+  function syncTrainingPrefs(){const p=state.profile||{};for(const [id,k] of [['prefGoal','goal'],['prefLevel','level'],['prefDays','days'],['prefEquipment','equipment'],['prefDuration','duration']]){const el=$(id);if(el)el.value=String(p[k]??defaults.profile[k]);}}
+  $('trainingPrefsForm')?.addEventListener('submit',e=>{
+    e.preventDefault();
+    for(const [id,k] of [['prefGoal','goal'],['prefLevel','level'],['prefDays','days'],['prefEquipment','equipment'],['prefDuration','duration']])$(k).value=$(id).value;
+    makePlan();syncTrainingPrefs();toast('Preferencias guardadas y plan actualizado.');
   });
   $('estimateNutritionGoals').addEventListener('click',()=>{
     const p=state.profile||{},age=Number(p.age),height=Number(p.heightCm),weight=Number(p.currentWeightKg),target=Number(p.targetWeightKg);
@@ -5358,7 +5291,7 @@ function findCatalogExercise(name){
     $('nutritionGoalHint').textContent=`Referencia cargada para ${direction}: ${calories} kcal, ${protein} g proteína, ${carbs} g carbohidratos y ${fat} g grasas. Estimación simplificada; revisá que sea razonable y tocá “Guardar objetivos” si querés aplicarla.`;
     toast('Estimación cargada para revisar; todavía no se guardó.');
   });
-  $('saveNutritionGoals').addEventListener('click',()=>{state.nutritionGoals={calories:Math.max(800,Math.min(6000,Number($('calorieGoal').value)||2400)),protein:Math.max(20,Math.min(400,Number($('proteinGoal').value)||120)),carbs:Math.max(0,Math.min(800,Number($('carbGoal').value)||0)),fat:Math.max(0,Math.min(300,Number($('fatGoal').value)||0)),water:Math.max(1,Math.min(20,Number($('waterGoal').value)||8))};save();renderNutrition();toast('Objetivos nutricionales guardados.');});
+  $('saveNutritionGoals').addEventListener('click',()=>{state.nutritionGoals={calories:Math.max(800,Math.min(6000,Number($('calorieGoal').value)||2400)),protein:Math.max(20,Math.min(400,Number($('proteinGoal').value)||120)),carbs:Math.max(0,Math.min(800,Number($('carbGoal').value)||0)),fat:Math.max(0,Math.min(300,Number($('fatGoal').value)||0)),water:Math.round((state.hydration?.goalMl||2000)/(state.hydration?.glassMl||250)*10)/10};save();renderNutrition();toast('Objetivos nutricionales guardados.');});
   $('mealName').addEventListener('input',autoEstimateMeal);for(const id of ['mealCalories','mealProtein','mealCarbs','mealFat'])$(id).addEventListener('input',()=>{$(id).dataset.manual='1';});
   $('mealForm').addEventListener('submit',e=>{e.preventDefault();const values={name:$('mealName').value.trim(),calories:Number($('mealCalories').value),protein:Number($('mealProtein').value),carbs:Number($('mealCarbs').value)||0,fat:Number($('mealFat').value)||0,type:$('mealType').value};if(!values.name||!Number.isFinite(values.calories)||values.calories<0||values.calories>10000||!Number.isFinite(values.protein)||values.protein<0||values.protein>500){toast('Revisá el nombre, las calorías (0–10000) y las proteínas (0–500 g).');return;}const editing=editingMealId&&state.meals.find(m=>String(m.id)===String(editingMealId));if(editing)Object.assign(editing,values,{editedAt:new Date().toISOString()});else state.meals.push({id:Date.now(),date:dateKey(),...values});const wasEditing=Boolean(editing);setMealEditing(null);if(!save())return;$('mealForm').reset();for(const id of ['mealCalories','mealProtein','mealCarbs','mealFat'])$(id).dataset.manual='0';lastAutoMealName='';$('mealEstimateStatus').textContent='Al escribir alimentos conocidos, FittForma estima calorías y macronutrientes automáticamente. Revisá los valores antes de guardar.';renderNutrition();renderHome();toast(wasEditing?'Comida actualizada.':'Comida registrada.');if(wasEditing)showViewTab('nutrition','hoy');});
   let editingMealId=null;
@@ -5374,8 +5307,66 @@ function findCatalogExercise(name){
     }else if(cancel)cancel.remove();
   }
   $('mealList').addEventListener('click',e=>{const b=e.target.closest('.editMeal');if(!b)return;const meal=state.meals.find(m=>String(m.id)===b.dataset.id);if(!meal)return;setMealEditing(meal);showViewTab('nutrition','registrar');$('mealName').focus();});
-  $('addWater').addEventListener('click',()=>{const key=dateKey();if(!state.waterLogs||typeof state.waterLogs!=='object'||Array.isArray(state.waterLogs))state.waterLogs={};if(!state.water||state.water.date!==key)state.water={date:key,count:Math.max(0,Number(state.waterLogs[key])||0)};state.water.count=Math.min(30,state.water.count+1);state.waterLogs[key]=state.water.count;save();renderNutrition();});
-  $('removeWater').addEventListener('click',()=>{const key=dateKey();if(!state.waterLogs||typeof state.waterLogs!=='object'||Array.isArray(state.waterLogs))state.waterLogs={};if(!state.water||state.water.date!==key)state.water={date:key,count:Math.max(0,Number(state.waterLogs[key])||0)};state.water.count=Math.max(0,state.water.count-1);state.waterLogs[key]=state.water.count;save();renderNutrition();});
+  // ---------- v48: hidratación por registros en ml ----------
+  // Cada registro guarda fecha local, cantidad y hora. waterLogs (vasos) se deriva para compatibilidad.
+  function hydro(){if(!isPlainObj(state.hydration))state.hydration=structuredClone(defaults.hydration);if(!Array.isArray(state.hydration.entries))state.hydration.entries=[];return state.hydration;}
+  function waterMl(date=dateKey()){return FittFormaTraining.hydrationDay(hydro().entries,date);}
+  function syncWaterDerived(date){
+    const h=hydro();state.waterLogs=isPlainObj(state.waterLogs)?state.waterLogs:{};
+    const dates=date?[date]:[...new Set(h.entries.map(e=>e.date))];
+    for(const d of dates){const ml=waterMl(d);if(ml>0)state.waterLogs[d]=Math.round(ml/h.glassMl*10)/10;else delete state.waterLogs[d];}
+    state.nutritionGoals={...(state.nutritionGoals||defaults.nutritionGoals),water:Math.round(h.goalMl/h.glassMl*10)/10};
+    state.water={date:dateKey(),count:state.waterLogs[dateKey()]||0};
+  }
+  function addWater(ml,label){
+    const v=FittFormaTraining.validWaterMl(ml);if(!v){toast('Ingresá una cantidad entre 10 y 2000 ml.');return false;}
+    const today=dateKey();if(waterMl(today)+v>15000){toast('Ese total no parece real para un día. Revisá los registros de hoy.');return false;}
+    hydro().entries.push({id:'w'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),date:today,ml:v,at:new Date().toISOString(),tz:-new Date().getTimezoneOffset()});
+    syncWaterDerived(today);save();renderHydration();renderHome?.();if(label!==false)toast(`+${v} ml · hoy ${waterMl(today)} ml`);return true;
+  }
+  function removeWaterEntry(id){const h=hydro(),e=h.entries.find(x=>x.id===id);if(!e)return;h.entries=h.entries.filter(x=>x!==e);syncWaterDerived(e.date);save();renderHydration();renderHome?.();toast(`Se quitó un registro de ${e.ml} ml.`);}
+  function undoLastWater(){const today=dateKey(),list=hydro().entries.filter(e=>e.date===today);const last=list[list.length-1];if(!last){toast('No hay registros de agua hoy.');return;}removeWaterEntry(last.id);}
+  function renderHydration(){
+    const h=hydro(),today=dateKey(),ml=waterMl(today),goal=h.goalMl,pct=Math.min(100,Math.round(ml/goal*100));
+    const set=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
+    set('hydroDate',prettyDate(today));set('waterMlToday',String(ml));set('waterGoalMlText',String(goal));set('waterPct',`${Math.round(ml/goal*100)} %`);set('glassMlLabel',String(h.glassMl));
+    set('waterRemaining',ml>=goal?`¡Llegaste a tu objetivo de hoy! (${ml} ml)`:ml?`Te faltan ${goal-ml} ml para tu objetivo.`:'Todavía sin registros hoy.');
+    set('waterCount',String(state.waterLogs?.[today]||0));set('waterGoalText',String(state.nutritionGoals?.water||0));
+    const water=$('hydroWater'),wave=$('hydroWave'),top=150-150*pct/100;
+    if(water)water.setAttribute('y',String(top));if(wave)wave.setAttribute('transform',`translate(0 ${top-150})`);
+    const bottle=$('hydroBottle');if(bottle){bottle.setAttribute('aria-label',`Hidratación de hoy: ${ml} de ${goal} ml (${pct} %)`);bottle.classList.toggle('is-full',ml>=goal);}
+    const list=$('waterEntries');if(list){const entries=h.entries.filter(e=>e.date===today).slice().reverse();list.innerHTML=entries.length?entries.map(e=>`<li class="ff-list-row"><div><strong>${e.ml} ml</strong><small>${e.at?new Date(e.at).toLocaleTimeString(uiLocale(),{hour:'2-digit',minute:'2-digit'}):'Registro migrado de versiones anteriores'}</small></div><button type="button" class="btn ghost btn-sm" data-water-remove="${esc(e.id)}">Eliminar</button></li>`).join(''):'<li class="muted small">Sin registros hoy.</li>';}
+    if($('waterGoalMl')&&document.activeElement!==$('waterGoalMl'))$('waterGoalMl').value=String(goal);
+    if(document.activeElement?.closest?.('.hydro-details')==null)syncWaterReminderForm();
+    if($('glassMl')&&document.activeElement!==$('glassMl'))$('glassMl').value=String(h.glassMl);
+    const rec=FittFormaTraining.hydrationRecommendation(state.profile?.currentWeightKg);
+    set('waterSuggestion',rec?`Referencia orientativa para tu peso: ${rec.low}–${rec.high} ml por día (30–35 ml por kg). No es una indicación médica; ajustala si entrenás mucho, hace calor o tenés indicaciones profesionales.`:'Si cargás tu peso en Perfil, te mostramos una referencia orientativa. Un objetivo común de partida es 2000 ml.');
+    const useRec=$('useWaterSuggestion');if(useRec){useRec.hidden=!rec;useRec.onclick=()=>{if(rec){$('waterGoalMl').value=String(Math.round((rec.low+rec.high)/2/50)*50);}};}
+    const week=$('waterWeek');if(week){const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-(6-i));const key=dateKey(d);return {key,ml:waterMl(key),label:d.toLocaleDateString(uiLocale(),{weekday:'short'})};});const recorded=days.filter(d=>d.ml>0);
+      week.innerHTML=days.map(d=>`<div class="hydro-day ${d.key===today?'today':''} ${d.ml>=goal?'met':''}" title="${prettyDate(d.key)} · ${d.ml?d.ml+' ml':'sin registro'}"><span class="hydro-day-bar"><i style="height:${Math.min(100,Math.round(d.ml/goal*100))}%"></i></span><small>${esc(d.label)}</small><b>${d.ml?(d.ml/1000).toFixed(1).replace('.',',')+' L':'—'}</b></div>`).join('');
+      set('waterWeekSummary',recorded.length?`Promedio en días con registro: ${Math.round(recorded.reduce((n,d)=>n+d.ml,0)/recorded.length)} ml · objetivo cumplido ${days.filter(d=>d.ml>=goal).length} de 7 días.`:'Todavía no hay registros esta semana.');}
+  }
+  function syncWaterReminderForm(){const r=hydro().reminder||{};if($('waterReminderEnabled'))$('waterReminderEnabled').checked=!!r.enabled;if($('waterReminderFrom'))$('waterReminderFrom').value=r.from||'09:00';if($('waterReminderTo'))$('waterReminderTo').value=r.to||'21:00';}
+  $('saveWaterReminder')?.addEventListener('click',()=>{const from=$('waterReminderFrom').value,to=$('waterReminderTo').value;if(!/^\d{2}:\d{2}$/.test(from)||!/^\d{2}:\d{2}$/.test(to)||from>=to){toast('El horario «hasta» debe ser posterior a «desde».');return;}const enabled=$('waterReminderEnabled').checked;hydro().reminder={...(hydro().reminder||{}),enabled,from,to};save();toast(enabled?(('Notification' in window)&&Notification.permission==='granted'?'Recordatorio de agua activado.':'Recordatorio guardado. Permití las notificaciones en Perfil › Recordatorios para recibirlo.'):'Recordatorio de agua desactivado.');});
+  // Aviso de agua: máximo uno cada 2 h y 4 por día, solo si va por debajo de lo esperado a esa hora.
+  async function checkWaterReminder(){
+    const h=hydro(),r=h.reminder;if(!r?.enabled||!('Notification' in window)||Notification.permission!=='granted')return;
+    const now=new Date(),today=dateKey(now),mins=now.getHours()*60+now.getMinutes(),toMin=t=>{const [a,b]=String(t).split(':').map(Number);return a*60+b;};
+    const from=toMin(r.from||'09:00'),to=toMin(r.to||'21:00');if(mins<from||mins>to)return;
+    const count=r.countDate===today?Number(r.count)||0:0;if(count>=4)return;
+    if(r.lastAt&&now-new Date(r.lastAt)<2*60*60*1000)return;
+    const expected=h.goalMl*(mins-from)/Math.max(60,to-from),ml=waterMl(today);if(ml>=expected-h.glassMl/2||ml>=h.goalMl)return;
+    const sent=await showWorkoutNotification('Hidratación',`Llevás ${ml} ml de ${h.goalMl} ml hoy. Si querés, tomá un vaso de agua.`,'fittforma-water-'+today+'-'+count);
+    if(sent){h.reminder={...r,lastAt:now.toISOString(),countDate:today,count:count+1};save();}
+  }
+  setInterval(()=>{if(document.visibilityState==='visible')checkWaterReminder();},60000);
+  $('addWater').addEventListener('click',()=>addWater(hydro().glassMl,false)||true);
+  $('removeWater').addEventListener('click',undoLastWater);
+  document.querySelectorAll('[data-water-add]').forEach(b=>b.addEventListener('click',()=>addWater(Number(b.dataset.waterAdd))));
+  $('waterCustomForm')?.addEventListener('submit',e=>{e.preventDefault();if(addWater(Number($('waterCustomMl').value)))$('waterCustomMl').value='';});
+  $('waterEntries')?.addEventListener('click',e=>{const b=e.target.closest('[data-water-remove]');if(b)removeWaterEntry(b.dataset.waterRemove);});
+  $('waterResetToday')?.addEventListener('click',()=>{const today=dateKey(),n=hydro().entries.filter(e=>e.date===today).length;if(!n){toast('No hay registros hoy.');return;}if(!confirm(`¿Borrar los ${n} registros de agua de hoy? Los días anteriores no se modifican.`))return;state.hydration.entries=hydro().entries.filter(e=>e.date!==today);syncWaterDerived(today);save();renderHydration();renderHome?.();toast('Contador de hoy reiniciado.');});
+  $('saveWaterSettings')?.addEventListener('click',()=>{const goal=Math.round(Number($('waterGoalMl').value)),glass=Number($('glassMl').value);if(!Number.isFinite(goal)||goal<500||goal>6000){toast('El objetivo debe estar entre 500 y 6000 ml.');return;}const h=hydro();h.goalMl=goal;h.glassMl=[150,200,250,300,330,350,400,500].includes(glass)?glass:250;syncWaterDerived();save();renderHydration();renderHome?.();toast('Objetivo de hidratación guardado.');});
   $('weightForm').addEventListener('submit',e=>{e.preventDefault();const kg=Number($('weightInput').value);state.weights.push({id:Date.now(),date:dateKey(),kg});state.weights.sort((a,b)=>a.date.localeCompare(b.date));state.profile.currentWeightKg=String(kg);save();syncBodyProfileForm();renderProfile();$('weightInput').value='';renderWeights();renderProgress();toast('Peso registrado y perfil actualizado.');});
   $('activityDate').value=dateKey();
   $('activityForm').addEventListener('submit',e=>{e.preventDefault();const distance=Number($('activityDistance').value),minutes=Number($('activityMinutes').value),type=$('manualActivityType').value,date=$('activityDate').value;if(!date||date>dateKey()||!Number.isFinite(distance)||distance<0.01||distance>500||!Number.isFinite(minutes)||minutes<1||minutes>1440){toast('Revisá la fecha, distancia y duración de la actividad.');return;}const speed=distance/(minutes/60);if(speed>(type==='Bicicleta'?100:20)){toast('La velocidad parece inusual. Revisá los datos ingresados.');return;}state.activities.push({id:Date.now(),type,date,distance:Number(distance.toFixed(3)),minutes:Number(minutes.toFixed(2)),durationSeconds:Math.round(minutes*60),speedKmh:Number(speed.toFixed(2)),source:'manual'});const badgeDelta=syncBadgeUnlocks();save();$('activityForm').reset();$('activityDate').value=dateKey();renderActivities();renderStats();renderProgress();renderPlanner();notifyBadgeChanges(badgeDelta,'Actividad registrada.');});
@@ -5414,7 +5405,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.47.0';
+  const APP_VERSION='0.48.0';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');
@@ -5457,6 +5448,11 @@ function findCatalogExercise(name){
   document.querySelectorAll('[data-library-mode]').forEach(b=>b.addEventListener('click',()=>{libraryMode=b.dataset.libraryMode;renderExerciseLibrary();}));
   document.querySelectorAll('.addMealIdea').forEach(b=>b.addEventListener('click',()=>{switchView('nutrition');$('mealName').value=b.dataset.name;$('mealCalories').value=b.dataset.cal;$('mealProtein').value=b.dataset.pro;$('mealCarbs').value=b.dataset.carbs||'';$('mealFat').value=b.dataset.fat||'';$('mealType').value='Almuerzo';$('mealName').focus();}));
   $('exerciseSearch').addEventListener('input',renderExerciseLibrary);$('exerciseGroupFilter').addEventListener('change',renderExerciseLibrary);$('exerciseFavoritesOnly').addEventListener('click',()=>{exerciseFavoritesOnly=!exerciseFavoritesOnly;renderExerciseLibrary();});
+  // v48: hora del servidor para el entrenamiento diario y pantalla de logro.
+  syncServerTime().then(ok=>{if(ok&&!activeSession)renderTrain();});setInterval(()=>{syncServerTime();},10*60*1000);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncServerTime().then(()=>{if(!activeSession)renderTrain();});});
+  $('badgeCelebrationClose')?.addEventListener('click',()=>$('badgeCelebration').close());
+  $('badgeCelebrationView')?.addEventListener('click',()=>{$('badgeCelebration').close();switchView('progress');showProgressTab('badges');});
   initBadgeCenter();initProgressTabs();document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});$('coachMessages')?.addEventListener('click',e=>{const b=e.target.closest('[data-ai-go]');if(b)fittaiGo(b.dataset.aiGo);});initViewTabs();initRoutines();initBodyTracking();initNotifications();initTheme();$('homeRecentAll')?.addEventListener('click',()=>{switchView('progress');showProgressTab('history');});initAvatar();initQuickAdd();initWelcome();initMealPlanning();$('deleteCloudAccount')?.addEventListener('click',deleteCloudAccount);initSessionHistoryEditing();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
   setTimeout(()=>checkWorkoutReminders(),1200);setInterval(()=>{if(document.visibilityState==='visible')checkWorkoutReminders();},30000);window.addEventListener('focus',()=>{renderReminderSettings();checkWorkoutReminders();});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){renderReminderSettings();checkWorkoutReminders();}});
   document.addEventListener('visibilitychange',()=>{if(!activeSession)return;if(document.visibilityState==='hidden'&&!activeSession.pausedAt){activeSession.elapsedMs=activeSessionElapsedMs(activeSession);activeSession.segmentStartedAt=Date.now();activeSession.pausedAt=Date.now();activeSession.pauseReason='background';persistActiveSessionDraft();}else if(document.visibilityState==='visible'&&activeSession.pausedAt&&activeSession.pauseReason==='background'){activeSession.pausedAt=0;activeSession.pauseReason='';activeSession.segmentStartedAt=Date.now();persistActiveSessionDraft();updateWorkoutClock();}});

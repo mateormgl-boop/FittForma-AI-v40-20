@@ -96,7 +96,8 @@ test('hidratación e historial de hábitos sobreviven carga local, importación 
   assert.match(html, /waterLogs:parsed\.waterLogs&&typeof parsed\.waterLogs==='object'/);
   assert.match(html, /habitLogs:data\.habitLogs&&typeof data\.habitLogs==='object'/);
   assert.match(html, /waterLogs:data\.waterLogs&&typeof data\.waterLogs==='object'/);
-  assert.match(html, /state\.waterLogs\[key\]=state\.water\.count/);
+  assert.match(html, /function addWater\(ml,label\)/, 'v48: el agua se registra en ml por entrada');
+  assert.match(html, /state\.waterLogs\[d\]=Math\.round\(ml\/h\.glassMl\*10\)\/10/, 'waterLogs se deriva de los registros para compatibilidad');
   assert.match(html, /state\.habitLogs\[key\]=log/);
   assert.match(html, /JSON\.stringify\(state,null,2\)/);
 });
@@ -104,9 +105,9 @@ test('hidratación e historial de hábitos sobreviven carga local, importación 
 test('v41.0 fuerza la actualización de la caché PWA y mantiene recursos base', async () => {
   const pkg = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
   const backendPkg = JSON.parse(await readFile(path.join(root, 'backend/package.json'), 'utf8'));
-  assert.equal(pkg.version, '0.47.0');
-  assert.equal(backendPkg.version, '0.47.0');
-  assert.match(sw, /fittforma-ai-static-v47-0/);
+  assert.equal(pkg.version, '0.48.0');
+  assert.equal(backendPkg.version, '0.48.0');
+  assert.match(sw, /fittforma-ai-static-v48-0/);
   assert.match(sw, /\.\/index\.html/);
   assert.match(sw, /\.\/supabase-config\.js/);
 });

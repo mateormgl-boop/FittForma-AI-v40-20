@@ -3,6 +3,9 @@
 // hábitos, exportar → borrar → importar, cambio de idioma y uso sin conexión (service worker).
 // Uso: APP_URL=http://localhost:8787 node tests/e2e/flows.e2e.mjs  (con `npm start` en otra terminal)
 import { createRequire } from 'module';
+
+// v48: la pantalla de logro es modal; las pruebas la registran y la cierran para seguir navegando.
+const CLOSE_CELEBRATION = () => { window.__celebrations = []; setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d && d.open) { window.__celebrations.push(document.getElementById('badgeCelebrationName')?.textContent || ''); d.close(); } }, 50); };
 import fs from 'node:fs';
 const require = createRequire((process.env.PLAYWRIGHT_DIR || '/opt/node-tools/node_modules') + '/');
 const { chromium } = require('playwright');
@@ -19,7 +22,8 @@ page.on('pageerror', e => errors.push('PAGEERR ' + e.message));
 page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|ERR_INTERNET_DISCONNECTED|leaflet|unpkg|jsdelivr/i.test(m.text())) errors.push(m.text()); });
 page.on('dialog', d => d.accept());
 await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
-await page.addInitScript(() => {
+await page.addInitScript(CLOSE_CELEBRATION);
+  await page.addInitScript(() => {
   localStorage.setItem('fittforma-welcome-v1', '1');
   // GPS simulado: la prueba decide cada posición y su hora (con el reloj simulado de Playwright).
   const watchers = new Map(); let next = 1;

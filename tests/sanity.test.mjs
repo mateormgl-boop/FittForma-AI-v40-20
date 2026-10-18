@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, access } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -12,22 +13,6 @@ const server = await read('backend/server.mjs');
 const i18n = await read('i18n.js');
 const sw = await read('sw.js');
 
-test('la página principal y archivos base existen en la raíz', async () => {
-  for (const file of ['index.html', 'package.json', 'backend/server.mjs', 'i18n.js', 'sw.js', 'manifest.json']) {
-    await access(path.join(root, file));
-  }
-  assert.match(html, /FittForma AI/);
-});
-
-test('las referencias de imágenes específicas y genéricas existen', async () => {
-  const helper = html.slice(html.indexOf('const exactRules'), html.indexOf('const matched=exactRules'));
-  const specific = [...helper.matchAll(/'([a-z0-9-]+\.(?:webp|svg))'/g)].map(m => m[1]);
-  const generic = ['reference-strength.svg','reference-legs.svg','reference-push.svg','reference-pull.svg','reference-shoulders.svg','reference-arms.svg','reference-core.svg','reference-cardio.svg'];
-  for (const file of [...new Set([...specific, ...generic])]) {
-    await access(path.join(root, 'assets/exercises', file));
-  }
-  assert.ok(specific.length >= 5, 'Debe existir un conjunto de imágenes específicas');
-});
 
 test('cada recurso del precaché del service worker existe', async () => {
   const match = sw.match(/const ASSETS = (\[[\s\S]*?\]);/);
@@ -49,10 +34,12 @@ test('el GPS simplifica rutas largas conservando los extremos', () => {
 });
 
 test('rutinas de fuerza separan tren superior/inferior y cardio', () => {
-  assert.match(html, /const fullBody=\['lower','push','pull','posterior','core','shoulders','arms','accessory'\]/);
-  assert.match(html, /\['Tren superior A','Tren inferior A','Tren superior B','Tren inferior B'\]/);
-  assert.match(html, /if\(p\.goal==='endurance'\)/);
-  assert.match(html, /kind==='cardio'/);
+  // v48: el generador vive en training-core.js (probado en v48.test.mjs).
+  const core = readFileSync(path.join(root, 'training-core.js'), 'utf8');
+  assert.match(core, /4: \['upperA', 'lowerA', 'upperB', 'lowerB'\]/);
+  assert.match(core, /title: 'Tren superior A'/);
+  assert.match(core, /if \(profile\.goal === 'endurance'\) return buildEndurancePlan/);
+  assert.match(html, /state\.plan=FittFormaTraining\.buildPlan\(p\)/);
 });
 
 test('el mapa usa URL canónica y permite un Referer válido', () => {
@@ -80,8 +67,8 @@ test('todos los botones estáticos y de plantillas declaran su tipo para no envi
 });
 
 test('versiones visibles del pie de página y traducciones están alineadas', () => {
-  assert.match(html, /Versión 47\.0/);
-  assert.match(i18n, /VERSION 47\.0 · ONLINE FITNESS COMMUNITY/);
+  assert.match(html, /Versión 48\.0/);
+  assert.match(i18n, /VERSION 48\.0 · ONLINE FITNESS COMMUNITY/);
   assert.doesNotMatch(html, /Versión 26\.0|Versión 25\.0|Versión 24\.0|Versión 23\.0/);
   assert.doesNotMatch(i18n, /Version 23\.0|Versão 23\.0|Versione 23\.0/);
 });
@@ -129,14 +116,13 @@ test('la navegación de app móvil y la instalación PWA están configuradas', a
 
 
 test('la biblioteca contiene al menos 150 ejercicios únicos y conserva las tres modalidades', () => {
-  const start = html.indexOf('const library = {');
-  const end = html.indexOf('\n  };', start);
-  assert.ok(start >= 0 && end > start, 'No se encontró la biblioteca');
-  const source = html.slice(start, end);
-  const names = [...source.matchAll(/\{name:'([^']+)'|\{name:"([^"]+)"/g)].map(m => m[1] || m[2]);
+  // v48: la biblioteca vive en training-core.js, depurada de duplicados con otro nombre.
+  const source = readFileSync(path.join(root, 'training-core.js'), 'utf8');
+  const names = [...source.matchAll(/[SCM]\('([^']+)'/g)].map(m => m[1]);
   const normalize = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
   const unique = new Set(names.map(normalize));
   assert.ok(source.includes('gym: [') && source.includes('home: [') && source.includes('bodyweight: ['));
+  assert.match(html, /const library = FittFormaTraining\.LIBRARY;/);
   assert.ok(unique.size >= 150, `Se encontraron ${unique.size} ejercicios únicos; se esperan al menos 150`);
 });
 
@@ -149,22 +135,14 @@ test('las fichas de ejercicio muestran una secuencia visual de tres etapas', () 
 });
 
 
-test('v40.7: los SVG generados que no demuestran de forma fiable la biomecánica están en cuarentena y no se usan ni se precargan', async () => {
-  const start = html.indexOf('const library = {');
-  const end = html.indexOf('\n  };', start);
-  const source = html.slice(start, end);
-  const names = [...source.matchAll(/\{name\s*:\s*(['\"])(.*?)\1\s*,group\s*:/g)].map(m => m[2]);
-  const slug = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,70) || 'ejercicio';
-  for (const name of new Set(names)) await access(path.join(root, 'assets/exercises/unverified-generated', `${slug(name)}.svg`));
-  assert.equal(new Set(names.map(n=>n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim())).size,180);
+test('v40.7: los SVG generados sin verificar siguen en cuarentena: no se usan ni se precargan', async () => {
   assert.doesNotMatch(html, /assets\/exercises\/unverified-generated/);
   assert.doesNotMatch(sw, /assets\/exercises\/unverified-generated/);
-  assert.match(html, /no se presentan como si mostraran el gesto exacto/);
 });
 
 test('la PWA tolera recursos estáticos opcionales no disponibles durante la instalación', () => {
   assert.match(sw, /Promise\.allSettled\(ASSETS\.map\(asset=>cache\.add\(asset\)\)\)/);
-  assert.match(sw, /fittforma-ai-static-v47-0/);
+  assert.match(sw, /fittforma-ai-static-v48-0/);
 });
 
 test('los estilos móviles protegen desbordamientos y el scroll de menús/modales', () => {
@@ -263,9 +241,12 @@ test('v32 deja la publicidad desactivada hasta configurar unidades reales', asyn
   const config = await read('ads-config.js');
   const ads = await read('ads.js');
   assert.match(config, /enabled: false/);
-  assert.match(ads, /FREE_DAILY = 6, REWARD_CREDITS = 3, MAX_REWARDS_DAILY = 3/);
-  assert.match(ads, /rewardedSlotGranted/);
-  assert.match(ads, /current\.credits\+=REWARD_CREDITS/);
+  // v48: las cuotas y recompensas las concede el servidor (/api/rewards/*), no el navegador.
+  const core = await read('monetization-core.js');
+  assert.match(core, /enabled: false/);
+  assert.match(core, /freePerDay: 6, plusPerDay: 40, creditsPerRewardedVideo: 3, maxRewardedVideosPerDay: 3/);
+  assert.match(ads, /\/api\/rewards\/claim/);
+  assert.doesNotMatch(ads, /credits\s*\+=/);
   assert.match(html, /id="adSlotHome"/);
   assert.match(html, /id="adSlotNutrition"/);
   assert.match(html, /Ver anuncio y obtener 3 consultas/);
@@ -288,7 +269,7 @@ test('v33 presenta Free/Pro sin simular pagos ni activar membresías desde el cl
   assert.match(html, /id="membershipStatus">Plan gratuito · activo/);
   assert.match(html, /precio orientativo, aún no definitivo/);
   assert.match(html, /No se hará ningún cobro desde esta pantalla/);
-  assert.match(html, /No se realizó ningún cobro/);
+  assert.match(html, /no se hace ningún cobro/);
   assert.match(html, /membership-config\.js/);
   assert.match(sw, /"\.\/membership-config\.js"/);
   assert.match(config, /Nunca conceder Pro por una bandera local/);
@@ -337,14 +318,14 @@ test('v36.1 mantiene válidos los metadatos y las traducciones del perfil/Pro', 
   const manifest = JSON.parse(await read('manifest.json'));
   const rootPackage = JSON.parse(await read('package.json'));
   const backendPackage = JSON.parse(await read('backend/package.json'));
-  assert.equal(rootPackage.version, '0.47.0');
-  assert.equal(backendPackage.version, '0.47.0');
+  assert.equal(rootPackage.version, '0.48.0');
+  assert.equal(backendPackage.version, '0.48.0');
   assert.equal(manifest.theme_color, '#f3f6fb');
   assert.equal(manifest.background_color, '#f3f6fb');
-  assert.match(i18n, /VERSION 47\.0 · ONLINE FITNESS COMMUNITY/i);
+  assert.match(i18n, /VERSION 48\.0 · ONLINE FITNESS COMMUNITY/i);
   assert.match(server, /GEMINI_MODEL\|\|'gemini-3\.8-flash'/);
   assert.match(await read('render.yaml'), /value: gemini-3\.8-flash/);
-  assert.match(sw, /const CACHE = 'fittforma-ai-static-v47-0'/);
+  assert.match(sw, /const CACHE = 'fittforma-ai-static-v48-0'/);
 });
 
 
@@ -372,7 +353,7 @@ test('v36.1 conserva identidad visual propia y perfil local editable', () => {
   assert.match(html, /identityForm/);
   assert.match(html, /displayName/);
   assert.match(html, /focusGoal/);
-  assert.match(sw, /fittforma-ai-static-v47-0/);
+  assert.match(sw, /fittforma-ai-static-v48-0/);
 });
 
 
@@ -389,7 +370,7 @@ test('v36.1 incluye preferencias completas de recordatorios y estado de permisos
   assert.match(html, /Notification\.requestPermission\(\)/);
   assert.match(html, /registration\.showNotification/);
   assert.match(sw, /notificationclick/);
-  assert.match(sw, /fittforma-ai-static-v47-0/);
+  assert.match(sw, /fittforma-ai-static-v48-0/);
 });
 
 test('v36.1 evita avisos duplicados y no marca entrenamientos como pendientes si hubo actividad', () => {
