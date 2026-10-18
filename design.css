@@ -452,3 +452,5 @@ body{font-feature-settings:"cv11","ss01"}
 .ad-test-label{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--t-amber)}
 .ad-test-count{font-size:22px;font-weight:800}
 .membership-status{margin:10px 0;padding:10px 12px;border-radius:12px;background:var(--ff-panel-2)}
+/* v48: en el celular la notificación queda por encima del botón «+» (antes lo tapaba). */
+@media(max-width:760px){body:not(.welcome-open) .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}}
