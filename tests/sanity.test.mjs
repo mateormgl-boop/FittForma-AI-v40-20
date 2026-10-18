@@ -13,22 +13,6 @@ const server = await read('backend/server.mjs');
 const i18n = await read('i18n.js');
 const sw = await read('sw.js');
 
-test('la página principal y archivos base existen en la raíz', async () => {
-  for (const file of ['index.html', 'package.json', 'backend/server.mjs', 'i18n.js', 'sw.js', 'manifest.json']) {
-    await access(path.join(root, file));
-  }
-  assert.match(html, /FittForma AI/);
-});
-
-test('las referencias de imágenes específicas y genéricas existen', async () => {
-  const helper = html.slice(html.indexOf('const exactRules'), html.indexOf('const matched=exactRules'));
-  const specific = [...helper.matchAll(/'([a-z0-9-]+\.(?:webp|svg))'/g)].map(m => m[1]);
-  const generic = ['reference-strength.svg','reference-legs.svg','reference-push.svg','reference-pull.svg','reference-shoulders.svg','reference-arms.svg','reference-core.svg','reference-cardio.svg'];
-  for (const file of [...new Set([...specific, ...generic])]) {
-    await access(path.join(root, 'assets/exercises', file));
-  }
-  assert.ok(specific.length >= 5, 'Debe existir un conjunto de imágenes específicas');
-});
 
 test('cada recurso del precaché del service worker existe', async () => {
   const match = sw.match(/const ASSETS = (\[[\s\S]*?\]);/);

@@ -100,7 +100,7 @@ const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=u
 const limits=new Map();
 const MAX_TRACKED_CLIENTS=5000;
 const PUBLIC_ROOT_FILES=new Set([
-  '/index.html','/i18n.js','/i18n-extra.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js','/training-core.js','/exercise-guides.js',
+  '/index.html','/i18n.js','/i18n-extra.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js','/training-core.js','/exercise-guides.js','/exercise-media.js',
   '/manifest.json','/icon.svg','/icon-180.png','/icon-192.png','/icon-512.png',
   '/supabase-config.js','/achievements.js','/sw.js'
 ]);

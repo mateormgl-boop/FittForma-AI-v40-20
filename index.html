@@ -1692,7 +1692,7 @@
   <link rel="stylesheet" href="./design.css">
 </head>
 <body>
-<svg class="ff-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs>
+<svg class="ff-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><linearGradient id="ffMedalBronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0b27a"/><stop offset=".55" stop-color="#b8692f"/><stop offset="1" stop-color="#7a3f17"/></linearGradient><linearGradient id="ffMedalSilver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f7fb"/><stop offset=".5" stop-color="#b9c3d1"/><stop offset="1" stop-color="#7d8898"/></linearGradient><linearGradient id="ffMedalGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a8"/><stop offset=".5" stop-color="#f2b822"/><stop offset="1" stop-color="#b07805"/></linearGradient><linearGradient id="ffMedalDiamond" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e4fbff"/><stop offset=".45" stop-color="#7fd8f7"/><stop offset="1" stop-color="#5b5cf0"/></linearGradient>
   <linearGradient id="ffGradNutri" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22c993"/><stop offset="1" stop-color="#0a7a50"/></linearGradient>
   <linearGradient id="ffGradBrand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#19b8ff"/><stop offset="1" stop-color="#6a4cf2"/></linearGradient>
 </defs></svg>
@@ -2365,6 +2365,7 @@
 <script src="./membership-config.js"></script>
 <script src="./training-core.js"></script>
 <script src="./exercise-guides.js"></script>
+<script src="./exercise-media.js"></script>
 <script src="./achievements.js"></script>
 <script>
 (() => {
@@ -2730,87 +2731,24 @@ function findCatalogExercise(name){
     return 'unclassified';
   }
 
-  // Usar fotos solo cuando el gesto representado coincide de forma razonable. Para variantes distintas,
-  // mostrar una ilustración neutra de la familia muscular, nunca otra máquina/movimiento como si fuera exacto.
-  function exerciseReferenceAsset(group,kind='strength'){
-    const g=normalizeExerciseName(group||'');
-    if(kind==='cardio'||g==='cardio')return 'reference-cardio.svg';
-    if(g==='piernas'||g==='gluteos')return 'reference-legs.svg';
-    if(g==='pecho')return 'reference-push.svg';
-    if(g==='espalda')return 'reference-pull.svg';
-    if(g==='hombros')return 'reference-shoulders.svg';
-    if(g==='brazos')return 'reference-arms.svg';
-    if(g==='core')return 'reference-core.svg';
-    return 'reference-strength.svg';
-  }
-  function exerciseAssetSlug(name){return normalizeExerciseName(name).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,70)||'ejercicio';}
-  function exerciseIllustrationMeta(name,group,kind='strength'){
-    const n=normalizeExerciseName(name);
-    // Los curls femorales y las flexiones de rodilla no deben heredar una foto de curl de bíceps o flexión de brazos.
-    if(/curl.*(?:femoral|isquiotibiales|nordico|piernas?)|flexion de rodilla/.test(n)){
-      return {src:'./assets/exercises/reference-legs.svg',specific:false,personalized:false,fallback:'./assets/exercises/reference-legs.svg'};
-    }
-    // Solo marcar como imagen específica las variantes que coinciden razonablemente con la foto real.
-    // Las ilustraciones SVG generadas son esquemas de figura humana, no demostraciones biomecánicas verificadas;
-    // por eso no se presentan como si mostraran el gesto exacto hasta que se revisen una por una.
-    const exactRules=[
-      [/^peso muerto rumano con mancuernas$/, 'romanian-deadlift-dumbbells.webp'],
-      [/^flexiones inclinadas contra una mesa firme$/, 'incline-push-up-reference.webp'],
-      [/^remo sentado en polea$/, 'seated-cable-row.webp'],
-      [/^elevaciones laterales$/, 'lateral-raise.webp'],
-      [/^extension de triceps en polea$/, 'cable-triceps-pushdown.webp'],
-      [/^bird.?dog(?: controlado| con pausa)?$/, 'bird-dog-reference.webp'],
-      [/^sentadilla al aire$/, 'squat.webp'],
-      [/^flexiones clasicas$/, 'push-up.webp'],
-      [/^press de banca con mancuernas$/, 'bench-press.webp'],
-      [/^peso muerto convencional con barra$/, 'deadlift.webp'],
-      [/^jalon al pecho$/, 'lat-pulldown.webp'],
-      [/^puente de gluteos$/, 'glute-bridge.webp'],
-      [/^plancha con apoyo de antebrazos$/, 'plank.webp'],
-      [/^bicicleta estatica$/, 'cycling.webp'],
-      [/^caminata a ritmo comodo$|^caminata rapida de recuperacion$/, 'walking-outdoor.webp'],
-      [/^carrera continua a ritmo comodo$|^trote suave o alternancia trote-caminata$|^alternancia de trote suave y caminata$|^carrera suave de recuperacion$/, 'jogging.webp'],
-      [/^curl de biceps con mancuernas$/, 'curl.webp'],
-      [/^press militar con mancuernas$/, 'shoulder-press.webp']
-    ];
-    const matched=exactRules.find(([re])=>re.test(n));
-    if(matched)return {src:'./assets/exercises/'+matched[1],specific:true};
-    // Para evitar que casi todo el catálogo se vea como un muñeco esquemático,
-    // reutilizamos fotos reales como REFERENCIAS de familia, nunca como técnica exacta.
-    // El distintivo genérico permanece visible para no confundir una referencia con la variante precisa.
-    const photoReferenceRules=[
-      [/cinta con inclinacion|caminadora|treadmill/, 'treadmill-running.webp'],
-      [/bicicleta suave|ciclismo al aire libre|bicicleta al aire libre|bicicleta de ruta|ciclismo de ruta/, 'cycling-outdoor.webp'],
-      [/bicicleta estatica|bicicleta fija|ciclismo indoor|spinning|bicicleta indoor/, 'cycling.webp'],
-      [/biciclet|ciclismo/, 'cycling.webp'],
-      [/carrera|trote|jogging|sprint/, 'jogging.webp'],
-      [/caminata|marcha|paseo|senderismo/, 'walking-outdoor.webp'],
-      [/plancha/, 'plank.webp'],
-      [/bird.?dog/, 'bird-dog-reference.webp'],
-      [/zancada|estocada|lunge/, 'lunge.webp'],
-      [/puente de gluteos|hip thrust|patada de gluteo|extension de cadera|gluteo|gluteos/, 'glute-bridge.webp'],
-      [/sentadilla|squat|prensa de piernas|sentarse y levantarse|step.?up|escalon|extension de cuadriceps/, 'squat.webp'],
-      [/flexiones?|lagartijas?|push.?ups?|flexion de brazos/, 'push-up.webp'],
-      [/press de banca|press de pecho|pecho/, 'bench-press.webp'],
-      [/remo/, 'seated-cable-row.webp'],
-      [/jalon|dominada|traccion vertical/, 'lat-pulldown.webp'],
-      [/elevaciones? laterales?/, 'lateral-raise.webp'],
-      [/press militar|press arnold|press de hombros/, 'shoulder-press.webp'],
-      [/extension de triceps|triceps|press frances/, 'cable-triceps-pushdown.webp'],
-      [/curl(?!.*(?:femoral|isquiotibiales|nordico|piernas?))|biceps|antebrazo/, 'curl.webp'],
-      [/peso muerto|bisagra|buenos dias|hip hinge/, 'deadlift.webp'],
-      [/estiramiento|movilidad|calentamiento/, 'stretching.webp']
-    ];
-    const photoReference=photoReferenceRules.find(([re])=>re.test(n));
-    if(photoReference)return {src:'./assets/exercises/'+photoReference[1],specific:false,personalized:false,fallback:'./assets/exercises/'+exerciseReferenceAsset(group,kind)};
-    const generic=exerciseReferenceAsset(group,kind);
-    return {src:'./assets/exercises/'+generic,specific:false,personalized:false,fallback:'./assets/exercises/'+generic};
-  }
-  function exerciseIllustrationUrl(name,group,kind='strength'){return exerciseIllustrationMeta(name,group,kind).src;}
+  // v48: una imagen por ejercicio, desde un único mapa (exercise-media.js): fotos de inicio y final del
+  // ejercicio exacto o una ilustración propia. Nunca se muestra la foto de otro movimiento como referencia.
+  function exerciseMedia(name){const m=window.FittFormaExerciseMedia||{};return m[FittFormaTraining.canonicalName(name)]||m[String(name||'').trim()]||null;}
+  function exerciseIllustrationMeta(name){const media=exerciseMedia(name);return media?{src:'./assets/exercises/'+media.frames[0],frames:media.frames.map(f=>'./assets/exercises/'+f),kind:media.kind,credit:media.credit,family:media.family||'',specific:true}:{src:'',frames:[],kind:'none',specific:false};}
+  function exerciseIllustrationUrl(name){return exerciseIllustrationMeta(name).src;}
   function exercisePhoto(name,group,compact=false,kind='strength'){
-    const meta=exerciseIllustrationMeta(name,group,kind),sizeClass=compact?' compact':'',fallback=meta.fallback||('./assets/exercises/'+exerciseReferenceAsset(group,kind));
-    const alt=meta.specific?'Imagen de referencia del movimiento: '+name:'Imagen de referencia de la familia de movimientos: '+name+' ('+group+')';
-    return `<div class="exercise-photo${sizeClass}${meta.specific?'':' generic-reference'}${meta.personalized?' personalized-reference':''}" role="img" aria-label="Referencia visual de ${esc(name)}"><img src="${meta.src}" data-fallback="${fallback}" alt="${esc(alt)}" loading="lazy" decoding="async" onerror="if(this.dataset.fallback&&this.src!==new URL(this.dataset.fallback,location.href).href){this.src=this.dataset.fallback;this.alt='Imagen general de referencia';this.parentElement.classList.add('generic-reference');this.parentElement.classList.remove('personalized-reference');}else{this.onerror=null;this.style.display='none';this.parentElement.classList.add('exercise-photo-unavailable');this.parentElement.setAttribute('aria-label','Ilustración no disponible');}"></div>`;
+    const meta=exerciseIllustrationMeta(name),sizeClass=compact?' compact':'';
+    if(!meta.frames.length)return `<div class="exercise-photo${sizeClass} exercise-photo-unavailable" role="img" aria-label="Sin imagen: ejercicio personalizado"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg></span><small>Ejercicio personalizado</small></div>`;
+    const onerr="this.onerror=null;this.closest('.exercise-photo').classList.add('exercise-photo-unavailable');this.remove();";
+    if(meta.frames.length>1)return `<div class="exercise-photo is-sequence${sizeClass}" role="img" aria-label="${esc(name)}: posición inicial y final"><img src="${meta.frames[0]}" alt="" loading="lazy" decoding="async" onerror="${onerr}"><img class="frame-end" src="${meta.frames[1]}" alt="" loading="lazy" decoding="async" onerror="${onerr}"><span class="frame-chip" aria-hidden="true"><b>1</b><b>2</b></span></div>`;
+    return `<div class="exercise-photo is-${meta.kind}${sizeClass}" role="img" aria-label="${esc(meta.kind==='illustration'?`Ilustración de ${name}`:name)}"><img src="${meta.frames[0]}" alt="" loading="lazy" decoding="async" onerror="${onerr}"></div>`;
+  }
+  function exerciseModalMedia(name){
+    const meta=exerciseIllustrationMeta(name);
+    if(!meta.frames.length)return '<p class="muted small">Este ejercicio no es de la biblioteca: no tiene imagen. Revisá la técnica con alguien de confianza.</p>';
+    const credit=`<p class="muted small exercise-media-credit">${esc(meta.credit)}${meta.family?` · ${esc(meta.family)}`:''}</p>`;
+    if(meta.frames.length>1)return `<div class="exercise-modal-frames">${meta.frames.map((f,i)=>`<figure class="exercise-modal-image"><img src="${f}" alt="${esc(name)}: ${i?'posición final':'posición inicial'}" loading="lazy" decoding="async"><figcaption><b>${i+1}</b> ${i?'Posición final':'Posición inicial'}</figcaption></figure>`).join('')}</div>${credit}`;
+    return `<figure class="exercise-modal-image is-${meta.kind}"><img src="${meta.frames[0]}" alt="${esc(meta.kind==='illustration'?`Ilustración de ${name}: 1 inicio y 2 final`:name)}" loading="lazy" decoding="async"><figcaption>${meta.kind==='illustration'?'1 · Posición inicial  →  2 · Posición final':'Foto del ejercicio'}</figcaption></figure>${credit}`;
   }
   function exerciseMuscles(name,group){
     const guide=exerciseGuide(name);if(guide)return `Principales: ${guide.primary}; secundarios/estabilizadores: ${guide.secondary}`;
@@ -2912,19 +2850,20 @@ function findCatalogExercise(name){
     const modal=$('exerciseModal');if(!modal)return;
     $('exerciseModalTitle').textContent=name;
     $('exerciseModalDescription').textContent=`${group} · ${kind==='cardio'?'Actividad cardiovascular':'Ejercicio de fuerza y control'}`;
-    const imageMeta=exerciseIllustrationMeta(name,group,kind);$('exerciseModalImages').innerHTML=`<figure class="exercise-modal-image">${exercisePhoto(name,group,false,kind)}<figcaption>${imageMeta.specific?'Imagen de referencia asociada a esta variante; contrastá la colocación exacta con los pasos de técnica. No sustituye una revisión profesional de la técnica.':'Imagen de referencia de la familia de movimientos; no es una demostración exacta de esta variante.'}</figcaption></figure>`;
+    $('exerciseModalImages').innerHTML=exerciseModalMedia(name);
     const videoQuery=encodeURIComponent(name+' técnica correcta ejercicio');
     $('exerciseModalVideoLink').innerHTML=`<a class="btn secondary" href="https://www.youtube.com/results?search_query=${videoQuery}" target="_blank" rel="noopener noreferrer">Buscar video demostrativo ↗</a><span class="muted small" style="align-self:center">Se abre una búsqueda de videos; elegí una fuente confiable.</span>`;
-    const prescription=findExercisePrescription(name),guide=exerciseGuide(name);
-    const dose=prescription?`${prescription.sets} × ${prescription.reps}`:(kind==='cardio'?'Ritmo progresivo':'Series y repeticiones según tu plan');
+    const inPlan=(state.plan?.days||[]).flatMap(d=>d.exercises).find(e=>normalizeExerciseName(e.name)===normalizeExerciseName(FittFormaTraining.canonicalName(name)));
+    const prescription=inPlan||findExercisePrescription(FittFormaTraining.canonicalName(name)),guide=exerciseGuide(name);
+    const dose=prescription?`${prescription.sets} × ${prescription.reps}${inPlan?' (tu plan)':''}`:(kind==='cardio'?'Ritmo progresivo':'Series y repeticiones según tu plan');
     const muscleMarkup=guide?`<span class="exercise-detail-stat">Principales: ${esc(guide.primary)}</span><span class="exercise-detail-stat">Secundarios/estabilizadores: ${esc(guide.secondary)}</span>`:`<span class="exercise-detail-stat">Músculos orientativos: ${esc(exerciseMuscles(name,group))}</span>`;
     const guideStatusMarkup=guide?.source==='catalog-generated'?'<span class="exercise-detail-stat exercise-guide-caution">Guía orientativa por familia de movimiento: confirmá que coincida con esta variante concreta.</span>':'<span class="exercise-detail-stat exercise-guide-caution">Guía específica de catálogo; adaptá recorrido, carga y equipo a tu situación.</span>';
-    $('exerciseModalStats').innerHTML=`${muscleMarkup}${guideStatusMarkup}<span class="exercise-detail-stat">Equipo: ${esc(exerciseEquipment(name,equipmentMode))}</span><span class="exercise-detail-stat">Guía: ${esc(dose)}</span><span class="exercise-detail-stat">Descanso: ${esc(exerciseRest(name,kind))}</span>${guide?`<span class="exercise-detail-stat">Nivel orientativo: ${esc(guide.level)}</span>`:''}`;
+    $('exerciseModalStats').innerHTML=`${guide?.start?`<span class="exercise-detail-stat">Posición inicial: ${esc(guide.start)}</span>`:''}${muscleMarkup}${guideStatusMarkup}<span class="exercise-detail-stat">Equipo: ${esc(exerciseEquipment(name,equipmentMode))}</span><span class="exercise-detail-stat">Guía: ${esc(dose)}</span><span class="exercise-detail-stat">Descanso: ${esc(exerciseRest(name,kind))}</span>${guide?`<span class="exercise-detail-stat">Nivel orientativo: ${esc(guide.level)}</span>`:''}`;
     const alternativeData=exerciseAlternatives(name,group,kind,equipmentMode);
     const alternativesRoot=$('exerciseModalAlternatives');
     if(alternativesRoot){alternativesRoot.innerHTML=alternativeData.items.length?`<p class="muted small">Disponibles en ${esc(({gym:'gimnasio',home:'casa con equipo básico',bodyweight:'peso corporal'})[alternativeData.mode]||'la modalidad seleccionada')}; ${esc(alternativeData.basis)}. Confirmá que el equipo y el rango te resulten adecuados.</p><ul>${alternativeData.items.map(item=>`<li>${esc(item.name)} <span class="muted small">· ${esc(item.group)}</span></li>`).join('')}</ul>`:`<p class="muted small">No hay una alternativa suficientemente clara en esta modalidad. Revisá el objetivo y el equipo antes de sustituirlo.</p>`;}
     const steps=exerciseSteps(name,group,kind);
-    const progressionLabels=['Preparación','Ejecución','Regreso y control'];
+    const progressionLabels=steps.length===3?['Preparación','Ejecución','Regreso y control']:steps.map((_,i)=>i===0?'Preparación':i===steps.length-1?'Regreso y control':'Ejecución');
     $('exerciseModalProgression').innerHTML=steps.map((step,i)=>`<article class="exercise-progression-step"><span class="step-number">${i+1}</span><strong>${progressionLabels[i]||`Paso ${i+1}`}</strong><p>${esc(step)}</p></article>`).join('');
     $('exerciseModalSteps').innerHTML=steps.map(x=>`<li>${esc(x)}</li>`).join('');
     $('exerciseModalTips').innerHTML=exerciseTips(name,group,kind).map(x=>`<li>${esc(x)}</li>`).join('');
@@ -3593,8 +3532,14 @@ function findCatalogExercise(name){
       const normalized=BadgeEngine.normalizeName(name);if(!normalized||seen.has(normalized))continue;seen.add(normalized);
       // La variante suma al desafío principal; solo se conserva el desafío viejo si ya tenía insignias (historial).
       if(BADGE_CHALLENGE_ALIASES.has(normalized)&&!Object.values(state.badgeUnlocks||{}).some(u=>u?.exerciseId==='exercise-'+BadgeEngine.slug(name)))continue;
-      const measure=BadgeEngine.measureForLibraryExercise(exercise);
-      catalog.push({id:'exercise-'+BadgeEngine.slug(name),name,group:String(exercise.group||'Otros'),category:BadgeEngine.categoryForLibraryExercise(exercise,measure),measure,kind:'exercise',library:true,thresholds:BadgeEngine.thresholdsForExercise({measure})});
+      const measure=BadgeEngine.measureForLibraryExercise(exercise),id='exercise-'+BadgeEngine.slug(name);
+      // v48: las repeticiones de un ejercicio con carga no miden dificultad sin el peso: no generan desafío
+      // nuevo (se conservan los que ya tenían insignias). Los movimientos fáciles de repetir usan una escala mayor.
+      const hasHistory=Object.values(state.badgeUnlocks||{}).some(u=>u?.exerciseId===id);
+      if(exercise.load&&!hasHistory)continue;
+      if(exercise.kind==='mobility'&&!hasHistory)continue;
+      const easy=measure==='reps'&&(['glute','calf','core_flex','abduct','adduct','scap','rear_delt'].includes(exercise.slot)||exercise.level?.[1]===1);
+      catalog.push({id,name,group:String(exercise.group||'Otros'),category:BadgeEngine.categoryForLibraryExercise(exercise,measure),measure,kind:'exercise',library:true,thresholds:easy?[5,10,15,20,25,30,40,50,60,75,100,125]:BadgeEngine.thresholdsForExercise({measure})});
     }
     const knownIds=new Set(catalog.map(item=>item.id));
     for(const record of (state.badgeRecords||[])){
@@ -3694,7 +3639,7 @@ function findCatalogExercise(name){
   }
   function badgeMedalFor(item,levelIndex,opts={}){
     const rank=levelIndex>=0?BadgeEngine.rankForLevel(levelIndex):null;
-    return BadgeEngine.medalSvg({rankKey:rank?rank.key:'bronze',numeral:rank?rank.numeral:'',glyph:BadgeEngine.glyphFor(item),locked:!rank,size:opts.size||48,title:opts.title||''});
+    return BadgeEngine.medalSvg({rankKey:rank?rank.key:'bronze',numeral:rank?rank.numeral:'',glyph:BadgeEngine.glyphFor(item),category:item?.category||'',locked:!rank,size:opts.size||48,title:opts.title||''});
   }
   function renderBadgeDetail(item){
     const root=$('badgeDetail');if(!root||!item)return;
@@ -3705,7 +3650,7 @@ function findCatalogExercise(name){
     const evidence=metric.value>0&&item.measure!=='days'?`<span class="ff-evidence ${metric.evidence==='gps_device'?'is-gps':''}">${esc(BadgeEngine.evidenceLabel(metric.evidence))}</span>`:'';
     root.innerHTML=`<div class="achievement-title-row"><div class="achievement-hero-medal">${badgeMedalFor(item,progress.highest,{size:64})}</div><div><div class="eyebrow">${esc(BadgeEngine.categoryLabel(item.category))}</div><h3>${esc(item.name)}</h3><p class="achievement-value"><strong>${esc(valueLabel)}</strong>${evidence}</p><p class="muted small">${rank?`Rango actual: ${esc(rank.label)}`:'Sin rango todavía'}</p></div></div>
       <div class="achievement-progress-head"><span>${esc(BadgeEngine.nextStepMessage(metric.value,thresholds,item.measure))}</span><strong>${Math.max(0,progress.highest+1)}/12</strong></div><div class="achievement-progress" role="progressbar" aria-label="Avance hacia el próximo nivel de ${esc(item.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.pct}"><span style="width:${progress.pct}%"></span></div>
-      <ol class="achievement-milestones" aria-label="Niveles del desafío">${thresholds.map((threshold,index)=>{const rankInfo=BadgeEngine.rankForLevel(index),entry=unlocks[badgeIdFor(item,index)],unlocked=Boolean(entry),gps=hasGpsEvidence(entry);return `<li class="achievement-milestone rank-${rankInfo.key} ${unlocked?'unlocked':'locked'}">${BadgeEngine.medalSvg({rankKey:rankInfo.key,numeral:rankInfo.numeral,glyph:BadgeEngine.glyphFor(item),locked:!unlocked,size:34})}<strong>${esc(rankInfo.label)}</strong><small>${esc(formatBadgeValue(threshold,item.measure))}</small><span class="achievement-status ${gps?'verified':''}">${unlocked?`${gps?'Con ruta GPS':'Declarada'} · ${esc(prettyDate(entry.earnedAt))}`:'Bloqueada'}</span></li>`;}).join('')}</ol>
+      <ol class="achievement-milestones" aria-label="Niveles del desafío">${thresholds.map((threshold,index)=>{const rankInfo=BadgeEngine.rankForLevel(index),entry=unlocks[badgeIdFor(item,index)],unlocked=Boolean(entry),gps=hasGpsEvidence(entry);return `<li class="achievement-milestone rank-${rankInfo.key} ${unlocked?'unlocked':'locked'}">${BadgeEngine.medalSvg({rankKey:rankInfo.key,numeral:rankInfo.numeral,glyph:BadgeEngine.glyphFor(item),category:item.category,locked:!unlocked,size:34})}<strong>${esc(rankInfo.label)}</strong><small>${esc(formatBadgeValue(threshold,item.measure))}</small><span class="achievement-status ${gps?'verified':''}">${unlocked?`${gps?'Con ruta GPS':'Declarada'} · ${esc(prettyDate(entry.earnedAt))}`:'Bloqueada'}</span></li>`;}).join('')}</ol>
       <p class="muted small achievement-rule">${item.measure==='km'?'Cada nivel mide la distancia de una sola actividad, no la suma de varias.':item.measure==='days'?'Se cuentan días distintos con actividad registrada, no la cantidad de ejercicios.':item.measure==='seconds'?'Se cuenta el tiempo sostenido en una única serie.':'Se cuenta la mejor serie de un mismo movimiento, no la suma de varias series.'} Máximo admitido por serie: ${esc(formatBadgeValue(BadgeEngine.maxPlausible(item),item.measure))}.</p>`;
   }
   function renderBadgeRecords(item){

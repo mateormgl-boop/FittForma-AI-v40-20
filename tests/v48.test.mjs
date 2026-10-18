@@ -168,3 +168,47 @@ test('v48: la migración del entrenamiento diario es aditiva y la base controla 
   assert.match(sql, /enable row level security/);
   assert.match(sql, /revoke all on public\.daily_training_sessions from anon, authenticated/);
 });
+
+test('v48: cada ejercicio tiene su propia imagen local, sin fotos de otro movimiento', async () => {
+  const { access } = await import('node:fs/promises');
+  globalThis.window = globalThis; await import(path.join(root, 'exercise-media.js'));
+  const media = globalThis.FittFormaExerciseMedia;
+  const owner = new Map();
+  for (const e of T.allExercises()) {
+    const m = media[e.name];
+    assert.ok(m && Array.isArray(m.frames) && m.frames.length, `${e.name} no tiene imagen`);
+    assert.ok(['photo', 'illustration'].includes(m.kind));
+    for (const f of m.frames) {
+      assert.doesNotMatch(f, /^https?:|reference-|unverified-generated/, `${e.name}: recurso externo o genérico ${f}`);
+      await access(path.join(root, 'assets/exercises', f));
+      assert.ok(!owner.has(f), `${f} se usa para ${owner.get(f)} y ${e.name}`);
+      owner.set(f, e.name);
+    }
+    if (m.kind === 'photo' && m.frames.length === 2) assert.match(m.frames[0], new RegExp(`${T.slugify(e.name)}-0\\.webp$`));
+  }
+  // Casos que antes heredaban una foto incorrecta.
+  assert.notEqual(media['Curl femoral tumbado'].frames[0], media['Curl de bíceps con mancuernas'].frames[0]);
+  assert.match(media['Bicicleta estática'].frames[0], /bicicleta-estatica/);
+  assert.match(media['Sentadilla hack en máquina'].frames[0], /sentadilla-hack/);
+  assert.equal(media['Sentadilla a una silla'].kind, 'illustration', 'la silla tiene que verse');
+  // Fotos compartidas solo entre variantes de carrera/caminata (misma técnica, distinta intensidad), declaradas.
+  for (const [name, m] of Object.entries(media)) if (!T.libraryEntry(name)) assert.ok(m.family, `${name} comparte foto sin declararlo`);
+  assert.match(html, /<script src="\.\/exercise-media\.js"><\/script>/);
+  assert.doesNotMatch(html, /photoReferenceRules|exerciseReferenceAsset/, 'no quedan reglas de foto por familia');
+  const sources = await readFile(path.join(root, 'assets/exercises/lib/SOURCES.md'), 'utf8');
+  assert.match(sources, /Unlicense/);
+  await access(path.join(root, 'assets/exercises/illustrations/README.md'));
+});
+
+test('v48: insignias con forma por rango, color por categoría y criterios corregidos', async () => {
+  globalThis.window = globalThis; await import(path.join(root, 'achievements.js'));
+  const E = globalThis.FittFormaBadgeEngine;
+  const svg = r => E.medalSvg({ rankKey: r, numeral: 'II', glyph: 'pushup', category: 'calisthenics' });
+  const shapes = ['bronze', 'silver', 'gold', 'diamond'].map(r => svg(r).match(/class="ff-medal-shape" d="([^"]+)"/)[1]);
+  assert.equal(new Set(shapes).size, 4, 'cada rango tiene una forma distinta');
+  assert.equal((svg('gold').match(/ff-medal-pip/g) || []).length, 2, 'el nivel II muestra 2 marcas');
+  assert.notEqual(E.medalSvg({ rankKey: 'gold', glyph: 'run', category: 'running' }).match(/--medal-hue:([^"]+)/)[1], E.medalSvg({ rankKey: 'gold', glyph: 'heart', category: 'cardio' }).match(/--medal-hue:([^"]+)/)[1]);
+  assert.match(html, /if\(exercise\.load&&!hasHistory\)continue;/, 'repeticiones con carga no generan desafío nuevo');
+  assert.match(html, /BADGE_CHALLENGE_ALIASES/, 'las variantes suman al desafío principal');
+  assert.match(html, /function celebrateBadges\(newly\)/);
+});

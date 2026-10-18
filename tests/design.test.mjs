@@ -49,13 +49,6 @@ test('v40.7: service worker y versiones de paquetes fuerzan una actualización d
   assert.equal(backendPkg.version, '0.47.0');
 });
 
-test('v40.7: las ilustraciones de ejercicios no se etiquetan como demostraciones exactas si solo son referencias de grupo', async () => {
-  const html = await read('index.html');
-  const helper = html.slice(html.indexOf('function exerciseIllustrationMeta'), html.indexOf('function exerciseIllustrationUrl'));
-  assert.match(helper, /Solo marcar como imagen específica/);
-  assert.match(helper, /specific:false,personalized:false/);
-  assert.doesNotMatch(helper, /const personalized='\.\/assets\/exercises\/generated/);
-});
 
 test('v40.7: curl femoral tiene instrucciones y músculos propios antes de la regla genérica de curl', async () => {
   const html = await read('index.html');

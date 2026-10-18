@@ -366,3 +366,76 @@ body{font-feature-settings:"cv11","ss01"}
 /* Comunidad tabs on phones: labels only, and a fade that shows the row scrolls */
 @media (max-width:599px){.community-subtab-icon{display:none!important}.community-subtab{padding:8px 12px!important}.community-subnav{-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent);padding-right:28px!important}}
 .hero-progress,.hero-profile,.hero-coach{min-height:0!important}
+
+/* v48: imagen exacta por ejercicio. Fotos con posición inicial y final que alternan suavemente;
+   ilustraciones propias completas (sin recorte). Sin movimiento si el sistema pide reducirlo. */
+.exercise-photo.is-sequence img,.exercise-photo.is-photo img{object-fit:cover;object-position:center 35%}
+.exercise-photo.is-illustration img{object-fit:contain;background:#eef3fb}
+.exercise-photo.is-sequence .frame-end{position:absolute;inset:0;opacity:0;animation:ffFrameSwap 3.2s ease-in-out infinite}
+.exercise-photo.is-sequence:hover .frame-end,.exercise-library-item:focus-within .is-sequence .frame-end{animation-play-state:paused;opacity:1}
+@keyframes ffFrameSwap{0%,40%{opacity:0}50%,90%{opacity:1}100%{opacity:0}}
+.exercise-photo .frame-chip{position:absolute;right:6px;bottom:6px;display:flex;gap:3px}
+.exercise-photo .frame-chip b{width:16px;height:16px;border-radius:50%;display:grid;place-items:center;font-size:10px;background:rgba(6,12,32,.6);color:#fff}
+.exercise-photo.compact .frame-chip{display:none}
+.exercise-photo.generic-reference:after,.exercise-photo.personalized-reference:after{content:none!important}
+.exercise-photo-unavailable{display:grid!important;place-items:center;align-content:center;gap:4px;color:var(--text-3)!important;background:var(--ff-panel-2)!important}
+.exercise-photo-unavailable svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.exercise-photo.compact.exercise-photo-unavailable small{display:none}
+.exercise-modal-frames{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.exercise-modal-image{margin:0}
+.exercise-modal-image img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px;background:var(--ff-panel-2)}
+.exercise-modal-image.is-illustration img{aspect-ratio:16/10;object-fit:contain;background:#eef3fb}
+.exercise-modal-image figcaption{margin-top:6px;font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:6px}
+.exercise-modal-image figcaption b{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--mod);color:#fff;font-size:11px}
+.exercise-media-credit{margin:6px 0 0}
+@media (prefers-reduced-motion:reduce){.exercise-photo.is-sequence .frame-end{animation:none}}
+
+/* v48: insignias rediseñadas. Forma por rango, color por categoría y nivel con marcas. */
+.ff-medal{overflow:visible;filter:drop-shadow(0 3px 5px rgba(10,20,50,.22))}
+.ff-medal .ff-medal-shape{stroke-width:1.2;stroke-linejoin:round}
+.ff-medal--bronze .ff-medal-shape{fill:url(#ffMedalBronze)!important;stroke:#6b3510!important}
+.ff-medal--silver .ff-medal-shape{fill:url(#ffMedalSilver)!important;stroke:#5f6b7c!important}
+.ff-medal--gold .ff-medal-shape{fill:url(#ffMedalGold)!important;stroke:#8a5d00!important}
+.ff-medal--diamond .ff-medal-shape{fill:url(#ffMedalDiamond)!important;stroke:#3d3fb8!important}
+.ff-medal .ff-medal-inner{fill:var(--medal-hue)!important;stroke:rgba(255,255,255,.75)!important;stroke-width:1.1!important}
+.ff-medal .ff-medal-facet{fill:none;stroke:rgba(255,255,255,.55);stroke-width:.8}
+.ff-medal .ff-medal-laurel{fill:none;stroke:#2f8a3b;stroke-width:1.8;stroke-linecap:round}
+.ff-medal .ff-medal-spark{fill:none;stroke:#7fd8f7;stroke-width:1.3;stroke-linecap:round}
+.ff-medal .ff-medal-ribbon{fill:var(--medal-hue);opacity:.85;stroke:none}
+.ff-medal .ff-medal-glyph{fill:none!important;stroke:#fff!important;stroke-width:2.1!important;opacity:1!important}
+.ff-medal .ff-medal-banner{fill:#16213f}
+.ff-medal--gold .ff-medal-banner{fill:#7a5200}.ff-medal--diamond .ff-medal-banner{fill:#3b3dc0}.ff-medal--silver .ff-medal-banner{fill:#4c5768}.ff-medal--bronze .ff-medal-banner{fill:#5c2c0c}
+.ff-medal .ff-medal-num{fill:#fff!important;font:800 5.4px/1 Inter,system-ui,sans-serif!important;letter-spacing:.2px}
+.ff-medal .ff-medal-pip{fill:#fff;opacity:.9}
+.ff-medal .ff-medal-num{display:none}
+.ff-medal[width="34"] .ff-medal-pip,.ff-medal[width="30"] .ff-medal-pip{r:1.6}
+.ff-medal.is-locked{filter:none}
+.ff-medal.is-locked .ff-medal-shape{fill:var(--ff-panel-2)!important;stroke:var(--ff-border)!important;stroke-dasharray:2.5 2}
+.ff-medal.is-locked .ff-medal-inner{fill:transparent!important;stroke:var(--ff-border)!important}
+.ff-medal.is-locked .ff-medal-glyph{stroke:var(--text-3)!important}
+.ff-medal.is-locked .ff-medal-facet,.ff-medal.is-locked .ff-medal-laurel,.ff-medal.is-locked .ff-medal-spark{stroke:var(--ff-border)}
+/* Pantalla de logro */
+.badge-celebration{border:0;border-radius:28px;padding:28px 24px 22px;width:min(92vw,380px);text-align:center;background:var(--ff-panel);color:var(--text);box-shadow:0 30px 80px -20px rgba(10,20,60,.55);overflow:hidden}
+.badge-celebration::backdrop{background:rgba(6,10,28,.62);backdrop-filter:blur(3px)}
+.badge-celebration-glow{position:absolute;inset:-40% -20% auto;height:70%;background:radial-gradient(closest-side,color-mix(in srgb,var(--glow,#6a4cf2) 35%,transparent),transparent);pointer-events:none}
+.badge-celebration[data-rank="bronze"]{--glow:#d4884a}.badge-celebration[data-rank="silver"]{--glow:#9aa8bb}.badge-celebration[data-rank="gold"]{--glow:#f2b822}.badge-celebration[data-rank="diamond"]{--glow:#7fd8f7}
+.badge-celebration-kicker{position:relative;margin:0;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2)}
+.badge-celebration-medal{position:relative;margin:10px auto 6px;width:132px;animation:ffMedalIn .7s cubic-bezier(.2,1.4,.4,1) both}
+.badge-celebration-rank{position:relative;display:block;font-size:20px;font-weight:800}
+.badge-celebration-name{position:relative;margin:4px 0 6px;font-size:22px;letter-spacing:-.02em}
+.badge-celebration-detail,.badge-celebration-more{position:relative;margin:0 0 6px;color:var(--text-2);font-size:14px}
+.badge-celebration .btn-row{position:relative;justify-content:center;margin-top:14px}
+@keyframes ffMedalIn{0%{transform:scale(.4) rotate(-12deg);opacity:0}100%{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.badge-celebration-medal{animation:none}}
+/* Insignias destacadas junto al nombre */
+.profile-name-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.featured-badges{display:flex;align-items:center;gap:4px}
+.featured-badge{display:inline-flex}
+.featured-edit{border:0;background:transparent;color:var(--mod-ink);font-weight:700;font-size:12px;cursor:pointer;padding:4px 6px;border-radius:8px}
+.featured-picker{margin:10px 0;padding:12px;border-radius:16px;background:var(--ff-panel-2);border:1px solid var(--ff-border)}
+.featured-options{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:8px 0}
+.featured-option{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:12px;background:var(--ff-panel);border:1px solid var(--ff-border);cursor:pointer}
+.featured-option span{display:grid;line-height:1.2}.featured-option small{color:var(--text-3)}
+.featured-option:has(input:checked){border-color:var(--mod);box-shadow:0 0 0 2px color-mix(in srgb,var(--mod) 25%,transparent)}
+.badge-celebration-medal .ff-medal-num,.achievement-hero-medal .ff-medal-num{display:inline!important}
+.badge-celebration-medal .ff-medal-pip,.achievement-hero-medal .ff-medal-pip{display:none}
