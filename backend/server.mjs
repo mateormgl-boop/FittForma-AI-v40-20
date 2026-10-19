@@ -97,13 +97,13 @@ function sanitizeHistory(items){
   }
   return alternating.slice(-8);
 }
-const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.ico':'image/x-icon','.woff2':'font/woff2'};
+const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.webp':'image/webp','.gif':'image/gif','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.ico':'image/x-icon','.woff2':'font/woff2'};
 const monetization=createMonetization();
 const adsCsp=adsCspAdditions(monetization.settings.ads);
 const limits=new Map();
 const MAX_TRACKED_CLIENTS=5000;
 const PUBLIC_ROOT_FILES=new Set([
-  '/index.html','/i18n.js','/i18n-extra.js','/i18n-v48.js','/anatomy.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js','/training-core.js','/monetization-core.js','/exercise-guides.js','/exercise-media.js',
+  '/index.html','/i18n.js','/i18n-extra.js','/i18n-v48.js','/anatomy.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js','/training-core.js','/monetization-core.js','/exercise-guides.js','/exercise-media.js','/exercise-gifs.js',
   '/manifest.json','/icon.svg','/icon-180.png','/icon-192.png','/icon-512.png',
   '/supabase-config.js','/achievements.js','/sw.js'
 ]);
@@ -192,7 +192,7 @@ function isPublicAssetPath(requested){
   const relative=requested.slice('/assets/'.length);
   if(relative.startsWith('exercises/unverified-generated/'))return false;
   if(!relative||relative.split('/').some(part=>!part||part==='.'||part==='..'||part.startsWith('.')))return false;
-  return ['.svg','.webp','.png','.jpg','.jpeg','.ico','.woff2'].includes(path.posix.extname(relative).toLowerCase());
+  return ['.svg','.webp','.gif','.png','.jpg','.jpeg','.ico','.woff2'].includes(path.posix.extname(relative).toLowerCase());
 }
 async function readBody(req,maxBytes=12000){
   const declared=Number(req.headers['content-length']);

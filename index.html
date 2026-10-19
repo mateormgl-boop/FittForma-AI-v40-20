@@ -2330,9 +2330,9 @@
   <div class="exercise-modal-backdrop" data-close-exercise-modal></div>
   <section class="exercise-modal-panel" role="dialog" aria-modal="true" aria-labelledby="exerciseModalTitle" aria-describedby="exerciseModalDescription" tabindex="-1">
     <div class="modal-top exercise-sheet-top"><div><div class="eyebrow">Ficha del ejercicio</div><h2 id="exerciseModalTitle">Ejercicio</h2><p id="exerciseModalDescription" class="muted small"></p></div><span class="exercise-group-pill" id="exerciseModalGroup"></span><button class="modal-close" type="button" aria-label="Cerrar guía" data-close-exercise-modal>×</button></div>
+    <div id="exerciseModalImages" class="exercise-modal-images"></div>
     <div class="exercise-sheet-hero"><div class="exercise-sheet-map" id="exerciseModalMap"></div><dl class="exercise-sheet-muscles" id="exerciseModalMuscles"></dl></div>
     <div class="exercise-sheet-chips" id="exerciseModalChips"></div>
-    <div id="exerciseModalImages" class="exercise-modal-images"></div>
     <div class="exercise-sheet-start" id="exerciseModalStart" hidden></div>
     <section class="exercise-progression" aria-label="Ejecución paso a paso"><h3>Ejecución paso a paso</h3><div id="exerciseModalProgression" class="exercise-progression-grid"></div></section>
     <div class="exercise-sheet-columns"><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">⇄</span>Respiración</h3><p id="exerciseModalBreathing" class="muted small"></p></div><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">!</span>Errores comunes</h3><ul id="exerciseModalErrors"></ul></div><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">✓</span>Recomendaciones</h3><ul id="exerciseModalTips"></ul></div></div>
@@ -2401,6 +2401,7 @@
 <script src="./training-core.js"></script>
 <script src="./exercise-guides.js"></script>
 <script src="./exercise-media.js"></script>
+<script src="./exercise-gifs.js"></script>
 <script src="./achievements.js"></script>
 <script>
 (() => {
@@ -2777,15 +2778,22 @@ function findCatalogExercise(name){
   function exerciseMedia(name){const m=window.FittFormaExerciseMedia||{};return m[FittFormaTraining.canonicalName(name)]||m[String(name||'').trim()]||null;}
   function exerciseIllustrationMeta(name){const media=exerciseMedia(name);return media?{src:'./assets/exercises/'+media.frames[0],frames:media.frames.map(f=>'./assets/exercises/'+f),kind:media.kind,credit:media.credit,family:media.family||'',specific:true}:{src:'',frames:[],kind:'none',specific:false};}
   function exerciseIllustrationUrl(name){return exerciseIllustrationMeta(name).src;}
+  // v50: animación propia de cada ejercicio (figura anatómica con los músculos que trabajan en rojo).
+  function exerciseGif(name){const m=window.FittFormaExerciseGifs||{};const g=m[FittFormaTraining.canonicalName(name)]||m[String(name||'').trim()];return g?{src:'./assets/exercises/'+g.file,muscles:g.muscles||[],secondary:g.secondary||[]}:null;}
   function exercisePhoto(name,group,compact=false,kind='strength'){
-    const meta=exerciseIllustrationMeta(name),sizeClass=compact?' compact':'';
+    const meta=exerciseIllustrationMeta(name),sizeClass=compact?' compact':'',gif=exerciseGif(name);
+    if(gif)return `<div class="exercise-photo is-gif${sizeClass}" role="img" aria-label="${esc(name)}: animación del movimiento"><img src="${gif.src}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.closest('.exercise-photo').classList.add('exercise-photo-unavailable');this.remove();"></div>`;
     if(!meta.frames.length)return `<div class="exercise-photo${sizeClass} exercise-photo-unavailable" role="img" aria-label="Sin imagen: ejercicio personalizado"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg></span><small>Ejercicio personalizado</small></div>`;
     const onerr="this.onerror=null;this.closest('.exercise-photo').classList.add('exercise-photo-unavailable');this.remove();";
     if(meta.frames.length>1)return `<div class="exercise-photo is-sequence${sizeClass}" role="img" aria-label="${esc(name)}: posición inicial y final"><img src="${meta.frames[0]}" alt="" loading="lazy" decoding="async" onerror="${onerr}"><img class="frame-end" src="${meta.frames[1]}" alt="" loading="lazy" decoding="async" onerror="${onerr}"><span class="frame-chip" aria-hidden="true"><b>1</b><b>2</b></span></div>`;
     return `<div class="exercise-photo is-${meta.kind}${sizeClass}" role="img" aria-label="${esc(meta.kind==='illustration'?`Ilustración de ${name}`:name)}"><img src="${meta.frames[0]}" alt="" loading="lazy" decoding="async" onerror="${onerr}"></div>`;
   }
   function exerciseModalMedia(name){
-    const meta=exerciseIllustrationMeta(name);
+    const meta=exerciseIllustrationMeta(name),gif=exerciseGif(name);
+    if(gif){
+      const photos=meta.kind==='photo'&&meta.frames.length>1?`<details class="exercise-real-photos"><summary>Ver fotos reales (posición inicial y final)</summary><div class="exercise-modal-frames">${meta.frames.map((f,i)=>`<figure class="exercise-modal-image"><img src="${f}" alt="${esc(name)}: ${i?'posición final':'posición inicial'}" loading="lazy" decoding="async"><figcaption><b>${i+1}</b> ${i?'Posición final':'Posición inicial'}</figcaption></figure>`).join('')}</div><p class="muted small exercise-media-credit">${esc(meta.credit)}</p></details>`:'';
+      return `<figure class="exercise-gif-hero"><img src="${gif.src}" alt="${esc(name)}: animación del movimiento completo, de la posición inicial a la final" loading="lazy" decoding="async"><figcaption class="exercise-gif-title">${esc(name)}</figcaption><span class="exercise-gif-legend"><i aria-hidden="true"></i>Músculos que trabajan</span></figure><p class="muted small exercise-media-credit">Animación ilustrativa propia de FittForma.</p>${photos}`;
+    }
     if(!meta.frames.length)return '<p class="muted small">Este ejercicio no es de la biblioteca: no tiene imagen. Revisá la técnica con alguien de confianza.</p>';
     const credit=`<p class="muted small exercise-media-credit">${esc(meta.credit)}${meta.family?` · ${esc(meta.family)}`:''}</p>`;
     if(meta.frames.length>1)return `<div class="exercise-modal-frames">${meta.frames.map((f,i)=>`<figure class="exercise-modal-image"><img src="${f}" alt="${esc(name)}: ${i?'posición final':'posición inicial'}" loading="lazy" decoding="async"><figcaption><b>${i+1}</b> ${i?'Posición final':'Posición inicial'}</figcaption></figure>`).join('')}</div>${credit}`;

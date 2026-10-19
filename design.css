@@ -719,3 +719,14 @@ body{font-feature-settings:"cv11","ss01"}
 #view-community header.community-topbar{position:relative!important;top:auto!important;z-index:2!important;margin:0 0 6px!important;padding:6px 0!important;background:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important;border:0!important}
 #view-community .community-subtab-create,#view-community .community-subtab-create.is-active{color:#fff!important;background:linear-gradient(135deg,#1d6fe8,#2f9bff)!important}
 #view-community .community-subtab-create.is-active{box-shadow:0 0 0 3px var(--mod-soft),0 6px 16px rgba(29,111,232,.35)}
+
+/* ===== v50 · animaciones de ejercicios (figura propia, músculos en rojo) ===== */
+.exercise-photo.is-gif{background:#16202a}
+.exercise-photo.is-gif img{width:100%;height:100%;object-fit:contain;display:block}
+.exercise-gif-hero{position:relative;margin:0 0 6px;border-radius:20px;overflow:hidden;background:#16202a;aspect-ratio:1/1;max-width:420px;margin-inline:auto;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.exercise-gif-hero img{width:100%;height:100%;display:block;object-fit:cover}
+.exercise-gif-title{position:absolute;inset:12px 12px auto;text-align:center;font-weight:900;font-size:clamp(17px,5.4vw,24px);line-height:1.05;letter-spacing:.01em;text-transform:uppercase;color:#8bff3c;-webkit-text-stroke:1px #0d2a06;text-shadow:0 0 14px rgba(139,255,60,.55),0 2px 0 #0d2a06;overflow-wrap:anywhere}
+.exercise-gif-legend{position:absolute;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:rgba(10,14,18,.72);color:#e9edf0;font-size:11.5px;font-weight:600}
+.exercise-gif-legend i{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#ff6a4d,#b8240f)}
+.exercise-real-photos{margin-top:8px}
+.exercise-real-photos summary{cursor:pointer;font-weight:600;font-size:14px;padding:6px 0}
