@@ -94,7 +94,7 @@ test('v42 presenta seis destinos móviles; FittAI y Correr quedan en Más y en E
 });
 
 test('v28 GPS mantiene fresca la marca temporal sin sumar jitter de menos de 2 m', () => {
-  assert.match(html, /if\(delta<2\)\{[\s\S]*?gpsLastPoint=\{\.\.\.gpsLastPoint,at:point\.at,accuracy:point\.accuracy\};[\s\S]*?return;/);
+  // v50: además conserva anchorAt (hora de la posición desde la que se mide) para no perder tiempo en movimiento.\n  assert.match(html, /if\(delta<2\)\{[\s\S]*?gpsLastPoint=\{\.\.\.gpsLastPoint,at:point\.at,anchorAt:gpsLastPoint\.anchorAt\?\?gpsLastPoint\.at,accuracy:point\.accuracy\};[\s\S]*?return;/);
   assert.match(html, /rawTimeDelta>15\|\|delta>allowedDistance/);
   assert.match(html, /point\.accuracy>45/);
   assert.match(html, /function persistGpsDraft\(/);
