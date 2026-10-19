@@ -790,3 +790,12 @@ body{font-feature-settings:"cv11","ss01"}
 .food-macros .stat{padding:8px 6px;text-align:center}
 .food-macros .stat strong{font-size:1rem}
 .food-online{margin-top:6px}
+
+/* ===== v50 · Comunidad: directorio y privacidad ===== */
+#view-community .community-people-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:8px 0}
+#view-community .community-person.is-private{opacity:.95}
+#view-community .community-private-tag{display:inline-flex;align-items:center;gap:4px;font-weight:600;color:#6b7280}
+#view-community .community-private-tag svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
+#view-community .community-person-bio{display:block;opacity:.8;line-height:1.35;overflow-wrap:anywhere}
+#view-community .community-private-notice{margin:12px 0}
+#view-community .community-comment .community-avatar{width:22px;height:22px;font-size:10px;vertical-align:middle;margin-right:6px;display:inline-flex}

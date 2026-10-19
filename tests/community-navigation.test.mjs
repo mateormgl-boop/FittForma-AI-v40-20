@@ -52,7 +52,7 @@ test('si el embed de autores de comentarios sigue ambiguo, Comunidad recupera lo
  const js=await read('community.js');
  assert.match(js,/plainComments=await client\.from\('community_comments'\)\.select\('id,post_id,user_id,body,created_at'\)/);
  assert.match(js,/commentAuthors=\[\.\.\.new Set\(\(plainComments\.data\|\|\[\]\)\.map\(comment=>comment\.user_id\)\)\]/);
- assert.match(js,/community_profiles'\)\.select\('user_id,display_name,username'\)\.in\('user_id',commentAuthors\)/);
+ assert.match(js,/community_profiles'\)\.select\('user_id,display_name,username(?:,avatar_path)?'\)\.in\('user_id',commentAuthors\)/); // v50: también la foto
 });
 
 test('las cinco pestañas principales y sus títulos de Comunidad tienen traducciones para los seis idiomas',async()=>{
@@ -67,5 +67,5 @@ test('comentarios también tienen recuperación no destructiva si su relación c
  const js=await read('community.js');
  assert.match(js,/plainComments=await client\.from\('community_comments'\)\.select\('id,post_id,user_id,body,created_at'\)/);
  assert.match(js,/commentAuthors=\[\.\.\.new Set\(\(plainComments\.data\|\|\[\]\)\.map\(comment=>comment\.user_id\)\)\]/);
- assert.match(js,/community_profiles'\)\.select\('user_id,display_name,username'\)\.in\('user_id',commentAuthors\)/);
+ assert.match(js,/community_profiles'\)\.select\('user_id,display_name,username(?:,avatar_path)?'\)\.in\('user_id',commentAuthors\)/); // v50: también la foto
 });

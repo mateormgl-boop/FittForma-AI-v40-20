@@ -196,3 +196,21 @@ test('alimentos: el buscador está integrado en Nutrición y funciona sin conexi
   assert.match(html, /La base local sigue disponible/);
   assert.match(readFileSync('sw.js', 'utf8'), /food-db\.js/);
 });
+
+// ---------- v50 Etapa 4: Comunidad ----------
+test('comunidad: perfiles públicos por defecto, directorio y privacidad también en la base', () => {
+  const js = readFileSync('community.js', 'utf8'), html = readFileSync('index.html', 'utf8');
+  const mig = readFileSync('supabase/migrations/2026-10-24_v50_community_directory.sql', 'utf8');
+  assert.match(js, /visibility:'public'\}/, 'el perfil creado desde la app nace público');
+  assert.match(html, /<option value="public">Público[^<]*<\/option><option value="private">/);
+  assert.match(mig, /alter column visibility set default 'public'/);
+  assert.match(mig, /function public\.community_directory\(/);
+  assert.match(mig, /function public\.community_profile_basic\(/);
+  assert.match(mig, /community_media_read_avatar_basic/);
+  assert.doesNotMatch(mig, /disable row level security|drop table|delete from/i, 'migración aditiva, sin desactivar RLS');
+  assert.match(js, /client\.rpc\('community_directory',\{p_search:peopleTerm,p_after:peopleAfter,p_limit:20\}\)/, 'carga progresiva');
+  assert.match(js, /Este perfil es privado/);
+  assert.match(js, /async function removeAvatar\(\)/);
+  assert.match(html, /id="communityAvatarRemove"/);
+  assert.match(html, /id="communityPeopleMore"/);
+});

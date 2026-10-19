@@ -22,7 +22,7 @@ SQL
 for m in "$root"/migrations/*.sql; do run "$m"; run "$m"; done   # dos veces: debe ser re-ejecutable
 psql -d "$url" -v ON_ERROR_STOP=1 -qAtc "select case when post_kind='transformation' then 'legacy ok' else 'legacy MAL' end from public.community_posts where user_id='eeeeeeee-0000-0000-0000-000000000005'"
 out=""
-for t in "$here"/rls_v4*_test.sql; do
+for t in "$here"/rls_v*_test.sql; do
   part="$(psql -d "$url" -v ON_ERROR_STOP=1 -q -f "$t" 2>&1)" || { echo "$part" | grep -E "OK|FALLO|ERROR"; echo "RESULTADO: FALLÓ en $(basename "$t")"; exit 1; }
   out="$out
 $part"
