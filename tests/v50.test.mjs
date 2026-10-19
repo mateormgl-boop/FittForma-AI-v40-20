@@ -40,3 +40,88 @@ test('la ficha y las tarjetas usan la animación y conservan las fotos reales co
   assert.match(readFileSync('sw.js', 'utf8'), /exercise-gifs\.js/);
   assert.match(readFileSync('backend/server.mjs', 'utf8'), /'\/exercise-gifs\.js'/);
 });
+
+// ---------- v50 Etapa 2: actividades, GPS y calorías ----------
+const A = load('activity-core.js').window.FittFormaActivity;
+
+test('calorías: cada actividad usa su propio método reconocido', () => {
+  const run = A.estimateActivityCalories({ type: 'Correr', distanceKm: 10, minutes: 60, movingMinutes: 60, weightKg: 70 });
+  const walk = A.estimateActivityCalories({ type: 'Caminar', distanceKm: 5, minutes: 60, movingMinutes: 60, weightKg: 70 });
+  const bike = A.estimateActivityCalories({ type: 'Bicicleta', distanceKm: 20, minutes: 60, movingMinutes: 60, weightKg: 70 });
+  assert.equal(run.method, 'acsm-correr');
+  assert.equal(walk.method, 'acsm-caminar');
+  assert.equal(bike.method, 'compendio-2011-bicicleta');
+  // ACSM correr a 166,7 m/min: VO2 = 3,5 + 0,2·166,7 = 36,8 ml/kg/min → 36,8·70·60/1000·5 ≈ 773 kcal.
+  assert.ok(Math.abs(run.kcal - 773) <= 2, String(run.kcal));
+  // ACSM caminar a 83,3 m/min: VO2 = 3,5 + 8,33 = 11,83 → ≈ 248 kcal.
+  assert.ok(Math.abs(walk.kcal - 248) <= 2, String(walk.kcal));
+  // Bicicleta 20 km/h → MET 8,0 (Compendio 2011) → 8·70·1 = 560 kcal.
+  assert.equal(bike.kcal, 560);
+  assert.ok(run.netKcal < run.kcal && walk.netKcal < walk.kcal && bike.netKcal < bike.kcal, 'el neto descuenta el reposo');
+});
+
+test('calorías: sin peso no se inventa un valor; sin tiempo en movimiento queda como aproximado', () => {
+  assert.equal(A.estimateActivityCalories({ type: 'Correr', distanceKm: 5, minutes: 30 }).kcal, null);
+  assert.equal(A.estimateActivityCalories({ type: 'Correr', distanceKm: 5, minutes: 30 }).reason, 'peso');
+  const approx = A.estimateActivityCalories({ type: 'Correr', distanceKm: 5, minutes: 30, weightKg: 70 });
+  assert.equal(approx.approximate, true);
+  assert.ok(approx.notes.some(n => /tiempo total/.test(n)));
+  assert.equal(A.estimateStrengthCalories({ minutes: 60 }).kcal, null);
+  assert.equal(A.estimateStrengthCalories({ minutes: 60, weightKg: 80 }).kcal, 280); // 3,5 MET · 80 kg · 1 h
+});
+
+test('calorías: la pendiente medida suma esfuerzo y un peso distinto cambia solo los cálculos nuevos', () => {
+  const flat = A.estimateActivityCalories({ type: 'Caminar', distanceKm: 4, minutes: 50, movingMinutes: 50, weightKg: 70 });
+  const hill = A.estimateActivityCalories({ type: 'Caminar', distanceKm: 4, minutes: 50, movingMinutes: 50, weightKg: 70, elevationGainM: 120 });
+  assert.ok(hill.kcal > flat.kcal);
+  const heavier = A.estimateActivityCalories({ type: 'Caminar', distanceKm: 4, minutes: 50, movingMinutes: 50, weightKg: 90 });
+  assert.ok(heavier.kcal > flat.kcal);
+  // El resumen suma lo GUARDADO en cada registro: no recalcula con el peso actual.
+  const now = new Date('2026-10-14T12:00:00');
+  const sum = A.summarizeExpenditure({ activities: [{ type: 'Caminar', date: '2026-10-13', distance: 4, calories: { kcal: flat.kcal } }, { type: 'Bicicleta', date: '2026-10-01', distance: 10, calories: { kcal: 300 } }], sessions: [{ date: '2026-10-14', minutes: 50, calories: { kcal: 200 } }, { date: '2026-10-14', minutes: 10 }] }, 'week', now);
+  assert.equal(sum.rows.Caminar.kcal, flat.kcal);
+  assert.equal(sum.rows.Bicicleta.kcal, 0, 'fuera de la semana');
+  assert.equal(sum.rows.Fuerza.kcal, 200);
+  assert.equal(sum.rows.Fuerza.missing, 1);
+  const month = A.summarizeExpenditure({ activities: [{ type: 'Bicicleta', date: '2026-10-01', distance: 10, calories: { kcal: 300 } }] }, 'month', now);
+  assert.equal(month.rows.Bicicleta.kcal, 300);
+});
+
+test('GPS: tiempo en movimiento, velocidad máxima suavizada y desnivel solo con altitud precisa', () => {
+  const st = A.createGpsStats();
+  for (let i = 0; i < 10; i++) A.addGpsSegment(st, 'Bicicleta', { meters: 7, seconds: 1, at: i * 1000, altitude: 10 + i, altitudeAccuracy: 5 });
+  for (let i = 0; i < 5; i++) A.addGpsSegment(st, 'Bicicleta', { meters: 0, seconds: 2, at: 10000 + i * 2000 });
+  assert.equal(st.movingMs, 10000, 'las detenciones no suman tiempo en movimiento');
+  assert.ok(Math.abs(st.maxSpeed - 7) < 0.01, String(st.maxSpeed));
+  assert.equal(st.elevationGain, 9);
+  // Un pico imposible no se toma como velocidad máxima.
+  A.addGpsSegment(st, 'Bicicleta', { meters: 400, seconds: 1, at: 30000 });
+  assert.ok(st.maxSpeed < A.MAX_SPEED.Bicicleta);
+  const noisy = A.createGpsStats();
+  A.addGpsSegment(noisy, 'Caminar', { meters: 5, seconds: 4, at: 0, altitude: 40, altitudeAccuracy: 30 });
+  A.addGpsSegment(noisy, 'Caminar', { meters: 5, seconds: 4, at: 4000, altitude: 60, altitudeAccuracy: 30 });
+  assert.equal(noisy.elevationGain, 0, 'altitud imprecisa no suma desnivel');
+  assert.equal(A.signalQuality(6).level, 'good');
+  assert.equal(A.signalQuality(60).level, 'none');
+});
+
+test('GPS: comparación con actividades anteriores del mismo tipo', () => {
+  const hist = [{ id: 1, type: 'Bicicleta', date: '2026-10-01', distance: 20, minutes: 60 }, { id: 2, type: 'Bicicleta', date: '2026-10-03', distance: 22, minutes: 60 }, { id: 3, type: 'Correr', date: '2026-10-04', distance: 5, minutes: 30 }];
+  const now = { id: 4, type: 'Bicicleta', date: '2026-10-05', distance: 25, minutes: 60, movingMinutes: 55 };
+  const c = A.compareWithPrevious(now, [...hist, now]);
+  assert.equal(c.count, 2);
+  assert.equal(c.faster, true);
+  assert.equal(A.compareWithPrevious({ id: 9, type: 'Caminar', date: '2026-10-05', distance: 3, minutes: 30 }, hist), null);
+});
+
+test('GPS nativo: puente seguro en la web y app Android preparada', () => {
+  const ctx = load('native-gps.js');
+  assert.equal(ctx.window.FittFormaNativeGps.available(), false, 'en el navegador no simula un servicio en segundo plano');
+  const html = readFileSync('index.html', 'utf8');
+  assert.match(html, /<script src="\.\/activity-core\.js"><\/script>/);
+  assert.match(html, /<script src="\.\/native-gps\.js"><\/script>/);
+  assert.match(html, /function clearGpsWatch\(\)/);
+  assert.match(html, /id="gpsSignal"/);
+  assert.match(html, /id="expenditureCard"/);
+  assert.match(html, /no suma automáticamente las calorías de ejercicio/);
+});

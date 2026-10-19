@@ -730,3 +730,30 @@ body{font-feature-settings:"cv11","ss01"}
 .exercise-gif-legend i{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#ff6a4d,#b8240f)}
 .exercise-real-photos{margin-top:8px}
 .exercise-real-photos summary{cursor:pointer;font-weight:600;font-size:14px;padding:6px 0}
+
+/* ===== v50 · GPS: señal, estadísticas y resumen ===== */
+.gps-stats{grid-template-columns:repeat(2,minmax(0,1fr));margin:12px 0}
+.gps-stats .gps-stat-main{grid-column:1/-1}
+.gps-stats .gps-stat-main strong{font-size:2rem}
+@media (min-width:640px){.gps-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.gps-signal{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--surface-2,rgba(127,127,127,.12));font-size:13px;margin-top:6px}
+.gps-signal i{width:10px;height:10px;border-radius:50%;background:#8a94a3}
+.gps-signal small{opacity:.75}
+.gps-signal[data-level="good"] i{background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.2)}
+.gps-signal[data-level="fair"] i{background:#eab308}
+.gps-signal[data-level="weak"] i{background:#f97316}
+.gps-signal[data-level="none"] i{background:#ef4444}
+.gps-summary{margin:14px 0;border:1px solid rgba(29,111,232,.25)}
+.gps-summary-stats{grid-template-columns:repeat(2,minmax(0,1fr));margin:10px 0}
+@media (min-width:640px){.gps-summary-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.kcal-tag{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(249,115,22,.14);color:#c2410c;font-weight:700;font-size:12px}
+:root[data-theme="dark"] .kcal-tag{color:#fdba74}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .kcal-tag{color:#fdba74}}
+.expenditure-card .exp-rows{display:grid;gap:8px;margin:10px 0}
+.expenditure-card .exp-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--surface-2,rgba(127,127,127,.08))}
+.expenditure-card .exp-row small{grid-column:1/-1;opacity:.75}
+.expenditure-card .exp-bar{grid-column:1/-1;height:6px;border-radius:6px;background:rgba(127,127,127,.18);overflow:hidden}
+.expenditure-card .exp-bar span{display:block;height:100%;background:linear-gradient(90deg,#f97316,#ef4444)}
+.expenditure-card .seg{display:inline-flex;gap:4px;padding:3px;border-radius:999px;background:var(--surface-2,rgba(127,127,127,.12))}
+.expenditure-card .seg button{border:0;background:none;padding:6px 12px;border-radius:999px;font-weight:600;color:inherit;cursor:pointer}
+.expenditure-card .seg button[aria-pressed="true"]{background:#1d6fe8;color:#fff}
