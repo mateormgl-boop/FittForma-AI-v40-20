@@ -1,6 +1,6 @@
 # Une los cuadros PNG en un GIF animado con paleta compartida (bucle infinito).
 # La paleta reserva los rojos de los músculos y los colores de bandas/colchonetas para que no se pierdan.
-import sys, glob
+import sys, glob, json
 from PIL import Image
 src, out = sys.argv[1], sys.argv[2]
 SIZE = 300
@@ -13,4 +13,5 @@ base = strip.quantize(colors=256 - len(FIXED), method=Image.Quantize.MEDIANCUT).
 pal_img = Image.new('P', (1, 1))
 pal_img.putpalette(base + [int(c[i:i + 2], 16) for c in FIXED for i in (0, 2, 4)])
 q = [f.quantize(palette=pal_img, dither=Image.Dither.NONE) for f in frames]
-q[0].save(out, save_all=True, append_images=q[1:], duration=105, loop=0, optimize=True, disposal=1)
+durations = json.loads(sys.argv[3]) if len(sys.argv) > 3 else 100
+q[0].save(out, save_all=True, append_images=q[1:], duration=durations, loop=0, optimize=True, disposal=1)

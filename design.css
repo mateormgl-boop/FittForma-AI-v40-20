@@ -723,6 +723,10 @@ body{font-feature-settings:"cv11","ss01"}
 /* ===== v50 · animaciones de ejercicios (figura propia, músculos en rojo) ===== */
 .exercise-photo.is-gif{background:#16202a}
 .exercise-photo.is-gif img{width:100%;height:100%;object-fit:contain;display:block}
+/* v51: el GIF es cuadrado y siempre se ve entero (nada de recortes por reglas de tarjetas con object-fit:cover). */
+.exercise-photo.is-gif img,#view-exercises .exercise-library-item .exercise-photo.is-gif img{object-fit:contain!important;object-position:center!important;background:#16202a!important}
+.exercise-library-item .exercise-photo.is-gif,#view-exercises .exercise-library-item .exercise-photo.is-gif{height:auto!important;aspect-ratio:1/1}
+.exercise-modal-image .exercise-photo.is-gif{height:auto!important;aspect-ratio:1/1;max-width:340px;margin-inline:auto}
 .exercise-gif-hero{position:relative;margin:0 0 6px;border-radius:20px;overflow:hidden;background:#16202a;aspect-ratio:1/1;max-width:420px;margin-inline:auto;box-shadow:0 10px 30px rgba(0,0,0,.35)}
 .exercise-gif-hero img{width:100%;height:100%;display:block;object-fit:cover}
 .exercise-gif-title{position:absolute;inset:12px 12px auto;text-align:center;font-weight:900;font-size:clamp(17px,5.4vw,24px);line-height:1.05;letter-spacing:.01em;text-transform:uppercase;color:#8bff3c;-webkit-text-stroke:1px #0d2a06;text-shadow:0 0 14px rgba(139,255,60,.55),0 2px 0 #0d2a06;overflow-wrap:anywhere}
@@ -799,3 +803,7 @@ body{font-feature-settings:"cv11","ss01"}
 #view-community .community-person-bio{display:block;opacity:.8;line-height:1.35;overflow-wrap:anywhere}
 #view-community .community-private-notice{margin:12px 0}
 #view-community .community-comment .community-avatar{width:22px;height:22px;font-size:10px;vertical-align:middle;margin-right:6px;display:inline-flex}
+/* v51: el título va en una franja propia, sin tapar la figura ni la trayectoria. */
+.exercise-gif-hero{aspect-ratio:auto;display:flex;flex-direction:column}
+.exercise-gif-hero img{aspect-ratio:1/1;height:auto;object-fit:contain}
+.exercise-gif-hero .exercise-gif-title{order:-1;position:static;inset:auto;padding:12px 12px 4px;background:#16202a}

@@ -69,6 +69,34 @@ function lens(a, b, n, t0, t1, off, w) {
 }
 const ellipse = (c, rx, ry, rot = 0) => `<ellipse class="m" cx="${f(c.x)}" cy="${f(c.y)}" rx="${f(rx)}" ry="${f(ry)}" transform="rotate(${f(rot)} ${f(c.x)} ${f(c.y)})"/>`;
 
+// Contorno de un segmento con volumen muscular: perfiles [t, media anchura] de la cara anterior y posterior.
+// La cara anterior es la normal (u.y, -u.x) del segmento a→b (para un brazo colgando, hacia adelante).
+function limb(a, b, ant, post) {
+  const u = unit(sub(b, a)), n = { x: u.y, y: -u.x }, Lg = len(sub(b, a));
+  const at = (t, w, sgn) => add(add(a, mul(u, t * Lg)), mul(n, sgn * w));
+  const capA = ant[0][1], capB = ant[ant.length - 1][1];
+  const front = ant.map(([t, w]) => at(t, w, 1));
+  const back = post.slice().reverse().map(([t, w]) => at(t, w, -1));
+  const endB = add(b, mul(u, (capB + post[post.length - 1][1]) / 2 * 0.8)), endA = sub(a, mul(u, (capA + post[0][1]) / 2 * 0.8));
+  return smooth([...front, endB, ...back, endA]);
+}
+const K = 1.16; // grosor general de la figura
+const PROF0 = {
+  upper: [[[0, 7.6], [0.18, 7.4], [0.5, 7.2], [0.8, 5.8], [1, 5.2]], [[0, 8.2], [0.3, 7.6], [0.62, 6.6], [0.88, 5.4], [1, 5]]],
+  fore: [[[0, 5.4], [0.22, 6.2], [0.55, 4.9], [1, 3.6]], [[0, 5.2], [0.25, 5.8], [0.65, 4.4], [1, 3.5]]],
+  thigh: [[[0, 11.2], [0.28, 11.2], [0.62, 9.6], [0.9, 7.2], [1, 6.6]], [[0, 12], [0.22, 10.8], [0.6, 9.2], [0.9, 7.2], [1, 6.6]]],
+  shin: [[[0, 6.6], [0.3, 5.3], [0.75, 3.8], [1, 3.9]], [[0, 6.4], [0.18, 8], [0.4, 7.6], [0.72, 4.2], [1, 3.9]]],
+};
+const PROF = Object.fromEntries(Object.entries(PROF0).map(([k, v]) => [k, v.map(side => side.map(([t, w]) => [t, w * K]))]));
+const deltoid = (sh, el) => { const u = unit(sub(el, sh)); return `<ellipse cx="${f(sh.x + u.x * 5)}" cy="${f(sh.y + u.y * 5)}" rx="9.4" ry="8.2" transform="rotate(${f(-angOf(u))} ${f(sh.x + u.x * 5)} ${f(sh.y + u.y * 5)})"/>`; };
+const handShape = (w, fa) => { const u = dir(fa), c = add(w, mul(u, 5.5)); return `<ellipse cx="${f(c.x)}" cy="${f(c.y)}" rx="4.2" ry="6.6" transform="rotate(${f(-angOf(u))} ${f(c.x)} ${f(c.y)})"/>`; };
+function footShape(ankle, footA) {
+  const u = dir(footA), up = { x: u.y, y: -u.x }; // hacia el empeine cuando el pie mira adelante
+  const p = (along, h) => add(add(ankle, mul(u, along)), mul(up, h));
+  return smooth([p(-5, -1), p(-4, 3.6), p(4, 3.8), p(12, 2.6), p(18, 0.6), p(17.6, -2.4), p(8, -3.4), p(-2, -3.8)]);
+}
+const knob = (c, r) => `<circle cx="${f(c.x)}" cy="${f(c.y)}" r="${f(r)}"/>`;
+
 // ---------- vista lateral ----------
 // pose: { hip:{x,y} (mundo), torso, head (inclinación relativa), arms:{n,f}, legs:{n,f}, feet:{n,f} }
 // brazo/pierna: { a:[proximal, distal] } o { t:{x,y}, bend }
@@ -131,8 +159,8 @@ function sideMuscles(J, side, ids, part) {
 function sideTorsoPath(J) {
   const a = J.hip, b = J.sh, u = unit(sub(b, a)), n = { x: -u.y, y: u.x };
   const at = (t, o) => add(add(a, mul(sub(b, a), t)), mul(n, o));
-  const front = [at(-0.12, 12), at(0.08, 13), at(0.35, 11.5), at(0.62, 15), at(0.82, 16.5), at(0.98, 10), at(1.08, 4)];
-  const back = [at(1.08, -6), at(0.98, -11), at(0.75, -13), at(0.45, -10.5), at(0.2, -12), at(0.02, -16), at(-0.14, -13)];
+  const front = [at(-0.12, 13), at(0.08, 14), at(0.35, 13), at(0.6, 17), at(0.8, 19.5), at(0.96, 13), at(1.08, 5)];
+  const back = [at(1.08, -7), at(0.97, -13.5), at(0.75, -15.5), at(0.45, -12.5), at(0.2, -14), at(0.02, -18.5), at(-0.14, -15)];
   return smooth([...front, ...back]);
 }
 function headSide(J) {
@@ -144,9 +172,8 @@ function headSide(J) {
 }
 function sideLimbs(J, side, part) {
   const l = J.limbs[side];
-  if (part === 'arm') return `<path d="${capsule(l.shoulder, l.elbow, 15, 11)}"/><path d="${capsule(l.elbow, l.wrist, 11, 8)}"/><circle cx="${f(l.hand.x)}" cy="${f(l.hand.y)}" r="5"/>`;
-  const fd = dir(l.footA), toe = add(l.ankle, mul(fd, L.foot)), heel = sub(l.ankle, mul(fd, 4));
-  return `<path d="${capsule(J.hip, l.knee, 22, 14)}"/><path d="${capsule(l.knee, l.ankle, 14, 8.5)}"/><path d="${capsule(heel, toe, 8, 6)}"/>`;
+  if (part === 'arm') return `${deltoid(l.shoulder, l.elbow)}<path d="${limb(l.shoulder, l.elbow, ...PROF.upper)}"/>${knob(l.elbow, 5.2)}<path d="${limb(l.elbow, l.wrist, ...PROF.fore)}"/>${handShape(l.wrist, l.fa)}`;
+  return `<path d="${limb(J.hip, l.knee, ...PROF.thigh)}"/>${knob(l.knee, 6.8)}<path d="${limb(l.knee, l.ankle, ...PROF.shin)}"/><path d="${footShape(l.ankle, l.footA)}"/>`;
 }
 function sideShorts(J, side) {
   const l = J.limbs[side], a = J.hip, b = J.sh, u = unit(sub(b, a)), n = { x: -u.y, y: u.x };
@@ -231,8 +258,9 @@ function frontMuscles(J, ids, back) {
 export function renderFront(pose, muscles = [], secondary = []) {
   const J = frontJoints(pose), T = J.T, back = !!pose.back;
   const tor = smooth([{ x: -24, y: -66 }, { x: -29, y: -58 }, { x: -22, y: -40 }, { x: -16, y: -18 }, { x: -18, y: 0 }, { x: -14, y: 10 }, { x: 14, y: 10 }, { x: 18, y: 0 }, { x: 16, y: -18 }, { x: 22, y: -40 }, { x: 29, y: -58 }, { x: 24, y: -66 }, { x: 0, y: -69 }].map(T));
-  const limbs = k => { const w = J.world[k]; return `<path d="${capsule(w.shoulder, w.elbow, 14, 11)}"/><path d="${capsule(w.elbow, w.wrist, 11, 8)}"/><circle cx="${f(w.hand.x)}" cy="${f(w.hand.y)}" r="5"/>`; };
-  const legs = k => { const w = J.world[k], sg = k === 'l' ? -1 : 1, foot = T(add(J.local[k].ankle, { x: sg * 4, y: 3 })); return `<path d="${capsule(w.hipJ, w.knee, 21, 14)}"/><path d="${capsule(w.knee, w.ankle, 14, 8.5)}"/><path d="${capsule(w.ankle, foot, 8, 7)}"/>`; };
+  const sym = pr => [pr[0], pr[0]];
+  const limbs = k => { const w = J.world[k], fa = angOf(sub(w.wrist, w.elbow)); return `${deltoid(w.shoulder, w.elbow)}<path d="${limb(w.shoulder, w.elbow, ...sym(PROF.upper))}"/>${knob(w.elbow, 5)}<path d="${limb(w.elbow, w.wrist, ...sym(PROF.fore))}"/>${handShape(w.wrist, fa)}`; };
+  const legs = k => { const w = J.world[k], sg = k === 'l' ? -1 : 1, foot = T(add(J.local[k].ankle, { x: sg * 4, y: 3 })); return `<path d="${limb(w.hipJ, w.knee, PROF.thigh[0], PROF.thigh[0])}"/>${knob(w.knee, 6.6)}<path d="${limb(w.knee, w.ankle, PROF.shin[1], PROF.shin[1])}"/><path d="${capsule(w.ankle, foot, 8.5, 7.5)}"/>`; };
   const neck = capsule(T({ x: 0, y: -60 }), T({ x: 0, y: -72 }), 13, 12);
   const hc = J.headC;
   const head = `<ellipse cx="${f(hc.x)}" cy="${f(hc.y)}" rx="${L.head - 1.5}" ry="${L.head + 0.5}" transform="rotate(${f(-J.rot)} ${f(hc.x)} ${f(hc.y)})"/>`;
@@ -258,22 +286,26 @@ export function renderFront(pose, muscles = [], secondary = []) {
 export const DEFS = `<defs>
 <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f2b36"/><stop offset=".68" stop-color="#16202a"/><stop offset=".69" stop-color="#28323c"/><stop offset="1" stop-color="#121920"/></linearGradient>
 <radialGradient id="spot" cx=".5" cy=".55" r=".55"><stop offset="0" stop-color="#3b4b5a" stop-opacity=".75"/><stop offset="1" stop-color="#3b4b5a" stop-opacity="0"/></radialGradient>
-<linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset=".55" stop-color="#d4d9de"/><stop offset="1" stop-color="#a9b0b8"/></linearGradient>
+<linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f7f8fa"/><stop offset=".45" stop-color="#dde1e5"/><stop offset="1" stop-color="#a3abb4"/></linearGradient>
 <linearGradient id="skinFar" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b9c0c7"/><stop offset="1" stop-color="#848c95"/></linearGradient>
 <linearGradient id="mus" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6a4d"/><stop offset=".6" stop-color="#e63b22"/><stop offset="1" stop-color="#b8240f"/></linearGradient>
 <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9ced4"/><stop offset="1" stop-color="#7d858e"/></linearGradient>
+<filter id="vol" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceAlpha" stdDeviation="2.6" result="b"/><feDiffuseLighting in="b" surfaceScale="3.2" diffuseConstant="1.05" lighting-color="#ffffff" result="d"><feDistantLight azimuth="225" elevation="52"/></feDiffuseLighting><feComposite in="d" in2="SourceAlpha" operator="in" result="lit"/><feComponentTransfer in="lit" result="lit2"><feFuncR type="linear" slope=".55" intercept=".5"/><feFuncG type="linear" slope=".55" intercept=".5"/><feFuncB type="linear" slope=".55" intercept=".5"/></feComponentTransfer><feBlend in="SourceGraphic" in2="lit2" mode="multiply"/></filter>
 <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#000" flood-opacity=".45"/></filter>
 </defs>
 <style>
-.near-o path,.near-o circle,.near-o ellipse{fill:none;stroke:#59616a;stroke-width:3.2;stroke-linejoin:round}
+.near-o path,.near-o circle,.near-o ellipse{fill:none;stroke:#4f5760;stroke-width:3;stroke-linejoin:round}
 .near path,.near circle,.near ellipse{fill:url(#skin)}
-.far-o path,.far-o circle{fill:none;stroke:#4a5158;stroke-width:3}
-.far path,.far circle{fill:url(#skinFar)}
-.ghost .m{fill:#e9edf0;stroke:#8d959e;stroke-width:.7;opacity:.55}
-.ghost .mf{fill:none;stroke:#9aa2ab;stroke-width:.5;opacity:.35}
+.far-o path,.far-o circle,.far-o ellipse{fill:none;stroke:#3f464d;stroke-width:3;stroke-linejoin:round}
+.far path,.far circle,.far ellipse{fill:url(#skinFar)}
+.ghost .m{fill:none;stroke:#8b939c;stroke-width:.7;opacity:.3}
+.ghost .mf{display:none}
 .mus .m{fill:url(#mus);stroke:#9c1e0c;stroke-width:.6}
 .mus2 .m{fill:#ff8a5c;opacity:.55}
-.mf{fill:none;stroke:#8f1a08;stroke-width:.7;opacity:.55}
+.mf{fill:none;stroke:#8f1a08;stroke-width:.6;opacity:.4}
+.trail{fill:none;stroke:#8bff3c;stroke-width:2.2;stroke-dasharray:1 5;stroke-linecap:round;opacity:.75}
+.trail-dot{fill:#8bff3c;opacity:.85}
+.trail-start{fill:none;stroke:#8bff3c;stroke-width:1.6;opacity:.8}
 .mus2 .mf{opacity:.25}
 .far-m{opacity:.72}
 .shorts path,.far-sh path{fill:#16191d;stroke:#0b0d10;stroke-width:1}
@@ -298,8 +330,11 @@ export function background() {
   return `<rect width="${W}" height="${H}" fill="url(#bg)"/>${slats}<rect y="248" width="${W}" height="6" fill="#0e151b"/>${floor}<ellipse cx="180" cy="210" rx="190" ry="170" fill="url(#spot)"/>`;
 }
 
-export function scene(content, groundShadow, scale = 1.5, cx = 180) {
+// back = equipamiento de fondo (puede salir del cuadro); fit = figura, trayectoria y equipamiento de mano (debe verse entero).
+// floorY = altura de pantalla donde queda el piso del mundo (FLOOR).
+export function scene(parts, groundShadow, scale = 1.5, cx = 180, floorY = FLOOR) {
+  const { back = '', fit = '' } = typeof parts === 'string' ? { fit: parts } : parts;
   const sh = groundShadow ? `<ellipse cx="${f(groundShadow.x)}" cy="${f(groundShadow.y)}" rx="${f(groundShadow.w)}" ry="7" fill="#05080b" opacity=".45"/>` : '';
-  const tf = `translate(${f(180 - cx * scale)} ${f(FLOOR - FLOOR * scale)}) scale(${scale})`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${DEFS}${background()}<g transform="${tf}">${sh}<g filter="url(#shadow)">${content}</g></g></svg>`;
+  const tf = `translate(${f(180 - cx * scale)} ${f(floorY - FLOOR * scale)}) scale(${f(scale * 1000) / 1000})`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${DEFS}${background()}<g transform="${tf}">${sh}<g filter="url(#shadow)">${back}<g class="fit">${fit}</g></g></g></svg>`;
 }
