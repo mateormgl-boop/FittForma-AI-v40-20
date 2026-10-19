@@ -2030,39 +2030,42 @@
     </section>
 
     <section class="view" id="view-community">
-      <div class="section-head community-page-head section-hero hero-community">
-        <div><div class="eyebrow">ENTRENÁ · COMPARTÍ · INSPIRÁ</div><h2>Comunidad FittForma</h2><p>Conectá con personas que entrenan, compartí avances y encontrá inspiración a tu ritmo.</p></div>
-        <div class="btn-row community-page-tools"><button class="btn ghost" id="communityRetryConnection" type="button">Comprobar conexión</button></div>
-      </div>
-      <div id="communityConnectionStatus" class="community-status community-global-status" role="status" aria-live="polite">Preparando comunidad…</div>
-      <nav class="community-subnav" role="tablist" aria-label="Secciones de Comunidad">
-        <button class="community-subtab is-active" id="communityTabFeed" type="button" role="tab" data-community-tab="feed" aria-controls="communityPanelFeed" aria-selected="true"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5h6v6H4zM14 5.5h6v6h-6zM4 15.5h6v4H4zM14 15.5h6v4h-6z"/></svg></span><span>Feed</span></button>
-        <button class="community-subtab" id="communityTabExplore" type="button" role="tab" data-community-tab="explore" aria-controls="communityPanelExplore" aria-selected="false" tabindex="-1"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.2 4.2"/></svg></span><span>Explorar</span></button>
-        <button class="community-subtab" id="communityTabPublish" type="button" role="tab" data-community-tab="publish" aria-controls="communityPanelPublish" aria-selected="false" tabindex="-1"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><span>Publicar</span></button>
-        <button class="community-subtab" id="communityTabMessages" type="button" role="tab" data-community-tab="messages" aria-controls="communityPanelMessages" aria-selected="false" tabindex="-1"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5h16v11H10l-5 3v-3H4z"/><path d="M8 9.5h8M8 13h5"/></svg></span><span>Mensajes</span><span class="community-unread" id="communityUnreadBadge" hidden></span></button>
-        <button class="community-subtab" id="communityTabProfile" type="button" role="tab" data-community-tab="profile" aria-controls="communityPanelProfile" aria-selected="false" tabindex="-1"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.8 20c.7-3.4 3.3-5.2 7.2-5.2s6.5 1.8 7.2 5.2"/></svg></span><span>Mi perfil</span></button>
-      </nav>
-      <div class="community-note community-privacy-note"><strong>Privacidad primero.</strong> Compartí solo fotos propias. Las experiencias son personales y no garantizan los mismos resultados.</div>
+      <!-- v49: barra propia de Comunidad dentro del contenido. La barra inferior principal de la app no cambia. -->
+      <header class="community-topbar">
+        <button class="community-brand" type="button" data-community-home aria-label="Ir al inicio de Comunidad"><h2>Comunidad</h2></button>
+        <nav class="community-subnav" role="tablist" aria-label="Secciones de Comunidad">
+          <button class="community-subtab is-active" id="communityTabFeed" type="button" role="tab" data-community-tab="feed" aria-controls="communityPanelFeed" aria-selected="true" title="Inicio"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5V20h-5v-5h-6v5H4z"/></svg></span><span class="community-subtab-label">Feed</span></button>
+          <button class="community-subtab" id="communityTabExplore" type="button" role="tab" data-community-tab="explore" aria-controls="communityPanelExplore" aria-selected="false" tabindex="-1" title="Explorar"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.2 4.2"/></svg></span><span class="community-subtab-label">Explorar</span></button>
+          <button class="community-subtab community-subtab-create" id="communityTabPublish" type="button" role="tab" data-community-tab="publish" aria-controls="communityPanelPublish" aria-selected="false" tabindex="-1" title="Crear publicación"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><span class="community-subtab-label">Publicar</span></button>
+          <button class="community-subtab" id="communityTabMessages" type="button" role="tab" data-community-tab="messages" aria-controls="communityPanelMessages" aria-selected="false" tabindex="-1" title="Mensajes"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5h16v11H10l-5 3v-3H4z"/></svg></span><span class="community-subtab-label">Mensajes</span><span class="community-unread" id="communityUnreadBadge" hidden></span></button>
+          <button class="community-subtab" id="communityTabProfile" type="button" role="tab" data-community-tab="profile" aria-controls="communityPanelProfile" aria-selected="false" tabindex="-1" title="Mi perfil social"><span class="community-subtab-icon community-subtab-avatar" id="communityTabAvatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.8 20c.7-3.4 3.3-5.2 7.2-5.2s6.5 1.8 7.2 5.2"/></svg></span><span class="community-subtab-label">Mi perfil</span></button>
+        </nav>
+      </header>
+      <div class="community-connection-row"><div id="communityConnectionStatus" class="community-status community-global-status" role="status" aria-live="polite">Preparando comunidad…</div><button class="btn ghost btn-sm" id="communityRetryConnection" type="button">Comprobar conexión</button></div>
 
       <section id="communityPanelFeed" class="community-subpanel is-active" data-community-panel="feed" role="tabpanel" aria-labelledby="communityTabFeed">
-        <div class="community-panel-heading"><div><h3>Lo que está pasando</h3><p class="muted small">Transformaciones y avances de perfiles que podés ver.</p></div><button class="btn secondary" id="communityRefresh" type="button">Actualizar feed</button></div>
-        <div class="community-feed-tools"><label for="communityFeedSort">Ordenar por</label><select id="communityFeedSort"><option value="activity">Actividad de la comunidad</option><option value="recent">Más recientes</option><option value="likes">Más me gusta</option></select></div>
+        <div class="community-stories" id="communityStories" aria-label="Novedades de personas que seguís"></div>
+        <div class="community-feed-tabs" role="group" aria-label="Qué mostrar en el feed"><button type="button" class="community-feed-tab is-active" data-feed-mode="activity" aria-pressed="true">Para vos</button><button type="button" class="community-feed-tab" data-feed-mode="following" aria-pressed="false">Siguiendo</button><button type="button" class="community-feed-tab" data-feed-mode="recent" aria-pressed="false">Recientes</button><button class="community-icon-btn" id="communityRefresh" type="button" aria-label="Actualizar feed" title="Actualizar feed"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button></div>
         <div id="communityFeedStatus" class="community-status" role="status" aria-live="polite">Preparando comunidad…</div>
         <aside class="ad-slot ad-slot-inline" id="adSlotCommunity" aria-label="Publicidad"><span class="ad-slot-label">Publicidad</span><div class="ad-slot-content" id="adContentCommunity"></div></aside>
-        <div id="communityFeed" class="community-feed"><div class="empty"><strong>Tu comunidad empieza acá</strong><p>Explorá perfiles o compartí tu primera transformación.</p></div></div>
+        <div id="communityFeed" class="community-feed"><div class="empty"><strong>Tu comunidad empieza acá</strong><p>Explorá perfiles o compartí tu primera publicación.</p></div></div>
+        <button class="btn ghost full" id="communityLoadMore" type="button" hidden>Cargar más publicaciones</button>
       </section>
 
       <section id="communityPanelExplore" class="community-subpanel" data-community-panel="explore" role="tabpanel" aria-labelledby="communityTabExplore" hidden>
-        <div class="community-panel-heading"><div><h3>Encontrá personas y avances</h3><p class="muted small">Buscá por nombre o @usuario. Los perfiles privados muestran información limitada.</p></div></div>
-        <form id="communitySearchForm" class="community-search-bar"><div class="field"><label for="communitySearch">Buscar perfil</label><input id="communitySearch" maxlength="40" placeholder="Ej. @mateo_fit" autocomplete="off"></div><button class="btn" type="submit">Buscar</button><button class="btn ghost" id="communityClearSearch" type="button">Limpiar</button></form>
-        <div id="communityExploreStatus" class="community-status" role="status" aria-live="polite">Escribí un nombre o @usuario para explorar perfiles y publicaciones.</div>
+        <h3 class="community-panel-title">Explorar</h3>
+        <form id="communitySearchForm" class="community-search-bar" role="search"><label class="sr-only" for="communitySearch">Buscar usuarios, publicaciones o #hashtags</label><span class="community-search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.2 4.2"/></svg></span><input id="communitySearch" maxlength="40" placeholder="Buscar usuarios, publicaciones o #hashtags" autocomplete="off" enterkeyhint="search"><button class="btn" type="submit">Buscar</button><button class="btn ghost" id="communityClearSearch" type="button" aria-label="Limpiar búsqueda">×</button></form>
+        <div class="community-chips" role="group" aria-label="Filtrar publicaciones"><button type="button" class="community-chip is-active" data-explore-filter="all" aria-pressed="true">Todos</button><button type="button" class="community-chip" data-explore-filter="photos" aria-pressed="false">Fotos</button><button type="button" class="community-chip" data-explore-filter="transformation" aria-pressed="false">Transformaciones</button><button type="button" class="community-chip" data-explore-filter="achievement" aria-pressed="false">Logros</button><button type="button" class="community-chip" data-explore-filter="workout" aria-pressed="false">Entrenamientos</button></div>
+        <div id="communityExploreStatus" class="community-status" role="status" aria-live="polite">Buscá personas por nombre o @usuario, o publicaciones por #hashtag.</div>
+        <section class="community-suggested-wrap" aria-labelledby="communitySuggestedTitle"><div class="community-section-head"><h4 id="communitySuggestedTitle">Personas sugeridas</h4><small class="muted">Perfiles públicos que todavía no seguís</small></div><div id="communitySuggested" class="community-suggested"></div></section>
         <div id="communitySearchResults" class="community-search-results"></div>
-        <div class="community-explore-posts"><h4>Publicaciones coincidentes</h4><div id="communitySearchPosts" class="community-feed"><div class="empty"><p>Los resultados aparecerán acá después de buscar.</p></div></div></div>
+        <div class="community-explore-posts"><div class="community-section-head"><h4>Publicaciones coincidentes</h4></div><div id="communityExploreGrid" class="community-grid"></div><div id="communitySearchPosts" class="community-feed"></div></div>
       </section>
 
       <section id="communityPanelPublish" class="community-subpanel" data-community-panel="publish" role="tabpanel" aria-labelledby="communityTabPublish" hidden>
         <div class="card community-editor">
-          <div class="community-panel-heading"><div><h3>Crear una publicación</h3><p class="muted small">Elegí qué querés compartir. Antes de publicar vas a ver exactamente qué datos se muestran.</p></div></div>
+          <div class="community-panel-heading"><div><h3>Crear publicación</h3><p class="muted small">Elegí qué compartir. Antes de publicar ves exactamente qué datos se muestran; se publica solo cuando la base confirma el guardado.</p></div></div>
+          <div class="community-note community-privacy-note"><strong>Privacidad primero.</strong> Compartí solo fotos propias. Las experiencias son personales y no garantizan los mismos resultados.</div>
           <nav class="ff-segmented" role="tablist" aria-label="Tipo de publicación">
             <button type="button" role="tab" class="ff-seg active" data-post-kind="text" aria-selected="true">Texto</button>
             <button type="button" role="tab" class="ff-seg" data-post-kind="achievement" aria-selected="false" tabindex="-1">Logro</button>
@@ -2070,8 +2073,9 @@
           </nav>
           <p class="community-status" id="communityKindNotice" role="status" hidden></p>
           <form id="communityTextPostForm" data-post-form="text">
-            <div class="field"><label for="communityTextBody">¿Qué querés contar?</label><textarea id="communityTextBody" maxlength="1200" rows="4" required placeholder="Ej. Hoy completé mi primera semana de 4 entrenamientos."></textarea><small class="muted"><span id="communityTextCount">0</span>/1200</small></div>
+            <div class="field"><label for="communityTextBody">¿Qué querés contar?</label><textarea id="communityTextBody" maxlength="1200" rows="4" required placeholder="Ej. Hoy completé mi primera semana de 4 entrenamientos. #constancia"></textarea><small class="muted"><span id="communityTextCount">0</span>/1200 · Podés usar #hashtags para que otras personas encuentren tu publicación.</small></div>
             <div class="field"><label for="communityTextImage">Foto (opcional)</label><input id="communityTextImage" type="file" accept="image/jpeg,image/png,image/webp"><small class="muted">JPG, PNG o WebP de hasta 8 MB. Se recomprime en tu dispositivo y se eliminan los metadatos (incluida la ubicación).</small></div>
+            <div class="field"><label for="communityLinkSession">Vincular un entrenamiento (opcional)</label><select id="communityLinkSession"><option value="">No vincular</option></select><small class="muted">Se comparte solo el resumen que ves (título, fecha, duración y ejercicios). Nunca tu peso corporal ni tus medidas.</small></div>
             <label class="reminder-pref-row" id="communityTextConsentRow" hidden><input id="communityTextPhotoConsent" type="checkbox"><span>Confirmo que tengo derecho a publicar esta foto y que no muestro a otras personas sin su permiso.</span></label>
             <button class="btn full" id="communityTextPublish" type="submit">Publicar</button>
           </form>
@@ -2102,22 +2106,38 @@
 
       <section id="communityPanelMessages" class="community-subpanel" data-community-panel="messages" role="tabpanel" aria-labelledby="communityTabMessages" hidden>
         <section class="card community-chat-panel" aria-labelledby="communityChatTitle">
-          <div class="community-panel-heading"><div><h3 id="communityChatTitle">Mensajes privados</h3><p class="muted small">El chat requiere seguimiento mutuo aceptado por ambas personas.</p></div><button class="btn secondary" id="communityChatRefresh" type="button">Actualizar chats</button></div>
-          <div class="community-inline-form"><div class="field"><label for="communityChatContact">Conversación</label><select id="communityChatContact"><option value="">Elegí un contacto mutuo</option></select></div></div>
+          <div class="community-chat-list" id="communityChatListView">
+            <div class="community-panel-heading"><div><h3 id="communityChatTitle">Mensajes privados</h3><p class="muted small">Solo con seguimiento mutuo aceptado por ambas personas.</p></div><button class="community-icon-btn" id="communityChatRefresh" type="button" aria-label="Actualizar chats" title="Actualizar chats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button></div>
+            <div class="community-inline-form"><div class="field"><label for="communityChatContact">Escribir a</label><select id="communityChatContact"><option value="">Elegí un contacto mutuo</option></select></div></div>
+            <div id="communityConversations" class="community-conversations" aria-label="Conversaciones"></div>
+          </div>
+          <div class="community-chat-view" id="communityChatView" hidden>
+            <div class="community-chat-head"><button class="community-icon-btn" id="communityChatBack" type="button" aria-label="Volver a las conversaciones"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="community-avatar community-avatar-sm" id="communityChatAvatar">FF</span><strong id="communityChatName">Conversación</strong></div>
+            <div id="communityChatMessages" class="community-chat-messages"><p class="muted small">Los mensajes aparecerán acá.</p></div>
+            <form id="communityChatForm" class="community-comment-form community-chat-form"><input id="communityChatText" name="message" maxlength="2000" required placeholder="Escribí un mensaje…" aria-label="Escribí un mensaje" autocomplete="off"><button class="btn" id="communityChatSend" type="submit">Enviar</button></form>
+            <details class="community-chat-more"><summary>Opciones de la conversación</summary><div class="btn-row community-chat-tools"><button class="btn ghost" id="communityChatDeleteConversation" type="button">Eliminar conversación para ambos</button><button class="btn ghost" id="communityChatBlockContact" type="button">Bloquear contacto</button></div><p class="muted small">El envío tiene límites contra el spam. Si bloqueás a alguien, se corta el seguimiento y el chat.</p></details>
+          </div>
           <div id="communityChatStatus" class="community-status" role="status" aria-live="polite">Iniciá sesión para ver tus chats.</div>
-          <div id="communityChatMessages" class="community-chat-messages"><p class="muted small">Los mensajes aparecerán acá.</p></div>
-          <form id="communityChatForm" class="community-comment-form"><input id="communityChatText" name="message" maxlength="2000" required placeholder="Escribí un mensaje…" aria-label="Escribí un mensaje"><button class="btn" id="communityChatSend" type="submit">Enviar</button></form>
-          <div class="btn-row community-chat-tools"><button class="btn ghost" id="communityChatDeleteConversation" type="button">Eliminar conversación para ambos</button><button class="btn ghost" id="communityChatBlockContact" type="button">Bloquear contacto</button></div><p class="muted small">El envío tiene límites contra el spam. Si bloqueás a alguien, se corta el seguimiento y el chat.</p>
         </section>
       </section>
 
       <section id="communityPanelProfile" class="community-subpanel" data-community-panel="profile" role="tabpanel" aria-labelledby="communityTabProfile" hidden>
-        <div class="card community-account-card">
-          <h3>Tu perfil comunitario</h3><p class="muted small">Usá un apodo si preferís. Los perfiles privados solo comparten contenido con seguidores aceptados.</p>
+        <div class="card community-social-profile" id="communityOwnProfile">
+          <div class="community-profile-header">
+            <div class="community-avatar community-avatar-lg" id="communityOwnAvatar">FF</div>
+            <div class="community-profile-id"><strong id="communityOwnName">Tu perfil</strong><span class="muted small" id="communityOwnHandle"></span><div class="community-featured" id="communityOwnFeatured" aria-label="Insignias destacadas"></div></div>
+          </div>
+          <p class="community-profile-bio" id="communityOwnBio"></p>
+          <div class="community-profile-stats" id="communityOwnStats" aria-live="polite"><span><b>0</b> publicaciones</span><span><b>0</b> seguidores</span><span><b>0</b> seguidos</span></div>
+          <div class="btn-row community-profile-actions"><button class="btn secondary" type="button" id="communityEditProfileToggle" aria-expanded="false" aria-controls="communityProfileEditor">Editar perfil</button><label class="btn ghost" id="communityAvatarLabel" for="communityAvatarInput">Cambiar foto</label><input id="communityAvatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden></div>
+          <div class="community-profile-tabs" role="group" aria-label="Contenido del perfil"><button type="button" class="community-feed-tab is-active" data-own-tab="posts" aria-pressed="true">Publicaciones</button><button type="button" class="community-feed-tab" data-own-tab="saved" aria-pressed="false">Guardadas</button></div>
+          <div id="communityOwnGrid" class="community-grid"></div>
+        </div>
+        <div class="card community-account-card" id="communityProfileEditor">
+          <h3>Tu perfil comunitario</h3><p class="muted small">Usá un apodo si preferís. Los perfiles privados solo comparten contenido con seguidores aceptados. Tu peso, altura y objetivos nunca se publican.</p>
           <form id="communityProfileForm">
-            <div class="community-profile-top community-own-profile"><div class="community-avatar" id="communityOwnAvatar">FF</div><div><strong id="communityOwnName">Tu perfil</strong><div id="communityOwnStats" class="muted small">0 publicaciones · 0 seguidores</div></div></div>
             <div class="field"><label for="communityDisplayName">Nombre visible</label><input id="communityDisplayName" maxlength="60" placeholder="Nombre o apodo" required></div>
-            <div class="field"><label for="communityUsername">Usuario público</label><input id="communityUsername" maxlength="24" pattern="[A-Za-z0-9_.-]{3,24}" placeholder="ej. mateo_fit" required><small class="muted">3–24 caracteres: letras, números, punto, guion o guion bajo.</small></div>
+            <div class="field"><label for="communityUsername">Usuario público</label><input id="communityUsername" maxlength="24" pattern="[A-Za-z0-9_.\-]{3,24}" placeholder="ej. mateo_fit" required><small class="muted">3–24 caracteres: letras, números, punto, guion o guion bajo.</small></div>
             <div class="field"><label for="communityBio">Descripción (opcional)</label><textarea id="communityBio" maxlength="280" rows="3" placeholder="Contá algo sobre tus objetivos…"></textarea></div>
             <div class="field"><label for="communityVisibility">Privacidad del perfil</label><select id="communityVisibility"><option value="private">Privado: solo seguidores aceptados</option><option value="public">Público: cualquiera puede verlo</option></select></div>
             <button class="btn full" type="submit">Guardar perfil online</button>
@@ -2130,6 +2150,13 @@
         <div class="card community-moderation" id="communityModerationCard" hidden><h3>Moderación</h3><p class="muted small">Denuncias abiertas. Solo lo ven las cuentas moderadoras asignadas por la persona dueña del proyecto.</p><div id="communityReportsList" class="muted small"></div></div>
         <div class="card community-profile-management"><h3>Solicitudes y privacidad</h3><div class="community-management-section"><strong>Solicitudes de seguimiento</strong><div id="communityFollowRequests" class="muted small">Iniciá sesión para administrar solicitudes.</div></div><div class="community-management-section"><strong>Usuarios bloqueados</strong><p class="muted small">Las cuentas bloqueadas no pueden ver tus publicaciones, seguirte ni enviarte mensajes mientras el bloqueo esté activo.</p><div id="communityBlockedList" class="muted small">Iniciá sesión para administrar los bloqueos.</div></div></div>
       </section>
+
+      <section id="communityPanelUser" class="community-subpanel" data-community-panel="user" aria-label="Perfil de la comunidad" hidden>
+        <button class="btn ghost btn-sm community-back" type="button" id="communityUserBack">← Volver</button>
+        <div class="card community-social-profile" id="communityUserProfile"></div>
+      </section>
+
+      <dialog class="community-post-dialog" id="communityPostDialog" aria-label="Publicación"><button class="modal-close" type="button" data-close-post-dialog aria-label="Cerrar">×</button><div id="communityPostDialogBody"></div></dialog>
     </section>
     <section class="view" id="view-profile">
       <div class="section-hero hero-profile"><div><h2>Tu perfil</h2><p>Tus datos, objetivos y configuración.</p></div></div>
@@ -2262,14 +2289,14 @@
         <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
         <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">48.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">49.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
       </details>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 48.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 49.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -2296,7 +2323,7 @@
   <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V48.0</p>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V49.0</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -3820,8 +3847,8 @@ function findCatalogExercise(name){
     box.innerHTML=`<p class="small"><strong>Elegí hasta 3 insignias para mostrar junto a tu nombre.</strong> Se muestra siempre tu mejor nivel en cada desafío.</p><div class="featured-options">${top.map(u=>{const item=catalog.find(i=>i.id===u.exerciseId)||{category:'custom'},rank=BadgeEngine.rankForLevel(u.level-1);return `<label class="featured-option"><input type="checkbox" value="${esc(u.exerciseId)}" ${chosen.has(u.exerciseId)?'checked':''}>${badgeMedalFor(item,u.level-1,{size:36})}<span><b>${esc(u.exerciseName)}</b><small>${esc(rank.label)}</small></span></label>`;}).join('')}</div><p class="muted small" id="featuredPickerStatus" role="status" aria-live="polite">Sin elegir, mostramos automáticamente tus insignias de mayor nivel.</p><div class="btn-row"><button type="button" class="btn btn-sm" id="featuredSave">Guardar</button><button type="button" class="btn ghost btn-sm" id="featuredAuto">Elegir automáticamente</button></div>`;
     box.hidden=false;$('featuredEdit')?.setAttribute('aria-expanded','true');
     box.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.onchange=()=>{const n=box.querySelectorAll('input:checked').length;if(n>3){cb.checked=false;$('featuredPickerStatus').textContent='Podés destacar como máximo 3 insignias.';}});
-    $('featuredSave').onclick=()=>{state.featuredBadges=[...box.querySelectorAll('input:checked')].map(x=>x.value).slice(0,3);save();box.hidden=true;renderFeaturedBadges();toast('Insignias destacadas actualizadas.');};
-    $('featuredAuto').onclick=()=>{state.featuredBadges=[];save();box.hidden=true;renderFeaturedBadges();toast('Se muestran tus insignias de mayor nivel.');};
+    $('featuredSave').onclick=()=>{state.featuredBadges=[...box.querySelectorAll('input:checked')].map(x=>x.value).slice(0,3);save();box.hidden=true;renderFeaturedBadges();window.dispatchEvent(new CustomEvent('fittforma:badgeschange'));toast('Insignias destacadas actualizadas.');};
+    $('featuredAuto').onclick=()=>{state.featuredBadges=[];save();box.hidden=true;renderFeaturedBadges();window.dispatchEvent(new CustomEvent('fittforma:badgeschange'));toast('Se muestran tus insignias de mayor nivel.');};
   }
   window.addEventListener('fittforma:badgeschange',()=>renderFeaturedBadges());
   function renderProfileBadgesPreview(){
@@ -3835,6 +3862,17 @@ function findCatalogExercise(name){
   }
   // Insignias que se pueden compartir en Comunidad: el nivel más alto por desafío.
   // Solo se envía lo necesario; la evidencia nunca puede ser 'verificada' (ver migración v41).
+  // v49: datos que Comunidad puede mostrar en el perfil social (solo el logro: nunca registros ni datos corporales).
+  window.FittFormaFeaturedBadgesPayload=function(){
+    const catalog=getBadgeCatalog();
+    return featuredUnlocks().slice(0,3).map(u=>{const item=catalog.find(x=>x.id===u.exerciseId)||{};const level=Math.min(12,Math.max(1,Number(u.level)||1));return {exerciseId:String(u.exerciseId).toLowerCase().replace(/[^a-z0-9-]/g,'-').slice(0,80),exerciseName:String(u.exerciseName||item.name||'Desafío').slice(0,72),category:String(item.category||'').replace(/[^a-z]/g,'').slice(0,20),rank:BadgeEngine.rankForLevel(level-1).key,level,measure:item.measure||u.measure||'reps'};});
+  };
+  // v49: entrenamientos recientes que la persona puede vincular a una publicación (resumen elegido por ella).
+  window.FittFormaRecentSessions=function(){
+    const sessions=(state.sessions||[]).filter(x=>x&&x.status!=='partial'&&Array.isArray(x.exercises)&&x.exercises.length).slice(0,8).map(x=>({key:'s'+x.id,label:`${String(x.title||'Entrenamiento').slice(0,60)} · ${prettyDate(x.date)}`,payload:{title:String(x.title||'Entrenamiento').slice(0,80),date:String(x.date),minutes:Math.max(0,Math.min(600,Math.round(Number(x.minutes)||0))),sets:Math.max(0,Math.min(300,Number(x.completedSets)||0)),type:['daily','plan_extra','custom','free','manual'].includes(x.type)?x.type:'free',exercises:x.exercises.slice(0,12).map(e=>String(e.name||'').slice(0,72)).filter(n=>n.length>0)}}));
+    const runs=(state.activities||[]).slice(-4).reverse().filter(a=>/^\d{4}-\d{2}-\d{2}$/.test(String(a?.date||''))).map(a=>({key:'a'+a.id,label:`${String(a.type||'Actividad').slice(0,30)} ${Number(a.distance)?`${Number(a.distance).toLocaleString('es-UY',{maximumFractionDigits:2})} km`:''} · ${prettyDate(a.date)}`,payload:{title:`${String(a.type||'Actividad').slice(0,40)}${Number(a.distance)?` · ${Number(a.distance).toLocaleString('es-UY',{maximumFractionDigits:2})} km`:''}`.slice(0,80),date:String(a.date),minutes:Math.max(0,Math.min(600,Math.round(Number(a.minutes)||0))),type:'run'}}));
+    return [...sessions,...runs];
+  };
   window.FittFormaShareableBadges=function(){
     const catalog=getBadgeCatalog(),best=new Map();
     for(const entry of Object.values(state.badgeUnlocks||{})){
@@ -4701,7 +4739,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.48.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.48.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.49.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.49.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -5514,7 +5552,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.48.0';
+  const APP_VERSION='0.49.0';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');

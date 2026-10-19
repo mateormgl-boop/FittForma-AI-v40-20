@@ -38,7 +38,7 @@ sql(`delete from user_app_data where user_id='aaaaaaaa-0000-0000-0000-0000000000
 sql(`insert into community_posts(id,user_id,post_kind,description,visibility) values('b0000000-0000-0000-0000-0000000000b1','bbbbbbbb-0000-0000-0000-000000000002','text','Primera semana completa de entrenamientos','public')`);
 sql(`set request.jwt.claim.sub='bbbbbbbb-0000-0000-0000-000000000002'; insert into community_messages(sender_id,recipient_id,body) values('bbbbbbbb-0000-0000-0000-000000000002','aaaaaaaa-0000-0000-0000-000000000001','¡Hola Alicia! ¿Entrenamos el sábado?')`);
 
-const seed = { profile: { goal: 'fitness' }, sessions: [], activities: [], badgeRecords: [{ id: 1, exerciseId: 'exercise-plancha-frontal', exerciseName: 'Plancha frontal', measure: 'seconds', value: 70, unit: 'seconds', date: new Date().toISOString().slice(0, 10), source: 'manual' }] };
+const seed = { profile: { goal: 'fitness' }, sessions: [{ id: 5, type: 'custom', status: 'completed', date: '2026-10-15', title: 'Pecho y tríceps', minutes: 40, completedSets: 6, exercises: [{ name: 'Press de banca con barra', group: 'Pecho', kind: 'strength', entries: [{ reps: '8', weight: '40', done: true }] }] }], activities: [], badgeRecords: [{ id: 1, exerciseId: 'exercise-plancha-frontal', exerciseName: 'Plancha frontal', measure: 'seconds', value: 70, unit: 'seconds', date: new Date().toISOString().slice(0, 10), source: 'manual' }] };
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 const errors = []; page.on('pageerror', e => errors.push('PAGEERR ' + e.message));
@@ -127,14 +127,45 @@ await page.fill('[data-community-comment-form="b0000000-0000-0000-0000-000000000
 await page.click('[data-community-comment-form="b0000000-0000-0000-0000-0000000000b1"] button'); await page.waitForTimeout(900);
 step('Comentario persistido', sql(`select body from community_comments`) === '¡Vamos Bruno!');
 const textPostId = sql(`select id from community_posts where post_kind='text' and user_id='aaaaaaaa-0000-0000-0000-000000000001'`);
+// v49: editar, eliminar, denunciar y bloquear están en el menú «⋯» de cada publicación.
+await page.click(`[data-community-post="${textPostId}"] .community-post-menu summary`);
 await page.click(`[data-community-edit-post="${textPostId}"]`);
 await page.fill(`[data-community-post="${textPostId}"] .community-edit-form textarea`, 'Hoy corrí 5 km sin parar (editado)');
 await page.click(`[data-community-post="${textPostId}"] .community-edit-form button[type=submit]`); await page.waitForTimeout(1000);
 step('Edición propia persistida', sql(`select description from community_posts where id='${textPostId}'`) === 'Hoy corrí 5 km sin parar (editado)');
 step('Botón editar ausente en post ajeno', !(await page.$('[data-community-post="b0000000-0000-0000-0000-0000000000b1"] [data-community-edit-post]')));
 
+// v49: guardar una publicación (solo después de que la base confirma) y verla en el perfil.
+await page.click('[data-community-post="b0000000-0000-0000-0000-0000000000b1"] [data-community-save]'); await page.waitForTimeout(900);
+step('Publicación guardada en la base', sql(`select count(*) from community_saved_posts where user_id='aaaaaaaa-0000-0000-0000-000000000001'`) === '1');
+step('El botón guardar queda marcado', (await page.getAttribute('[data-community-post="b0000000-0000-0000-0000-0000000000b1"] [data-community-save]', 'aria-pressed')) === 'true');
+// v49: perfil social de otra persona con conteos reales.
+await page.click('[data-community-post="b0000000-0000-0000-0000-0000000000b1"] .community-author-name'); await page.waitForTimeout(1200);
+const otherProfile = await page.textContent('#communityUserProfile');
+step('Perfil de otra persona: nombre, usuario y conteos reales', /Bruno Fit/.test(otherProfile) && /@bruno_fit/.test(otherProfile) && /seguidores/.test(otherProfile), otherProfile.replace(/\s+/g, ' ').slice(0, 140));
+step('Mutuos: se ofrece escribir un mensaje', await page.isVisible('#communityUserProfile [data-user-message]'));
+step('La barra inferior principal sigue intacta', await page.$$eval('.mobile-nav-item', n => n.map(x => x.dataset.mobileView).join(',')) === 'plan,train,nutrition,progress,community,profile');
+await page.click('#communityUserBack'); await page.waitForTimeout(600);
+// v49: buscar por #hashtag en Explorar.
+sql(`set request.jwt.claim.sub='bbbbbbbb-0000-0000-0000-000000000002'; insert into community_posts(id,user_id,post_kind,description,visibility) values('b0000000-0000-0000-0000-0000000000b2','bbbbbbbb-0000-0000-0000-000000000002','text','Cuarto día seguido #constancia','public') on conflict do nothing`);
+await page.click('#communityTabExplore'); await page.waitForTimeout(800);
+await page.fill('#communitySearch', '#constancia'); await page.click('#communitySearchForm button[type=submit]'); await page.waitForTimeout(1200);
+step('Explorar encuentra publicaciones por #hashtag', /Cuarto día seguido/.test(await page.textContent('#communitySearchPosts')));
+// v49: publicación con un entrenamiento vinculado (resumen elegido por la persona).
+await page.click('#communityTabPublish'); await page.waitForTimeout(400); await page.click('[data-post-kind="text"]');
+await page.fill('#communityTextBody', 'Sesión de pecho completa #fuerza');
+await page.selectOption('#communityLinkSession', 's5');
+step('La vista previa muestra el entrenamiento vinculado', /Pecho y tríceps/.test(await page.textContent('#communityPostPreview')));
+await page.click('#communityTextPublish'); await page.waitForTimeout(1500);
+step('Entrenamiento vinculado guardado (sin datos corporales)', sql(`select linked_session->>'title' || '|' || (linked_session ? 'weightKg')::text from community_posts where description='Sesión de pecho completa #fuerza'`) === 'Pecho y tríceps|false');
+// Guardadas en el perfil propio.
+await page.click('#communityTabProfile'); await page.waitForTimeout(900);
+await page.click('[data-own-tab="saved"]'); await page.waitForTimeout(900);
+step('Perfil propio › Guardadas muestra la publicación guardada', (await page.$$('#communityOwnGrid [data-community-open-post="b0000000-0000-0000-0000-0000000000b1"]')).length === 1);
+
 // Mensajes: abrir conversación marca leído
-await page.click('#communityTabMessages'); await page.waitForTimeout(1000);
+await page.click('#communityTabMessages'); await page.waitForTimeout(1200);
+step('Lista de conversaciones con el último mensaje y no leídos', /Bruno Fit/.test(await page.textContent('#communityConversations')) && (await page.$$('#communityConversations .community-conversation.has-unread')).length === 1);
 const opt = await page.$$eval('#communityChatContact option', o => o.map(x => x.textContent));
 step('Contacto muestra mensajes sin leer', opt.some(o => /1 sin leer/.test(o)), opt.join(' | '));
 await page.selectOption('#communityChatContact', 'bbbbbbbb-0000-0000-0000-000000000002'); await page.waitForTimeout(1200);
@@ -145,6 +176,7 @@ step('Mensaje enviado y persistido', sql(`select count(*) from community_message
 
 // Eliminación propia
 await page.click('#communityTabFeed'); await page.waitForTimeout(900);
+await page.click(`[data-community-post="${textPostId}"] .community-post-menu summary`);
 await page.click(`[data-community-post="${textPostId}"] [data-community-delete-post]`); await page.waitForTimeout(1200);
 step('Eliminar publicación propia', sql(`select count(*) from community_posts where id='${textPostId}'`) === '0');
 // Moderación (v43): solo una cuenta agregada por SQL ve las denuncias.
