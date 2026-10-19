@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">FittForma AI</string>
+    <string name="title_activity_main">FittForma AI</string>
+    <string name="package_name">app.fittforma.ai</string>
+    <string name="custom_url_scheme">app.fittforma.ai</string>
+    <string name="capacitor_background_geolocation_notification_icon">mipmap/ic_launcher</string>
+</resources>

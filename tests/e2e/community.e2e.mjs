@@ -74,6 +74,7 @@ await page.route(`${SUPA}/auth/v1/**`, async route => {
 await page.route(`${SUPA}/storage/v1/**`, async route => {
   const req = route.request(), url = new URL(req.url()), cors = { 'access-control-allow-origin': '*' };
   if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { ...cors, 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' } });
+  if (url.pathname.includes('/object/sign/') && req.method() === 'GET') return route.fulfill({ headers: cors, contentType: 'image/png', body: PNG }); // la URL firmada devuelve la imagen
   if (url.pathname.includes('/object/sign/')) { const path = url.pathname.split('/object/sign/community-media/')[1]; return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ signedURL: `/object/sign/community-media/${path}?token=t` }) }); }
   if (url.pathname.includes('/object/community-media/') && req.method() === 'POST') { const path = url.pathname.split('/object/community-media/')[1]; uploaded.push(path); return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ Key: 'community-media/' + path, Id: crypto.randomUUID() }) }); }
   if (req.method() === 'GET') return route.fulfill({ headers: cors, contentType: 'image/png', body: PNG });
@@ -173,6 +174,38 @@ step('Abrir conversación marca leído en la base', sql(`select count(*) from co
 step('Indicador de no leídos desaparece', !(await page.isVisible('#communityUnreadBadge')));
 await page.fill('#communityChatText', 'Dale, sábado 9 h'); await page.click('#communityChatSend'); await page.waitForTimeout(1000);
 step('Mensaje enviado y persistido', sql(`select count(*) from community_messages where sender_id='aaaaaaaa-0000-0000-0000-000000000001'`) === '1');
+
+// v50: perfiles nuevos públicos, directorio de usuarios reales, privado con datos básicos y foto de perfil.
+sql(`delete from community_follows where following_id='cccccccc-0000-0000-0000-0000000000c5'; delete from community_profiles where user_id in ('cccccccc-0000-0000-0000-0000000000c5','dddddddd-0000-0000-0000-0000000000d5'); delete from auth.users where id in ('cccccccc-0000-0000-0000-0000000000c5','dddddddd-0000-0000-0000-0000000000d5')`);
+sql(`insert into auth.users(id,email,raw_user_meta_data) values('cccccccc-0000-0000-0000-0000000000c5','carla@example.test','{"full_name":"Carla"}'),('dddddddd-0000-0000-0000-0000000000d5','diego@example.test','{"full_name":"Diego"}')`);
+step('Un perfil nuevo empieza público', sql(`select visibility from community_profiles where user_id='dddddddd-0000-0000-0000-0000000000d5'`) === 'public');
+sql(`update community_profiles set username='carla_priv', visibility='private', bio='No deberías ver esto', avatar_path='cccccccc-0000-0000-0000-0000000000c5/avatar/c1.jpg' where user_id='cccccccc-0000-0000-0000-0000000000c5'; update community_profiles set username='diego_pub' where user_id='dddddddd-0000-0000-0000-0000000000d5'`);
+await page.click('#communityTabExplore'); await page.waitForTimeout(1200);
+const people = await page.textContent('#communityPeople');
+step('Explorar lista usuarios reales de la app', /carla_priv/.test(people) && /diego_pub/.test(people) && /bruno_fit/.test(people), people.replace(/\s+/g, ' ').slice(0, 160));
+step('El perfil privado muestra solo datos básicos y la etiqueta', /Perfil privado/.test(people) && !/No deberías ver esto/.test(people));
+const carlaAvatar = await page.$$eval('#communityPeople .community-person', n => (n.find(x => /carla_priv/.test(x.textContent))?.querySelector('.community-avatar')?.outerHTML) || '');
+step('Foto de perfil del privado visible como dato básico', /has-photo/.test(carlaAvatar) && /cccccccc-0000-0000-0000-0000000000c5\/avatar\/c1\.jpg/.test(carlaAvatar), carlaAvatar.slice(0, 200));
+await page.click('#communityPeople .community-person-open[aria-label*="Carla"]'); await page.waitForTimeout(900);
+const priv = await page.textContent('#communityUserProfile');
+step('Abrir un perfil privado muestra el aviso, sin su contenido', /Este perfil es privado/.test(priv) && !/No deberías ver esto/.test(priv), priv.replace(/\s+/g, ' ').slice(0, 140));
+await page.click('#communityUserProfile [data-user-follow]'); await page.waitForTimeout(700);
+step('Solicitar seguir a un privado queda pendiente', sql(`select status from community_follows where follower_id='aaaaaaaa-0000-0000-0000-000000000001' and following_id='cccccccc-0000-0000-0000-0000000000c5'`) === 'pending');
+await page.click('#communityTabExplore'); await page.fill('#communitySearch', 'diego'); await page.press('#communitySearch', 'Enter'); await page.waitForTimeout(900);
+const found = await page.textContent('#communityPeople');
+step('Buscar personas por nombre o usuario', /diego_pub/.test(found) && !/carla_priv/.test(found), found.replace(/\s+/g, ' ').slice(0, 100));
+await page.fill('#communitySearch', ''); await page.press('#communitySearch', 'Enter'); await page.waitForTimeout(500);
+await page.click('#communityTabProfile'); await page.waitForTimeout(600);
+await page.setInputFiles('#communityAvatarInput', { name: 'yo.png', mimeType: 'image/png', buffer: PNG }); await page.waitForTimeout(1500);
+const avatarPath = sql(`select coalesce(avatar_path,'') from community_profiles where user_id='aaaaaaaa-0000-0000-0000-000000000001'`);
+step('Subir foto de perfil (carpeta propia)', /^aaaaaaaa-0000-0000-0000-000000000001\/avatar\/[a-z0-9]+\.jpg$/.test(avatarPath), avatarPath);
+step('Botón para quitar la foto visible', await page.isVisible('#communityAvatarRemove'));
+await page.click('#communityAvatarRemove'); await page.waitForTimeout(800);
+step('Quitar la foto de perfil vuelve a las iniciales', sql(`select avatar_path is null from community_profiles where user_id='aaaaaaaa-0000-0000-0000-000000000001'`) === 't' && !(await page.isVisible('#communityAvatarRemove')));
+await page.selectOption('#communityVisibility', 'private'); await page.evaluate(() => document.getElementById('communityProfileForm').requestSubmit()); await page.waitForTimeout(800);
+step('Cambiar a privado se aplica al instante en la base', sql(`select visibility from community_profiles where user_id='aaaaaaaa-0000-0000-0000-000000000001'`) === 'private');
+await page.selectOption('#communityVisibility', 'public'); await page.evaluate(() => document.getElementById('communityProfileForm').requestSubmit()); await page.waitForTimeout(800);
+
 
 // Eliminación propia
 await page.click('#communityTabFeed'); await page.waitForTimeout(900);

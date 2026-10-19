@@ -9,6 +9,26 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v50
+
+- `APP_URL=… node tests/e2e/gps.e2e.mjs`: GPS simulado (posiciones controladas). Cubre:
+  - Bicicleta, caminata y carrera.
+  - Pausa, saltos descartados, cortes de señal y recuperación del borrador.
+  - Calorías con el peso vigente y el resumen en Progreso.
+- `APP_URL=… node tests/e2e/nutrition.e2e.mjs`: buscador de alimentos. Cubre:
+  - Variantes, gramos, ml y porciones.
+  - Registro, favoritos y frecuentes, edición y eliminación.
+  - Open Food Facts simulado, y su caída.
+- `tests/e2e/community.e2e.mjs` suma los pasos v50:
+  - Perfil nuevo público y directorio.
+  - Perfil privado con aviso y solicitud de seguimiento.
+  - Búsqueda de personas.
+  - Subir y quitar la foto de perfil, y cambio de privacidad.
+- `supabase/tests/rls_v50_test.sql`: directorio, privados, foto de perfil, bloqueos, sesión anónima y alta con
+  usuario repetido.
+- **Requieren un celular físico:** GPS con la pantalla bloqueada o en segundo plano, la notificación persistente y
+  la app Android (ver `docs/GPS_SEGUNDO_PLANO.md`).
+
 ## 2. SQL y RLS sobre PostgreSQL local
 
 `supabase/tests/run.sh` crea una base temporal en un PostgreSQL **de pruebas**, carga un stub mínimo de

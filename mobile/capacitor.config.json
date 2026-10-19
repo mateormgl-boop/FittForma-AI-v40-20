@@ -1,0 +1,8 @@
+{
+  "appId": "app.fittforma.ai",
+  "appName": "FittForma AI",
+  "webDir": "www",
+  "android": {
+    "useLegacyBridge": true
+  }
+}

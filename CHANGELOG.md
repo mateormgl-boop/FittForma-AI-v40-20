@@ -1,5 +1,53 @@
 # FittForma AI — Registro de cambios
 
+## v50.0 — Animaciones de ejercicios, GPS en segundo plano, calorías, alimentos y comunidad real (19 de octubre de 2026)
+
+**Entrenamiento**
+- Animación GIF propia para cada uno de los 162 ejercicios de la biblioteca, sin reutilizar animaciones:
+  - Figura anatómica propia con los músculos que trabajan en rojo y fondo de gimnasio oscuro.
+  - Movimiento real de cada ejercicio, de la posición inicial a la final.
+  - Generador reproducible en `tools/exercise-gifs`.
+- Las fotos reales de uso libre quedan como complemento en la ficha.
+
+**GPS y calorías**
+- Corredor, caminata y bicicleta como actividades propias:
+  - Tiempo total y en movimiento.
+  - Ritmo o velocidad, media, actual y máxima.
+  - Desnivel solo con altitud precisa.
+  - Estado de la señal.
+  - Resumen al finalizar con comparación con las actividades anteriores.
+- Un corte breve de señal ya no detiene el registro: empieza un tramo nuevo sin sumar el hueco.
+- Se corrigió el tiempo en movimiento al caminar despacio.
+- Calorías estimadas, distintas por actividad:
+  - Correr y caminar: ecuaciones de la ACSM.
+  - Bicicleta y fuerza: Compendio 2011.
+  - Se usa el peso de cada momento y se guarda en cada registro.
+  - Sin peso, no se calculan.
+- Progreso: gasto estimado por actividad por semana y por mes, separado de lo consumido.
+- `mobile/`: proyecto Android (Capacitor 8) con GPS en segundo plano y notificación persistente.
+  Hay que compilarlo y probarlo en un celular (ver `docs/GPS_SEGUNDO_PLANO.md`).
+
+**Nutrición**
+- 281 alimentos con datos USDA SR28 verificables por número NDB:
+  - Variantes de preparación.
+  - Gramos, mililitros y porciones.
+  - Sinónimos.
+  - Recetas uruguayas marcadas como estimación.
+- Buscador con categorías, favoritos y frecuentes, y registro directo por comida.
+- Productos envasados de Open Food Facts con respaldo local.
+
+**Comunidad**
+- Perfiles nuevos públicos por defecto.
+- Directorio de usuarios reales con búsqueda y «Ver más».
+- Perfiles privados con datos básicos y un aviso, sin exponer su contenido.
+- Quitar foto de perfil; fotos de perfil en los comentarios.
+- Migración aditiva `2026-10-24_v50_community_directory.sql`:
+  - Arregla el alta cuando el usuario automático ya existía.
+- Se corrigió un error al redibujar la foto propia.
+
+**Pruebas:** unitarias 242, SQL 194 comprobaciones, E2E de GPS, nutrición, comunidad (54), entrenamiento, flujos,
+integración y monetización.
+
 ## v49.0 — Rediseño de entrenamiento, insignias y comunidad (19 de octubre de 2026)
 
 **Entrenamiento y biblioteca**

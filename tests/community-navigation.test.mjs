@@ -35,9 +35,9 @@ test('feed search results render inside Explore and clearing the query does not 
 
 test('version, backend and service-worker cache match v41.0',async()=>{
  const a=JSON.parse(await read('package.json')),b=JSON.parse(await read('backend/package.json'));
- assert.equal(a.version,'0.49.0');assert.equal(b.version,'0.49.0');
+ assert.equal(a.version,'0.50.0');assert.equal(b.version,'0.50.0');
  const server=await read('backend/server.mjs'),html=await read('index.html'),sw=await read('sw.js');
- assert.match(server,/0\.49\.0/);assert.match(html,/Versión 49\.0/);assert.match(sw,/fittforma-ai-static-v49-0/);
+ assert.match(server,/0\.50\.0/);assert.match(html,/Versión 50\.0/);assert.match(sw,/fittforma-ai-static-v50-0/);
 });
 
 test('la navegación y los títulos principales de Comunidad están traducidos en los seis idiomas',async()=>{
@@ -52,7 +52,7 @@ test('si el embed de autores de comentarios sigue ambiguo, Comunidad recupera lo
  const js=await read('community.js');
  assert.match(js,/plainComments=await client\.from\('community_comments'\)\.select\('id,post_id,user_id,body,created_at'\)/);
  assert.match(js,/commentAuthors=\[\.\.\.new Set\(\(plainComments\.data\|\|\[\]\)\.map\(comment=>comment\.user_id\)\)\]/);
- assert.match(js,/community_profiles'\)\.select\('user_id,display_name,username'\)\.in\('user_id',commentAuthors\)/);
+ assert.match(js,/community_profiles'\)\.select\('user_id,display_name,username(?:,avatar_path)?'\)\.in\('user_id',commentAuthors\)/); // v50: también la foto
 });
 
 test('las cinco pestañas principales y sus títulos de Comunidad tienen traducciones para los seis idiomas',async()=>{
@@ -67,5 +67,5 @@ test('comentarios también tienen recuperación no destructiva si su relación c
  const js=await read('community.js');
  assert.match(js,/plainComments=await client\.from\('community_comments'\)\.select\('id,post_id,user_id,body,created_at'\)/);
  assert.match(js,/commentAuthors=\[\.\.\.new Set\(\(plainComments\.data\|\|\[\]\)\.map\(comment=>comment\.user_id\)\)\]/);
- assert.match(js,/community_profiles'\)\.select\('user_id,display_name,username'\)\.in\('user_id',commentAuthors\)/);
+ assert.match(js,/community_profiles'\)\.select\('user_id,display_name,username(?:,avatar_path)?'\)\.in\('user_id',commentAuthors\)/); // v50: también la foto
 });

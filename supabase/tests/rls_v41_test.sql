@@ -28,7 +28,7 @@ begin
 end $$;
 grant execute on all functions in schema t to anon, authenticated;
 
--- Datos: A (público), B (público), C (privado). El trigger crea los perfiles.
+-- Datos: A (público), B (público), C (privado). El trigger crea los perfiles (desde v50 nacen públicos: C pasa a privado).
 reset role;
 insert into auth.users(id,email) values
  ('aaaaaaaa-0000-0000-0000-000000000001','alice@example.test'),
@@ -36,6 +36,7 @@ insert into auth.users(id,email) values
  ('cccccccc-0000-0000-0000-000000000003','carol@example.test')
 on conflict do nothing;
 update public.community_profiles set visibility='public' where user_id in ('aaaaaaaa-0000-0000-0000-000000000001','bbbbbbbb-0000-0000-0000-000000000002');
+update public.community_profiles set visibility='private' where user_id='cccccccc-0000-0000-0000-000000000003';
 
 set role authenticated;
 -- ---------------------------------------------------------------- publicaciones
