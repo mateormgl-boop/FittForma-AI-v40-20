@@ -182,3 +182,58 @@ test('insignias: historial, mejor nivel, celebración única y máximo de 3 dest
   assert.ok(T.featuredBadges(unlocks, ['activity-running:3', 'activity-running:3', 'exercise-flexiones:5', 'load-press-banca:8', 'consistency-streak:2']).length <= 3, 'nunca más de 3 ni repetidas');
   assert.equal(Object.keys(unlocks).length, 5, 'el historial no se borra al calcular el mejor nivel');
 });
+
+// ---------- Etapa 4: comunidad ----------
+const communityJs = await read('community.js');
+const communitySql = await read('supabase/migrations/2026-10-23_v49_community.sql');
+
+test('comunidad: barra propia dentro del contenido y barra inferior principal intacta', () => {
+  const view = html.slice(html.indexOf('id="view-community"'), html.indexOf('id="view-profile"'));
+  assert.match(view, /<header class="community-topbar">/);
+  for (const tab of ['feed', 'explore', 'publish', 'messages', 'profile']) assert.match(view, new RegExp(`data-community-tab="${tab}"`));
+  assert.doesNotMatch(view, /mobile-nav-item|data-mobile-view/, 'Comunidad no agrega otra barra de navegación general');
+  const nav = [...html.matchAll(/class="mobile-nav-item[^"]*"[^>]*data-mobile-view="([a-z]+)"/g)].map(m => m[1]);
+  assert.deepEqual(nav, ['plan', 'train', 'nutrition', 'progress', 'community', 'profile']);
+  assert.match(css, /#view-community header\.community-topbar\{position:relative!important/);
+});
+
+test('comunidad: feed, explorar, mensajes y perfiles sociales con datos reales', () => {
+  for (const id of ['communityStories', 'communityLoadMore', 'communitySuggested', 'communityExploreGrid', 'communityConversations', 'communityChatView', 'communityChatBack', 'communityOwnGrid', 'communityPanelUser', 'communityPostDialog', 'communityLinkSession', 'communityAvatarInput']) assert.match(html, new RegExp(`id="${id}"`), id);
+  assert.match(communityJs, /client\.rpc\('community_conversations'\)/);
+  assert.match(communityJs, /client\.rpc\('community_suggested_profiles'\)/);
+  assert.match(communityJs, /client\.rpc\('community_profile_stats',\{p_user:uid\}\)/);
+  assert.match(communityJs, /from\('community_saved_posts'\)/);
+  assert.match(communityJs, /ilike\('description',`%#\$\{hashtag\}%`\)/, 'búsqueda por #hashtag');
+  assert.doesNotMatch(communityJs, /Math\.random\(\)[^;]*(seguidores|followers|likes)/, 'no se inventan cifras');
+});
+
+test('comunidad: me gusta y guardar cambian el botón solo después de que la base confirma', () => {
+  const like = communityJs.match(/async function toggleLike[\s\S]*?\n  async function toggleSave/)[0];
+  assert.ok(like.indexOf('if(result.error)') < like.indexOf("classList.toggle('is-on',on)"));
+  const save = communityJs.match(/async function toggleSave[\s\S]*?\n  async function sharePost/)[0];
+  assert.ok(save.indexOf('if(result.error)') < save.indexOf("classList.toggle('is-on',on)"));
+  assert.match(communityJs, /\/\/ Recién cuando la base confirma el guardado se muestra como publicada\.\n\s+const \{error\}=await client\.from\('community_posts'\)\.insert\(row\);\n\s+if\(error\)throw error;/);
+});
+
+test('comunidad: privacidad del perfil social y del entrenamiento vinculado', () => {
+  // El resumen vinculado nunca lleva datos corporales; la base lo valida.
+  assert.match(communitySql, /k not in \('title','date','minutes','exercises','sets','type'\)/);
+  assert.match(html, /payload:\{title:String\(x\.title\|\|'Entrenamiento'\)\.slice\(0,80\),date:String\(x\.date\),minutes:/);
+  assert.doesNotMatch(html.match(/window\.FittFormaRecentSessions=function[\s\S]*?\n  \};/)[0], /currentWeightKg|heightCm|weights/);
+  // Destacadas: máximo 3, sin «verified»; foto de perfil solo en la carpeta propia y legible solo si el perfil lo es.
+  assert.match(communitySql, /jsonb_array_length\(f\) <= 3/);
+  assert.match(communitySql, /avatar_path ~ \('\^' \|\| user_id::text \|\| '\/avatar\//);
+  assert.match(communitySql, /create policy community_media_read_avatar[\s\S]*?cp\.avatar_path = name/);
+  // Conversaciones bajo RLS (invoker); conteos solo de perfiles visibles y sin bloqueo.
+  assert.match(communitySql, /community_conversations\(\)[\s\S]*?security invoker/);
+  assert.match(communitySql, /community_profile_stats[\s\S]*?not public\.community_users_blocked\(viewer, p_user\)/);
+  assert.match(communitySql, /where p\.visibility = 'public'/);
+  assert.doesNotMatch(communitySql, /disable row level security|drop table|delete from/i);
+});
+
+test('comunidad: el patrón del usuario es válido en navegadores actuales (antes no validaba)', () => {
+  const pattern = html.match(/id="communityUsername"[^>]*pattern="([^"]+)"/)[1];
+  assert.doesNotThrow(() => new RegExp(pattern, 'v'));
+  assert.ok(new RegExp(`^(?:${pattern})$`, 'v').test('mateo_fit.1'));
+  assert.ok(!new RegExp(`^(?:${pattern})$`, 'v').test('a'));
+});

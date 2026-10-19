@@ -108,7 +108,7 @@ a{color:var(--mod-ink)}
 .mobile-nav-item[data-mobile-view="train"],.tab[data-view="train"]{--nav-c:#0a5fc0}
 .mobile-nav-item[data-mobile-view="nutrition"],.tab[data-view="nutrition"]{--nav-c:#08704a}
 .mobile-nav-item[data-mobile-view="progress"],.tab[data-view="progress"]{--nav-c:#5338d0}
-.mobile-nav-item[data-mobile-view="community"],.tab[data-view="community"]{--nav-c:#a3226f}
+.mobile-nav-item[data-mobile-view="community"],.tab[data-view="community"]{--nav-c:#0b67a6}
 .mobile-nav-item[data-mobile-view="profile"],.tab[data-view="profile"]{--nav-c:#3b33c4}
 .tab[data-view="coach"]{--nav-c:#5338d0}.tab[data-view="running"]{--nav-c:#07705f}
 :root:not([data-theme="light"]) .mobile-nav-item,:root:not([data-theme="light"]) .tab{--nav-c-l:1}
@@ -116,7 +116,7 @@ a{color:var(--mod-ink)}
 :root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="train"],:root:not([data-theme="light"]) .tab[data-view="train"]{--nav-c:#5cb8ff}
 :root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="nutrition"],:root:not([data-theme="light"]) .tab[data-view="nutrition"]{--nav-c:#4fd9a0}
 :root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="progress"],:root:not([data-theme="light"]) .tab[data-view="progress"],:root:not([data-theme="light"]) .tab[data-view="coach"]{--nav-c:#b3a2ff}
-:root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="community"],:root:not([data-theme="light"]) .tab[data-view="community"]{--nav-c:#ff8fcf}
+:root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="community"],:root:not([data-theme="light"]) .tab[data-view="community"]{--nav-c:#6fd0ff}
 :root:not([data-theme="light"]) .mobile-nav-item[data-mobile-view="profile"],:root:not([data-theme="light"]) .tab[data-view="profile"]{--nav-c:#a9a6ff}
 :root:not([data-theme="light"]) .tab[data-view="running"]{--nav-c:#5fe0cc}
 .tabs{background:var(--ff-panel)!important;border-color:var(--ff-border)!important}
