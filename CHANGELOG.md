@@ -1,5 +1,54 @@
 # FittForma AI — Registro de cambios
 
+## v51.0 — Galería de ejercicios, hidratación y «Objetivo y actualidad» (19 de octubre de 2026)
+
+**Galería de ejercicios**
+- Los 162 GIF se generaron de nuevo:
+  - Encuadre automático medido en cada ejercicio: la figura y el equipo entran completos, sin cortes.
+  - Figura más clara: músculos perfilados, torso más ancho, luz con volumen y contornos limpios.
+  - Pausa en la posición inicial y en la final, para que se entienda el recorrido.
+  - Línea de trayectoria (verde) del punto que más se mueve en los ejercicios de repeticiones.
+- La galería y la ficha muestran el GIF entero y cuadrado. Una regla de las tarjetas (`object-fit:cover`) lo recortaba.
+- En la ficha, el título va en una franja propia y no tapa la animación.
+
+**Hidratación**
+- Botella con el nivel de agua, porcentaje y barra de progreso.
+- Marca del ritmo esperado según la hora (dentro del horario del recordatorio, 9 a 21 h por defecto).
+- Botones rápidos: mi vaso, lata (330 ml), botella (500 ml) y botella grande (750 ml), además de otra cantidad y deshacer.
+- Línea de tiempo de hoy con hora y acumulado, racha de días con el objetivo cumplido y hora del último registro.
+- Gráfico de 7 días con la línea del objetivo.
+- La tarjeta no tenía estilos propios (la botella se veía gigante y negra); ahora funciona en tema claro y oscuro.
+
+**Objetivo y actualidad (Perfil, con acceso desde Inicio)**
+- Actualidad:
+  - Sexo, con la opción «prefiero no decir».
+  - Edad, altura y peso.
+  - Cintura y % de grasa, opcionales.
+  - Actividad habitual.
+- Objetivo: bajar, mantener o subir de peso, peso meta, ritmo semanal y fecha objetivo opcional.
+- Resultados (`body-goals.js`):
+  - IMC con la categoría de la OMS y la relación cintura/altura.
+  - Metabolismo basal con Mifflin-St Jeor, o Katch-McArdle si hay % de grasa.
+  - Gasto diario y calorías sugeridas, con límites seguros.
+  - Proteína y agua.
+  - Distancia a la meta y fecha estimada.
+- Avisos:
+  - Ritmo agresivo.
+  - Meta con un IMC menor de 18,5.
+  - Meta contraria al objetivo.
+  - Fecha ya pasada.
+  - Menores de 18: no se calculan calorías ni ritmos.
+- Botón para aplicar las referencias a los objetivos de Nutrición y de agua, con confirmación.
+- «Calcular objetivos con mi perfil» (Nutrición) usa el mismo cálculo y ahora considera el sexo, el objetivo y el ritmo.
+- Datos privados: nunca se muestran en Comunidad. FittAI los recibe solo si la persona comparte sus registros.
+
+**Otros**
+- Traducciones de los textos nuevos a inglés, portugués, francés, italiano y alemán (`i18n-v51.js`).
+- Pruebas nuevas:
+  - `tests/v51.test.mjs`.
+  - `tests/e2e/body-goals.e2e.mjs`: 36 comprobaciones en celular y escritorio.
+- No hay migraciones de base de datos.
+
 ## v50.0 — Animaciones de ejercicios, GPS en segundo plano, calorías, alimentos y comunidad real (19 de octubre de 2026)
 
 **Entrenamiento**

@@ -9,6 +9,21 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v51
+
+- `npm test` incluye `tests/v51.test.mjs`:
+  - Galería sin recortes.
+  - Ritmo y racha de hidratación.
+  - IMC, cintura/altura, metabolismo basal, resumen del objetivo y sus avisos.
+  - Privacidad respecto de Comunidad.
+- `APP_URL=… node tests/e2e/body-goals.e2e.mjs`, a 390 px y 1280 px. Cubre:
+  - Acceso desde Inicio y validaciones.
+  - Guardado, recarga y cálculos con valores conocidos.
+  - Aplicar las referencias a Nutrición y agua.
+  - Línea de tiempo, barra y gráfico de hidratación.
+- Para regenerar los GIF: `node tools/exercise-gifs/build.mjs` (unos 7 minutos).
+  - Vista previa de algunos: `node tools/exercise-gifs/preview.mjs salida.png "nombre"`.
+
 ### v50
 
 - `APP_URL=… node tests/e2e/gps.e2e.mjs`: GPS simulado (posiciones controladas). Cubre:

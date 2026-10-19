@@ -1,9 +1,19 @@
-# Despliegue de FittForma AI v50.0
+# Despliegue de FittForma AI v51.0
 
-Esta guía es la lista de pasos para publicar v50.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v51.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
-## Qué cambia en v50.0
+## Qué cambia en v51.0
+
+- **Archivos nuevos:** `body-goals.js` e `i18n-v51.js`. Ya están en la lista de archivos que entrega el servidor y en
+  el service worker.
+- **GIF regenerados:** `assets/exercises/gif/` pasa a unos 29 MB, porque cada GIF tiene más cuadros y pausas. Se siguen
+  cargando solo al verlos y no se precargan en el service worker.
+- **Sin migraciones:** los datos nuevos del perfil (sexo, cintura, % de grasa, objetivo, ritmo, fecha) viven en el estado
+  local y en la copia privada en la nube que ya existía.
+- **Mobile:** `npm --prefix mobile run sync` copia los archivos nuevos (toma la lista del servidor).
+
+## Qué cambió en v50.0
 
 - **Archivos y cambios:**
   - `exercise-gifs.js` y `assets/exercises/gif/` (162 GIF, unos 19 MB; se cargan solo al verlos).

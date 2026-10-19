@@ -451,6 +451,25 @@
     const low = Math.round(w * 30 / 50) * 50, high = Math.round(w * 35 / 50) * 50;
     return { low: Math.min(4000, low), high: Math.min(4500, high) };
   }
+  // v51: cuánto «se esperaría» llevar a esta hora si el objetivo se reparte parejo en la ventana del día (desde–hasta).
+  // Es una guía de ritmo, no una indicación: antes de «desde» es 0 y después de «hasta» es el objetivo completo.
+  function hydrationPace(goalMl, from = '09:00', to = '21:00', minutesNow = 0) {
+    const goal = Number(goalMl), toMin = t => { const m = /^(\d{1,2}):(\d{2})$/.exec(String(t || '')); return m ? Number(m[1]) * 60 + Number(m[2]) : null; };
+    let a = toMin(from), b = toMin(to); if (a == null || b == null || b <= a) { a = 540; b = 1260; }
+    if (!Number.isFinite(goal) || goal <= 0) return 0;
+    const now = Number(minutesNow) || 0;
+    if (now <= a) return 0; if (now >= b) return Math.round(goal);
+    return Math.round(goal * (now - a) / (b - a) / 10) * 10;
+  }
+  // v51: días seguidos con el objetivo cumplido. Si hoy todavía no se cumplió, la racha cuenta desde ayer (no se corta a mitad del día).
+  function hydrationStreak(entries, goalMl, todayKey) {
+    const goal = Number(goalMl); if (!Number.isFinite(goal) || goal <= 0 || !/^\d{4}-\d{2}-\d{2}$/.test(String(todayKey))) return 0;
+    const totals = new Map(); for (const e of Array.isArray(entries) ? entries : []) if (e && e.date) totals.set(e.date, (totals.get(e.date) || 0) + Math.max(0, Number(e.ml) || 0));
+    const d = new Date(todayKey + 'T12:00:00Z'), key = () => d.toISOString().slice(0, 10);
+    if ((totals.get(key()) || 0) < goal) d.setUTCDate(d.getUTCDate() - 1);
+    let n = 0; while (n < 3660 && (totals.get(key()) || 0) >= goal) { n++; d.setUTCDate(d.getUTCDate() - 1); }
+    return n;
+  }
   function validWaterMl(ml) { const n = Number(ml); return Number.isFinite(n) && n >= 10 && n <= 2000 ? Math.round(n) : null; }
 
   // ---------- Insignias destacadas ----------
@@ -479,7 +498,7 @@
     return out;
   }
 
-  const api = { norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, validWaterMl, highestPerChallenge, featuredBadges };
+  const api = { norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaTraining = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);

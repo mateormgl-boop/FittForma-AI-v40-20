@@ -4,7 +4,7 @@ import { FLOOR, lerpPose, renderSide, renderFront, scene } from './figure.mjs';
 export const CX = 180;
 export const pt = (x, y) => ({ x, y });
 export const ease = phi => (1 - Math.cos(phi)) / 2; // 0 → 1 → 0 en un ciclo
-export const rep = (a, b) => phi => lerpPose(a, b, ease(phi));
+export const rep = (a, b) => Object.assign(phi => lerpPose(a, b, ease(phi)), { kind: 'rep' });
 export const hold = (a, b, amt = 0.15) => phi => lerpPose(a, b, ease(phi) * amt); // isométricos: respiración leve
 // Ciclo alternado: primera mitad lado A, segunda mitad lado B.
 export const alt = (base, a, b) => phi => { const t = phi % (2 * Math.PI); const h = t < Math.PI ? a : b; const k = Math.sin(t < Math.PI ? t : t - Math.PI); return lerpPose(base, h, k); };
@@ -36,11 +36,35 @@ export function front(o = {}) {
   };
 }
 
+// Punto que más se mueve (mano, pie, cadera o cabeza): su recorrido se dibuja como guía del movimiento.
+function keyPoints(J, view) {
+  if (view === 'front') return { manoI: J.world.l.hand, manoD: J.world.r.hand, pieI: J.world.l.ankle, pieD: J.world.r.ankle, cadera: J.hip, cabeza: J.headC };
+  return { mano: J.limbs.n.hand, manoLejana: J.limbs.f.hand, pie: J.limbs.n.ankle, pieLejano: J.limbs.f.ankle, cadera: J.hip, cabeza: J.headC };
+}
+const render = (spec, pose) => (spec.view === 'front' ? renderFront : renderSide)(pose, spec.m || [], spec.s || []);
+export function trailOf(spec) {
+  if (spec._trail !== undefined) return spec._trail;
+  if (spec.trail === false || spec.pose.kind !== 'rep') return (spec._trail = null);
+  const N = 36, paths = {};
+  for (let i = 0; i <= N; i++) { const J = render(spec, spec.pose(2 * Math.PI * i / N)).J; for (const [k, p] of Object.entries(keyPoints(J, spec.view))) (paths[k] ||= []).push(p); }
+  let best = null, bestLen = 0;
+  if (spec.trailPoint && paths[spec.trailPoint]) { best = spec.trailPoint; bestLen = 99; }
+  else for (const [k, pts] of Object.entries(paths)) { let d = 0; for (let i = 1; i < pts.length; i++) d += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y); if (d > bestLen) { bestLen = d; best = k; } }
+  if (!best || bestLen < 30) return (spec._trail = null);
+  const pts = paths[best], half = spec.cyclic ? pts : pts.slice(0, N / 2 + 1);
+  const r = n => Math.round(n * 10) / 10;
+  const d = 'M' + half.map(p => `${r(p.x)},${r(p.y)}`).join(' L');
+  const a = half[0], b = half[half.length - 1];
+  return (spec._trail = `<path class="trail" d="${d}"/>` + (spec.cyclic ? '' : `<circle class="trail-start" cx="${r(a.x)}" cy="${r(a.y)}" r="4"/><circle class="trail-dot" cx="${r(b.x)}" cy="${r(b.y)}" r="3.2"/>`));
+}
+
 // Renderiza un cuadro: spec = { view, pose(phi), env(J, phi, pose) → {back, front}, m, s, shadow }
-export function frameSvg(spec, phi) {
+// spec._fit (calculado por fit.mjs) = { scale, cx, floorY } para que la figura entre entera en el cuadro.
+export function frameSvg(spec, phi, { fitting = false } = {}) {
   const pose = spec.pose(phi);
-  const out = (spec.view === 'front' ? renderFront : renderSide)(pose, spec.m || [], spec.s || []);
+  const out = render(spec, pose);
   const env = spec.env ? spec.env(out.J, phi, pose) : {};
   const sh = spec.shadow === false ? null : { x: spec.shadowX ?? pose.hip.x, y: FLOOR + 3, w: spec.shadowW ?? 48 };
-  return scene(`${env.back || ''}${out.svg}${env.front || ''}`, sh, spec.scale ?? 1.5, spec.cx ?? CX);
+  const fit = fitting ? { scale: 1, cx: CX, floorY: FLOOR } : (spec._fit || { scale: spec.scale ?? 1.5, cx: spec.cx ?? CX, floorY: FLOOR });
+  return scene({ back: env.back || '', fit: (trailOf(spec) || '') + `<g filter="url(#vol)">${out.svg}</g>` + (env.front || '') }, sh, fit.scale, fit.cx, fit.floorY);
 }

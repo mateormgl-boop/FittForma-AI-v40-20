@@ -19,7 +19,7 @@ const root=rootCandidates.find(candidate=>existsSync(path.join(candidate,'index.
 const rawPort=String(process.env.PORT||'8787');
 const port=Number(rawPort);
 if(!Number.isInteger(port)||port<0||port>65535)throw new Error(`PORT debe ser un entero entre 0 y 65535; se recibió ${JSON.stringify(rawPort)}.`);
-const appVersion='0.50.0';
+const appVersion='0.51.0';
 const apiKey=String(process.env.GEMINI_API_KEY||'').trim(), model=String(process.env.GEMINI_MODEL||'gemini-3.8-flash').trim()||'gemini-3.8-flash';
 const trustRenderClientIp=String(process.env.TRUST_RENDER_CLIENT_IP||'').toLowerCase()==='true';
 // If the primary model temporarily returns 503, try a lighter official model automatically.
@@ -103,7 +103,7 @@ const adsCsp=adsCspAdditions(monetization.settings.ads);
 const limits=new Map();
 const MAX_TRACKED_CLIENTS=5000;
 const PUBLIC_ROOT_FILES=new Set([
-  '/index.html','/i18n.js','/i18n-extra.js','/i18n-v48.js','/i18n-v50.js','/anatomy.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js','/training-core.js','/monetization-core.js','/exercise-guides.js','/exercise-media.js','/exercise-gifs.js','/activity-core.js','/native-gps.js','/food-db.js','/food-core.js',
+  '/index.html','/i18n.js','/i18n-extra.js','/i18n-v48.js','/i18n-v50.js','/i18n-v51.js','/anatomy.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js','/training-core.js','/body-goals.js','/monetization-core.js','/exercise-guides.js','/exercise-media.js','/exercise-gifs.js','/activity-core.js','/native-gps.js','/food-db.js','/food-core.js',
   '/manifest.json','/icon.svg','/icon-180.png','/icon-192.png','/icon-512.png',
   '/supabase-config.js','/achievements.js','/sw.js'
 ]);
@@ -239,8 +239,9 @@ function sanitizeTrainingContext(body){
 function sanitizeCoachProfile(p){
   if(!isJsonObject(p))return {};
   const out={};
-  for(const k of ['goal','level','days','equipment','duration','activityLevel','sex'])if(p[k]!==undefined)out[k]=cleanText(String(p[k]),24);
-  for(const [k,max] of [['age',120],['heightCm',250],['currentWeightKg',350],['targetWeightKg',350]]){const n=Number(p[k]);if(Number.isFinite(n)&&n>0)out[k]=Math.min(max,n);}
+  for(const k of ['goal','level','days','equipment','duration','activityLevel','sex','bodyGoal'])if(p[k]!==undefined)out[k]=cleanText(String(p[k]),24);
+  for(const [k,max] of [['age',120],['heightCm',250],['currentWeightKg',350],['targetWeightKg',350],['waistCm',250],['bodyFatPct',60],['weeklyRateKg',1]]){const n=Number(p[k]);if(Number.isFinite(n)&&n>0)out[k]=Math.min(max,n);}
+  if(/^\d{4}-\d{2}-\d{2}$/.test(String(p.targetDate||'')))out.targetDate=String(p.targetDate);
   return out;
 }
 function sanitizeCoachGoals(g){
