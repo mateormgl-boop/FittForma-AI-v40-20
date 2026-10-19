@@ -57,7 +57,7 @@ test('interfaz integra insignias en Progreso/Perfil y precarga el motor en la PW
   assert.match(html, /id="profileBadgesPreview"/);
   assert.match(html, /<script src="\.\/achievements\.js"><\/script>/);
   assert.match(html, /initBadgeCenter\(\)/);
-  assert.match(sw, /fittforma-ai-static-v48-0/);
+  assert.match(sw, /fittforma-ai-static-v49-0/);
   const match = sw.match(/const ASSETS = (\[[\s\S]*?\]);/);
   assert.ok(match);
   assert.ok(JSON.parse(match[1]).includes('./achievements.js'));

@@ -1,8 +1,15 @@
-# FittForma AI — v48.0
+# FittForma AI — v49.0
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v49.0
+
+- Entrenamiento rediseñado: mapa muscular propio en cada ejercicio, ficha completa, tabla por serie con récords reales y plancha en segundos.
+- Insignias hexagonales con símbolo por actividad, insignias por carga relativa al peso corporal, constancia y racha; la fuente de cada marca queda explícita.
+- Comunidad como red social integrada: feed con novedades, Explorar, Crear, Mensajes y perfiles sociales, con la barra inferior de la app intacta.
+- Requiere aplicar dos migraciones nuevas (ver `docs/DESPLIEGUE.md`).
 
 ## Novedades v48.0
 
@@ -87,13 +94,14 @@ Pruebas en navegador (con `npm start` en otra terminal): `npm run test:e2e` (int
    (`SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`). Nunca `service_role`/`sb_secret_` como clave pública.
    Opcional desde v48: `SUPABASE_SERVICE_ROLE_KEY` **solo como variable del servidor**, para los contadores de
    monetización; nunca llega al navegador.
-3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v48-0`
+3. Hacer merge a la rama que Render despliega. El service worker cambia a `fittforma-ai-static-v49-0`
    y la app ofrece actualizar.
 
 ## Documentación
 
-- `docs/DESPLIEGUE.md` — pasos para publicar v48 en Render y comprobarlo.
+- `docs/DESPLIEGUE.md` — pasos para publicar v49 en Render y comprobarlo.
 - `docs/MONETIZACION.md` — anuncios, recompensas, Plus: variables, pasos externos, límites y costos.
+- `docs/AUDITORIA_v49.md` — auditoría y plan de la v49 (entrenamiento, insignias, comunidad).
 - `docs/AUDITORIA_v48.md` — auditoría integral v48 (problemas encontrados).
 - `DESIGN.md` — sistema visual (temas, colores por sección, componentes).
 - `docs/INSIGNIAS.md` — reglas, umbrales y evidencia de las insignias.

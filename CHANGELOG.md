@@ -1,5 +1,66 @@
 # FittForma AI — Registro de cambios
 
+## v49.0 — Rediseño de entrenamiento, insignias y comunidad (19 de octubre de 2026)
+
+**Entrenamiento y biblioteca**
+- Mapa muscular propio (`anatomy.js`):
+  - Figura de frente y espalda con 20 regiones con identificador estable.
+  - Resalta el músculo principal y los secundarios de cada ejercicio.
+- Ficha del ejercicio con la distribución de la referencia:
+  - Grupo, músculos, equipamiento, nivel y tipo de movimiento.
+  - Inicio y fin.
+  - Posición inicial; se agregó en 33 fichas que no la tenían.
+  - Pasos, respiración, errores, recomendaciones y dosis.
+- Entrenamiento en curso:
+  - Grupos, duración, ejercicios y series completadas, volumen en vivo y récords.
+  - Tabla por serie: anterior, kg, reps o segundos, listo.
+  - Plancha en segundos; ejercicios sin carga con lastre opcional.
+- Récords solo con datos reales:
+  - El peso exige repeticiones.
+  - El cardio no cuenta como repeticiones.
+  - 1RM estimado señalado como estimación.
+  - Registros manuales marcados.
+- Registro manual con un valor por serie y volumen real.
+- El entrenamiento diario se mantiene cada 12 h (decisión confirmada).
+
+**Insignias**
+- Emblema hexagonal con relieve: el marco cambia por rango y cada actividad tiene su símbolo.
+- Insignias por carga (press de banca, sentadilla con barra, peso muerto, press militar):
+  - Mejor serie válida ÷ peso corporal, con umbrales configurables y documentados.
+  - Nunca se usa el volumen.
+- Constancia: entrenamientos completos y racha de días seguidos.
+- Fuente honesta: Declarada, Registrada en sesión o Con ruta GPS. Nunca «verificada».
+- Pantalla de logro que no se repite al recargar (`celebratedAt`).
+- Destacadas (máx. 3) también en el perfil social.
+
+**Comunidad**
+- Barra propia (Inicio, Explorar, Crear, Mensajes, Perfil) dentro de la sección. La barra inferior principal no cambia.
+- Feed:
+  - Novedades de quienes seguís; Para vos, Siguiendo y Recientes.
+  - Fotos 4:5, me gusta, comentar, compartir y guardar.
+  - #hashtags, menú «⋯» y entrenamiento vinculado.
+- Explorar: personas sugeridas reales, búsqueda por persona o #hashtag y grilla con filtros.
+- Mensajes: lista de conversaciones y chat que se actualiza mientras está abierto; solo con seguimiento mutuo.
+- Perfiles sociales:
+  - Foto, conteos reales, 3 insignias, seguir y mensaje.
+  - Grilla y Guardadas.
+
+**Base de datos:** dos migraciones aditivas, `2026-10-22_v49_badges.sql` y `2026-10-23_v49_community.sql`.
+
+**Corregido**
+- La validación del usuario público no funcionaba en navegadores actuales.
+- Los avisos de Publicar se escribían en un elemento oculto.
+- La notificación quedaba debajo del botón «+».
+
+**Pruebas**
+- 227 automáticas.
+- SQL/RLS: 167.
+- Integración: 115.
+- Flujos e idiomas: 22.
+- Entrenamiento e insignias E2E: 29.
+- Comunidad E2E: 43.
+- Monetización E2E: 47.
+
 ## v48.0 — Auditoría integral y monetización (18 de octubre de 2026)
 
 **Entrenamiento**

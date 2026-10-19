@@ -42,7 +42,7 @@ Preparación (resumen):
 
 1. Base `ff_e2e` con `supabase/tests/supabase_stub.sql`, `schema.sql`, `community.sql` y la migración;
    rol `authenticator` (`login noinherit`) con `grant anon, authenticated to authenticator`;
-   migraciones v41, v43, v44 y v48 aplicadas (el script crea los usuarios de prueba).
+   migraciones v41, v43, v44, v48 y v49 aplicadas (el script crea los usuarios de prueba).
 2. PostgREST 12 con `db-anon-role = "anon"` y un `jwt-secret` guardado en un archivo.
 3. `npm start` en otra terminal.
 4. Ejecutar:
@@ -52,6 +52,23 @@ JWT_SECRET_FILE=/ruta/secret POSTGREST_URL=http://127.0.0.1:3300 \
 SUPABASE_UMD=/ruta/node_modules/@supabase/supabase-js/dist/umd/supabase.js \
 PGHOST=... PGPORT=... PGUSER=... node tests/e2e/community.e2e.mjs
 ```
+
+### Entrenamiento e insignias (v49)
+
+`tests/e2e/workout.e2e.mjs` (con `npm start` en otra terminal) recorre 29 pasos:
+- **Pesos por serie:** dos series con pesos distintos se guardan por separado.
+- **Volumen:** en vivo y guardado.
+- **Récords:** el récord es el mejor peso real, no el volumen; se marca solo al superar el historial.
+- **Plancha:** en segundos y sin kg.
+- **Ficha:** con mapa muscular.
+- **Registro manual:** un valor por serie, ubicado por fecha.
+- **Insignia por carga:** 80 kg con 80 kg de peso corporal da Oro II; conserva el historial, informa la fuente real y la celebración no se repite al recargar.
+- **Perfil:** como máximo 3 insignias destacadas.
+
+`supabase/tests/rls_v49_test.sql` y `rls_v49c_test.sql` cubren los logros nuevos y la comunidad v49:
+- guardadas, destacadas y foto de perfil propia;
+- entrenamiento vinculado sin datos corporales;
+- conversaciones, conteos y sugeridos, con privacidad y bloqueos.
 
 ### Monetización (v48)
 

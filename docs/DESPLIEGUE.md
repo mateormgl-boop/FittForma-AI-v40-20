@@ -1,9 +1,20 @@
-# Despliegue de FittForma AI v48.0
+# Despliegue de FittForma AI v49.0
 
-Esta guía es la lista de pasos para publicar v48.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v49.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
-## Qué cambia en v48.0
+## Qué cambia en v49.0
+
+- **Archivos y cambios:**
+  - `anatomy.js` (mapa muscular).
+  - Entrenamiento e insignias rediseñados.
+  - Comunidad como red social integrada.
+- **Migraciones nuevas (aditivas):**
+  - `2026-10-22_v49_badges.sql`: medidas nuevas en los logros compartidos.
+  - `2026-10-23_v49_community.sql`: guardadas, destacadas, foto de perfil, entrenamiento vinculado, conversaciones, conteos y sugeridos.
+- **Sin migración v49:** la app sigue funcionando y oculta guardar, la foto de perfil y el entrenamiento vinculado.
+
+## Qué cambió en v48.0
 
 - Planificador de rutinas nuevo (`training-core.js`), biblioteca con imagen propia y guía por ejercicio
   (`exercise-media.js`, `exercise-guides.js`, `assets/exercises/`), progresión diaria cada 12 h controlada
@@ -18,7 +29,7 @@ hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 1. Revisar el PR en GitHub y mirar las capturas de las pruebas visuales.
 2. Correr las pruebas en una máquina con Node 20 o más reciente:
-   - `npm test` (209 pruebas automáticas).
+   - `npm test` (227 pruebas automáticas).
    - Con `npm start` en otra terminal: `APP_URL=http://localhost:8787 npm run test:e2e`.
    - Opcional, con Postgres y PostgREST locales: `npm run test:sql` y `tests/e2e/community.e2e.mjs`
      (cómo prepararlos en `docs/PRUEBAS.md`).
@@ -36,6 +47,9 @@ un proyecto de **pruebas** y después en producción:
 4. `supabase/migrations/2026-10-20_v48_daily_training.sql` (entrenamiento diario cada 12 h, idempotente)
 5. `supabase/migrations/2026-10-21_v48_monetization.sql` (contadores, comprobantes, Google Play; el límite de
    fotos queda **desactivado** hasta `update public.monetization_settings set photo_limit_enabled = true`)
+6. `supabase/migrations/2026-10-22_v49_badges.sql` (insignias por carga, entrenamientos, racha y fuente «sesión»)
+7. `supabase/migrations/2026-10-23_v49_community.sql` (comunidad v49; después de aplicarla, en Supabase:
+   *Settings › API › Reload schema* o `notify pgrst, 'reload schema';`)
 
 No volver a ejecutar `schema.sql` ni `community.sql`. RLS queda activado en todas las tablas: no
 desactivarlo para resolver errores.
