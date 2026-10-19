@@ -1738,6 +1738,7 @@
       </div>
       <div class="home-week-stats" id="homeWeekStats"></div>
     </section>
+    <button type="button" class="home-card home-body-goal" id="homeBodyGoal" aria-label="Objetivo y actualidad: abrir en Perfil"></button>
     <section class="home-hero" aria-labelledby="homeTodayTitle">
       <small>Entrenamiento de hoy</small>
       <h2 id="homeTodayTitle">Armá tu primera rutina</h2>
@@ -2214,24 +2215,39 @@
         <div class="profile-badges-preview" id="profileBadgesPreview"><h4>Mis insignias</h4><div id="profileBadgeChips" class="profile-badge-chips"><span class="muted small">Tus logros aparecerán acá.</span></div><button class="btn secondary full" id="profileViewBadges" type="button" style="margin-top:10px">Ver todas mis insignias</button></div>
         <p class="muted small" style="margin-bottom:0">Tu nombre y objetivo se guardan en este dispositivo. Tus insignias se guardan en este dispositivo. Podés compartir la que elijas desde Comunidad › Publicar › Logro.</p>
       </div>
-      <details class="ff-group">
-        <summary><span><strong>Objetivos y datos físicos</strong><small>Peso, altura, actividad y preferencias de entrenamiento</small></span></summary>
-        <div class="card" id="bodyProfileCard">
-        <h3>Datos físicos y objetivo de peso</h3>
-        <p class="muted small">Estos datos permiten calcular referencias de nutrición e hidratación. Ninguno es obligatorio. Son privados: se guardan en este dispositivo y en tu copia privada en la nube si iniciás sesión; nunca se muestran en Comunidad.</p>
+      <section class="card body-goal-card" id="bodyProfileCard" aria-labelledby="bodyGoalTitle">
+        <div class="section-head"><div><h3 id="bodyGoalTitle">Objetivo y actualidad</h3><p class="muted small">Dónde estás hoy y a dónde querés llegar. Son datos privados: se guardan en este dispositivo y en tu copia privada en la nube si iniciás sesión; nunca se muestran en Comunidad. Ninguno es obligatorio.</p></div></div>
+        <div class="body-goal-glance" id="bodyGoalGlance" aria-live="polite"></div>
+        <div class="body-goal-results" id="bodyGoalResults" aria-live="polite"></div>
+        <div class="btn-row body-goal-apply"><button type="button" class="btn secondary" id="applyBodyGoals" hidden>Usar estas referencias en Nutrición y agua</button></div>
         <form id="bodyProfileForm">
+          <fieldset class="body-goal-fieldset"><legend>Tu actualidad</legend>
           <div class="grid2">
+            <div class="field"><label for="profileSex">Sexo</label><select id="profileSex"><option value="">Prefiero no decir</option><option value="female">Femenino</option><option value="male">Masculino</option></select><small class="muted">Solo se usa para estimar el metabolismo basal.</small></div>
             <div class="field"><label for="profileAge">Edad (años)</label><input id="profileAge" type="number" min="13" max="100" inputmode="numeric" placeholder="Ej. 25"></div>
             <div class="field"><label for="profileHeight">Altura (cm)</label><input id="profileHeight" type="number" min="1" max="250" step="0.01" inputmode="decimal" placeholder="Ej. 175 (o 1,75 m)" aria-describedby="profileHeightHint"><small class="muted" id="profileHeightHint">En centímetros. Si escribís metros (1,75) lo convertimos.</small></div>
             <div class="field"><label for="profileWeightUnit">Unidad de peso</label><select id="profileWeightUnit"><option value="kg" selected>Kilogramos (kg)</option><option value="lb">Libras (lb)</option></select></div>
             <div class="field"><label for="profileCurrentWeight">Peso actual (<span data-weight-unit>kg</span>)</label><input id="profileCurrentWeight" type="number" min="25" max="350" step="0.1" inputmode="decimal" placeholder="Ej. 72.5"></div>
-            <div class="field"><label for="profileTargetWeight">Peso al que querés llegar (<span data-weight-unit>kg</span>)</label><input id="profileTargetWeight" type="number" min="25" max="350" step="0.1" inputmode="decimal" placeholder="Ej. 76"></div>
+            <div class="field"><label for="profileWaist">Cintura (cm, opcional)</label><input id="profileWaist" type="number" min="40" max="250" step="0.5" inputmode="decimal" placeholder="A la altura del ombligo"></div>
+            <div class="field"><label for="profileBodyFat">Grasa corporal (%, opcional)</label><input id="profileBodyFat" type="number" min="3" max="60" step="0.1" inputmode="decimal" placeholder="Solo si la mediste"></div>
             <div class="field"><label for="profileActivityLevel">Actividad habitual</label><select id="profileActivityLevel"><option value="sedentary">Mayormente sentado/a</option><option value="light" selected>Ligera (1–3 días/semana)</option><option value="moderate">Moderada (3–5 días/semana)</option><option value="high">Alta (6–7 días/semana)</option></select></div>
           </div>
-          <button class="btn full" id="saveBodyProfile" type="submit">Guardar datos físicos</button>
+          </fieldset>
+          <fieldset class="body-goal-fieldset"><legend>Tu objetivo</legend>
+          <div class="grid2">
+            <div class="field"><label for="profileBodyGoal">¿Qué querés lograr?</label><select id="profileBodyGoal"><option value="">Según mi peso meta</option><option value="lose">Bajar de peso (grasa)</option><option value="maintain">Mantener mi peso</option><option value="gain">Subir de peso (músculo)</option></select></div>
+            <div class="field"><label for="profileTargetWeight">Peso al que querés llegar (<span data-weight-unit>kg</span>)</label><input id="profileTargetWeight" type="number" min="25" max="350" step="0.1" inputmode="decimal" placeholder="Ej. 76"></div>
+            <div class="field"><label for="profileWeeklyRate">Ritmo semanal</label><select id="profileWeeklyRate"><option value="">Automático</option><option value="0.25">0,25 kg/sem · suave</option><option value="0.5">0,5 kg/sem · moderado</option><option value="0.75">0,75 kg/sem · rápido</option></select></div>
+            <div class="field"><label for="profileTargetDate">Fecha objetivo (opcional)</label><input id="profileTargetDate" type="date"></div>
+          </div>
+          </fieldset>
+          <button class="btn full" id="saveBodyProfile" type="submit">Guardar objetivo y actualidad</button>
         </form>
-        <div id="bodyProfileSummary" class="muted small" style="margin-top:12px" aria-live="polite"></div>
-      </div>
+        <div id="bodyProfileSummary" class="muted small" style="margin-top:8px" aria-live="polite"></div>
+        <p class="muted small body-goal-disclaimer">Las cifras son estimaciones con fórmulas usadas en nutrición deportiva (IMC de la OMS, Mifflin-St Jeor, Katch-McArdle si cargás tu % de grasa). Orientan, no reemplazan a un profesional de la salud.</p>
+      </section>
+      <details class="ff-group">
+        <summary><span><strong>Preferencias de entrenamiento</strong><small>Objetivo del plan, nivel, días, equipamiento y duración</small></span></summary>
         <div class="card">
         <h3>Preferencias de entrenamiento</h3>
         <p class="muted small">Definen tu plan: objetivo, nivel, días, equipamiento y duración. No hace falta ingresar información médica.</p>
@@ -2437,6 +2453,7 @@
 <script src="./membership-config.js"></script>
 <script src="./anatomy.js"></script>
 <script src="./training-core.js"></script>
+<script src="./body-goals.js"></script>
 <script src="./exercise-guides.js"></script>
 <script src="./exercise-media.js"></script>
 <script src="./exercise-gifs.js"></script>
@@ -2453,7 +2470,7 @@
   const PREVIOUS_V3_STORAGE = 'fittforma-ai-v3';
   const PREVIOUS_STORAGE = 'fittforma-ai-v2';
   const LEGACY_STORAGE = 'forma-prototype-v1';
-  const defaults = {foodFavorites:[],customFoods:[],daily:{seq:0,lastCompletedAt:'',nextAvailableAt:'',history:[]},hydration:{goalMl:2000,glassMl:250,entries:[]},featuredBadges:[],mealPlan:{},routines:[],bodyMeasures:[],notifications:[],coachShareData:true,plannedActivities:[],mealFavorites:[],habitLogs:{},waterLogs:{},badgeRecords:[],badgeUnlocks:{},profile:{goal:'fitness',level:'beginner',days:'3',equipment:'gym',duration:'30',name:'',age:'',heightCm:'',currentWeightKg:'',targetWeightKg:'',activityLevel:'light'},sessions:[],plan:null,meals:[],weights:[],activities:[],water:{date:'',count:0},nutritionGoals:{calories:2400,protein:120,carbs:280,fat:80,water:8},chat:[],proposal:null,planHistory:[],runningPlan:'starter',reminders:{enabled:false,time:'18:00',days:[1,3,5],missedEnabled:true,missedTime:'21:00',lastTrainingNoticeDate:'',lastMissedNoticeDate:''}};
+  const defaults = {foodFavorites:[],customFoods:[],daily:{seq:0,lastCompletedAt:'',nextAvailableAt:'',history:[]},hydration:{goalMl:2000,glassMl:250,entries:[]},featuredBadges:[],mealPlan:{},routines:[],bodyMeasures:[],notifications:[],coachShareData:true,plannedActivities:[],mealFavorites:[],habitLogs:{},waterLogs:{},badgeRecords:[],badgeUnlocks:{},profile:{goal:'fitness',level:'beginner',days:'3',equipment:'gym',duration:'30',name:'',age:'',heightCm:'',currentWeightKg:'',targetWeightKg:'',activityLevel:'light',sex:'',waistCm:'',bodyFatPct:'',bodyGoal:'',weeklyRateKg:'',targetDate:''},sessions:[],plan:null,meals:[],weights:[],activities:[],water:{date:'',count:0},nutritionGoals:{calories:2400,protein:120,carbs:280,fat:80,water:8},chat:[],proposal:null,planHistory:[],runningPlan:'starter',reminders:{enabled:false,time:'18:00',days:[1,3,5],missedEnabled:true,missedTime:'21:00',lastTrainingNoticeDate:'',lastMissedNoticeDate:''}};
   let state = loadState();
   let activeSession = null;
   let sessionRecordIndex = new Map();
@@ -4050,7 +4067,7 @@ function findCatalogExercise(name){
   }
   function syncBodyProfileForm(){
     const p=state.profile||defaults.profile;
-    const map={profileAge:'age',profileHeight:'heightCm',profileCurrentWeight:'currentWeightKg',profileTargetWeight:'targetWeightKg',profileActivityLevel:'activityLevel'};
+    const map={profileAge:'age',profileHeight:'heightCm',profileCurrentWeight:'currentWeightKg',profileTargetWeight:'targetWeightKg',profileActivityLevel:'activityLevel',profileSex:'sex',profileWaist:'waistCm',profileBodyFat:'bodyFatPct',profileBodyGoal:'bodyGoal',profileWeeklyRate:'weeklyRateKg',profileTargetDate:'targetDate'};
     for(const [id,key] of Object.entries(map)){const el=$(id);if(el)el.value=p[key]??defaults.profile[key]??'';}
   }
   function renderBodyProfileSummary(){
@@ -4058,7 +4075,49 @@ function findCatalogExercise(name){
     if(p.age)pieces.push(`${esc(p.age)} años`);if(p.heightCm)pieces.push(`${esc(p.heightCm)} cm`);if(p.currentWeightKg)pieces.push(`${esc(p.currentWeightKg)} kg actuales`);if(p.targetWeightKg)pieces.push(`meta: ${esc(p.targetWeightKg)} kg`);
     const activity=({sedentary:'actividad baja',light:'actividad ligera',moderate:'actividad moderada',high:'actividad alta'})[p.activityLevel]||'actividad no indicada';
     $('bodyProfileSummary').textContent=pieces.length?`Guardado: ${pieces.join(' · ')} · ${activity}.`:'Todavía no cargaste tus datos físicos. Completalos para personalizar los objetivos nutricionales.';
+    renderBodyGoals();
   }
+  // ---------- v51: Objetivo y actualidad ----------
+  function bodyGoalSummary(){return window.FittFormaBody?FittFormaBody.summary(state.profile||{},dateKey()):null;}
+  function fmtNum(v,d=1){return v==null?'—':Number(v).toLocaleString(uiLocale(),{maximumFractionDigits:d});}
+  function fmtDay(key){return key?new Date(key+'T12:00:00').toLocaleDateString(uiLocale(),{day:'numeric',month:'short',year:'numeric'}):'';}
+  function bodyGoalStartKg(){const w=(state.weights||[]).filter(x=>Number(x.kg)>0).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));return w.length?w[0].kg:state.profile?.currentWeightKg;}
+  function renderBodyGoals(){
+    const p=state.profile||{},r=bodyGoalSummary(),glance=$('bodyGoalGlance'),box=$('bodyGoalResults'),apply=$('applyBodyGoals');if(!r||!box)return;
+    const cur=Number(p.currentWeightKg)||null,tgt=Number(p.targetWeightKg)||null,dirTxt={lose:'Bajar de peso',maintain:'Mantener',gain:'Subir de peso'}[r.direction];
+    const prog=FittFormaBody.goalProgress(bodyGoalStartKg(),cur,tgt);
+    if(glance)glance.innerHTML=cur?`<div class="bg-glance-row"><div><small>Hoy</small><b>${fmtNum(cur)} kg</b></div><div class="bg-glance-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h15M14 6l6 6-6 6"/></svg></div><div><small>Meta</small><b>${tgt?fmtNum(tgt)+' kg':'—'}</b></div><span class="bg-goal-pill">${esc(dirTxt)}</span></div>${prog!=null?`<div class="bg-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${prog}" aria-label="Avance hacia tu meta"><span style="width:${prog}%"></span></div><p class="muted small">${prog} % del camino desde tu primer peso registrado (${fmtNum(bodyGoalStartKg())} kg).</p>`:''}`:'<p class="muted small">Cargá tu peso, altura y edad para ver tu punto de partida y tu meta.</p>';
+    const cells=[];
+    if(r.bmi!=null)cells.push(['IMC',fmtNum(r.bmi),r.bmiCategory?.label||'',r.bmiCategory?.key||'']);
+    if(r.waist)cells.push(['Cintura / altura',fmtNum(r.waist.ratio,2),r.waist.ok?'Debajo de 0,5 (referencia habitual)':'Por encima de 0,5',r.waist.ok?'normal':'over']);
+    if(r.bmr)cells.push(['Metabolismo basal',`${fmtNum(r.bmr.kcal,0)} kcal`,r.bmr.method==='katch'?'Con tu % de grasa':r.bmr.approximate?'Aproximado (sin sexo indicado)':'Mifflin-St Jeor','']);
+    if(r.tdee)cells.push(['Gasto diario estimado',`${fmtNum(r.tdee,0)} kcal`,'Con tu actividad habitual','']);
+    if(r.calories)cells.push(['Calorías sugeridas',`${fmtNum(r.calories,0)} kcal`,r.dailyDeltaKcal?`${r.dailyDeltaKcal>0?'+':''}${fmtNum(r.dailyDeltaKcal,0)} kcal por día`:'Para mantener','accent']);
+    if(r.proteinG)cells.push(['Proteína',`${fmtNum(r.proteinG,0)} g/día`,r.direction==='maintain'?'≈1,4 g por kg':'≈1,8 g por kg','']);
+    if(r.waterMl)cells.push(['Agua',`${fmtNum(r.waterMl/1000,1)} L/día`,'≈32 ml por kg','']);
+    if(r.diffKg!=null&&Math.abs(r.diffKg)>0.3)cells.push(['Distancia a la meta',`${r.diffKg>0?'+':''}${fmtNum(r.diffKg)} kg`,r.etaDate?`≈${r.weeksToGoal} semanas · ${fmtDay(r.etaDate)}`:'',r.etaDate?'accent':'']);
+    const notes=[...r.warnings];
+    if(r.requiredRateKg!=null)notes.unshift(`Para llegar el ${fmtDay(p.targetDate)} necesitás ~${fmtNum(r.requiredRateKg,2)} kg por semana.`);
+    if(r.calorieFloorApplied)notes.push('Las calorías se ajustaron al mínimo recomendado sin supervisión; por eso el ritmo estimado es menor.');
+    if(r.missing.length)notes.push(`Para completar el cálculo falta: ${r.missing.join(', ')}.`);
+    box.innerHTML=(cells.length?`<div class="bg-grid">${cells.map(([l,v,s,k])=>`<div class="bg-cell ${k?'is-'+k:''}"><small>${esc(l)}</small><b>${esc(v)}</b>${s?`<span>${esc(s)}</span>`:''}</div>`).join('')}</div>`:'')+(notes.length?`<ul class="bg-notes">${notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>`:'');
+    if(apply)apply.hidden=!(r.calories&&r.proteinG&&r.waterMl);
+    renderHomeBodyGoal(r);
+  }
+  function renderHomeBodyGoal(r=bodyGoalSummary()){
+    const el=$('homeBodyGoal');if(!el||!r)return;const p=state.profile||{},cur=Number(p.currentWeightKg)||null,tgt=Number(p.targetWeightKg)||null;
+    if(!cur){el.innerHTML='<div><strong>Objetivo y actualidad</strong><small>Cargá tu altura, peso y meta para ver tu punto de partida.</small></div><span class="bg-home-cta">Completar</span>';return;}
+    const prog=FittFormaBody.goalProgress(bodyGoalStartKg(),cur,tgt);
+    el.innerHTML=`<div><strong>${fmtNum(cur)} kg${tgt?` → ${fmtNum(tgt)} kg`:''}</strong><small>${r.bmi!=null?`IMC ${fmtNum(r.bmi)} · `:''}${r.calories?`${fmtNum(r.calories,0)} kcal sugeridas`:'Objetivo y actualidad'}${r.etaDate?` · meta ≈ ${fmtDay(r.etaDate)}`:''}</small>${prog!=null?`<i class="bg-progress"><span style="width:${prog}%"></span></i>`:''}</div><span class="bg-home-cta">Ver</span>`;
+  }
+  $('applyBodyGoals')?.addEventListener('click',()=>{
+    const r=bodyGoalSummary();if(!r?.calories||!r.proteinG||!r.waterMl)return;
+    const fat=Math.round(Math.max(35,Math.min(180,r.calories*0.27/9))/5)*5,carbs=Math.max(0,Math.round((r.calories-r.proteinG*4-fat*9)/4/5)*5);
+    if(!confirm(`Se van a reemplazar tus objetivos por: ${r.calories} kcal, ${r.proteinG} g de proteína, ${carbs} g de carbohidratos, ${fat} g de grasas y ${r.waterMl} ml de agua por día. ¿Continuar?`))return;
+    const h=hydro();h.goalMl=Math.max(500,Math.min(6000,r.waterMl));
+    state.nutritionGoals={...(state.nutritionGoals||{}),calories:r.calories,protein:r.proteinG,carbs,fat,water:Math.round(h.goalMl/h.glassMl*10)/10};
+    syncWaterDerived();save();renderNutrition?.();renderHydration?.();renderHome?.();toast('Objetivos de nutrición y agua actualizados.');
+  });
   function renderProfile(){
     const statsBox=$('profileStats');
     if(statsBox){const sessions=state.sessions||[],acts=state.activities||[],days=new Set([...sessions,...acts].map(x=>String(x?.date||'').slice(0,10)).filter(Boolean)).size,badges=Object.keys(state.badgeUnlocks||{}).length;statsBox.innerHTML=[[sessions.length,'Entrenamientos'],[days,'Días activos'],[badges,'Insignias']].map(([v,l])=>`<div><strong>${v}</strong><small>${l}</small></div>`).join('');}
@@ -4994,6 +5053,7 @@ function findCatalogExercise(name){
 
   // v40.21: panel de Inicio. Solo muestra datos guardados en este dispositivo; sin datos, ceros y un aviso de ayuda.
   function renderHome(){
+    renderHomeBodyGoal();
     const set=(id,value)=>{const el=$(id);if(el)el.textContent=value;};
     const arc=(id,fraction)=>{const el=$(id);if(el)el.style.strokeDashoffset=String(251.2*(1-Math.max(0,Math.min(1,fraction||0))));};
     const sessions=Array.isArray(state.sessions)?state.sessions:[],activities=Array.isArray(state.activities)?state.activities:[],planned=Array.isArray(state.plannedActivities)?state.plannedActivities:[];
@@ -5419,6 +5479,7 @@ function findCatalogExercise(name){
   document.addEventListener('click',e=>{if(!e.target.closest('#mobileAppNav')&&!e.target.closest('#mobileMoreMenu')&&!e.target.closest('#mobileMoreToggle')){$('mobileMoreMenu').hidden=true;$('mobileMoreToggle').setAttribute('aria-expanded','false');}});
 
   document.querySelectorAll('[data-shortcut-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.shortcutView)));
+  $('homeBodyGoal')?.addEventListener('click',()=>{switchView('profile');setTimeout(()=>$('bodyProfileCard')?.scrollIntoView({behavior:'smooth',block:'start'}),60);});
   document.querySelectorAll('[data-subview]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.subview)));
   $('homeStartBtn').addEventListener('click',()=>{const parts=String($('homeStartBtn').dataset.homeAction||'view:train').split(':');if(parts[0]==='start'){const index=Number(parts[1]);if(Number.isInteger(index)&&state.plan&&state.plan.days&&state.plan.days[index])startWorkout(index);else switchView('routines');}else switchView(parts[1]||'train');});
   $('homeHabits').addEventListener('click',event=>{const button=event.target.closest('[data-home-habit]');if(!button)return;const habitKey=button.dataset.homeHabit;if(!dailyHabitDefinitions.some(item=>item.key===habitKey))return;if(!state.habitLogs||typeof state.habitLogs!=='object'||Array.isArray(state.habitLogs))state.habitLogs={};const day=dateKey(),log=state.habitLogs[day]&&typeof state.habitLogs[day]==='object'?state.habitLogs[day]:{};log[habitKey]=!log[habitKey];state.habitLogs[day]=log;save();renderHabitTracker();renderHome();});
@@ -5561,12 +5622,17 @@ function findCatalogExercise(name){
     if(height&&(Number(height)<100||Number(height)>250)){toast('Ingresá una altura entre 100 y 250 cm (o entre 1 y 2,5 m).');return;}
     if(current&&(Number(current)<25||Number(current)>350)){toast(lb?'Ingresá un peso actual entre 55 y 770 lb.':'Ingresá un peso actual entre 25 y 350 kg.');return;}
     if(target&&(Number(target)<25||Number(target)>350)){toast(lb?'Ingresá una meta entre 55 y 770 lb.':'Ingresá una meta de peso entre 25 y 350 kg.');return;}
+    const waist=$('profileWaist').value.trim().replace(',','.'),fat=$('profileBodyFat').value.trim().replace(',','.'),targetDate=$('profileTargetDate').value;
+    if(waist&&(!(Number(waist)>=40)||Number(waist)>250)){toast('Ingresá una cintura entre 40 y 250 cm.');return;}
+    if(fat&&(!(Number(fat)>=3)||Number(fat)>60)){toast('Ingresá un porcentaje de grasa entre 3 y 60 %.');return;}
+    if(targetDate&&(!/^\d{4}-\d{2}-\d{2}$/.test(targetDate)||targetDate<=dateKey())){toast('La fecha objetivo tiene que ser posterior a hoy.');return;}
+    const pick=(id,allowed)=>{const v=$(id).value;return allowed.includes(v)?v:'';};
     const previousWeight=state.profile.currentWeightKg;
-    state.profile={...state.profile,age:age?String(Number(age)):'',heightCm:height?String(Number(height)):'',currentWeightKg:current,targetWeightKg:target,activityLevel:$('profileActivityLevel').value};
+    state.profile={...state.profile,age:age?String(Number(age)):'',heightCm:height?String(Number(height)):'',currentWeightKg:current,targetWeightKg:target,activityLevel:$('profileActivityLevel').value,sex:pick('profileSex',['female','male']),waistCm:waist?String(Number(waist)):'',bodyFatPct:fat?String(Number(fat)):'',bodyGoal:pick('profileBodyGoal',['lose','maintain','gain']),weeklyRateKg:pick('profileWeeklyRate',['0.25','0.5','0.75']),targetDate};
     // Un peso nuevo también queda en el historial (una medición por día; se reemplaza la del día si existe).
     if(current&&current!==previousWeight){state.weights=Array.isArray(state.weights)?state.weights:[];const today=dateKey(),i=state.weights.findIndex(w=>w.date===today);if(i>=0)state.weights[i]={...state.weights[i],kg:Number(current)};else state.weights.push({id:Date.now(),date:today,kg:Number(current)});state.weights.sort((a,b)=>a.date.localeCompare(b.date));}
     if($('profileWeightUnit'))$('profileWeightUnit').value='kg';document.querySelectorAll('[data-weight-unit]').forEach(x=>x.textContent='kg');
-    const badgeDelta=current!==previousWeight?syncBadgeUnlocks():null;save();syncBodyProfileForm();renderProfile();renderWeights();renderProgress();renderHydration?.();if(badgeDelta?.newlyUnlocked?.length)notifyBadgeChanges(badgeDelta,'Datos físicos guardados');else toast('Datos físicos guardados.');
+    const badgeDelta=current!==previousWeight?syncBadgeUnlocks():null;save();syncBodyProfileForm();renderProfile();renderWeights();renderProgress();renderHydration?.();if(badgeDelta?.newlyUnlocked?.length)notifyBadgeChanges(badgeDelta,'Objetivo y actualidad guardados');else toast('Objetivo y actualidad guardados.');
   });
   function syncTrainingPrefs(){const p=state.profile||{};for(const [id,k] of [['prefGoal','goal'],['prefLevel','level'],['prefDays','days'],['prefEquipment','equipment'],['prefDuration','duration']]){const el=$(id);if(el)el.value=String(p[k]??defaults.profile[k]);}}
   $('trainingPrefsForm')?.addEventListener('submit',e=>{
@@ -5578,16 +5644,14 @@ function findCatalogExercise(name){
     const p=state.profile||{},age=Number(p.age),height=Number(p.heightCm),weight=Number(p.currentWeightKg),target=Number(p.targetWeightKg);
     if(!age||!height||!weight||!target){$('nutritionGoalHint').textContent='Completá edad, altura, peso actual y peso objetivo en Perfil y guardalos antes de calcular.';toast('Faltan datos en Perfil.');return;}
     if(age<18){$('nutritionGoalHint').textContent='Para menores de 18 años no generamos una meta calórica automática. Pedí orientación a un profesional que tenga en cuenta tu crecimiento y actividad.';toast('El cálculo automático es solo para adultos.');return;}
-    const factors={sedentary:1.2,light:1.375,moderate:1.55,high:1.725},factor=factors[p.activityLevel]||1.375;
-    // Fórmula simplificada de gasto estimado para adultos; promedio de coeficientes por sexo.
-    const bmr=10*weight+6.25*height-5*age-78;
-    const adjustment=target>weight+0.3?250:target<weight-0.3?-250:0;
-    const calories=Math.round(Math.max(1200,Math.min(4500,bmr*factor+adjustment))/50)*50;
-    const protein=Math.round(Math.max(50,Math.min(250,weight*1.6))/5)*5;
+    // v51: mismo cálculo que «Objetivo y actualidad» (usa sexo, % de grasa, objetivo y ritmo si están cargados).
+    const bodySum=bodyGoalSummary();
+    const calories=bodySum?.calories||1200;
+    const protein=Math.round(Math.max(50,Math.min(250,bodySum?.proteinG||weight*1.6))/5)*5;
     const fat=Math.round(Math.max(35,Math.min(180,calories*0.27/9))/5)*5;
     const carbs=Math.max(0,Math.round((calories-protein*4-fat*9)/4/5)*5);
     $('calorieGoal').value=calories;$('proteinGoal').value=protein;$('carbGoal').value=carbs;$('fatGoal').value=fat;
-    const direction=target>weight+0.3?'subida gradual hacia la meta':target<weight-0.3?'bajada gradual hacia la meta':'mantenimiento aproximado';
+    const direction=({gain:'subida gradual hacia la meta',lose:'bajada gradual hacia la meta'})[bodySum?.direction]||'mantenimiento aproximado';
     $('nutritionGoalHint').textContent=`Referencia cargada para ${direction}: ${calories} kcal, ${protein} g proteína, ${carbs} g carbohidratos y ${fat} g grasas. Estimación simplificada; revisá que sea razonable y tocá “Guardar objetivos” si querés aplicarla.`;
     toast('Estimación cargada para revisar; todavía no se guardó.');
   });
