@@ -807,3 +807,76 @@ body{font-feature-settings:"cv11","ss01"}
 .exercise-gif-hero{aspect-ratio:auto;display:flex;flex-direction:column}
 .exercise-gif-hero img{aspect-ratio:1/1;height:auto;object-fit:contain}
 .exercise-gif-hero .exercise-gif-title{order:-1;position:static;inset:auto;padding:12px 12px 4px;background:#16202a}
+
+/* ===== v51 · Hidratación ===== */
+.hydration-card{--hy:#1a7fe8;--hy-2:#5fd0ff;--hy-ink:#7cc8ff;--hy-soft:rgba(26,127,232,.13);position:relative;overflow:hidden}
+:root[data-theme="light"] .hydration-card{--hy-ink:#0f5fc0;--hy-soft:rgba(26,127,232,.09)}
+.hydration-card:before{content:"";position:absolute;inset:-40% -30% auto auto;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(95,208,255,.16),transparent 65%);pointer-events:none}
+.hydration-card h4{margin:0 0 8px;font-size:14px}
+.hydro-main{display:grid;grid-template-columns:104px minmax(0,1fr);gap:18px;align-items:center;margin:6px 0 14px}
+.hydro-bottle{width:104px;height:180px;filter:drop-shadow(0 10px 18px rgba(26,127,232,.25))}
+.hydro-bottle svg{width:100%;height:100%;display:block;overflow:visible}
+.hydro-shell{fill:rgb(var(--surface2-rgb) / 1);stroke:rgba(95,208,255,.55);stroke-width:2.2}
+.hydro-water{fill:url(#hydroGrad);transition:y .7s cubic-bezier(.3,.7,.2,1)}
+.hydro-wave{fill:#5fd0ff;opacity:.85;transition:transform .7s cubic-bezier(.3,.7,.2,1)}
+.hydro-shine{stroke:rgba(255,255,255,.35);stroke-width:4;stroke-linecap:round;fill:none}
+.hydro-ticks path{stroke:rgba(var(--text-3-rgb) / .5);stroke-width:1.5;stroke-linecap:round}
+.hydro-cap{fill:var(--hy);rx:2}
+.hydro-bottle.is-full .hydro-shell{stroke:var(--ok)}
+.hydro-copy{display:flex;flex-direction:column;gap:6px;min-width:0}
+.hydro-pct{align-self:flex-start;padding:3px 10px;border-radius:999px;background:var(--hy-soft);color:var(--hy-ink);font-weight:800;font-size:13px}
+.hydro-total{font-size:34px;line-height:1;font-weight:900;letter-spacing:-.02em;color:var(--text)}
+.hydro-total small{font-size:15px;font-weight:700;color:var(--text-3);letter-spacing:0}
+.hydro-progress{position:relative;height:10px;border-radius:999px;background:rgb(var(--surface2-rgb) / 1);overflow:visible}
+.hydro-progress span{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--hy),var(--hy-2));transition:width .6s ease}
+.hydro-progress i{position:absolute;top:-4px;width:3px;height:18px;margin-left:-1.5px;border-radius:2px;background:var(--warn);box-shadow:0 0 0 2px rgb(var(--surface-rgb) / 1)}
+.hydro-remaining{margin:2px 0 0;font-weight:700;font-size:14px;color:var(--text)}
+.hydro-pace{margin:0;font-size:12.5px;color:var(--text-3)}
+.hydro-pace:empty{display:none}
+.hydro-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:4px}
+.hydro-stat{display:flex;flex-direction:column;padding:7px 8px;border-radius:12px;background:var(--hy-soft);min-width:0}
+.hydro-stat b{font-size:16px;font-weight:800;color:var(--text)}
+.hydro-stat small{font-size:10.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hydro-quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 10px}
+.hydro-add{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 9px;border-radius:16px;border:1.5px solid rgba(95,208,255,.35);background:var(--hy-soft);color:var(--text);font:inherit;cursor:pointer;transition:transform .12s ease,background .2s ease;min-height:84px}
+.hydro-add svg{width:24px;height:24px;fill:none;stroke:var(--hy-ink);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.hydro-add b{font-size:13.5px;font-weight:800;white-space:nowrap}
+.hydro-add small{font-size:10.5px;color:var(--text-3);text-align:center;line-height:1.15}
+.hydro-add:hover{background:rgba(26,127,232,.2)}
+.hydro-add:active{transform:scale(.96)}
+.hydro-add:focus-visible{outline:3px solid var(--ff-focus,#2f6bff);outline-offset:2px}
+.hydro-row{display:flex;gap:8px;align-items:center;margin-bottom:14px}
+.hydro-custom{display:flex;gap:6px;flex:1;min-width:0}
+.hydro-custom input{flex:1;min-width:0}
+.hydro-today{margin:0 0 14px}
+.hydro-timeline{list-style:none;margin:0;padding:0;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.hydro-timeline::-webkit-scrollbar{display:none}
+.hydro-timeline li{flex:none;display:grid;grid-template-columns:auto auto;column-gap:7px;align-items:center;padding:8px 11px;border-radius:14px;background:rgb(var(--surface2-rgb) / 1);border:1px solid var(--ff-border)}
+.hydro-timeline li b{font-size:13px}
+.hydro-timeline li small{grid-column:2;font-size:11px;color:var(--text-3)}
+.hydro-timeline li em{grid-column:1/-1;font-style:normal;font-size:10.5px;color:var(--hy-ink);margin-top:2px}
+.hydro-dot{grid-row:1/3;width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,var(--hy-2),var(--hy));transform:scale(var(--s,1))}
+.hydro-timeline li.hydro-empty{display:block;background:none;border:1px dashed var(--ff-border);color:var(--text-3);font-size:12.5px;white-space:normal}
+.hydro-history{margin:0 0 10px;padding:12px;border-radius:16px;background:rgb(var(--surface2-rgb) / .6);border:1px solid var(--ff-border)}
+.hydro-history .section-head{margin-bottom:8px}
+.hydro-week{position:relative;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.hydro-goal-line{position:absolute;left:0;right:0;top:0;border-top:1.5px dashed rgba(var(--text-3-rgb) / .55);pointer-events:none;z-index:1}
+.hydro-goal-line span{position:absolute;right:0;top:-16px;font-size:10px;font-style:normal;color:var(--text-3)}
+.hydro-day{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.hydro-day-bar{display:flex;align-items:flex-end;width:100%;max-width:30px;height:92px;border-radius:9px;background:rgb(var(--surface-rgb) / 1);overflow:hidden}
+.hydro-day-bar i{display:block;width:100%;border-radius:9px 9px 0 0;background:linear-gradient(180deg,var(--hy-2),var(--hy));min-height:0}
+.hydro-day.met .hydro-day-bar i{background:linear-gradient(180deg,#5ee6b0,var(--ok))}
+.hydro-day small{font-size:10.5px;color:var(--text-3);text-transform:capitalize}
+.hydro-day b{font-size:10.5px;font-weight:700;color:var(--text-2);white-space:nowrap}
+.hydro-day.today small{color:var(--hy-ink);font-weight:800}
+.hydro-details{margin-top:8px;border-top:1px solid var(--ff-border);padding-top:8px}
+.hydro-details summary{cursor:pointer;font-weight:700;font-size:14px;padding:6px 0;color:var(--text)}
+.hydro-entries{margin:6px 0 8px}
+.hydro-reminder-toggle{display:flex;gap:8px;align-items:center;margin:6px 0}
+@media(max-width:380px){.hydro-main{grid-template-columns:84px minmax(0,1fr);gap:12px}.hydro-bottle{width:84px;height:150px}.hydro-total{font-size:28px}.hydro-quick{grid-template-columns:repeat(2,minmax(0,1fr))}.hydro-add{min-height:66px;flex-direction:row;justify-content:center;flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.hydro-water,.hydro-wave,.hydro-progress span{transition:none}}
+.hydro-stat b{font-size:15px;line-height:1.15;white-space:nowrap}
+.hydro-stat small{white-space:normal}
+.hydro-row{flex-wrap:wrap}
+.hydro-custom{flex:1 1 220px}
+.hydro-row #removeWater{margin-left:auto}
