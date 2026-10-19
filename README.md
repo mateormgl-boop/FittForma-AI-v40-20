@@ -4,6 +4,16 @@ Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HT
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
 
+## Novedades v50.0
+
+- Animación GIF propia para cada ejercicio (figura anatómica, músculos en rojo, fondo de gimnasio).
+- GPS más robusto, con velocidad máxima, tiempo en movimiento y estado de la señal.
+- App Android en `mobile/` para registrar con el celular bloqueado.
+- Calorías estimadas por correr, caminar, bicicleta y fuerza.
+- 281 alimentos verificables con buscador, porciones y recetas uruguayas estimadas.
+- Comunidad con usuarios reales, perfiles públicos por defecto y privacidad aplicada en la base.
+- Requiere aplicar `2026-10-24_v50_community_directory.sql` (ver `docs/DESPLIEGUE.md`).
+
 ## Novedades v49.0
 
 - Entrenamiento rediseñado: mapa muscular propio en cada ejercicio, ficha completa, tabla por serie con récords reales y plancha en segundos.

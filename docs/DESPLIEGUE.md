@@ -1,9 +1,22 @@
-# Despliegue de FittForma AI v49.0
+# Despliegue de FittForma AI v50.0
 
-Esta guía es la lista de pasos para publicar v49.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v50.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
-## Qué cambia en v49.0
+## Qué cambia en v50.0
+
+- **Archivos y cambios:**
+  - `exercise-gifs.js` y `assets/exercises/gif/` (162 GIF, unos 19 MB; se cargan solo al verlos).
+  - `activity-core.js`, `native-gps.js`, `food-db.js`, `food-core.js`, `i18n-v50.js`.
+  - `mobile/` (app Android, opcional).
+- **Migración nueva (aditiva):**
+  - `2026-10-24_v50_community_directory.sql`: perfiles públicos por defecto, directorio, datos básicos de privados
+    y lectura de la foto de perfil actual.
+- **Sin la migración v50:** la app sigue funcionando con la búsqueda de perfiles anterior y oculta el directorio.
+- **Perfiles existentes:** no cambian su privacidad; solo los nuevos empiezan públicos.
+- **App Android:** ver `docs/GPS_SEGUNDO_PLANO.md`. Compilarla requiere Android Studio y un celular para probar.
+
+## Qué cambió en v49.0
 
 - **Archivos y cambios:**
   - `anatomy.js` (mapa muscular).
@@ -50,6 +63,8 @@ un proyecto de **pruebas** y después en producción:
 6. `supabase/migrations/2026-10-22_v49_badges.sql` (insignias por carga, entrenamientos, racha y fuente «sesión»)
 7. `supabase/migrations/2026-10-23_v49_community.sql` (comunidad v49; después de aplicarla, en Supabase:
    *Settings › API › Reload schema* o `notify pgrst, 'reload schema';`)
+8. `supabase/migrations/2026-10-24_v50_community_directory.sql` (directorio y privacidad v50; después, recargar el
+   esquema igual que en el paso 7)
 
 No volver a ejecutar `schema.sql` ni `community.sql`. RLS queda activado en todas las tablas: no
 desactivarlo para resolver errores.
