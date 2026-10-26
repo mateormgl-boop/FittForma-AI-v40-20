@@ -596,11 +596,12 @@
     return r.error?r:{data:(r.data||[]).map(legacyToAthlete),error:null};
   }
   // Todos: usuarios reales, por @usuario, de a 20 (carga progresiva).
-  let peopleAfter=null,peopleTerm='',peopleBusy=false;
+  let peopleAfter=null,peopleTerm='',peopleBusy=false,peopleQueued=false;
   async function loadDirectory(reset=true){
     const root=$('communityPeople'),more=$('communityPeopleMore');if(!root)return;
     if(!client){root.innerHTML='';setStatus('communityWorldStatus',authHint());return;}
-    if(peopleBusy)return;peopleBusy=true;
+    if(peopleBusy){peopleQueued=peopleQueued||reset;return;} // una búsqueda durante una carga se hace al terminar
+    peopleBusy=true;
     if(reset){peopleAfter=null;root.innerHTML='<div class="cm-skeleton" aria-hidden="true"><i></i><i></i><i></i></div>';setStatus('communityWorldStatus','Cargando personas…');}
     try{
       const r=await peopleRpc('all',peopleTerm,peopleAfter,20);
@@ -612,7 +613,7 @@
       setStatus('communityPeopleHint',peopleTerm?`Resultados para «${peopleTerm}»`:'Usuarios reales de la app, por orden alfabético');
       setStatus('communityWorldStatus',athleteEnabled===false?'Las estadísticas de los perfiles requieren la actualización v53 de la base de datos.':user?'':'Iniciá sesión para seguir personas y ver perfiles privados que te acepten.');
       connectionStatus('Supabase responde correctamente: el directorio de Comunidad se pudo consultar.');
-    }finally{peopleBusy=false;}
+    }finally{peopleBusy=false;if(peopleQueued){peopleQueued=false;loadDirectory(true);}}
   }
   async function searchUsers(e){
     e.preventDefault();searchTerm=$('communitySearch').value.trim();
