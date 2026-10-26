@@ -107,7 +107,71 @@
     return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="${title || 'Rango ' + r.name}"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${r.glow}"/><stop offset=".55" stop-color="${r.color}"/><stop offset="1" stop-color="#0b1222"/></linearGradient></defs>${wing}<g fill="url(#${id})" stroke="${r.glow}" stroke-width="2.5" stroke-linejoin="round" style="filter:drop-shadow(0 0 6px ${r.color})">${shapes[rankIndex]}</g>${star}${crown}</svg>`;
   }
 
-  const api = { RANKS, MUSCLES, GROUP_MUSCLES, rankFor, nextStep, countedSets, compute, rankUps, emblemSvg };
+  // ---------- Rango por ejercicio: cuánto mejoraste desde tu primera vez ----------
+  // Medida: 1RM estimado (Epley) si hay carga; si no, repeticiones; en isométricos, segundos.
+  // El rango sube con la mejora sobre tu primer registro (no se compara con otras personas: no hay datos para eso).
+  const EX_STEPS = [0, 5, 10, 15, 25, 35, 50, 75, 100]; // % de mejora para cada rango (Hierro … Leyenda)
+  const num = v => { const n = Number.parseFloat(String(v ?? '').trim().replace(',', '.')); return Number.isFinite(n) && n > 0 ? n : 0; };
+  const e1rm = (w, r) => w * (1 + Math.min(r, 12) / 30);
+  function exerciseProgress(sessions, matches, timed = false) {
+    const points = []; // una medición por sesión: la mejor serie
+    const list = (Array.isArray(sessions) ? sessions : []).filter(s => s && (!s.status || s.status === 'completed' || s.status === 'partial'))
+      .slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+    for (const s of list) for (const ex of Array.isArray(s.exercises) ? s.exercises : []) {
+      if (!matches(ex?.name)) continue;
+      const entries = (Array.isArray(ex.entries) ? ex.entries : []).filter(e => e && e.done !== false && num(e.reps) > 0);
+      if (!entries.length) continue;
+      let best = null;
+      for (const e of entries) {
+        const w = num(e.weight), r = num(e.reps), value = w > 0 && !timed ? e1rm(w, r) : r;
+        if (!best || value > best.value) best = { value, weight: w, reps: r, date: s.date };
+      }
+      points.push(best);
+    }
+    if (!points.length) return null;
+    const kind = timed ? 'seconds' : points.some(p => p.weight > 0) ? 'kg' : 'reps';
+    const usable = kind === 'kg' ? points.filter(p => p.weight > 0) : points;
+    const first = usable[0], best = usable.reduce((a, p) => (p.value > a.value ? p : a), usable[0]);
+    const pct = first.value > 0 ? Math.round(((best.value - first.value) / first.value) * 1000) / 10 : 0;
+    let rank = 0; EX_STEPS.forEach((p, i) => { if (pct >= p) rank = i; });
+    let next = null;
+    if (rank < EX_STEPS.length - 1) {
+      const target = first.value * (1 + EX_STEPS[rank + 1] / 100);
+      if (kind === 'kg') { const reps = Math.max(1, Math.min(12, best.reps || 10)); next = { rank: rank + 1, weight: Math.ceil(target / (1 + reps / 30) / 0.5) * 0.5, reps }; }
+      else next = { rank: rank + 1, [kind]: Math.ceil(target) };
+    }
+    return { kind, sessions: usable.length, first, best, pct, rank, next };
+  }
+
+  // Músculos de una sesión (para el mapa de «qué trabajaste hoy»): principales y secundarios con series hechas.
+  function sessionMuscles(session, musclesOf) {
+    const prim = new Set(), sec = new Set();
+    for (const ex of Array.isArray(session?.exercises) ? session.exercises : []) {
+      if (!countedSets(ex)) continue;
+      const mm = musclesOf(ex?.name, ex?.group) || {};
+      (mm.primary || []).forEach(m => prim.add(m)); (mm.secondary || []).forEach(m => sec.add(m));
+    }
+    return { primary: [...prim], secondary: [...sec].filter(m => !prim.has(m)) };
+  }
+
+  // Volumen (kg × repeticiones de las series hechas) por semana, de lunes a domingo. weeks = cuántas semanas hacia atrás.
+  function weeklyVolume(sessions, today, weeks = 8) {
+    const d = new Date(today + 'T12:00:00Z'), dow = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - dow);
+    const starts = Array.from({ length: weeks }, (_, i) => { const x = new Date(d); x.setUTCDate(x.getUTCDate() - (weeks - 1 - i) * 7); return x.toISOString().slice(0, 10); });
+    const out = starts.map(start => ({ start, kg: 0, sets: 0 }));
+    for (const s of Array.isArray(sessions) ? sessions : []) {
+      if (!s || (s.status && s.status !== 'completed' && s.status !== 'partial')) continue;
+      const date = String(s.date || ''); let i = -1; starts.forEach((st, k) => { if (date >= st) i = k; });
+      if (i < 0) continue; const end = new Date(starts[i] + 'T12:00:00Z'); end.setUTCDate(end.getUTCDate() + 7); if (date >= end.toISOString().slice(0, 10)) continue;
+      for (const ex of Array.isArray(s.exercises) ? s.exercises : []) for (const e of Array.isArray(ex?.entries) ? ex.entries : []) {
+        if (!e || e.done === false) continue; const r = num(e.reps); if (!r) continue;
+        out[i].sets++; out[i].kg += num(e.weight) * r;
+      }
+    }
+    return out.map(w => ({ ...w, kg: Math.round(w.kg) }));
+  }
+
+  const api = { RANKS, MUSCLES, GROUP_MUSCLES, EX_STEPS, rankFor, nextStep, countedSets, compute, rankUps, emblemSvg, exerciseProgress, sessionMuscles, weeklyVolume };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaMuscleRanks = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);

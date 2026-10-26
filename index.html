@@ -2068,6 +2068,7 @@
       </div>
       <div class="progress-panel" id="progressPanelMuscles" role="tabpanel" aria-labelledby="progressTabMuscles" data-progress-panel="muscles" hidden>
         <div class="card mr-hero" id="mrHero"></div>
+        <div class="card mr-volume-card"><div class="eyebrow">Volumen por semana</div><h3>Kilos levantados</h3><p id="mrVolumeHead" class="mr-vol-head"></p><div class="mr-vol" id="mrVolume" role="img" aria-label="Kilos levantados en las últimas 8 semanas"></div><p class="muted small">Suma de peso × repeticiones de las series hechas. Los ejercicios sin carga suman series pero no kilos.</p></div>
         <div class="card mr-compare">
           <div class="section-head"><div><div class="eyebrow">Mapa de avances</div><h3>Tus músculos, rango por rango</h3></div>
             <div class="ff-chips" role="group" aria-label="Lado del cuerpo"><button type="button" class="ff-chip" data-mr-side="front" aria-pressed="true">Frente</button><button type="button" class="ff-chip" data-mr-side="back" aria-pressed="false">Espalda</button></div></div>
@@ -2400,6 +2401,7 @@
     <div id="exerciseModalImages" class="exercise-modal-images"></div>
     <div class="exercise-sheet-hero"><div class="exercise-sheet-map" id="exerciseModalMap"></div><dl class="exercise-sheet-muscles" id="exerciseModalMuscles"></dl></div>
     <div class="exercise-sheet-chips" id="exerciseModalChips"></div>
+    <section class="ex-rank" id="exerciseModalRank" aria-label="Tu rango en este ejercicio" hidden></section>
     <div class="exercise-sheet-start" id="exerciseModalStart" hidden></div>
     <section class="exercise-progression" aria-label="Ejecución paso a paso"><h3>Ejecución paso a paso</h3><div id="exerciseModalProgression" class="exercise-progression-grid"></div></section>
     <div class="exercise-sheet-columns"><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">⇄</span>Respiración</h3><p id="exerciseModalBreathing" class="muted small"></p></div><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">!</span>Errores comunes</h3><ul id="exerciseModalErrors"></ul></div><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">✓</span>Recomendaciones</h3><ul id="exerciseModalTips"></ul></div></div>
@@ -2998,6 +3000,7 @@ function findCatalogExercise(name){
     $('exerciseModalTitle').textContent=name;
     $('exerciseModalDescription').textContent=kind==='cardio'?'Actividad cardiovascular':kind==='mobility'?'Movilidad y control':'Ejercicio de fuerza y control';
     $('exerciseModalGroup').textContent=group||'';
+    {const box=$('exerciseModalRank');if(box){const html=kind==='cardio'?'':exerciseRankMarkup(name,false);box.innerHTML=html;box.hidden=!html;}}
     const inPlan=(state.plan?.days||[]).flatMap(d=>d.exercises).find(e=>normalizeExerciseName(e.name)===normalizeExerciseName(FittFormaTraining.canonicalName(name)));
     const prescription=inPlan||findExercisePrescription(FittFormaTraining.canonicalName(name)),guide=exerciseGuide(name);
     const muscles=exerciseMuscleTexts(name,group);
@@ -3549,6 +3552,7 @@ function findCatalogExercise(name){
       if(lastWorkoutSummary){
         const x=lastWorkoutSummary;
         root.innerHTML=`<div class="card workout-live-card"><div class="eyebrow">ENTRENAMIENTO GUARDADO</div><h2 style="margin:5px 0">${esc(x.title)}</h2><p class="muted small">${prettyDate(x.date)} · Sesión guardada en tu historial.</p><div class="workout-summary-grid"><div class="workout-summary-metric"><small>Tiempo total</small><strong>${formatWorkoutDuration(x.minutes*60)}</strong></div><div class="workout-summary-metric"><small>Series completadas</small><strong>${x.completedSets}/${x.totalSets}</strong></div><div class="workout-summary-metric"><small>Ejercicios con datos</small><strong>${x.completedExercises}/${x.totalExercises}</strong></div><div class="workout-summary-metric"><small>Volumen registrado</small><strong>${x.volumeKg.toLocaleString('es-UY',{maximumFractionDigits:1})} kg</strong></div></div><div class="workout-summary-check">✓ Tu sesión está guardada en este dispositivo. ${x.recordedSets>x.completedSets?`${x.recordedSets-x.completedSets} serie(s) tenían datos pero no quedaron marcadas como completadas.`:'Las series marcadas como listas quedaron registradas.'}</div><div class="btn-row" style="margin-top:14px"><button class="btn full" id="summaryGoProgress" type="button">Ver mi progreso</button><button class="btn ghost full" id="summaryGoPlan" type="button">Volver al plan</button></div></div>`;
+        {const saved=state.sessions[0];const map=saved?sessionMuscleMap(saved,'Músculos que trabajaste hoy'):'';if(map)root.querySelector('.workout-live-card')?.insertAdjacentHTML('beforeend',map);}
         root.insertAdjacentHTML('beforeend',trainLauncherMarkup());bindTrainLauncher(root);
         $('summaryGoProgress').onclick=()=>switchView('progress');$('summaryGoPlan').onclick=()=>switchView('routines');return;
       }
@@ -3563,7 +3567,7 @@ function findCatalogExercise(name){
       const measure=sessionMeasure(e),load=sessionUsesLoad(e),previous=lastLoggedExercise(e.name)?.exercise?.entries||[];
       const valueLabel=measure==='seconds'?'Seg':'Reps',valueMax=measure==='seconds'?3600:200;
       const target=`${e.entries.length} × ${esc(e.reps)}${e.targetWeight?` · ${esc(e.targetWeight)} kg`:''}`;
-      return `<div class="card workout-exercise" data-ex-card="${ei}"><div class="train-exercise-head">${exercisePhoto(e.name,e.group,true,e.kind)}<div class="wx-main"><h3>${esc(e.name)}</h3><p class="muted small">${esc(e.group)} · Objetivo: ${target}${e.rest?` · descanso ${esc(String(e.rest))} s`:''}</p><button class="btn ghost btn-sm" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${esc(state.profile.equipment)}">Ver técnica y postura</button></div><div class="wx-map" aria-hidden="true">${muscleMapMarkup(e.name,e.group,'sm')}</div></div>${lastPerformanceMarkup(e)}`+
+      return `<div class="card workout-exercise" data-ex-card="${ei}"><div class="train-exercise-head">${exercisePhoto(e.name,e.group,true,e.kind)}<div class="wx-main"><h3>${esc(e.name)}</h3>${e.kind==="cardio"?"":exerciseRankMarkup(e.name,true)}<p class="muted small">${esc(e.group)} · Objetivo: ${target}${e.rest?` · descanso ${esc(String(e.rest))} s`:''}</p><button class="btn ghost btn-sm" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${esc(state.profile.equipment)}">Ver técnica y postura</button></div><div class="wx-map" aria-hidden="true">${muscleMapMarkup(e.name,e.group,'sm')}</div></div>${lastPerformanceMarkup(e)}`+
       (e.kind==='cardio'?`<div class="field"><label>Minutos completados</label><input type="number" min="0" max="300" step="1" inputmode="numeric" data-e="${ei}" data-s="0" data-k="reps" placeholder="Ej. 10" value="${esc(e.entries[0]?.reps||'')}"></div><label class="cardio-complete"><input type="checkbox" data-done="1" data-e="${ei}" data-s="0" ${e.entries[0]?.done?'checked':''}><span>Marcar actividad como completada</span></label>`:
       `<div class="set-table ${load?'':'no-load'}"><div class="set-head" aria-hidden="true"><span>#</span><span>Anterior</span><span>${load?'Kg':measure==='seconds'?'':'Lastre'}</span><span>${valueLabel}</span><span>✓</span></div>`+
       e.entries.map((entry,si)=>{const prev=previous[si];const prevText=prev?(measure==='seconds'?(prev.reps?`${prev.reps} s`:'—'):`${prev.weight?`${prev.weight} kg × `:''}${prev.reps||'—'}`):'—';
@@ -4057,9 +4061,37 @@ function findCatalogExercise(name){
     const gm=MR.GROUP_MUSCLES[group||FittFormaTraining.libraryEntry(canon)?.group];return gm?{primary:gm[0],secondary:gm[1]}:{primary:[],secondary:[]};
   }
   const muscleRanksNow=until=>MR.compute(state.sessions,musclesOfExercise,until);
+  // v52: rango del ejercicio según tu mejora desde la primera vez + la serie que te falta para el siguiente.
+  function exerciseRankMarkup(name,compact){
+    if(!MR)return '';const key=normalizeExerciseName(FittFormaTraining.canonicalName(name));
+    const p=MR.exerciseProgress(state.sessions,n=>normalizeExerciseName(FittFormaTraining.canonicalName(n))===key,TIMED_EXERCISE_RE.test(name));if(!p)return '';
+    const r=MR.RANKS[p.rank],nx=p.next,fmt=n=>Number(n).toLocaleString(uiLocale(),{maximumFractionDigits:1});
+    const unit=p.kind==='kg'?'kg':p.kind==='seconds'?'s':'reps';
+    const target=!nx?'':p.kind==='kg'?`${fmt(nx.weight)} kg × ${nx.reps}`:p.kind==='seconds'?`${nx.seconds} s`:`${nx.reps} reps`;
+    const best=p.kind==='kg'?`${fmt(p.best.weight)} kg × ${p.best.reps}`:`${fmt(p.best.reps)} ${unit}`;
+    if(compact)return `<p class="ex-rank-line">${MR.emblemSvg(p.rank,22)}<b style="color:${r.glow}">${esc(r.name)}</b>${nx?`<span>Siguiente rango: ${esc(target)}</span>`:'<span>Rango máximo</span>'}</p>`;
+    const first=p.kind==='kg'?`${fmt(p.first.weight)} kg × ${p.first.reps}`:`${fmt(p.first.reps)} ${unit}`;
+    return `<div class="ex-rank-head"><div class="ex-rank-emblem">${MR.emblemSvg(p.rank,84)}</div><div><div class="eyebrow">Tu rango en este ejercicio</div><strong class="ex-rank-name" style="color:${r.glow}">${esc(r.name)}</strong><small class="muted">${p.pct>0?`+${fmt(p.pct)} % desde tu primera vez`:'Tu punto de partida'} · ${p.sessions} ${p.sessions===1?'sesión':'sesiones'}</small></div></div>
+      <dl class="ex-rank-dl"><div><dt>Primera vez</dt><dd>${esc(first)}</dd></div><div><dt>Mejor serie</dt><dd>${esc(best)}</dd></div><div><dt>Serie para el siguiente rango</dt><dd>${nx?`${esc(target)} <em style="color:${MR.RANKS[nx.rank].glow}">→ ${esc(MR.RANKS[nx.rank].name)}</em>`:'Rango máximo'}</dd></div></dl>
+      <div class="ex-rank-ladder" aria-hidden="true">${MR.RANKS.map((x,i)=>`<span class="${i<=p.rank?'on':''}${i===p.rank?' cur':''}" title="${esc(x.name)}">${MR.emblemSvg(i,30)}</span>`).join('')}</div>
+      <p class="muted small">El rango mide tu mejora en este ejercicio (${p.kind==='kg'?'1RM estimado':unit==='s'?'mejor tiempo':'mejores repeticiones'}) frente a tu primer registro. No te compara con otras personas.</p>`;
+  }
+  function sessionMuscleMap(session,label){
+    if(!MR||!window.FittFormaAnatomy)return '';const m=MR.sessionMuscles(session,musclesOfExercise);if(!m.primary.length)return '';
+    const names=FittFormaAnatomy.MUSCLES;
+    return `<div class="session-muscles"><div class="session-muscles-map">${FittFormaAnatomy.muscleMapSvg(m.primary,m.secondary,{size:'md',label:`${label}: ${m.primary.map(x=>names[x]).join(', ')}`})}</div><div><div class="eyebrow">Músculos que trabajaste</div><p class="small">${m.primary.map(x=>esc(names[x])).join(', ')}</p>${m.secondary.length?`<p class="muted small">También: ${m.secondary.map(x=>esc(names[x])).join(', ')}</p>`:''}</div></div>`;
+  }
+  function renderWeeklyVolume(){
+    const box=$('mrVolume');if(!box||!MR)return;const w=MR.weeklyVolume(state.sessions,dateKey(),8),max=Math.max(1,...w.map(x=>x.kg));
+    const cur=w[w.length-1],prev=w[w.length-2],pct=prev.kg>0?Math.round((cur.kg-prev.kg)/prev.kg*100):null;
+    const fmt=n=>n>=1000?`${(n/1000).toLocaleString(uiLocale(),{maximumFractionDigits:1})} mil kg`:`${n} kg`;
+    $('mrVolumeHead').innerHTML=`<strong>${fmt(cur.kg)}</strong> <small class="muted">esta semana</small>${pct!==null?` <span class="mr-delta ${pct>=0?'up':'down'}">${pct>=0?'+':''}${pct} %</span>`:''}`;
+    box.innerHTML=w.map((x,i)=>`<div class="mr-vol-col ${i===w.length-1?'cur':''}" title="Semana del ${prettyDate(x.start)} · ${fmt(x.kg)} · ${x.sets} series"><span class="mr-vol-bar"><i style="height:${Math.round(x.kg/max*100)}%"></i></span><small>${new Date(x.start+'T12:00:00').toLocaleDateString(uiLocale(),{day:'numeric',month:'short'})}</small></div>`).join('');
+  }
   function rankColorFills(r){return Object.fromEntries(r.muscles.filter(m=>m.rank>=0).map(m=>[m.id,MR.RANKS[m.rank].color]));}
   function renderMuscleRanks(){
     if(!MR||!$('mrHero'))return;
+    renderWeeklyVolume();
     const now=muscleRanksNow(),d=new Date();d.setDate(d.getDate()-30);const before=muscleRanksNow(dateKey(d));
     const names=FittFormaAnatomy.MUSCLES,ov=now.overall,ovR=MR.RANKS[ov],step=MR.nextStep(now.median);
     $('mrHero').innerHTML=`<div class="mr-hero-row"><div class="mr-emblem">${MR.emblemSvg(ov,112)}</div><div class="mr-hero-copy"><div class="eyebrow">Rango general</div><strong class="mr-rank-name" style="color:${ovR?.glow||'var(--text-2)'}">${ovR?esc(ovR.name):'Sin rango todavía'}</strong>${step.next?`<div class="mr-bar"><span style="width:${Math.round(step.pct*100)}%;background:${step.next.color}"></span></div><small class="muted">Próximo: ${esc(step.next.name)} · el músculo del medio necesita ${String(step.missing).replace('.',',')} series más</small>`:'<small class="muted">Llegaste al rango máximo.</small>'}</div></div>
@@ -4110,7 +4142,7 @@ function findCatalogExercise(name){
     const physical=state.profile||{},currentKg=Number(physical.currentWeightKg),targetKg=Number(physical.targetWeightKg);
     const weightGoalHtml=Number.isFinite(currentKg)&&currentKg>0&&Number.isFinite(targetKg)&&targetKg>0?`<div class="notice"><strong>Tu objetivo de peso:</strong> ${currentKg.toFixed(1)} kg actuales → ${targetKg.toFixed(1)} kg objetivo. ${Math.abs(targetKg-currentKg)<0.1?'Estás en el peso que definiste como meta.':`Diferencia: ${Math.abs(targetKg-currentKg).toFixed(1)} kg ${targetKg>currentKg?'por ganar para la meta':'por bajar para la meta'}.`} El peso diario puede fluctuar; mirá la tendencia a lo largo de las semanas.</div>`:'';
     $('progressSummary').innerHTML=`<div class="stats" style="margin:12px 0 0"><div class="stat"><strong>${total}</strong><small>Rutinas completadas</small></div><div class="stat"><strong>${activeDays}</strong><small>Días activos</small></div><div class="stat"><strong>${totalSets}</strong><small>Registros de series</small></div></div>${weightGoalHtml}<p class="muted small">Tiempo total registrado: ${mins} minutos entre rutinas y actividades al aire libre. El tiempo de las rutinas se estima desde que abriste la sesión hasta que la guardaste.</p>`;
-    $('historyList').innerHTML=state.sessions.length?state.sessions.slice(0,30).map(s=>`<div class="history-item"><div><strong>${esc(s.title)}</strong>${sessionTypeTag(s)}<small>${prettyDate(s.date)} · ${Array.isArray(s.exercises)?s.exercises.length:0} ejercicios · ${Number(s.minutes)||0} min</small>${s.notes?`<div class="muted small">${esc(s.notes)}</div>`:''}${s.editedAt?'<div class="muted small">Editada</div>':''}</div><div class="history-actions"><span class="tag">${setsOf(s)} series</span><button class="btn ghost btn-sm" type="button" data-session-edit="${esc(String(s.id))}">Editar</button><button class="btn ghost btn-sm" type="button" data-session-delete="${esc(String(s.id))}">Eliminar</button></div></div>`).join(''):'<div class="empty"><strong>Todavía no hay sesiones</strong><p>Cuando guardes tu primer entrenamiento, aparecerá acá.</p><button class="btn" type="button" data-goto-view="train">Empezar un entrenamiento</button></div>';
+    $('historyList').innerHTML=state.sessions.length?state.sessions.slice(0,30).map(s=>`<div class="history-item"><div><strong>${esc(s.title)}</strong>${sessionTypeTag(s)}<small>${prettyDate(s.date)} · ${Array.isArray(s.exercises)?s.exercises.length:0} ejercicios · ${Number(s.minutes)||0} min</small>${s.notes?`<div class="muted small">${esc(s.notes)}</div>`:''}${s.editedAt?'<div class="muted small">Editada</div>':''}${(()=>{if(!MR)return '';const m=MR.sessionMuscles(s,musclesOfExercise);return m.primary.length?`<div class="muted small history-muscles">${m.primary.map(x=>esc(FittFormaAnatomy.MUSCLES[x])).join(' · ')}</div>`:''})()}</div><div class="history-actions"><span class="tag">${setsOf(s)} series</span><button class="btn ghost btn-sm" type="button" data-session-edit="${esc(String(s.id))}">Editar</button><button class="btn ghost btn-sm" type="button" data-session-delete="${esc(String(s.id))}">Eliminar</button></div></div>`).join(''):'<div class="empty"><strong>Todavía no hay sesiones</strong><p>Cuando guardes tu primer entrenamiento, aparecerá acá.</p><button class="btn" type="button" data-goto-view="train">Empezar un entrenamiento</button></div>';
     renderActivityPeriod();renderProgressTiles();
     renderConsistencyChallenges();
     renderTrainingInsights();

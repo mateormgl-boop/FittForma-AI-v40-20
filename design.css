@@ -956,3 +956,37 @@ body{font-feature-settings:"cv11","ss01"}
 /* v52: Progreso tiene 5 pestañas; se reparten el ancho para que entren todas en el celular. */
 #view-progress .progress-subnav{display:grid!important;grid-template-columns:repeat(5,auto);justify-content:space-between;gap:0;overflow:visible;padding-inline:4px!important}
 #view-progress .progress-subnav .ff-seg{min-width:0;padding-inline:clamp(4px,1.4vw,14px)!important;font-size:clamp(11px,3.05vw,15px)!important;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;justify-content:center;text-align:center}
+/* v52: rango por ejercicio, músculos de la sesión y volumen semanal */
+.ex-rank{margin:12px 0;padding:14px;border-radius:18px;background:radial-gradient(circle at 12% 20%,rgba(95,184,255,.16),transparent 55%),#070c18;border:1px solid rgba(95,184,255,.3);color:#eaf2ff}
+.ex-rank-head{display:flex;gap:12px;align-items:center}
+.ex-rank-emblem{flex:none;width:84px;height:84px}
+.ex-rank-name{display:block;font-size:28px;font-weight:900;letter-spacing:-.02em;line-height:1.05}
+.ex-rank .eyebrow{color:#8fd3ff}
+.ex-rank .muted{color:#9fb0d0}
+.ex-rank-dl{display:grid;grid-template-columns:1fr;gap:6px;margin:12px 0 8px}
+.ex-rank-dl div{display:flex;justify-content:space-between;gap:10px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.04)}
+.ex-rank-dl dt{font-size:13px;color:#9fb0d0}
+.ex-rank-dl dd{margin:0;font-weight:800;font-size:14px;text-align:right}
+.ex-rank-dl em{font-style:normal;font-weight:900}
+.ex-rank-ladder{display:flex;justify-content:space-between;gap:2px;margin:6px 0}
+.ex-rank-ladder span{opacity:.3;filter:grayscale(.7)}
+.ex-rank-ladder span.on{opacity:1;filter:none}
+.ex-rank-ladder span.cur{transform:scale(1.25)}
+.ex-rank-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:2px 0 4px;font-size:12.5px}
+.ex-rank-line b{font-weight:900}
+.ex-rank-line span{color:var(--text-2)}
+.session-muscles{display:flex;gap:12px;align-items:center;margin-top:12px;padding:10px;border-radius:14px;background:rgb(var(--surface2-rgb)/.6);border:1px solid var(--ff-border)}
+.session-muscles-map{flex:none;width:120px}
+.session-muscles p{margin:3px 0 0}
+.history-muscles{margin-top:2px}
+.mr-vol-head{margin:2px 0 8px;display:flex;align-items:baseline;gap:6px}
+.mr-vol-head strong{font-size:24px;font-weight:900}
+.mr-delta{font-size:12.5px;font-weight:800;padding:2px 8px;border-radius:999px}
+.mr-delta.up{color:#5ee6b0;background:rgba(34,201,147,.14)}
+.mr-delta.down{color:#ff9d97;background:rgba(255,107,107,.14)}
+.mr-vol{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;align-items:end}
+.mr-vol-col{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.mr-vol-bar{display:flex;align-items:flex-end;width:100%;max-width:26px;height:110px;border-radius:8px;background:rgb(var(--surface2-rgb)/1);overflow:hidden}
+.mr-vol-bar i{display:block;width:100%;border-radius:8px 8px 0 0;background:linear-gradient(180deg,#5fb8ff,#1f6fe0)}
+.mr-vol-col.cur .mr-vol-bar i{background:linear-gradient(180deg,#8bdcff,#2f7bff);box-shadow:0 0 14px rgba(95,184,255,.5)}
+.mr-vol-col small{font-size:10px;color:var(--text-3);white-space:nowrap}

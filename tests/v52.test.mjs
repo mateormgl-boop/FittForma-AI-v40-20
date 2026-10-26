@@ -59,3 +59,39 @@ test('Progreso › Músculos integrado, cargado por la app, en el servidor y en 
   assert.match(readFileSync('backend/server.mjs', 'utf8'), /'\/muscle-ranks\.js'/);
   assert.match(readFileSync('sw.js', 'utf8'), /\.\/muscle-ranks\.js/);
 });
+
+test('rango por ejercicio: mejora desde la primera vez y serie para el siguiente rango', () => {
+  const s = (date, w, r) => ({ date, status: 'completed', exercises: [{ name: 'Press de banca con barra', entries: [{ weight: String(w), reps: String(r), done: true }, { weight: '', reps: '', done: false }] }] });
+  const is = n => n === 'Press de banca con barra';
+  const p = R.exerciseProgress([s('2026-10-10', 60, 8), s('2026-09-01', 50, 10), s('2026-10-20', 55, 10)], is);
+  assert.equal(p.kind, 'kg'); assert.equal(p.sessions, 3);
+  assert.equal(p.first.weight, 50, 'la primera vez es la más antigua por fecha');
+  assert.equal(p.best.weight, 60); assert.equal(p.pct, 14, 'Epley: 50×10 ≈ 66,7 y 60×8 = 76 → +14 %');
+  assert.equal(p.rank, 2, '+14 % → Plata');
+  assert.deepEqual({ ...p.next }, { rank: 3, weight: 61, reps: 8 }, 'Oro pide +15 % (76,7 de 1RM): 61 kg × 8');
+  const bw = R.exerciseProgress([{ date: '2026-01-01', exercises: [{ name: 'Flexiones', entries: [{ reps: '10', done: true }] }] }, { date: '2026-02-01', exercises: [{ name: 'Flexiones', entries: [{ reps: '20', done: true }] }] }], n => n === 'Flexiones');
+  assert.equal(bw.kind, 'reps'); assert.equal(bw.pct, 100); assert.equal(bw.rank, 8); assert.equal(bw.next, null);
+  assert.equal(R.exerciseProgress([], is), null);
+});
+
+test('músculos de la sesión y volumen semanal', () => {
+  const of = n => ({ Sentadilla: { primary: ['cuadriceps', 'gluteos'], secondary: ['aductores', 'gluteos'] }, Curl: { primary: ['biceps'], secondary: [] } }[n] || {});
+  const m = R.sessionMuscles({ exercises: [{ name: 'Sentadilla', entries: [{ reps: '8', done: true }] }, { name: 'Curl', entries: [{ reps: '8', done: false }] }] }, of);
+  assert.deepEqual([...m.primary], ['cuadriceps', 'gluteos']); assert.deepEqual([...m.secondary], ['aductores']);
+  const w = R.weeklyVolume([
+    { date: '2026-10-26', exercises: [{ entries: [{ weight: '50', reps: '10', done: true }, { weight: '50', reps: '10', done: false }] }] },
+    { date: '2026-10-25', exercises: [{ entries: [{ weight: '20', reps: '10' }] }] },
+    { date: '2026-08-01', exercises: [{ entries: [{ weight: '99', reps: '9' }] }] },
+  ], '2026-10-26', 8);
+  assert.equal(w.length, 8); assert.equal(w[7].start, '2026-10-26', 'semana de lunes a domingo');
+  assert.equal(w[7].kg, 500); assert.equal(w[7].sets, 1); assert.equal(w[6].kg, 200);
+  assert.equal(w.reduce((a, x) => a + x.kg, 0), 700, 'lo de hace más de 8 semanas no cuenta');
+});
+
+test('la ficha, la sesión en curso, el resumen y el historial muestran lo nuevo', () => {
+  assert.match(html, /id="exerciseModalRank"/);
+  assert.match(html, /exerciseRankMarkup\(e\.name,true\)/);
+  assert.match(html, /sessionMuscleMap\(saved,'Músculos que trabajaste hoy'\)/);
+  assert.match(html, /history-muscles/);
+  assert.match(html, /id="mrVolume"/);
+});
