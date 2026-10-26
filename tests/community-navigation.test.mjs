@@ -6,38 +6,41 @@ import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=file=>readFile(path.join(root,file),'utf8');
 
-test('v41.0 usa claves foráneas explícitas para evitar el error PGRST201 en feed y comentarios',async()=>{
+test('v53 evita el error PGRST201: publicaciones sin embed ambiguo, solicitudes por función y recuperación en comentarios',async()=>{
  const js=await read('community.js');
- assert.match(js,/community_profiles!community_posts_user_id_fkey!inner\(/);
+ assert.doesNotMatch(js,/community_profiles!community_posts_user_id_fkey/,'las publicaciones ya no usan el embed posts → perfiles');
+ assert.match(js,/async function withAuthors\(posts\)/);
+ assert.match(js,/client\.rpc\('community_follow_requests'\)/);
  assert.match(js,/community_profiles!community_comments_user_id_fkey\(/);
- assert.match(js,/PGRST201|community_posts_user_id_fkey/);
+ assert.match(js,/error\.code==='PGRST201'\|\|results\[1\]\.error\.code==='PGRST200'/);
 });
 
-test('Comunidad v41.0 separa Feed, Explorar, Publicar, Mensajes y Mi perfil en paneles internos',async()=>{
+test('Comunidad v53: Todo el mundo, Ranking y Amigos como pestañas; Mensajes y Mi perfil en la cabecera; sin feed',async()=>{
  const html=await read('index.html'),js=await read('community.js');
- for(const name of ['feed','explore','publish','messages','profile']){
+ for(const name of ['world','ranking','friends','messages','profile']){
   assert.match(html,new RegExp(`data-community-tab="${name}"`));
   assert.match(html,new RegExp(`data-community-panel="${name}"`));
  }
- assert.match(html,/id="communitySearchPosts"/);
- assert.match(html,/class="community-subnav"/);
+ for(const name of ['publish','user','compare'])assert.match(html,new RegExp(`data-community-panel="${name}"`));
+ for(const old of ['data-community-panel="feed"','data-community-panel="explore"','id="communityFeed"','data-feed-mode','Para vos'])assert.ok(!html.includes(old),`sin feed: ${old}`);
+ assert.match(html,/class="community-subnav cm-tabs" role="tablist"/);
  assert.match(html,/\.community-subpanel\[hidden\]\{display:none!important\}/);
  assert.match(js,/function showCommunitySubView/);
  assert.match(js,/ArrowLeft.*ArrowRight.*Home.*End/);
 });
 
-test('feed search results render inside Explore and clearing the query does not hide the main feed permanently',async()=>{
+test('la búsqueda de Todo el mundo busca personas y limpiarla vuelve al directorio',async()=>{
  const js=await read('community.js');
- assert.match(js,/searchTerm&&\$\('communitySearchPosts'\)\?\$\('communitySearchPosts'\):\$\('communityFeed'\)/);
- assert.match(js,/communityClearSearch/);
- assert.match(js,/searchTerm='';if\(\$\('communitySearch'\)\)/);
+ assert.match(js,/peopleTerm=searchTerm\.replace\(\/\^\[@#\]\/,''\)/);
+ assert.match(js,/\$\('communityClearSearch'\)\?\.addEventListener\('click',clearSearch\)/);
+ assert.match(js,/function clearSearch\(\)\{searchTerm='';peopleTerm='';\$\('communitySearch'\)\.value='';loadDirectory\(true\);\}/);
 });
 
 test('version, backend and service-worker cache match v41.0',async()=>{
  const a=JSON.parse(await read('package.json')),b=JSON.parse(await read('backend/package.json'));
- assert.equal(a.version,'0.52.0');assert.equal(b.version,'0.52.0');
+ assert.equal(a.version,'0.53.0');assert.equal(b.version,'0.53.0');
  const server=await read('backend/server.mjs'),html=await read('index.html'),sw=await read('sw.js');
- assert.match(server,/0\.52\.0/);assert.match(html,/Versión 52\.0/);assert.match(sw,/fittforma-ai-static-v52-0/);
+ assert.match(server,/0\.53\.0/);assert.match(html,/Versión 53\.0/);assert.match(sw,/fittforma-ai-static-v53-0/);
 });
 
 test('la navegación y los títulos principales de Comunidad están traducidos en los seis idiomas',async()=>{

@@ -1,4 +1,4 @@
-// E2E v52: ranking de rangos con amigos. Navegador real + supabase-js real + PostgREST real sobre PostgreSQL local.
+// E2E v52/v53: ranking de rangos con amigos en Progreso › Músculos (desde v53 usa las estadísticas de Comunidad). Navegador real + supabase-js real + PostgREST real sobre PostgreSQL local.
 // Reutiliza la preparación de community.e2e.mjs (misma sesión simulada y mismas variables de entorno).
 // Solo /auth/v1 y /storage/v1 se simulan en el navegador (sus permisos los cubre supabase/tests/run.sh).
 // Preparación y variables: ver docs/PRUEBAS.md. NO apuntar nunca a un proyecto real.
@@ -86,30 +86,32 @@ await page.route(`${SUPA}/storage/v1/**`, async route => {
 
 
 const step = (name, ok, detail = '') => { console.log(`${ok ? 'PASA' : 'FALLA'}  ${name}${detail ? ' — ' + detail : ''}`); if (!ok) process.exitCode = 1; };
-sql(`delete from community_rank_shares`);
-// Bruno (a quien Alicia sigue, aceptado) comparte Plata; Alicia todavía no comparte.
-sql(`insert into community_rank_shares(user_id,overall_rank,median_sets,balance,ranked_muscles) values('bbbbbbbb-0000-0000-0000-000000000002',2,30,70,20)`);
+const A = 'aaaaaaaa-0000-0000-0000-000000000001', B = 'bbbbbbbb-0000-0000-0000-000000000002';
+// v53: Bruno (a quien Alicia sigue, aceptado) muestra sus estadísticas con rango Plata. Alicia todavía no publicó nada.
+sql(`delete from community_athlete_stats`);
+sql(`insert into community_athlete_stats(user_id,overall_rank,ranked_muscles) values('${B}',2,20)`);
+sql(`insert into community_follows(follower_id,following_id,status) values('${A}','${B}','accepted') on conflict do nothing`);
 await page.goto(APP + '/'); await page.waitForTimeout(800);
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(600);
 await page.click('#communityTabProfile');
 await page.fill('#communityEmail', 'alice@example.test'); await page.fill('#communityPassword', 'clave-segura-123');
 await page.click('#communityEmailLogin'); await page.waitForTimeout(1500);
-const openMuscles = async () => { await page.evaluate(() => document.querySelector('[data-view="progress"]').click()); await page.waitForTimeout(300); await page.evaluate(() => document.querySelector('[data-progress-tab="muscles"]').click()); await page.waitForTimeout(1500); };
+const openMuscles = async () => { await page.evaluate(() => document.querySelector('[data-view="progress"]').click()); await page.waitForTimeout(300); await page.evaluate(() => document.querySelector('[data-progress-tab="muscles"]').click()); await page.waitForTimeout(1800); };
 await openMuscles();
-step('Compartir está apagado por defecto', !(await page.isChecked('#rkShareToggle')));
 let names = await page.$$eval('#rkBoard .rk-who strong', l => l.map(x => x.textContent));
-step('Sin compartir, igual ve a quien sigue y comparte', names.includes('Bruno Fit') && !names.includes('Vos'), names.join(','));
-step('No se guardó nada de Alicia sin su permiso', sql(`select count(*) from community_rank_shares where user_id='aaaaaaaa-0000-0000-0000-000000000001'`) === '0');
+step('Ve a quien sigue y muestra sus estadísticas', names.includes('Bruno Fit'), names.join(','));
+step('Sin ver el aviso de Comunidad no se publicó nada de Alicia', sql(`select count(*) from community_athlete_stats where user_id='${A}'`) === '0' && !names.includes('Vos'));
+step('La casilla arranca activada (públicas por defecto)', await page.isChecked('#rkShareToggle'));
+await page.uncheck('#rkShareToggle'); await page.waitForTimeout(1500);
+step('Al desactivar, la preferencia queda oculta en la base', sql(`select stats_public from community_athlete_stats where user_id='${A}'`) === 'f');
 await page.check('#rkShareToggle'); await page.waitForTimeout(1800);
-step('Al activar, se guarda solo el rango general', sql(`select overall_rank from community_rank_shares where user_id='aaaaaaaa-0000-0000-0000-000000000001'`) !== '');
+step('Al activar, se publica el rango general calculado por la app', sql(`select stats_public||'|'||(overall_rank>=0) from community_athlete_stats where user_id='${A}'`) === 'true|true');
 names = await page.$$eval('#rkBoard .rk-who strong', l => l.map(x => x.textContent));
 step('Aparece «Vos» en el ranking', names.includes('Vos') && names.includes('Bruno Fit'), names.join(','));
 if (process.env.SHOT) await (await page.$('#rkBoardCard')).screenshot({ path: process.env.SHOT });
 step('El primer puesto se destaca', await page.$('#rkBoard .rk-row.is-first') !== null);
-await page.uncheck('#rkShareToggle'); await page.waitForTimeout(1500);
-step('Al desactivar, se borra lo compartido', sql(`select count(*) from community_rank_shares where user_id='aaaaaaaa-0000-0000-0000-000000000001'`) === '0');
-names = await page.$$eval('#rkBoard .rk-who strong', l => l.map(x => x.textContent));
-step('Y deja de aparecer', !names.includes('Vos'), names.join(','));
+await page.click('#rkBoard [data-rk-user="' + B + '"]'); await page.waitForTimeout(1500);
+step('Tocar una fila abre el perfil completo en Comunidad', /Bruno Fit/.test(await page.textContent('#communityUserProfile')) && await page.isVisible('#communityPanelUser'));
 step('Sin errores de página', errors.length === 0, errors.join(' | '));
-sql(`delete from community_rank_shares`);
+sql(`delete from community_athlete_stats`);
 await browser.close();

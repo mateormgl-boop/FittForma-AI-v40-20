@@ -208,7 +208,8 @@ test('comunidad: perfiles públicos por defecto, directorio y privacidad tambié
   assert.match(mig, /function public\.community_profile_basic\(/);
   assert.match(mig, /community_media_read_avatar_basic/);
   assert.doesNotMatch(mig, /disable row level security|drop table|delete from/i, 'migración aditiva, sin desactivar RLS');
-  assert.match(js, /client\.rpc\('community_directory',\{p_search:peopleTerm,p_after:peopleAfter,p_limit:20\}\)/, 'carga progresiva');
+  assert.match(js, /peopleRpc\('all',peopleTerm,peopleAfter,20\)/, 'carga progresiva');
+  assert.match(js, /client\.rpc\('community_directory',\{p_search:term,p_after:after,p_limit:limit\}\)/, 'directorio v50 si falta la migración v53');
   assert.match(js, /Este perfil es privado/);
   assert.match(js, /async function removeAvatar\(\)/);
   assert.match(html, /id="communityAvatarRemove"/);

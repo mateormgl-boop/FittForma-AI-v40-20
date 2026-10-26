@@ -2068,8 +2068,8 @@
       </div>
       <div class="progress-panel" id="progressPanelMuscles" role="tabpanel" aria-labelledby="progressTabMuscles" data-progress-panel="muscles" hidden>
         <div class="card mr-hero" id="mrHero"></div>
-        <div class="card rk-board-card" id="rkBoardCard"><div class="rk-board-top"><div class="rk-laurel" aria-hidden="true"><svg viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="#ffd66b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 38c-6-3-10-9-10-16 0-3 1-6 2-8"/><path d="M31 38c6-3 10-9 10-16 0-3-1-6-2-8"/><path d="M9 20c3 0 5 2 5 5M8 27c3-1 6 1 7 3M12 33c3-1 6 0 7 2M39 20c-3 0-5 2-5 5M40 27c-3-1-6 1-7 3M36 33c-3-1-6 0-7 2"/><path d="M18 14l3 3 3-6 3 6 3-3-1 8H19z" fill="#ffd66b"/></svg></div><div><div class="eyebrow">Ranking</div><h3>Competí con tus amigos</h3><p class="muted small">Compará tu rango general con las personas que seguís. Compartir el tuyo es opcional: solo se comparte el rango (no tu peso ni tus entrenamientos) y solo lo ven quienes te siguen con tu aprobación.</p></div></div>
-          <label class="rk-share"><input type="checkbox" id="rkShareToggle"> <span>Compartir mi rango con quienes me siguen</span></label>
+        <div class="card rk-board-card" id="rkBoardCard"><div class="rk-board-top"><div class="rk-laurel" aria-hidden="true"><svg viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="#ffd66b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 38c-6-3-10-9-10-16 0-3 1-6 2-8"/><path d="M31 38c6-3 10-9 10-16 0-3-1-6-2-8"/><path d="M9 20c3 0 5 2 5 5M8 27c3-1 6 1 7 3M12 33c3-1 6 0 7 2M39 20c-3 0-5 2-5 5M40 27c-3-1-6 1-7 3M36 33c-3-1-6 0-7 2"/><path d="M18 14l3 3 3-6 3 6 3-3-1 8H19z" fill="#ffd66b"/></svg></div><div><div class="eyebrow">Ranking</div><h3>Competí con tus amigos</h3><p class="muted small">Compará tu rango general con las personas que seguís. Sale de las estadísticas de tu perfil de Comunidad: solo datos de entrenamiento (nunca tu peso ni tus medidas), visibles para quien puede ver tu perfil. Podés ocultarlas.</p></div></div>
+          <label class="rk-share"><input type="checkbox" id="rkShareToggle"> <span>Mostrar mis estadísticas en Comunidad</span></label>
           <ol class="rk-board" id="rkBoard" aria-live="polite"></ol>
           <p class="muted small" id="rkBoardStatus"></p>
           <button type="button" class="btn secondary btn-sm" id="rkFindFriends">Buscar amigos</button></div>
@@ -2087,51 +2087,63 @@
     </section>
 
     <section class="view" id="view-community">
-      <!-- v49: barra propia de Comunidad dentro del contenido. La barra inferior principal de la app no cambia. -->
-      <header class="community-topbar">
-        <button class="community-brand" type="button" data-community-home aria-label="Ir al inicio de Comunidad"><h2>Comunidad</h2></button>
-        <nav class="community-subnav" role="tablist" aria-label="Secciones de Comunidad">
-          <button class="community-subtab is-active" id="communityTabFeed" type="button" role="tab" data-community-tab="feed" aria-controls="communityPanelFeed" aria-selected="true" title="Inicio"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5V20h-5v-5h-6v5H4z"/></svg></span><span class="community-subtab-label">Feed</span></button>
-          <button class="community-subtab" id="communityTabExplore" type="button" role="tab" data-community-tab="explore" aria-controls="communityPanelExplore" aria-selected="false" tabindex="-1" title="Explorar"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.2 4.2"/></svg></span><span class="community-subtab-label">Explorar</span></button>
-          <button class="community-subtab community-subtab-create" id="communityTabPublish" type="button" role="tab" data-community-tab="publish" aria-controls="communityPanelPublish" aria-selected="false" tabindex="-1" title="Crear publicación"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><span class="community-subtab-label">Publicar</span></button>
-          <button class="community-subtab" id="communityTabMessages" type="button" role="tab" data-community-tab="messages" aria-controls="communityPanelMessages" aria-selected="false" tabindex="-1" title="Mensajes"><span class="community-subtab-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5h16v11H10l-5 3v-3H4z"/></svg></span><span class="community-subtab-label">Mensajes</span><span class="community-unread" id="communityUnreadBadge" hidden></span></button>
-          <button class="community-subtab" id="communityTabProfile" type="button" role="tab" data-community-tab="profile" aria-controls="communityPanelProfile" aria-selected="false" tabindex="-1" title="Mi perfil social"><span class="community-subtab-icon community-subtab-avatar" id="communityTabAvatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.8 20c.7-3.4 3.3-5.2 7.2-5.2s6.5 1.8 7.2 5.2"/></svg></span><span class="community-subtab-label">Mi perfil</span></button>
+      <!-- v53: Comunidad de deportistas. Tres apartados (Todo el mundo, Ranking, Amigos); sin feed general.
+           Mensajes y Mi perfil quedan como accesos en la cabecera. La barra inferior principal de la app no cambia. -->
+      <header class="community-topbar cm-topbar">
+        <div class="cm-head">
+          <button class="community-brand" type="button" data-community-home aria-label="Ir al inicio de Comunidad"><h2>Comunidad</h2></button>
+          <div class="cm-head-actions">
+            <button class="community-icon-btn cm-head-btn" id="communityTabMessages" type="button" data-community-tab="messages" aria-controls="communityPanelMessages" aria-pressed="false" aria-label="Mensajes" title="Mensajes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v11H10l-5 3v-3H4z"/></svg><span class="community-unread" id="communityUnreadBadge" hidden></span></button>
+            <button class="community-icon-btn cm-head-btn cm-head-avatar" id="communityTabProfile" type="button" data-community-tab="profile" aria-controls="communityPanelProfile" aria-pressed="false" aria-label="Mi perfil" title="Mi perfil"><span class="community-subtab-avatar" id="communityTabAvatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.8 20c.7-3.4 3.3-5.2 7.2-5.2s6.5 1.8 7.2 5.2"/></svg></span></button>
+          </div>
+        </div>
+        <nav class="community-subnav cm-tabs" role="tablist" aria-label="Secciones de Comunidad">
+          <button class="community-subtab is-active" id="communityTabWorld" type="button" role="tab" data-community-tab="world" aria-controls="communityPanelWorld" aria-selected="true">Todo el mundo</button>
+          <button class="community-subtab" id="communityTabRanking" type="button" role="tab" data-community-tab="ranking" aria-controls="communityPanelRanking" aria-selected="false" tabindex="-1">Ranking</button>
+          <button class="community-subtab" id="communityTabFriends" type="button" role="tab" data-community-tab="friends" aria-controls="communityPanelFriends" aria-selected="false" tabindex="-1">Amigos</button>
         </nav>
       </header>
       <div class="community-connection-row"><div id="communityConnectionStatus" class="community-status community-global-status" role="status" aria-live="polite">Preparando comunidad…</div><button class="btn ghost btn-sm" id="communityRetryConnection" type="button">Comprobar conexión</button></div>
+      <div class="cm-notice" id="communityStatsNotice" role="note" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.9 7.5-9.5V6z"/></svg><div><strong>Tus estadísticas de entrenamiento se ven en tu perfil</strong><p class="small">Nivel, rango, insignias, constancia, running y mejores series. Nunca tu peso, altura, medidas ni fotos de progreso.</p><div class="btn-row"><button class="btn btn-sm" type="button" id="communityStatsNoticeOk">Entendido</button><button class="btn ghost btn-sm" type="button" id="communityStatsNoticeHide">Ocultar mis estadísticas</button></div></div></div>
 
-      <section id="communityPanelFeed" class="community-subpanel is-active" data-community-panel="feed" role="tabpanel" aria-labelledby="communityTabFeed">
-        <div class="community-stories" id="communityStories" aria-label="Novedades de personas que seguís"></div>
-        <div class="community-feed-tabs" role="group" aria-label="Qué mostrar en el feed"><button type="button" class="community-feed-tab is-active" data-feed-mode="activity" aria-pressed="true">Para vos</button><button type="button" class="community-feed-tab" data-feed-mode="following" aria-pressed="false">Siguiendo</button><button type="button" class="community-feed-tab" data-feed-mode="recent" aria-pressed="false">Recientes</button><button class="community-icon-btn" id="communityRefresh" type="button" aria-label="Actualizar feed" title="Actualizar feed"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button></div>
-        <div id="communityFeedStatus" class="community-status" role="status" aria-live="polite">Preparando comunidad…</div>
+      <section id="communityPanelWorld" class="community-subpanel is-active" data-community-panel="world" role="tabpanel" aria-labelledby="communityTabWorld">
+        <form id="communitySearchForm" class="community-search-bar cm-search" role="search"><label class="sr-only" for="communitySearch">Buscar personas por nombre o @usuario</label><span class="community-search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.2 4.2"/></svg></span><input id="communitySearch" maxlength="40" placeholder="Buscar personas por nombre o @usuario" autocomplete="off" enterkeyhint="search"><button class="btn" type="submit">Buscar</button><button class="btn ghost" id="communityClearSearch" type="button" aria-label="Limpiar búsqueda">×</button></form>
+        <div class="community-section-head"><h4 id="communityPeopleTitle">Deportistas en FittForma</h4><small class="muted" id="communityPeopleHint">Usuarios reales de la app</small></div>
+        <div id="communityWorldStatus" class="community-status" role="status" aria-live="polite"></div>
+        <div id="communityPeople" class="cm-people" aria-labelledby="communityPeopleTitle"></div>
+        <button class="btn ghost full" type="button" id="communityPeopleMore" hidden>Ver más personas</button>
         <aside class="ad-slot ad-slot-inline" id="adSlotCommunity" aria-label="Publicidad"><span class="ad-slot-label">Publicidad</span><div class="ad-slot-content" id="adContentCommunity"></div></aside>
-        <div id="communityFeed" class="community-feed"><div class="empty"><strong>Tu comunidad empieza acá</strong><p>Explorá perfiles o compartí tu primera publicación.</p></div></div>
-        <button class="btn ghost full" id="communityLoadMore" type="button" hidden>Cargar más publicaciones</button>
       </section>
 
-      <section id="communityPanelExplore" class="community-subpanel" data-community-panel="explore" role="tabpanel" aria-labelledby="communityTabExplore" hidden>
-        <h3 class="community-panel-title">Explorar</h3>
-        <form id="communitySearchForm" class="community-search-bar" role="search"><label class="sr-only" for="communitySearch">Buscar usuarios, publicaciones o #hashtags</label><span class="community-search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.2 4.2"/></svg></span><input id="communitySearch" maxlength="40" placeholder="Buscar usuarios, publicaciones o #hashtags" autocomplete="off" enterkeyhint="search"><button class="btn" type="submit">Buscar</button><button class="btn ghost" id="communityClearSearch" type="button" aria-label="Limpiar búsqueda">×</button></form>
-        <div class="community-chips" role="group" aria-label="Filtrar publicaciones"><button type="button" class="community-chip is-active" data-explore-filter="all" aria-pressed="true">Todos</button><button type="button" class="community-chip" data-explore-filter="photos" aria-pressed="false">Fotos</button><button type="button" class="community-chip" data-explore-filter="transformation" aria-pressed="false">Transformaciones</button><button type="button" class="community-chip" data-explore-filter="achievement" aria-pressed="false">Logros</button><button type="button" class="community-chip" data-explore-filter="workout" aria-pressed="false">Entrenamientos</button></div>
-        <div id="communityExploreStatus" class="community-status" role="status" aria-live="polite">Buscá personas por nombre o @usuario, o publicaciones por #hashtag.</div>
-        <section class="community-people-wrap" aria-labelledby="communityPeopleTitle"><div class="community-section-head"><h4 id="communityPeopleTitle">Personas en FittForma</h4><small class="muted" id="communityPeopleHint">Usuarios reales de la app</small></div><div id="communityPeople" class="community-people-list"></div><button class="btn ghost full" type="button" id="communityPeopleMore" hidden>Ver más personas</button></section>
-        <section class="community-suggested-wrap" aria-labelledby="communitySuggestedTitle"><div class="community-section-head"><h4 id="communitySuggestedTitle">Personas sugeridas</h4><small class="muted">Perfiles públicos que todavía no seguís</small></div><div id="communitySuggested" class="community-suggested"></div></section>
-        <div id="communitySearchResults" class="community-search-results"></div>
-        <div class="community-explore-posts"><div class="community-section-head"><h4>Publicaciones coincidentes</h4></div><div id="communityExploreGrid" class="community-grid"></div><div id="communitySearchPosts" class="community-feed"></div></div>
+      <section id="communityPanelRanking" class="community-subpanel" data-community-panel="ranking" role="tabpanel" aria-labelledby="communityTabRanking" hidden>
+        <div class="cm-chips" id="rankingCategories" role="group" aria-label="Categoría del ranking"></div>
+        <div class="ff-segmented cm-scope" role="group" aria-label="Quiénes participan"><button type="button" class="ff-seg active" data-ranking-scope="all" aria-pressed="true">Todo el mundo</button><button type="button" class="ff-seg" data-ranking-scope="friends" aria-pressed="false">Amigos</button></div>
+        <div class="cm-explain" id="rankingExplain"></div>
+        <div id="rankingStatus" class="community-status" role="status" aria-live="polite"></div>
+        <ol class="cm-podium" id="rankingPodium" aria-label="Primeros puestos"></ol>
+        <ol class="cm-board" id="rankingList" aria-label="Clasificación"></ol>
       </section>
 
-      <section id="communityPanelPublish" class="community-subpanel" data-community-panel="publish" role="tabpanel" aria-labelledby="communityTabPublish" hidden>
+      <section id="communityPanelFriends" class="community-subpanel" data-community-panel="friends" role="tabpanel" aria-labelledby="communityTabFriends" hidden>
+        <div class="community-section-head"><h4>Tus amigos</h4><small class="muted">Personas que seguís con la solicitud aceptada</small></div>
+        <div id="communityFriendsStatus" class="community-status" role="status" aria-live="polite"></div>
+        <div id="communityFriends" class="cm-people"></div>
+        <button class="btn ghost full" type="button" id="communityFriendsMore" hidden>Ver más amigos</button>
+      </section>
+
+      <section id="communityPanelPublish" class="community-subpanel" data-community-panel="publish" aria-label="Publicar en tu perfil" hidden>
+        <button class="btn ghost btn-sm community-back" type="button" data-community-go="profile">← Volver a mi perfil</button>
         <div class="card community-editor">
-          <div class="community-panel-heading"><div><h3>Crear publicación</h3><p class="muted small">Elegí qué compartir. Antes de publicar ves exactamente qué datos se muestran; se publica solo cuando la base confirma el guardado.</p></div></div>
+          <div class="community-panel-heading"><div><h3>Publicar en tu perfil</h3><p class="muted small">Una foto con descripción, tu antes y después o un logro. Aparece en tu perfil (no hay un feed general). Antes de publicar ves exactamente qué datos se muestran; se publica solo cuando la base confirma el guardado.</p></div></div>
           <div class="community-note community-privacy-note"><strong>Privacidad primero.</strong> Compartí solo fotos propias. Las experiencias son personales y no garantizan los mismos resultados.</div>
           <nav class="ff-segmented" role="tablist" aria-label="Tipo de publicación">
-            <button type="button" role="tab" class="ff-seg active" data-post-kind="text" aria-selected="true">Texto</button>
+            <button type="button" role="tab" class="ff-seg active" data-post-kind="text" aria-selected="true">Foto o texto</button>
             <button type="button" role="tab" class="ff-seg" data-post-kind="achievement" aria-selected="false" tabindex="-1">Logro</button>
-            <button type="button" role="tab" class="ff-seg" data-post-kind="transformation" aria-selected="false" tabindex="-1">Transformación</button>
+            <button type="button" role="tab" class="ff-seg" data-post-kind="transformation" aria-selected="false" tabindex="-1">Antes y después</button>
           </nav>
           <p class="community-status" id="communityKindNotice" role="status" hidden></p>
           <form id="communityTextPostForm" data-post-form="text">
-            <div class="field"><label for="communityTextBody">¿Qué querés contar?</label><textarea id="communityTextBody" maxlength="1200" rows="4" required placeholder="Ej. Hoy completé mi primera semana de 4 entrenamientos. #constancia"></textarea><small class="muted"><span id="communityTextCount">0</span>/1200 · Podés usar #hashtags para que otras personas encuentren tu publicación.</small></div>
+            <div class="field"><label for="communityTextBody">Descripción</label><textarea id="communityTextBody" maxlength="1200" rows="4" required placeholder="Ej. Hoy completé mi primera semana de 4 entrenamientos. #constancia"></textarea><small class="muted"><span id="communityTextCount">0</span>/1200 · Podés usar #hashtags para que otras personas encuentren tu publicación.</small></div>
             <div class="field"><label for="communityTextImage">Foto (opcional)</label><input id="communityTextImage" type="file" accept="image/jpeg,image/png,image/webp"><small class="muted">JPG, PNG o WebP de hasta 8 MB. Se recomprime en tu dispositivo y se eliminan los metadatos (incluida la ubicación).</small></div>
             <div class="field"><label for="communityLinkSession">Vincular un entrenamiento (opcional)</label><select id="communityLinkSession"><option value="">No vincular</option></select><small class="muted">Se comparte solo el resumen que ves (título, fecha, duración y ejercicios). Nunca tu peso corporal ni tus medidas.</small></div>
             <label class="reminder-pref-row" id="communityTextConsentRow" hidden><input id="communityTextPhotoConsent" type="checkbox"><span>Confirmo que tengo derecho a publicar esta foto y que no muestro a otras personas sin su permiso.</span></label>
@@ -2157,7 +2169,7 @@
             <div class="field"><label for="communityPostRunning">Actividad al aire libre (opcional)</label><textarea id="communityPostRunning" maxlength="600" rows="2" placeholder="Ej. caminar o correr 5 km dos veces por semana…"></textarea></div>
             <label class="reminder-pref-row"><input id="communityPostPublic" type="checkbox" checked><span>Publicación visible para la comunidad, según la privacidad y los permisos de mi perfil.</span></label>
             <label class="reminder-pref-row"><input id="communityPhotoConsent" type="checkbox" required><span>Confirmo que tengo derecho a publicar estas fotos y que no muestro a otras personas sin su permiso.</span></label>
-            <button class="btn full" id="communityPublish" type="submit">Publicar transformación</button><div class="community-status" id="communityPostStatus" role="status" aria-live="polite"></div>
+            <button class="btn full" id="communityPublish" type="submit">Publicar antes y después</button><div class="community-status" id="communityPostStatus" role="status" aria-live="polite"></div>
           </form>
         </div>
       </section>
@@ -2187,9 +2199,15 @@
           </div>
           <p class="community-profile-bio" id="communityOwnBio"></p>
           <div class="community-profile-stats" id="communityOwnStats" aria-live="polite"><span><b>0</b> publicaciones</span><span><b>0</b> seguidores</span><span><b>0</b> seguidos</span></div>
-          <div class="btn-row community-profile-actions"><button class="btn secondary" type="button" id="communityEditProfileToggle" aria-expanded="false" aria-controls="communityProfileEditor">Editar perfil</button><label class="btn ghost" id="communityAvatarLabel" for="communityAvatarInput">Cambiar foto</label><button class="btn ghost" type="button" id="communityAvatarRemove" hidden>Quitar foto</button><input id="communityAvatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden></div>
+          <div class="btn-row community-profile-actions"><button class="btn" type="button" id="communityOpenPublish" data-community-go="publish">Publicar en mi perfil</button><button class="btn ghost" type="button" id="communityViewOwnPublic">Ver cómo me ven</button><button class="btn secondary" type="button" id="communityEditProfileToggle" aria-expanded="false" aria-controls="communityProfileEditor">Editar perfil</button><label class="btn ghost" id="communityAvatarLabel" for="communityAvatarInput">Cambiar foto</label><button class="btn ghost" type="button" id="communityAvatarRemove" hidden>Quitar foto</button><input id="communityAvatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden></div>
           <div class="community-profile-tabs" role="group" aria-label="Contenido del perfil"><button type="button" class="community-feed-tab is-active" data-own-tab="posts" aria-pressed="true">Publicaciones</button><button type="button" class="community-feed-tab" data-own-tab="saved" aria-pressed="false">Guardadas</button></div>
           <div id="communityOwnGrid" class="community-grid"></div>
+        </div>
+        <div class="card cm-stats-card" id="communityStatsCard">
+          <h3>Estadísticas en tu perfil</h3>
+          <label class="reminder-pref-row"><input id="communityStatsPublic" type="checkbox" checked><span>Mostrar mis estadísticas de entrenamiento en Comunidad</span></label>
+          <p class="muted small">Se comparten tu nivel de entrenamiento, tu nivel de XP, tu rango general del Mapa de avances, tus insignias, tu constancia y tu running de los últimos 30 días y tus mejores series de flexiones, dominadas, sentadilla al aire y plancha. Las ve quien puede ver tu perfil (si es privado, solo tus seguidores aceptados) y sirven para los rankings y las comparaciones. Nunca se publican tu peso, tu altura, tus medidas, tus objetivos ni tus fotos de progreso. Si las ocultás, salís de los rankings.</p>
+          <div class="community-status" id="communityStatsStatus" role="status" aria-live="polite"></div>
         </div>
         <div class="card community-account-card" id="communityProfileEditor">
           <h3>Tu perfil comunitario</h3><p class="muted small">Usá un apodo si preferís. Los perfiles privados solo comparten contenido con seguidores aceptados. Tu peso, altura y objetivos nunca se publican.</p>
@@ -2211,7 +2229,12 @@
 
       <section id="communityPanelUser" class="community-subpanel" data-community-panel="user" aria-label="Perfil de la comunidad" hidden>
         <button class="btn ghost btn-sm community-back" type="button" id="communityUserBack">← Volver</button>
-        <div class="card community-social-profile" id="communityUserProfile"></div>
+        <div class="cm-profile" id="communityUserProfile"></div>
+      </section>
+
+      <section id="communityPanelCompare" class="community-subpanel" data-community-panel="compare" aria-label="Comparar progreso" hidden>
+        <button class="btn ghost btn-sm community-back" type="button" id="communityCompareBack">← Volver</button>
+        <div class="cm-compare" id="communityCompare"></div>
       </section>
 
       <dialog class="community-post-dialog" id="communityPostDialog" aria-label="Publicación"><button class="modal-close" type="button" data-close-post-dialog aria-label="Cerrar">×</button><div id="communityPostDialogBody"></div></dialog>
@@ -2362,14 +2385,14 @@
         <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
         <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">52.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">53.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
       </details>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 52.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 53.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -2396,7 +2419,7 @@
   <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V52.0</p>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V53.0</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -2473,6 +2496,7 @@
 <script src="./membership-config.js"></script>
 <script src="./anatomy.js"></script>
 <script src="./muscle-ranks.js"></script>
+<script src="./athlete-stats.js"></script>
 <script src="./training-core.js"></script>
 <script src="./body-goals.js"></script>
 <script src="./exercise-guides.js"></script>
@@ -3982,6 +4006,12 @@ function findCatalogExercise(name){
       return {key:item.id+':'+level,label:`${item.name} · ${rank.label}${gps?' · GPS':''}`,payload:{exerciseId,exerciseName:String(item.name).slice(0,72),category:item.category||'',rank:rank.key,level,threshold:Number(entry.threshold),measure:item.measure,evidence:gps?'gps_device':entry.evidence==='session'?'session':'declared',earnedAt:/^\d{4}-\d{2}-\d{2}$/.test(String(entry.earnedAt))?entry.earnedAt:dateKey()}};
     });
   };
+  // v53: estadísticas deportivas que Comunidad puede mostrar (athlete-stats.js). Nunca peso, altura, medidas ni fotos.
+  window.FittFormaAthleteStatsNow=function(){
+    const S=window.FittFormaAthleteStats;if(!S)return null;
+    const r=MR?muscleRanksNow():{overall:-1,ranked:0};
+    return S.compute({sessions:state.sessions,activities:state.activities,badges:window.FittFormaShareableBadges(),xp:profileXp().xp,trainingLevel:state.profile?.level,muscle:{overall:r.overall,ranked:r.ranked},today:dateKey(),canonical:n=>FittFormaTraining.canonicalName(n)});
+  };
   // La insignia más cercana a subir de nivel, para Inicio.
   function closestNextBadge(){
     let best=null;
@@ -4099,32 +4129,26 @@ function findCatalogExercise(name){
     const names=FittFormaAnatomy.MUSCLES;
     return `<div class="session-muscles"><div class="session-muscles-map">${FittFormaAnatomy.muscleMapSvg(m.primary,m.secondary,{size:'md',label:`${label}: ${m.primary.map(x=>names[x]).join(', ')}`})}</div><div><div class="eyebrow">Músculos que trabajaste</div><p class="small">${m.primary.map(x=>esc(names[x])).join(', ')}</p>${m.secondary.length?`<p class="muted small">También: ${m.secondary.map(x=>esc(names[x])).join(', ')}</p>`:''}</div></div>`;
   }
-  // v52: ranking con amigos. Solo el rango general, solo si la persona lo activa (tabla community_rank_shares + RLS).
-  let rkBoardLoading=false,rkLastShared='';
-  async function syncRankShare(){
-    if(!state.rankShare||!supabaseClient||!cloudUser||!MR)return;
-    const r=muscleRanksNow(),row={user_id:cloudUser.id,overall_rank:r.overall,median_sets:Math.min(99999,Math.round(r.median*10)/10),balance:r.balance,ranked_muscles:r.ranked,updated_at:new Date().toISOString()};
-    const sig=[row.overall_rank,row.median_sets,row.balance,row.ranked_muscles].join('|');if(sig===rkLastShared)return;
-    const {error}=await supabaseClient.from('community_rank_shares').upsert(row);if(!error)rkLastShared=sig;return error;
-  }
+  // v53: ranking con amigos desde las estadísticas de Comunidad (community_leaderboard, categoría «rank», alcance amigos).
+  // La casilla es la misma preferencia que «Mostrar mis estadísticas» de Comunidad › Mi perfil.
+  let rkBoardLoading=false;
   async function renderRankBoard(){
-    const list=$('rkBoard'),status=$('rkBoardStatus'),toggle=$('rkShareToggle');if(!list||!MR)return;
-    toggle.checked=!!state.rankShare;
+    const list=$('rkBoard'),status=$('rkBoardStatus'),toggle=$('rkShareToggle'),C=window.FittFormaCommunity;if(!list||!MR)return;
     if(!supabaseClient||!cloudUser){list.innerHTML='';status.textContent='Iniciá sesión en tu cuenta (Perfil › Cuenta) para competir con las personas que seguís en Comunidad.';toggle.disabled=true;return;}
     toggle.disabled=false;if(rkBoardLoading)return;rkBoardLoading=true;status.textContent='Cargando ranking…';
     try{
-      await syncRankShare();
-      const {data,error}=await supabaseClient.rpc('community_rank_board');
-      if(error){list.innerHTML='';status.textContent=/function|does not exist|schema cache/i.test(error.message||'')?'El ranking todavía no está activado en el servidor (falta aplicar la actualización v52 de la base de datos).':'No se pudo cargar el ranking. Probá de nuevo más tarde.';return;}
+      const own=await C?.syncStats?.();toggle.checked=own?own.stats_public!==false:true;
+      const {data,error}=await supabaseClient.rpc('community_leaderboard',{p_category:'rank',p_scope:'friends',p_limit:50});
+      if(error){list.innerHTML='';status.textContent=/function|does not exist|schema cache/i.test(error.message||'')?'El ranking todavía no está activado en el servidor (falta aplicar la actualización v53 de la base de datos).':'No se pudo cargar el ranking. Probá de nuevo más tarde.';return;}
       const rows=Array.isArray(data)?data:[];
-      list.innerHTML=rows.map((x,i)=>{const r=MR.RANKS[x.overall_rank];return `<li class="rk-row ${x.is_self?'is-self':''} ${i===0?'is-first':''}"><span class="rk-pos">${i+1}</span><span class="rk-avatar" aria-hidden="true">${esc(String(x.display_name||x.username||'?').trim().charAt(0).toUpperCase())}</span><span class="rk-who"><strong>${x.is_self?'Vos':esc(x.display_name||x.username)}</strong><small>@${esc(x.username)}</small></span><span class="rk-badge">${MR.emblemSvg(x.overall_rank,34)}<b style="color:${r?.glow||'#8b9ab8'}">${r?esc(r.name):'Sin rango'}</b></span></li>`;}).join('');
-      status.textContent=!rows.length?(state.rankShare?'Todavía nadie de las personas que seguís comparte su rango.':'Activá «Compartir mi rango» para aparecer y ver a tus amigos que también lo comparten.'):rows.length===1&&rows[0].is_self?'Cuando las personas que seguís compartan su rango, van a aparecer acá.':'';
+      list.innerHTML=rows.map((x,i)=>{const r=MR.RANKS[x.overall_rank];return `<li class="rk-row ${x.is_self?'is-self':''} ${Number(x.pos)===1?'is-first':''}"><button type="button" class="rk-open" data-rk-user="${esc(x.user_id)}" aria-label="Ver el perfil de ${esc(x.display_name||x.username)}"><span class="rk-pos">${Number(x.pos)||i+1}</span><span class="rk-avatar" aria-hidden="true">${esc(String(x.display_name||x.username||'?').trim().charAt(0).toUpperCase())}</span><span class="rk-who"><strong>${x.is_self?'Vos':esc(x.display_name||x.username)}</strong><small>@${esc(x.username)}</small></span><span class="rk-badge">${MR.emblemSvg(x.overall_rank,34)}<b style="color:${r?.glow||'#8b9ab8'}">${r?esc(r.name):'Sin rango'}</b></span></button></li>`;}).join('');
+      status.textContent=!rows.length?(toggle.checked?'Todavía no hay rangos para mostrar. Entrená y seguí a tus amigos en Comunidad.':'Tus estadísticas están ocultas: activalas para aparecer en el ranking.'):rows.length===1&&rows[0].is_self?'Cuando las personas que seguís muestren sus estadísticas, van a aparecer acá.':'';
     }finally{rkBoardLoading=false;}
   }
+  $('rkBoard')?.addEventListener('click',e=>{const b=e.target.closest('[data-rk-user]');if(!b)return;switchView('community');window.FittFormaCommunity?.openProfile?.(b.dataset.rkUser);});
   $('rkShareToggle')?.addEventListener('change',async e=>{
-    state.rankShare=e.target.checked;save();rkLastShared='';
-    if(!state.rankShare&&supabaseClient&&cloudUser){const {error}=await supabaseClient.from('community_rank_shares').delete().eq('user_id',cloudUser.id);toast(error?'No se pudo dejar de compartir. Probá de nuevo.':'Dejaste de compartir tu rango.');}
-    else if(state.rankShare)toast('Tu rango general se comparte con quienes te siguen.');
+    const C=window.FittFormaCommunity;if(!C?.setStatsPublic){e.target.checked=!e.target.checked;return;}
+    const ok=await C.setStatsPublic(e.target.checked);if(!ok)e.target.checked=!e.target.checked;
     renderRankBoard();
   });
   $('rkFindFriends')?.addEventListener('click',()=>switchView('community'));
@@ -4156,7 +4180,7 @@ function findCatalogExercise(name){
   document.addEventListener('click',e=>{const b=e.target.closest('[data-mr-side]');if(b){mrSide=b.dataset.mrSide;renderMuscleRanks();}});
   // Aviso cuando un músculo sube de rango (se compara con lo último que la persona ya vio).
   function checkMuscleRankUps(){
-    if(!MR)return;setTimeout(()=>syncRankShare()?.catch?.(()=>{}),0);const now=muscleRanksNow(),seen=isPlainObj(state.muscleRanksSeen)?state.muscleRanksSeen:null;
+    if(!MR)return;setTimeout(()=>window.FittFormaCommunity?.syncStats?.()?.catch?.(()=>{}),0);const now=muscleRanksNow(),seen=isPlainObj(state.muscleRanksSeen)?state.muscleRanksSeen:null;
     const cur=Object.fromEntries(now.muscles.map(m=>[m.id,m.rank]));state.muscleRanksSeen=cur;
     if(!seen)return;const ups=now.muscles.filter(m=>m.rank>(seen[m.id]??-1));if(!ups.length)return;
     const best=ups.sort((a,b)=>b.rank-a.rank)[0],names=FittFormaAnatomy.MUSCLES;
@@ -4671,7 +4695,7 @@ function findCatalogExercise(name){
     switchView(view);
     if(view==='nutrition')showViewTab('nutrition',sub);
     else if(view==='progress')showProgressTab(sub);
-    else if(view==='community'){const tab={feed:'communityTabFeed',publish:'communityTabPublish',messages:'communityTabMessages',explore:'communityTabExplore'}[sub];if(tab)$(tab)?.click();}
+    else if(view==='community'){const tab={feed:'world',explore:'world',publish:'publish',messages:'messages'}[sub];if(tab)window.FittFormaCommunity?.show?.(tab);}
     else if(view==='routines'&&sub==='new')$('newRoutine')?.click();
     else if(view==='profile'&&sub){const card=$(sub),g=card?.closest('details');if(g)g.open=true;setTimeout(()=>card?.scrollIntoView({behavior:'smooth',block:'start'}),60);}
   }
@@ -4689,9 +4713,9 @@ function findCatalogExercise(name){
     [/peso|medida|cintura|foto.*progreso|cuerpo/,'Peso, medidas y fotos privadas están en Progreso › Cuerpo.',[['Abrir Cuerpo','progress:body']]],
     [/historial|sesiones|editar.*sesión|editar.*sesion|exportar|importar/,'El historial de sesiones (editable) y la exportación están en Progreso › Historial.',[['Ver historial','progress:history']]],
     [/estadística|estadistica|progreso|gráfico|grafico/,'Tus estadísticas y la comparación por período están en Progreso.',[['Ver progreso','progress']]],
-    [/publicar|compartir|post/,'Podés publicar texto, un logro o una transformación en Comunidad › Publicar.',[['Crear publicación','community:publish']]],
+    [/publicar|compartir|post/,'Podés publicar una foto con descripción, un logro o tu antes y después en Comunidad › Mi perfil › Publicar en mi perfil.',[['Crear publicación','community:publish']]],
     [/mensaje|chat privado/,'Los mensajes privados requieren seguimiento mutuo; están en Comunidad › Mensajes.',[['Abrir mensajes','community:messages']]],
-    [/comunidad|seguir|buscar (personas|perfil)/,'En Comunidad ves el feed y podés explorar perfiles.',[['Ir a Comunidad','community'],['Explorar perfiles','community:explore']]],
+    [/comunidad|seguir|buscar (personas|perfil)/,'En Comunidad encontrás a otros deportistas (Todo el mundo), los rankings y a tus amigos.',[['Ir a Comunidad','community'],['Explorar perfiles','community:explore']]],
     [/recordatorio|notificaci/,'Los recordatorios se configuran en Perfil › Recordatorios.',[['Configurar recordatorios','profile:reminders']]],
     [/foto de perfil|avatar|mi perfil|nombre/,'En Perfil podés cambiar tu foto (ícono de cámara), nombre y objetivo.',[['Ir a Perfil','profile']]],
     [/cuenta|sesión|sesion|nube|sincroniz|iniciar/,'La cuenta y la copia en la nube están en Perfil › Cuenta y sincronización.',[['Abrir cuenta','profile:account']]]
@@ -5082,7 +5106,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.52.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.52.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.53.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.53.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -5416,7 +5440,7 @@ function findCatalogExercise(name){
       if(['train','meal','water'].includes(k))homeQuickAction(k);
       else if(k==='run')switchView('running');
       else if(k==='body'){switchView('progress');showProgressTab('body');setTimeout(()=>$('weightInput')?.focus(),80);}
-      else if(k==='post'){switchView('community');$('communityTabPublish')?.click();}
+      else if(k==='post'){switchView('community');window.FittFormaCommunity?.show?.('publish');}
       else if(k==='routine'){switchView('routines');$('newRoutine')?.click();}
     });
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!sheet.hidden)close();});
@@ -5910,7 +5934,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.52.0';
+  const APP_VERSION='0.53.0';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');
@@ -5972,6 +5996,7 @@ function findCatalogExercise(name){
 <script src="./i18n-v50.js" defer></script>
 <script src="./i18n-v51.js" defer></script>
 <script src="./i18n-v52.js" defer></script>
+<script src="./i18n-v53.js" defer></script>
 <script src="./i18n.js" defer></script>
 </body>
 </html>

@@ -1,5 +1,42 @@
 # FittForma AI — Registro de cambios
 
+## v53.0 — Comunidad de deportistas (27 de octubre de 2026)
+
+- **Comunidad sin feed:** tres apartados, «Todo el mundo» (predeterminado), «Ranking» y «Amigos».
+  - Se quitaron de la interfaz el feed, «Para vos», las historias y Explorar. Las tablas y funciones del backend siguen intactas.
+  - Mensajes y Mi perfil pasan a la cabecera de Comunidad.
+- **Todo el mundo:** directorio de usuarios reales con búsqueda y carga de a 20.
+  - Cada tarjeta muestra foto, nombre, @usuario, nivel de entrenamiento, nivel de XP, rango principal, hasta 3 insignias destacadas, el último logro y el botón Seguir.
+- **Perfil completo**, el mismo componente desde las tres pestañas:
+  - Encabezado con rango, insignias, seguidores, seguir, comparar, mensaje (solo con seguimiento mutuo) y bloquear.
+  - Estadísticas: constancia y running de 30 días, actividades y mejores series.
+  - Insignias con categoría, rango, nivel, fecha y si vienen de GPS, de un entrenamiento o son autorregistradas.
+  - Publicaciones del perfil.
+- **Ranking:** 9 categorías, cada una con qué mide, el período, el orden y quiénes participan.
+  - Categorías: rango general, constancia, insignias, nivel de XP, running (km), flexiones, dominadas, sentadilla al aire y plancha.
+  - Alcance: todo el mundo o amigos, con podio.
+  - El orden lo calcula el servidor.
+- **Amigos:** personas que seguís con la solicitud aceptada.
+  - Puesto en el ranking de amigos y botón Comparar.
+  - Estado vacío: «Todavía no tenés amigos en tu comunidad».
+- **Comparación «Tu progreso» vs. «Progreso de tu amigo»:** misma métrica, unidad y período.
+  - Si falta un dato muestra «Sin datos disponibles»; no estima nada.
+  - Aclara que no es un diagnóstico ni una medición de masa muscular.
+- **Estadísticas públicas por defecto:**
+  - Se publican recién después de mostrar el aviso en Comunidad.
+  - Se pueden ocultar en Mi perfil o en Progreso › Músculos.
+  - Nunca incluyen peso, altura, medidas, objetivos ni fotos.
+- **Publicar en el perfil:** foto con descripción o antes y después, desde Mi perfil › «Publicar en mi perfil».
+- **Progreso › Músculos:** el ranking con amigos usa las estadísticas de Comunidad. Tocar una fila abre el perfil.
+- **PGRST201:** las consultas de publicaciones ya no usan el embed ambiguo `community_posts → community_profiles`.
+  - Los autores se piden aparte.
+  - Las solicitudes de seguimiento usan la función `community_follow_requests`.
+- **Otros cambios:**
+  - `athlete-stats.js`, con funciones puras y pruebas en `tests/v53.test.mjs`.
+  - Traducciones en `i18n-v53.js`.
+  - Migración aditiva `2026-10-27_v53_athlete_community.sql`, probada en `supabase/tests/rls_v53_test.sql`.
+  - `tests/e2e/athletes.e2e.mjs`.
+
 ## v52.0 — Mapa de avances: rango por músculo (26 de octubre de 2026)
 
 - Nueva pestaña **Progreso › Músculos**.

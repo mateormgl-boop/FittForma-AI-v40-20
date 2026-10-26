@@ -1,11 +1,12 @@
-/* FittForma AI v49 — comunidad online: feed con novedades de quienes seguís, explorar, crear, mensajes y perfiles
- * sociales. Privacidad, bloqueos, moderación y ranking orgánico. Requiere supabase/community.sql y las migraciones.
+/* FittForma AI v53 — comunidad de deportistas: Todo el mundo (directorio), Ranking, Amigos, perfil completo, comparación,
+ * publicaciones dentro del perfil (sin feed general), mensajes, privacidad, bloqueos y moderación.
+ * Requiere supabase/community.sql y las migraciones (v53: estadísticas deportivas, rankings y comparación).
  * Todo lo que se muestra sale de la base (RLS): no hay seguidores, publicaciones ni mensajes simulados. */
 (()=>{
   'use strict';
   const $=id=>document.getElementById(id);
   const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  let client=null,user=null,searchTerm='',loading=false,feedSort='activity',connectionMessage='',currentSubView='feed',feedLimit=30,exploreFilter='all',ownTab='posts',ownProfile=null,exploreLoaded=false,chatPoll=null,lastTab='feed';
+  let client=null,user=null,searchTerm='',loading=false,connectionMessage='',currentSubView='world',ownTab='posts',ownProfile=null,chatPoll=null,lastTab='world';
   // null = sin comprobar; false = el proyecto todavía no aplicó la migración v41 (solo transformaciones).
   const SCHEMA_KEY='fittforma-community-schema-v41';
   let schemaV41=(()=>{try{return sessionStorage.getItem(SCHEMA_KEY)==='0'?false:null;}catch{return null;}})(),ownVisibility='private',postKind='text';
@@ -24,7 +25,7 @@
   const dateLabel=value=>{if(!value)return '';const d=new Date(value+'T12:00:00');return Number.isNaN(d.getTime())?value:d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});};
   // Antigüedad corta («hace 3 h»); después de una semana, la fecha.
   function timeAgo(iso){const t=Date.parse(iso||'');if(!Number.isFinite(t))return '';const m=Math.max(0,Math.round((Date.now()-t)/60000));if(m<1)return 'ahora';if(m<60)return `hace ${m} min`;const h=Math.round(m/60);if(h<24)return `hace ${h} h`;const d=Math.round(h/24);if(d<7)return `hace ${d} d`;return dateLabel(String(iso).slice(0,10));}
-  function status(message){const target=currentSubView==='explore'?'communityExploreStatus':currentSubView==='publish'?'communityComposeStatus':currentSubView==='messages'?'communityChatStatus':currentSubView==='profile'?'communityProfileStatus':'communityFeedStatus';setStatus(target,message);}
+  function status(message){const target={world:'communityWorldStatus',ranking:'rankingStatus',friends:'communityFriendsStatus',user:'communityWorldStatus',compare:'communityWorldStatus'}[currentSubView]||(currentSubView==='publish'?'communityComposeStatus':currentSubView==='messages'?'communityChatStatus':currentSubView==='profile'?'communityProfileStatus':'communityWorldStatus');setStatus(target,message);}
   // Si la conexión está bien, el aviso se oculta (queda el texto para lectores de pantalla); si hay un problema, se muestra con el botón para comprobar.
   function connectionStatus(message){const el=$('communityConnectionStatus');if(!el)return;el.removeAttribute('data-state');setStatus('communityConnectionStatus',message);const ok=/correctamente|Conexión correcta/.test(String(message));el.closest('.community-connection-row')?.classList.toggle('is-ok',ok);}
   // Sin configuración: mensaje claro para quien usa la app y el detalle técnico plegado para quien la administra.
@@ -66,7 +67,8 @@
   function avatarHtml(profile,urlOf,size=''){const name=profile?.display_name||profile?.username||'Usuario',url=profile?.avatar_path&&urlOf?urlOf(profile.avatar_path):'';return `<span class="community-avatar${size?' community-avatar-'+size:''}${url?' has-photo':''}">${url?`<img src="${esc(url)}" alt="" loading="lazy" onerror="this.parentElement.classList.remove('has-photo');this.remove()">`:''}<span aria-hidden="true">${esc(initials(name))}</span></span>`;}
   function featuredHtml(list,size=18){const E=window.FittFormaBadgeEngine;if(!E||!Array.isArray(list))return '';return list.slice(0,3).map(b=>{const level=Math.min(12,Math.max(1,Number(b?.level)||1)),rank=E.rankForLevel(level-1);return `<span class="community-mini-badge" title="${esc(b?.exerciseName||'')} · ${esc(rank.label)}">${E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:b?.exerciseId,name:b?.exerciseName,category:b?.category,measure:b?.measure}),category:b?.category,size,title:`${b?.exerciseName||''} · ${rank.label}`})}</span>`;}).join('');}
   // #hashtags clicables (se buscan en Explorar). El texto se escapa antes.
-  function richText(text){return esc(text).replace(/(^|[\s(])#([\p{L}\p{N}_]{2,30})/gu,(m,pre,tag)=>`${pre}<button type="button" class="community-hashtag" data-community-hashtag="${tag}">#${tag}</button>`);}
+  // v53: los #hashtags se resaltan pero no abren una búsqueda de publicaciones (no hay feed general).
+  function richText(text){return esc(text).replace(/(^|[\s(])#([\p{L}\p{N}_]{2,30})/gu,(m,pre,tag)=>`${pre}<span class="community-hashtag">#${tag}</span>`);}
 
   async function ensureProfile(){
     if(!authReady())throw new Error(authHint());
@@ -118,10 +120,25 @@
     if(error){if(isMissingColumn(error))schemaV49=false;else console.warn('No se pudieron publicar las insignias destacadas:',error.message);return;}
     if(data){ownProfile=data;renderOwnHeader();}
   }
-  async function loadFollowRequests(){const root=$('communityFollowRequests');if(!root)return;if(!authReady()){root.textContent='Iniciá sesión para administrar solicitudes.';return;}const {data,error}=await client.from('community_follows').select('follower_id,created_at,community_profiles!community_follows_follower_id_fkey(user_id,display_name,username,bio)').eq('following_id',user.id).eq('status','pending').order('created_at',{ascending:false}).limit(30);if(error){root.textContent='No se pudieron cargar las solicitudes: '+error.message;return;}if(!data?.length){root.textContent='No hay solicitudes pendientes.';return;}root.innerHTML=data.map(row=>{const profile=Array.isArray(row.community_profiles)?row.community_profiles[0]:row.community_profiles;return `<div class="community-comment"><strong>${esc(profile?.display_name||'Usuario')}</strong> <span class="muted">@${esc(profile?.username||row.follower_id.slice(0,8))}</span><div class="btn-row" style="margin-top:7px"><button class="btn secondary" type="button" data-community-accept="${esc(row.follower_id)}">Aceptar</button><button class="btn ghost" type="button" data-community-reject="${esc(row.follower_id)}">Rechazar</button></div></div>`;}).join('');root.querySelectorAll('[data-community-accept]').forEach(b=>b.addEventListener('click',()=>resolveFollow(b.dataset.communityAccept,true)));root.querySelectorAll('[data-community-reject]').forEach(b=>b.addEventListener('click',()=>resolveFollow(b.dataset.communityReject,false)));}
-  async function resolveFollow(followerId,accept){const result=accept?await client.from('community_follows').update({status:'accepted'}).eq('follower_id',followerId).eq('following_id',user.id).eq('status','pending'):await client.from('community_follows').delete().eq('follower_id',followerId).eq('following_id',user.id).eq('status','pending');if(result.error){status('No se pudo actualizar la solicitud: '+result.error.message);return;}await loadFollowRequests();await loadFeed();refreshOwnCounts();}
+  // v53: solicitudes con la función community_follow_requests (sin el embed community_follows → community_profiles,
+  // que puede dar PGRST201/PGRST200 según el nombre de las FK). Sin la migración v53, consulta por separado.
+  async function loadFollowRequests(){const root=$('communityFollowRequests');if(!root)return;if(!authReady()){root.textContent='Iniciá sesión para administrar solicitudes.';return;}
+    let rows=null;const r=await client.rpc('community_follow_requests');
+    if(!r.error)rows=r.data||[];
+    else if(isMissingFunction(r.error)){const f=await client.from('community_follows').select('follower_id,created_at').eq('following_id',user.id).eq('status','pending').order('created_at',{ascending:false}).limit(30);if(f.error){root.textContent='No se pudieron cargar las solicitudes: '+f.error.message;return;}const ids=(f.data||[]).map(x=>x.follower_id);const pr=ids.length?await client.rpc('community_directory',{p_search:'',p_after:null,p_limit:30}):{data:[]};const byId=new Map((pr.data||[]).map(x=>[x.user_id,x]));rows=(f.data||[]).map(x=>({follower_id:x.follower_id,...(byId.get(x.follower_id)||{})}));}
+    else{root.textContent='No se pudieron cargar las solicitudes: '+r.error.message;return;}
+    if(!rows.length){root.textContent='No hay solicitudes pendientes.';return;}
+    root.innerHTML=rows.map(row=>`<div class="community-comment"><strong>${esc(row.display_name||'Usuario')}</strong> <span class="muted">@${esc(row.username||String(row.follower_id).slice(0,8))}</span><div class="btn-row" style="margin-top:7px"><button class="btn secondary" type="button" data-community-accept="${esc(row.follower_id)}">Aceptar</button><button class="btn ghost" type="button" data-community-reject="${esc(row.follower_id)}">Rechazar</button></div></div>`).join('');root.querySelectorAll('[data-community-accept]').forEach(b=>b.addEventListener('click',()=>resolveFollow(b.dataset.communityAccept,true)));root.querySelectorAll('[data-community-reject]').forEach(b=>b.addEventListener('click',()=>resolveFollow(b.dataset.communityReject,false)));}
+  async function resolveFollow(followerId,accept){const result=accept?await client.from('community_follows').update({status:'accepted'}).eq('follower_id',followerId).eq('following_id',user.id).eq('status','pending'):await client.from('community_follows').delete().eq('follower_id',followerId).eq('following_id',user.id).eq('status','pending');if(result.error){status('No se pudo actualizar la solicitud: '+result.error.message);return;}await loadFollowRequests();refreshOwnCounts();}
 
   // ---------- Publicaciones ----------
+  // v53: publicaciones con su autor sin el embed community_posts → community_profiles (evita PGRST201/PGRST200).
+  async function withAuthors(posts){
+    const ids=[...new Set((posts||[]).map(p=>p.user_id))];if(!ids.length)return [];
+    const r=await client.from('community_profiles').select(profileCols()).in('user_id',ids);
+    const byUser=new Map((r.error?[]:r.data||[]).map(x=>[x.user_id,x]));
+    return posts.filter(p=>byUser.has(p.user_id)).map(p=>({...p,community_profiles:byUser.get(p.user_id)}));
+  }
   function postSelect(){const extra=schemaV41===false?'':V41_COLS;return 'id,user_id,description,exercises_text,nutrition_text,running_text,start_date,end_date,before_path,after_path,visibility,created_at'+extra+(schemaV49===false?'':',linked_session');}
   function profileCols(){return 'user_id,display_name,username,bio,visibility,avatar_path'+(schemaV49===false?'':',featured_badges');}
   async function myFollowing(){if(!authReady())return new Map();const {data,error}=await client.from('community_follows').select('following_id,status').eq('follower_id',user.id);return new Map((error?[]:data||[]).map(x=>[x.following_id,x.status]));}
@@ -179,75 +196,20 @@
     const content=media?`${media}${actions}${bodyHtml}`:`${bodyHtml}${actions}`;
     return `<article class="card community-post" data-community-post="${esc(p.id)}"><div class="community-post-head"><button type="button" class="community-author-btn" data-community-open-user="${esc(p.user_id)}" aria-label="Ver el perfil de ${esc(profileName)}">${avatarHtml(profile,urlOf)}</button><div class="community-author"><strong><button type="button" class="community-author-name" data-community-open-user="${esc(p.user_id)}">${esc(profileName)}</button>${featuredHtml(profile?.featured_badges,18)}${rank.isPro?'<span class="community-pro-badge">PRO</span>':''}</strong><small>@${esc(profile?.username||'usuario')} · ${esc(when)}${p.visibility==='followers'?' · Seguidores':''}</small></div>${owner||!user||isFollowing?'':`<button class="btn ghost btn-sm community-follow-btn" type="button" data-community-follow="${esc(p.user_id)}" data-following="${isPending?'pending':'no'}">${isPending?'Solicitud enviada':'Seguir'}</button>`}${menu}</div>${content}<div class="community-comments">${postComments.length>2?`<button class="community-more-comments" type="button" data-community-show-comments>Ver los ${postComments.length} comentarios</button>`:''}${commentHtml}${user?`<form class="community-comment-form" data-community-comment-form="${esc(p.id)}"><input name="body" maxlength="500" required placeholder="Agregá un comentario…" aria-label="Escribí un comentario"><button class="btn secondary btn-sm" type="submit">Enviar</button></form>`:`<p class="muted small">Iniciá sesión para comentar.</p>`}</div></article>`;
   }
-  async function loadFeed(){
-    if(loading)return;loading=true;
-    try{
-      if(!client){status('');return;}
-      status('Cargando publicaciones…');
-      const selectPosts=postSelect()+`,community_profiles!community_posts_user_id_fkey!inner(${profileCols()})`;
-      let rankByPost={},rankedIds=[];
-      try{const ranked=await client.rpc('community_ranked_post_ids');if(!ranked.error&&ranked.data){ranked.data.forEach((r,index)=>{rankByPost[r.post_id]={index,isPro:!!r.is_pro,followerCount:Number(r.follower_count)||0,activityScore:Number(r.activity_score)||0};});rankedIds=ranked.data.map(r=>r.post_id);}}catch{}
-      const following=feedSort==='following'&&!searchTerm&&user?[...(await myFollowing()).entries()].filter(([,s])=>s==='accepted').map(([id])=>id):null;
-      const hashtag=searchTerm.startsWith('#')?searchTerm.slice(1).replace(/[^\p{L}\p{N}_]/gu,''):'';
-      let query=client.from('community_posts').select(selectPosts);
-      if(searchTerm&&hashtag)query=query.ilike('description',`%#${hashtag}%`).order('created_at',{ascending:false}).limit(30);
-      else if(searchTerm){const term=searchTerm.replace(/^@/,'').replace(/[,%()]/g,'');query=query.ilike('community_profiles.username',`%${term}%`).order('created_at',{ascending:false}).limit(20);}
-      else if(following)query=query.in('user_id',[...following,user.id]).order('created_at',{ascending:false}).limit(feedLimit);
-      else if(feedSort==='recent')query=query.order('created_at',{ascending:false}).limit(feedLimit);
-      else if(rankedIds.length)query=query.in('id',rankedIds.slice(0,feedLimit));
-      else query=query.order('created_at',{ascending:false}).limit(feedLimit);
-      let {data,error}=await query;
-      // En proyectos donde el esquema haya quedado con una FK adicional o un nombre distinto,
-      // evitamos depender del embed ambiguo: consultamos posts y perfiles por separado, bajo RLS.
-      if(error&&(error.code==='PGRST201'||error.code==='PGRST200')){
-        let fallbackQuery=client.from('community_posts').select(postSelect());
-        if(searchTerm&&!hashtag){
-          const term=searchTerm.replace(/^@/,'').replace(/[,%()]/g,'');
-          const profileResult=await client.from('community_profiles').select('user_id').ilike('username',`%${term}%`).limit(30);
-          if(profileResult.error)throw profileResult.error;
-          const matchingUsers=(profileResult.data||[]).map(row=>row.user_id);
-          if(!matchingUsers.length){data=[];error=null;}
-          else fallbackQuery=fallbackQuery.in('user_id',matchingUsers).order('created_at',{ascending:false}).limit(20);
-        }else if(hashtag)fallbackQuery=fallbackQuery.ilike('description',`%#${hashtag}%`).order('created_at',{ascending:false}).limit(30);
-        else if(rankedIds.length)fallbackQuery=fallbackQuery.in('id',rankedIds.slice(0,feedLimit));
-        else fallbackQuery=fallbackQuery.order('created_at',{ascending:false}).limit(feedLimit);
-        if(error){const fallback=await fallbackQuery;if(fallback.error)throw fallback.error;data=fallback.data||[];const authorIds=[...new Set(data.map(row=>row.user_id))];if(authorIds.length){const profileResult=await client.from('community_profiles').select(profileCols()).in('user_id',authorIds);if(profileResult.error)throw profileResult.error;const byUser=new Map((profileResult.data||[]).map(profile=>[profile.user_id,profile]));data=data.filter(post=>byUser.has(post.user_id)).map(post=>({...post,community_profiles:byUser.get(post.user_id)}));}else data=[];error=null;}
-      }
-      if(error&&isMissingColumn(error)){
-        if(schemaV49!==false&&/linked_session|featured_badges/.test(String(error.message))){schemaV49=false;loading=false;return loadFeed();}
-        if(schemaV41!==false){markLegacySchema();loading=false;updateKindAvailability();return loadFeed();}
-      }
-      if(error)throw error;
-      if(schemaV41===null){schemaV41=true;updateKindAvailability();}
-      let posts=data||[];
-      if(feedSort==='recent'||following||searchTerm)posts.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
-      else posts.sort((a,b)=>(rankByPost[a.id]?.index??9999)-(rankByPost[b.id]?.index??9999));
-      const ctx=await bundle(posts);
-      const outputRoot=searchTerm&&$('communitySearchPosts')?$('communitySearchPosts'):$('communityFeed');
-      if(outputRoot)outputRoot.innerHTML=posts.map(p=>renderPostCard(p,ctx,rankByPost)).join('')||(searchTerm?'<div class="empty"><strong>No hay publicaciones que coincidan</strong><p>Probá otra búsqueda o seguí explorando perfiles.</p></div>':following?'<div class="empty"><strong>Todavía no hay publicaciones de personas que seguís</strong><p>Buscá perfiles en Explorar y seguí a quienes te inspiren.</p><button class="btn" type="button" data-community-go="explore">Explorar</button></div>':'<div class="empty"><strong>Tu feed está vacío por ahora</strong><p>Seguí perfiles desde Explorar o compartí tu primer logro.</p><button class="btn" type="button" data-community-go="publish">Crear una publicación</button></div>');
-      if(!searchTerm){renderStories(posts,ctx);const more=$('communityLoadMore');if(more)more.hidden=posts.length<feedLimit;}
-      status(`${posts.length} publicación(es) cargadas.`);window.dispatchEvent(new CustomEvent('fittforma:feedrendered'));connectionStatus('Supabase responde correctamente: el feed de Comunidad se pudo consultar.');bindFeedActions(outputRoot||$('communityFeed'));
-    }catch(error){const message=friendlySupabaseError(error,'cargar el feed de la comunidad');status(message);connectionStatus(message);}
-    finally{loading=false;}
+  // v53: después de una acción sobre publicaciones se actualiza lo que está a la vista (no hay feed general).
+  let dialogPostId=null;
+  async function refreshPosts(){
+    if(currentSubView==='profile')await renderOwnGrid();
+    else if(currentSubView==='user'&&viewedUser)await openUser(viewedUser,{asOthers:viewedUser===user?.id});
+    if($('communityPostDialog')?.open&&dialogPostId)await openPostDialog(dialogPostId);
   }
-  // Novedades: personas que seguís (aceptadas) que publicaron en las últimas 48 h. No son historias efímeras nuevas:
-  // abren el perfil y sus publicaciones reales.
-  function renderStories(posts,ctx){
-    const root=$('communityStories');if(!root)return;
-    const cutoff=Date.now()-48*3600*1000,seen=new Set(),items=[];
-    for(const p of posts){if(p.user_id===user?.id||seen.has(p.user_id))continue;if(ctx.followStatus.get(p.user_id)!=='accepted')continue;if(Date.parse(p.created_at||'')<cutoff)continue;seen.add(p.user_id);items.push(Array.isArray(p.community_profiles)?p.community_profiles[0]:p.community_profiles);if(items.length>=12)break;}
-    const own=user?`<button type="button" class="community-story is-own" data-community-go="publish"><span class="community-story-ring">${avatarHtml(ownProfile||{display_name:'Vos'},ctx.urlOf)}<b aria-hidden="true">+</b></span><small>Publicar</small></button>`:'';
-    root.innerHTML=own+items.map(pr=>`<button type="button" class="community-story" data-community-open-user="${esc(pr?.user_id)}"><span class="community-story-ring is-new">${avatarHtml(pr,ctx.urlOf)}</span><small>${esc(pr?.username||'usuario')}</small></button>`).join('');
-    root.hidden=!own&&!items.length;
-    root.querySelectorAll('[data-community-open-user]').forEach(b=>b.addEventListener('click',()=>openUser(b.dataset.communityOpenUser)));
-    root.querySelectorAll('[data-community-go]').forEach(b=>b.addEventListener('click',()=>showCommunitySubView(b.dataset.communityGo)));
-  }
+
   async function saveProfile(e){e.preventDefault();if(!authReady()){setStatus('communityProfileStatus',authHint());return;}
     const display=$('communityDisplayName').value.trim(),username=$('communityUsername').value.trim().toLowerCase(),bio=$('communityBio').value.trim(),visibility=$('communityVisibility').value;
     if(display.length<1||!/^[a-z0-9_.-]{3,24}$/.test(username)){setStatus('communityProfileStatus','Revisá el nombre y el usuario (3–24 caracteres permitidos).');return;}
     setStatus('communityProfileStatus','Guardando perfil…');
     const {data,error}=await client.from('community_profiles').upsert({user_id:user.id,display_name:display,username,bio,visibility,updated_at:new Date().toISOString()},{onConflict:'user_id'}).select('*').single();
-    if(error){setStatus('communityProfileStatus',error.message.includes('unique')?'Ese usuario ya está ocupado. Elegí otro.':`No se pudo guardar: ${error.message}`);return;}fillProfile(data);setStatus('communityProfileStatus','Perfil guardado. Privacidad: '+(visibility==='public'?'público':'privado')+'.');await loadFeed();
+    if(error){setStatus('communityProfileStatus',error.message.includes('unique')?'Ese usuario ya está ocupado. Elegí otro.':`No se pudo guardar: ${error.message}`);return;}fillProfile(data);setStatus('communityProfileStatus','Perfil guardado. Privacidad: '+(visibility==='public'?'público':'privado')+'.');await refreshPosts();
   }
   async function prepareImage(file,{max=1800,square=false}={}){
     if(!file)throw new Error('Elegí las dos fotos de antes y después.');
@@ -306,28 +268,28 @@
       const postId=crypto.randomUUID();beforePath=await uploadImage(beforeFile,`${user.id}/${postId}/before.jpg`);afterPath=await uploadImage(afterFile,`${user.id}/${postId}/after.jpg`);
       const profile=await ensureProfile();const visibility=profile.visibility==='public'&&$('communityPostPublic').checked?'public':'followers';
       const {error}=await client.from('community_posts').insert({id:postId,user_id:user.id,description:$('communityPostDescription').value.trim(),exercises_text:$('communityPostExercises').value.trim(),nutrition_text:$('communityPostNutrition').value.trim(),running_text:$('communityPostRunning').value.trim(),start_date:start,end_date:end,before_path:beforePath,after_path:afterPath,visibility});
-      if(error)throw error;if(photoUnlocked){photoUnlocked=false;window.FittFormaAds?.refresh?.(true);fetch('/api/metrics',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'photo_after_reward'})}).catch(()=>{});}$('communityPostForm').reset();setStatus('communityPostStatus','¡Transformación publicada!');showCommunitySubView('feed');await loadFeed();
+      if(error)throw error;if(photoUnlocked){photoUnlocked=false;window.FittFormaAds?.refresh?.(true);fetch('/api/metrics',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'photo_after_reward'})}).catch(()=>{});}$('communityPostForm').reset();setStatus('communityPostStatus','¡Antes y después publicado!');toast('Publicado en tu perfil.');showCommunitySubView('profile');
     }catch(error){if(beforePath||afterPath){try{await client.storage.from(bucket).remove([beforePath,afterPath].filter(Boolean));}catch{}}if(photoLimitError(error)){setStatus('communityPostStatus','Ya publicaste las fotos de hoy. Tu publicación sigue en el formulario.');photoGate('communityPostStatus');return;}setStatus('communityPostStatus',`No se pudo publicar: ${error.message||'revisá las políticas de Supabase.'}`);}
     finally{btn.disabled=false;}
   }
   // Me gusta y guardar: se actualiza solo el botón (sin volver a dibujar el feed) y solo después de que la base confirma.
   async function toggleLike(postId,button){if(!authReady())return alert(tr(authHint()));const {data,error}=await client.from('community_likes').select('post_id').eq('post_id',postId).eq('user_id',user.id).maybeSingle();if(error){status(error.message);return;}const result=data?await client.from('community_likes').delete().eq('post_id',postId).eq('user_id',user.id):await client.from('community_likes').insert({post_id:postId,user_id:user.id});if(result.error){status(`No se pudo actualizar el me gusta: ${result.error.message}`);return;}
-    const on=!data;document.querySelectorAll(`[data-community-like="${CSS.escape(postId)}"]`).forEach(b=>{b.classList.toggle('is-on',on);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',tr(on?'Quitar me gusta':'Me gusta'));const c=b.querySelector('[data-like-count]');if(c)c.textContent=String(Math.max(0,(Number(c.textContent)||0)+(on?1:-1)));});if(!button)await loadFeed();}
+    const on=!data;document.querySelectorAll(`[data-community-like="${CSS.escape(postId)}"]`).forEach(b=>{b.classList.toggle('is-on',on);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',tr(on?'Quitar me gusta':'Me gusta'));const c=b.querySelector('[data-like-count]');if(c)c.textContent=String(Math.max(0,(Number(c.textContent)||0)+(on?1:-1)));});if(!button)await refreshPosts();}
   async function toggleSave(postId){if(!authReady())return alert(tr(authHint()));const on=!document.querySelector(`[data-community-save="${CSS.escape(postId)}"]`)?.classList.contains('is-on');const result=on?await client.from('community_saved_posts').insert({user_id:user.id,post_id:postId}):await client.from('community_saved_posts').delete().eq('user_id',user.id).eq('post_id',postId);if(result.error){status(friendlySupabaseError(result.error,'guardar la publicación'));return;}document.querySelectorAll(`[data-community-save="${CSS.escape(postId)}"]`).forEach(b=>{b.classList.toggle('is-on',on);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',tr(on?'Quitar de guardadas':'Guardar'));});toast(on?'Publicación guardada.':'Publicación quitada de guardadas.');if(currentSubView==='profile'&&ownTab==='saved')renderOwnGrid();}
   async function sharePost(postId){const article=document.querySelector(`[data-community-post="${CSS.escape(postId)}"]`),author=article?.querySelector('.community-author small')?.textContent?.split('·')[0]?.trim()||'',text=(article?.querySelector('[data-community-post-text]')?.textContent||'').slice(0,140);const url=location.origin+location.pathname;const data={title:'FittForma AI · Comunidad',text:`${author?`${author} en FittForma AI`:'Una publicación en FittForma AI'}${text?`: «${text}»`:''}`,url};try{if(navigator.share){await navigator.share(data);return;}await navigator.clipboard.writeText(`${data.text} ${url}`);toast('Texto y enlace copiados para compartir.');}catch(error){if(error?.name!=='AbortError')toast('No se pudo compartir desde este navegador.');}}
-  async function addComment(postId,body){if(!authReady())return alert(tr(authHint()));const text=String(body||'').trim();if(!text||text.length>500)return;const {error}=await client.from('community_comments').insert({post_id:postId,user_id:user.id,body:text});if(error)status(`No se pudo comentar: ${error.message}`);else{await loadFeed();if($('communityPostDialog')?.open)openPostDialog(postId);}}
+  async function addComment(postId,body){if(!authReady())return alert(tr(authHint()));const text=String(body||'').trim();if(!text||text.length>500)return;const {error}=await client.from('community_comments').insert({post_id:postId,user_id:user.id,body:text});if(error)status(`No se pudo comentar: ${error.message}`);else await refreshPosts();}
   async function toggleFollow(target,button){if(!authReady())return alert(tr(authHint()));if(target===user.id)return;const {data,error}=await client.from('community_follows').select('follower_id,following_id,status').eq('follower_id',user.id).eq('following_id',target).maybeSingle();if(error){status(error.message);return;}let result;if(data)result=await client.from('community_follows').delete().eq('follower_id',user.id).eq('following_id',target);else{
       // La base de datos decide si el seguimiento queda aceptado o pendiente según la privacidad.
       result=await client.from('community_follows').insert({follower_id:user.id,following_id:target,status:'pending'}).select('status').single();
-    }if(result.error)status(`No se pudo actualizar el seguimiento: ${result.error.message}`);else{if(!data&&button)button.textContent=result.data?.status==='accepted'?'Siguiendo':'Solicitud enviada';refreshOwnCounts();if(currentSubView==='user')await openUser(target);else if(currentSubView==='explore')loadSuggested();else await loadFeed();}}
+    }if(result.error)status(`No se pudo actualizar el seguimiento: ${result.error.message}`);else{if(!data&&button)button.textContent=result.data?.status==='accepted'?'Siguiendo':'Solicitud enviada';refreshOwnCounts();if(currentSubView==='user')await openUser(target);else if(currentSubView==='friends')loadFriends(true);}}
   async function blockUser(target){
     if(!authReady())return alert(tr(authHint()));if(!target||target===user.id)return;
     if(!confirm(tr('¿Bloquear a esta persona? Dejarán de verse entre ustedes en la comunidad, se eliminará el seguimiento mutuo y no podrán enviarse mensajes. Podés desbloquearla desde tu perfil.')))return;
     const {error}=await client.from('community_blocks').insert({blocker_id:user.id,blocked_id:target});
     if(error){status(error.message.includes('duplicate')?'Esta persona ya está bloqueada.':`No se pudo bloquear: ${error.message}`);return;}
     status('Usuario bloqueado. El seguimiento entre ambas cuentas fue eliminado.');
-    if(currentSubView==='user')showCommunitySubView('feed');
-    await Promise.all([loadBlockedUsers(),loadFeed(),loadChatContacts()]);
+    if(currentSubView==='user'||currentSubView==='compare')showCommunitySubView(lastTab||'world');
+    await Promise.all([loadBlockedUsers(),loadCurrentView(),loadChatContacts()]);
   }
   async function loadBlockedUsers(){
     const root=$('communityBlockedList');if(!root)return;
@@ -344,7 +306,7 @@
     const {error}=await client.from('community_blocks').delete().eq('blocker_id',user.id).eq('blocked_id',target);
     if(error){setStatus('communityProfileStatus',`No se pudo desbloquear: ${error.message}`);return;}
     setStatus('communityProfileStatus','Usuario desbloqueado. El seguimiento no se restaura automáticamente.');
-    await Promise.all([loadBlockedUsers(),loadFeed(),loadChatContacts()]);
+    await Promise.all([loadBlockedUsers(),loadChatContacts()]);
   }
   async function deleteConversation(){
     if(!authReady())return;const target=$('communityChatContact')?.value;if(!target)return setStatus('communityChatStatus','Elegí una conversación primero.');
@@ -353,9 +315,9 @@
     if(error){setStatus('communityChatStatus',`No se pudo borrar la conversación: ${error.message}`);return;}
     setStatus('communityChatStatus','Conversación eliminada para ambas personas.');await loadMessages();
   }
-  async function deletePost(id){if(!confirm(tr('¿Eliminar esta publicación? También se borran sus fotos, me gusta y comentarios.')))return;const {data,error}=await client.from('community_posts').select('before_path,after_path'+(schemaV41?',image_path':'')).eq('id',id).eq('user_id',user.id).maybeSingle();if(error||!data){status(error?.message||'No se encontró la publicación.');return;}const {error:delError}=await client.from('community_posts').delete().eq('id',id).eq('user_id',user.id);if(delError){status(delError.message);return;}const paths=[data.before_path,data.after_path,data.image_path].filter(Boolean);if(paths.length)await client.storage.from(bucket).remove(paths);$('communityPostDialog')?.close?.();await loadFeed();refreshOwnCounts();}
+  async function deletePost(id){if(!confirm(tr('¿Eliminar esta publicación? También se borran sus fotos, me gusta y comentarios.')))return;const {data,error}=await client.from('community_posts').select('before_path,after_path'+(schemaV41?',image_path':'')).eq('id',id).eq('user_id',user.id).maybeSingle();if(error||!data){status(error?.message||'No se encontró la publicación.');return;}const {error:delError}=await client.from('community_posts').delete().eq('id',id).eq('user_id',user.id);if(delError){status(delError.message);return;}const paths=[data.before_path,data.after_path,data.image_path].filter(Boolean);if(paths.length)await client.storage.from(bucket).remove(paths);$('communityPostDialog')?.close?.();await refreshPosts();refreshOwnCounts();}
   async function reportPost(id){if(!authReady())return alert(tr(authHint()));const reason=String(prompt(tr('Motivo de la denuncia (spam, acoso, contenido inapropiado, otro):'))??'').trim();if(!reason)return;const {error}=await client.from('community_reports').insert({reporter_id:user.id,post_id:id,reason:reason.trim().slice(0,300)});if(error)status(error.code==='23505'?'Ya enviaste una denuncia por esta publicación.':`No se pudo enviar la denuncia: ${error.message}`);else status('Denuncia enviada. Gracias por ayudar a cuidar la comunidad.');}
-  async function deleteComment(id){if(!confirm(tr('¿Borrar tu comentario?')))return;const {error}=await client.from('community_comments').delete().eq('id',id).eq('user_id',user.id);if(error)status(error.message);else await loadFeed();}
+  async function deleteComment(id){if(!confirm(tr('¿Borrar tu comentario?')))return;const {error}=await client.from('community_comments').delete().eq('id',id).eq('user_id',user.id);if(error)status(error.message);else await refreshPosts();}
   function achievementCard(a){
     const E=window.FittFormaBadgeEngine,level=Math.min(12,Math.max(1,Number(a?.level)||1));
     const rank=E?E.rankForLevel(level-1):{label:String(a?.rank||''),key:String(a?.rank||'bronze'),numeral:''};
@@ -380,7 +342,7 @@
       const {error}=await client.from('community_posts').update({description:value}).eq('id',id).eq('user_id',user.id);
       save.disabled=false;
       if(error){status(friendlySupabaseError(error,'editar la publicación'));return;}
-      status('Publicación actualizada.');await loadFeed();
+      status('Publicación actualizada.');await refreshPosts();
     });
   }
   function shareableBadges(){try{return typeof window.FittFormaShareableBadges==='function'?window.FittFormaShareableBadges():[];}catch(error){console.error('No se pudieron leer las insignias locales:',error);return [];}}
@@ -452,7 +414,7 @@
       if(error)throw error;
       if(imagePath&&photoUnlocked){photoUnlocked=false;window.FittFormaAds?.refresh?.(true);fetch('/api/metrics',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'photo_after_reward'})}).catch(()=>{});}
       (postKind==='text'?$('communityTextPostForm'):$('communityAchievementPostForm')).reset();
-      setStatus('communityComposeStatus','Publicado.');toast('Publicación guardada.');renderPostPreview();showCommunitySubView('feed');await loadFeed();refreshOwnCounts();
+      setStatus('communityComposeStatus','Publicado.');toast('Publicación guardada.');renderPostPreview();showCommunitySubView('profile');refreshOwnCounts();
     }catch(error){
       if(imagePath){try{await client.storage.from(bucket).remove([imagePath]);}catch(cleanupError){console.warn('No se pudo limpiar la foto subida:',cleanupError);}}
       if(photoLimitError(error)){setStatus('communityComposeStatus','Ya publicaste las fotos de hoy. Tu publicación sigue en el formulario.');photoGate('communityComposeStatus');return;}
@@ -507,7 +469,7 @@
       const {data:removed,error}=await client.from('community_posts').delete().eq('id',id).select('id');
       if(error||!removed?.length){setStatus('communityProfileStatus',error?friendlySupabaseError(error,'eliminar la publicación'):'No se pudo eliminar la publicación (sin permiso o ya no existe).');b.disabled=false;return;}
       const paths=[data?.before_path,data?.after_path,data?.image_path].filter(Boolean);if(paths.length){const r=await client.storage.from(bucket).remove(paths);if(r.error)console.warn('No se pudieron borrar las fotos de la publicación eliminada:',r.error.message);}
-      await loadModeration();await loadFeed();
+      await loadModeration();await refreshPosts();
     }
   }
   function bindFeedActions(root=$('communityFeed')){
@@ -519,7 +481,6 @@
     root.querySelectorAll('[data-community-show-comments]').forEach(b=>b.addEventListener('click',()=>{b.closest('.community-comments')?.querySelectorAll('[data-older-comment]').forEach(c=>c.hidden=false);b.remove();}));
     root.querySelectorAll('[data-community-follow]').forEach(b=>b.addEventListener('click',()=>toggleFollow(b.dataset.communityFollow,b)));
     root.querySelectorAll('[data-community-open-user]').forEach(b=>b.addEventListener('click',()=>openUser(b.dataset.communityOpenUser)));
-    root.querySelectorAll('[data-community-hashtag]').forEach(b=>b.addEventListener('click',()=>searchHashtag(b.dataset.communityHashtag)));
     root.querySelectorAll('[data-community-block]').forEach(b=>b.addEventListener('click',()=>blockUser(b.dataset.communityBlock)));
     root.querySelectorAll('[data-community-edit-post]').forEach(b=>b.addEventListener('click',()=>startEditPost(b)));
     root.querySelectorAll('[data-community-go]').forEach(b=>b.addEventListener('click',()=>showCommunitySubView(b.dataset.communityGo)));
@@ -593,49 +554,264 @@
   }
 
   // ---------- Explorar ----------
-  function personCard(p,urlOf){const locked=p.visibility==='private'&&p.can_view===false,fs=p.follow_status||'';const followLabel=fs==='accepted'?'Siguiendo':fs==='pending'?'Solicitud enviada':p.visibility==='private'?'Solicitar seguir':'Seguir';return `<article class="community-person${locked?' is-private':''}" data-community-open-user="${esc(p.user_id)}"><button type="button" class="community-person-open" data-community-open-user="${esc(p.user_id)}" aria-label="Ver el perfil de ${esc(p.display_name||p.username)}">${avatarHtml(p,urlOf,'lg')}</button><strong>${esc(p.display_name||p.username)}</strong><small class="muted">@${esc(p.username)}</small>${locked?`<small class="community-private-tag"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Perfil privado</small>`:''}${!locked&&p.bio?`<small class="community-person-bio">${esc(String(p.bio).slice(0,80))}</small>`:''}${!locked&&Number.isFinite(Number(p.followers))&&p.followers!==null?`<small class="muted">${Number(p.posts)||0} publicaciones · ${Number(p.followers)||0} seguidores</small>`:''}${user&&user.id!==p.user_id&&!p.is_self?`<button class="btn btn-sm${fs?' secondary':''}" type="button" data-community-search-follow="${esc(p.user_id)}">${followLabel}</button>`:''}</article>`;}
-  function bindPeople(root){root.querySelectorAll('button[data-community-open-user]').forEach(b=>b.addEventListener('click',()=>openUser(b.dataset.communityOpenUser)));root.querySelectorAll('[data-community-search-follow]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();toggleFollow(b.dataset.communitySearchFollow,b);}));root.querySelectorAll('[data-community-search-block]').forEach(b=>b.addEventListener('click',()=>blockUser(b.dataset.communitySearchBlock)));}
-  // v50: directorio de usuarios reales (RPC community_directory), con búsqueda y carga progresiva por @usuario.
-  let peopleAfter=null,peopleTerm='',peopleBusy=false,directoryEnabled=true;
+  // ---------- v53: comunidad de deportistas ----------
+  // Todo el mundo y Amigos (community_people), Ranking (community_leaderboard), perfil completo (community_athlete_profile)
+  // y comparación. Todo sale de funciones del servidor: el cliente nunca lee la tabla de estadísticas de otra persona.
+  // Si el proyecto todavía no aplicó la migración v53, se usa el directorio de v50 sin estadísticas.
+  const AS=()=>window.FittFormaAthleteStats,MRK=()=>window.FittFormaMuscleRanks,BE=()=>window.FittFormaBadgeEngine;
+  const LEVEL_LABEL={beginner:'Principiante',intermediate:'Intermedio',advanced:'Avanzado'};
+  const V53_HINT='Esta sección necesita la actualización v53 de la base de datos (supabase/migrations/2026-10-27_v53_athlete_community.sql).';
+  let athleteEnabled=null,viewedUser=null,compareUser=null;
+  const LOCK_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  function rankChip(i,size=26){const R=MRK();if(!R||!Number.isInteger(Number(i))||Number(i)<0||!R.RANKS[Number(i)])return '<span class="cm-rank is-none">Sin rango</span>';const r=R.RANKS[Number(i)];return `<span class="cm-rank" style="--rk:${esc(r.glow||r.color||'#8b9ab8')}">${R.emblemSvg(Number(i),size)}<b>${esc(r.name)}</b></span>`;}
+  function levelLine(p){if(!p?.stats_visible)return '';return [LEVEL_LABEL[p.training_level]||'',p.xp_level?`Nivel ${Number(p.xp_level)}`:''].filter(Boolean).join(' · ');}
+  function followLabel(fs,priv){return fs==='accepted'?'Siguiendo':fs==='pending'?'Solicitud enviada':priv?'Solicitar seguir':'Seguir';}
+  function athleteCard(p,urlOf,opts={}){
+    const uid=esc(p.user_id),name=esc(p.display_name||p.username),locked=p.can_view===false,fs=p.follow_status||'',meta=levelLine(p);
+    const side=p.stats_visible?rankChip(p.overall_rank,30):locked?`<small class="community-private-tag">${LOCK_SVG}Perfil privado</small>`:'<span class="cm-rank is-none">Sin estadísticas</span>';
+    const latest=p.stats_visible&&p.latest_badge?.exerciseName?`<small class="cm-latest">Último logro: ${esc(p.latest_badge.exerciseName)}</small>`:'';
+    const mutual=fs==='accepted'&&p.follows_me;
+    const actions=[opts.position?`<span class="cm-pos" title="Puesto en el ranking de rango general entre tus amigos">#${Number(opts.position)} en rango</span>`:'',
+      user&&!p.is_self?`<button class="btn btn-sm${fs?' secondary':''}" type="button" data-community-search-follow="${uid}">${followLabel(fs,p.visibility==='private')}</button>`:'',
+      opts.compare&&user&&!p.is_self&&p.stats_visible?`<button class="btn ghost btn-sm" type="button" data-community-compare="${uid}">Comparar</button>`:''].filter(Boolean).join('');
+    return `<article class="cm-card${locked?' is-private':''}${p.is_self?' is-self':''}"><button type="button" class="cm-card-open" data-community-open-user="${uid}" aria-label="Ver el perfil de ${name}">${avatarHtml(p,urlOf,'lg')}<span class="cm-card-id"><strong>${name}</strong><small class="muted">@${esc(p.username)}${p.is_self?' · Vos':mutual?' · Se siguen':''}</small>${meta?`<small class="cm-card-level">${esc(meta)}</small>`:''}${latest}</span><span class="cm-card-side">${side}<span class="cm-card-badges">${featuredHtml(p.featured_badges,20)}</span></span></button>${actions?`<div class="cm-card-actions">${actions}</div>`:''}</article>`;
+  }
+  // Tarjeta del directorio de v50 (sin estadísticas), para proyectos sin la migración v53.
+  function legacyToAthlete(p){return {...p,stats_visible:false,follows_me:false};}
+  function bindPeople(root){
+    root.querySelectorAll('[data-community-open-user]').forEach(b=>b.addEventListener('click',()=>openUser(b.dataset.communityOpenUser)));
+    root.querySelectorAll('[data-community-search-follow]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();toggleFollow(b.dataset.communitySearchFollow,b);}));
+    root.querySelectorAll('[data-community-compare]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openCompare(b.dataset.communityCompare);}));
+  }
+  async function peopleRpc(scope,term,after,limit=20){
+    if(athleteEnabled!==false){
+      const r=await client.rpc('community_people',{p_search:term,p_after:after,p_limit:limit,p_scope:scope});
+      if(!r.error){athleteEnabled=true;return r;}
+      if(!isMissingFunction(r.error))return r;
+      athleteEnabled=false;
+    }
+    if(scope==='friends')return {data:null,error:{message:V53_HINT,code:'V53'}};
+    const r=await client.rpc('community_directory',{p_search:term,p_after:after,p_limit:limit});
+    return r.error?r:{data:(r.data||[]).map(legacyToAthlete),error:null};
+  }
+  // Todo el mundo: usuarios reales, por @usuario, de a 20 (carga progresiva).
+  let peopleAfter=null,peopleTerm='',peopleBusy=false;
   async function loadDirectory(reset=true){
-    const root=$('communityPeople'),more=$('communityPeopleMore'),wrap=root?.closest('.community-people-wrap');if(!root||!client||peopleBusy)return;
-    if(!directoryEnabled){if(wrap)wrap.hidden=true;return false;}
-    if(reset){peopleAfter=null;root.innerHTML='<p class="muted small">Cargando personas…</p>';}
-    peopleBusy=true;
+    const root=$('communityPeople'),more=$('communityPeopleMore');if(!root)return;
+    if(!client){root.innerHTML='';setStatus('communityWorldStatus',authHint());return;}
+    if(peopleBusy)return;peopleBusy=true;
+    if(reset){peopleAfter=null;root.innerHTML='<div class="cm-skeleton" aria-hidden="true"><i></i><i></i><i></i></div>';setStatus('communityWorldStatus','Cargando personas…');}
     try{
-      const r=await client.rpc('community_directory',{p_search:peopleTerm,p_after:peopleAfter,p_limit:20});
-      if(r.error){if(isMissingFunction(r.error)){directoryEnabled=false;if(wrap)wrap.hidden=true;return false;}root.innerHTML=`<p class="muted small">${esc(friendlySupabaseError(r.error,'cargar personas'))}</p>`;return true;}
-      const list=r.data||[];if(wrap)wrap.hidden=false;
-      const urlOf=await signedMany(list.map(x=>x.avatar_path));
-      const html=list.map(p=>personCard(p,urlOf)).join('');
-      if(reset)root.innerHTML=html||`<div class="empty"><p>${peopleTerm?'No encontramos personas con ese nombre o usuario.':'Todavía no hay otras personas en la comunidad.'}</p></div>`;else root.insertAdjacentHTML('beforeend',html);
+      const r=await peopleRpc('all',peopleTerm,peopleAfter,20);
+      if(r.error){root.innerHTML='';setStatus('communityWorldStatus',friendlySupabaseError(r.error,'cargar personas'));return;}
+      const list=r.data||[];const urlOf=await signedMany(list.map(x=>x.avatar_path));
+      const html=list.map(p=>athleteCard(p,urlOf)).join('');
+      if(reset)root.innerHTML=html||`<div class="empty"><strong>${peopleTerm?'No encontramos personas':'Todavía no hay otras personas'}</strong><p>${peopleTerm?'Probá con otro nombre o @usuario.':'Cuando más deportistas usen FittForma, van a aparecer acá.'}</p></div>`;else root.insertAdjacentHTML('beforeend',html);
       bindPeople(root);peopleAfter=list.length?list[list.length-1].username:peopleAfter;if(more)more.hidden=list.length<20;
-      $('communityPeopleHint').textContent=peopleTerm?`Resultados para «${peopleTerm}»`:'Usuarios reales de la app, por orden alfabético';
-      return true;
+      setStatus('communityPeopleHint',peopleTerm?`Resultados para «${peopleTerm}»`:'Usuarios reales de la app, por orden alfabético');
+      setStatus('communityWorldStatus',athleteEnabled===false?'Las estadísticas de los perfiles requieren la actualización v53 de la base de datos.':user?'':'Iniciá sesión para seguir personas y ver perfiles privados que te acepten.');
+      connectionStatus('Supabase responde correctamente: el directorio de Comunidad se pudo consultar.');
     }finally{peopleBusy=false;}
   }
-  async function loadSuggested(){
-    const root=$('communitySuggested'),wrap=root?.closest('.community-suggested-wrap');if(!root||!client)return;
-    const r=await client.rpc('community_suggested_profiles');
-    if(r.error){if(wrap)wrap.hidden=true;if(!isMissingFunction(r.error))console.warn('No se pudieron cargar sugerencias:',r.error.message);return;}
-    const list=r.data||[];if(wrap)wrap.hidden=!list.length;
-    const urlOf=await signedMany(list.map(x=>x.avatar_path));
-    root.innerHTML=list.map(p=>personCard({...p,visibility:'public'},urlOf)).join('');bindPeople(root);
+  async function searchUsers(e){
+    e.preventDefault();searchTerm=$('communitySearch').value.trim();
+    if(!client){setStatus('communityWorldStatus',authHint());return;}
+    peopleTerm=searchTerm.replace(/^[@#]/,'').replace(/[,%()]/g,'');await loadDirectory(true);
   }
-  async function loadExploreGrid(){
-    const root=$('communityExploreGrid');if(!root||!client)return;
-    let q=client.from('community_posts').select(postSelect()+`,community_profiles!community_posts_user_id_fkey!inner(${profileCols()})`).order('created_at',{ascending:false}).limit(24);
-    if(exploreFilter==='transformation')q=q.eq('post_kind','transformation');
-    else if(exploreFilter==='achievement')q=q.eq('post_kind','achievement');
-    else if(exploreFilter==='photos')q=q.not('image_path','is',null);
-    else if(exploreFilter==='workout'&&schemaV49!==false)q=q.not('linked_session','is',null);
-    const {data,error}=await q;
-    if(error){root.innerHTML='';status(friendlySupabaseError(error,'cargar publicaciones para explorar'));return;}
-    const posts=(data||[]).filter(p=>exploreFilter!=='transformation'||true);
-    const urlOf=await signedMany(posts.flatMap(p=>[p.image_path,(p.post_kind||'transformation')==='transformation'?p.after_path:null]));
-    root.innerHTML=posts.length?posts.map(p=>gridTile(p,urlOf)).join(''):'<div class="empty"><p>No hay publicaciones para este filtro todavía.</p></div>';
-    bindGrid(root);
+  function clearSearch(){searchTerm='';peopleTerm='';$('communitySearch').value='';loadDirectory(true);}
+
+  // Amigos: la relación de seguimiento existente (seguís a la persona y aceptó). Se marca si además te sigue.
+  let friendsAfter=null,friendsBusy=false;
+  async function loadFriends(reset=true){
+    const root=$('communityFriends'),more=$('communityFriendsMore');if(!root)return;
+    if(!client){root.innerHTML='';setStatus('communityFriendsStatus',authHint());return;}
+    if(!user){root.innerHTML=`<div class="empty cm-empty"><strong>Iniciá sesión para ver a tus amigos</strong><p>Tus amigos son las personas que seguís en Comunidad.</p><button class="btn" type="button" data-community-go="profile">Iniciar sesión</button></div>`;bindGo(root);setStatus('communityFriendsStatus','');if(more)more.hidden=true;return;}
+    if(friendsBusy)return;friendsBusy=true;
+    if(reset){friendsAfter=null;root.innerHTML='<div class="cm-skeleton" aria-hidden="true"><i></i><i></i></div>';setStatus('communityFriendsStatus','Cargando amigos…');}
+    try{
+      const [r,board]=await Promise.all([peopleRpc('friends','',friendsAfter,20),reset?client.rpc('community_leaderboard',{p_category:'rank',p_scope:'friends',p_limit:100}):Promise.resolve({data:null})]);
+      if(r.error){root.innerHTML='';setStatus('communityFriendsStatus',r.error.code==='V53'?V53_HINT:friendlySupabaseError(r.error,'cargar tus amigos'));return;}
+      if(reset)friendPositions=new Map((board.data||[]).map(x=>[x.user_id,Number(x.pos)]));
+      const list=r.data||[];const urlOf=await signedMany(list.map(x=>x.avatar_path));
+      const html=list.map(p=>athleteCard(p,urlOf,{compare:true,position:friendPositions.get(p.user_id)})).join('');
+      if(reset)root.innerHTML=html||`<div class="empty cm-empty"><svg class="cm-empty-art" viewBox="0 0 64 64" aria-hidden="true"><circle cx="24" cy="22" r="9"/><circle cx="43" cy="26" r="7"/><path d="M8 52c1.5-9 8-14 16-14s14.5 5 16 14M38 40c7 0 12 4 14 12"/></svg><strong>Todavía no tenés amigos en tu comunidad</strong><p>Seguí a otros deportistas para ver su progreso, compararte y competir en el ranking de amigos.</p><div class="btn-row"><button class="btn" type="button" data-community-go="world">Descubrir personas</button><button class="btn ghost" type="button" data-community-search-focus>Buscar a alguien</button></div></div>`;else root.insertAdjacentHTML('beforeend',html);
+      bindPeople(root);bindGo(root);root.querySelector('[data-community-search-focus]')?.addEventListener('click',()=>{showCommunitySubView('world');$('communitySearch')?.focus();});
+      friendsAfter=list.length?list[list.length-1].username:friendsAfter;if(more)more.hidden=list.length<20;
+      setStatus('communityFriendsStatus',list.length&&reset?`${list.length}${list.length>=20?'+':''} amigo(s). Para escribirle a alguien, tienen que seguirse mutuamente.`:'');
+    }finally{friendsBusy=false;}
   }
+  let friendPositions=new Map();
+  function bindGo(root){root.querySelectorAll('[data-community-go]').forEach(b=>b.addEventListener('click',()=>showCommunitySubView(b.dataset.communityGo)));}
+
+  // Ranking: una categoría a la vez, con qué mide, el período y el orden. Las posiciones las calcula el servidor.
+  let rankCategory='rank',rankScope='all',rankBusy=false;
+  function formatMetric(cat,v){
+    const n=Number(v);if(v==null||!Number.isFinite(n))return 'Sin datos disponibles';
+    if(cat==='rank'){const r=MRK()?.RANKS?.[n];return r?r.name:'Sin rango';}
+    if(cat==='constancy')return `${n} ${n===1?'día':'días'}`;
+    if(cat==='badges')return `${n} ${n===1?'insignia':'insignias'}`;
+    if(cat==='level')return `Nivel ${n}`;
+    if(cat==='running')return `${n.toLocaleString(undefined,{maximumFractionDigits:1})} km`;
+    if(cat==='plank'){const m=Math.floor(n/60),s=Math.round(n%60);return m?`${m} min ${String(s).padStart(2,'0')} s`:`${s} s`;}
+    return `${n} rep`;
+  }
+  function renderRankingChips(){
+    const root=$('rankingCategories');const S=AS();if(!root||!S)return;
+    root.innerHTML=S.CATEGORIES.map(c=>`<button type="button" class="cm-chip${c.key===rankCategory?' is-active':''}" data-ranking-category="${esc(c.key)}" aria-pressed="${c.key===rankCategory}">${esc(c.label)}</button>`).join('');
+    root.querySelectorAll('[data-ranking-category]').forEach(b=>b.addEventListener('click',()=>{rankCategory=b.dataset.rankingCategory;renderRankingChips();loadRanking();}));
+    const c=S.CATEGORIES.find(x=>x.key===rankCategory);
+    $('rankingExplain').innerHTML=c?`<strong>${esc(c.label)}</strong><p>${esc(c.measures)}</p><dl><div><dt>Período</dt><dd>${esc(c.period)}</dd></div><div><dt>Orden</dt><dd>${esc(c.order)}</dd></div><div><dt>Participan</dt><dd>${rankScope==='friends'?'Vos y las personas que seguís':'Perfiles que podés ver'} que muestran sus estadísticas.</dd></div></dl>`:'';
+  }
+  function rankRow(x,urlOf,podium=false){
+    const name=esc(x.is_self?'Vos':(x.display_name||x.username)),uid=esc(x.user_id),pos=Number(x.pos)||0,lvl=LEVEL_LABEL[x.training_level]||'';
+    const value=formatMetric(rankCategory,x.value);
+    if(podium)return `<li class="cm-podium-step p${Math.min(pos,3)}${x.is_self?' is-self':''}"><button type="button" data-community-open-user="${uid}" aria-label="Puesto ${pos}: ${name}, ${esc(value)}">${avatarHtml(x,urlOf,'lg')}<span class="cm-podium-pos">${pos}</span><strong>${name}</strong><small>${esc(value)}</small></button></li>`;
+    return `<li class="cm-board-row${x.is_self?' is-self':''}"><button type="button" data-community-open-user="${uid}" aria-label="Puesto ${pos}: ${name}, ${esc(value)}"><span class="cm-board-pos">${pos}</span>${avatarHtml(x,urlOf)}<span class="cm-board-who"><strong>${name}</strong><small class="muted">@${esc(x.username)}${lvl?' · '+esc(lvl):''}</small></span><span class="cm-board-meta">${rankCategory==='rank'?'':rankChip(x.overall_rank,22)}<span class="cm-card-badges">${featuredHtml(x.featured_badges,16)}</span></span><b class="cm-board-value">${esc(value)}</b></button></li>`;
+  }
+  async function loadRanking(){
+    renderRankingChips();const podium=$('rankingPodium'),list=$('rankingList');if(!podium||!list)return;
+    if(!client){podium.innerHTML='';list.innerHTML='';setStatus('rankingStatus',authHint());return;}
+    if(rankScope==='friends'&&!user){podium.innerHTML='';list.innerHTML='';setStatus('rankingStatus','Iniciá sesión para ver el ranking con tus amigos.');return;}
+    if(rankBusy)return;rankBusy=true;setStatus('rankingStatus','Cargando ranking…');
+    const cat=rankCategory,scope=rankScope;
+    try{
+      if(user)await syncStats();
+      const r=await client.rpc('community_leaderboard',{p_category:cat,p_scope:scope,p_limit:50});
+      if(cat!==rankCategory||scope!==rankScope)return;
+      if(r.error){podium.innerHTML='';list.innerHTML='';setStatus('rankingStatus',isMissingFunction(r.error)?V53_HINT:friendlySupabaseError(r.error,'cargar el ranking'));return;}
+      athleteEnabled=true;
+      const rows=r.data||[];const urlOf=await signedMany(rows.map(x=>x.avatar_path));
+      const top=rows.filter(x=>Number(x.pos)<=3).slice(0,3),rest=rows.slice(top.length);
+      podium.innerHTML=top.map(x=>rankRow(x,urlOf,true)).join('');podium.hidden=!top.length;
+      list.innerHTML=rest.map(x=>rankRow(x,urlOf)).join('');
+      bindPeople(podium);bindPeople(list);
+      const mine=rows.find(x=>x.is_self);
+      setStatus('rankingStatus',!rows.length?(scope==='friends'?'Todavía no hay datos de tus amigos en esta categoría. Seguí a más personas o probá otra categoría.':'Todavía nadie tiene datos en esta categoría.'):mine?`Tu puesto: ${Number(mine.pos)} de ${rows.length}${rows.length>=50?'+':''}.`:user?(ownStats?.stats_public===false?'Tus estadísticas están ocultas: no aparecés en los rankings.':'Todavía no tenés datos en esta categoría.'):'Iniciá sesión para aparecer en el ranking.');
+    }finally{rankBusy=false;}
+  }
+
+  // ---------- Estadísticas propias: se publican desde la app, públicas por defecto y ocultables ----------
+  const NOTICE_KEY='fittforma-v53-stats-notice';
+  let ownStats=null,ownStatsLoaded=false,statsSig='',statsBusy=null,statsVersion=0;
+  const noticeState=()=>{try{return localStorage.getItem(NOTICE_KEY)||'';}catch{return 'shown';}};
+  const setNotice=v=>{try{localStorage.setItem(NOTICE_KEY,v);}catch{}};
+  function renderStatsNotice(){
+    const box=$('communityStatsNotice');if(!box)return;
+    const show=authReady()&&athleteEnabled!==false&&noticeState()!=='1'&&['world','ranking','friends'].includes(currentSubView);
+    box.hidden=!show;if(show&&!noticeState())setNotice('shown');
+  }
+  function reflectStatsToggles(){const on=ownStats?ownStats.stats_public!==false:true;['communityStatsPublic','rkShareToggle'].forEach(id=>{const el=$(id);if(el)el.checked=on;});}
+  // Sube las estadísticas actuales (si cambiaron). Solo después de mostrar el aviso al menos una vez, y nunca
+  // si la persona las ocultó. Devuelve la fila propia ({stats_public, ...}) o null.
+  async function syncStats(force=false){
+    if(!authReady()||athleteEnabled===false)return ownStats;
+    if(statsBusy)return statsBusy;
+    statsBusy=(async()=>{
+      try{
+        if(!ownStatsLoaded){
+          const r=await client.from('community_athlete_stats').select('stats_public,stats_date,updated_at').eq('user_id',user.id).maybeSingle();
+          if(r.error){if(String(r.error.code)==='42P01'||String(r.error.code)==='PGRST205'||/does not exist|could not find the table/i.test(String(r.error.message)))athleteEnabled=false;return ownStats;}
+          ownStats=r.data||null;ownStatsLoaded=true;reflectStatsToggles();
+        }
+        if(ownStats?.stats_public===false)return ownStats;
+        if(!ownStats&&!noticeState())return null;
+        const row=window.FittFormaAthleteStatsNow?.();if(!row)return ownStats;
+        const sig=JSON.stringify(row);if(!force&&ownStats&&sig===statsSig)return ownStats;
+        const version=statsVersion;
+        const {data,error}=await client.from('community_athlete_stats').upsert({...row,user_id:user.id}).select('stats_public,stats_date,updated_at').maybeSingle();
+        if(error){console.warn('No se pudieron publicar las estadísticas de Comunidad:',error.message);return ownStats;}
+        if(version!==statsVersion)return ownStats; // la persona cambió la preferencia mientras tanto
+        statsSig=sig;ownStats=data||ownStats;athleteEnabled=true;reflectStatsToggles();return ownStats;
+      }catch(error){console.warn('Estadísticas de Comunidad:',error?.message||error);return ownStats;}
+    })();
+    const current=statsBusy;current.finally(()=>{if(statsBusy===current)statsBusy=null;});
+    return current;
+  }
+  async function setStatsPublic(on){
+    if(!authReady()){toast(authHint());return false;}
+    if(athleteEnabled===false){setStatus('communityStatsStatus',V53_HINT);return false;}
+    statsVersion++;if(statsBusy)await statsBusy.catch(()=>{});
+    const row=on?(window.FittFormaAthleteStatsNow?.()||{}):{stats_date:localDateKey()};
+    const payload=ownStats&&!on?{user_id:user.id,stats_public:false,stats_date:localDateKey()}:{...row,user_id:user.id,stats_public:!!on};
+    const {data,error}=await client.from('community_athlete_stats').upsert(payload).select('stats_public,stats_date,updated_at').maybeSingle();
+    if(error){setStatus('communityStatsStatus',friendlySupabaseError(error,'guardar la preferencia de estadísticas'));reflectStatsToggles();return false;}
+    ownStats=data;ownStatsLoaded=true;statsSig=on?JSON.stringify(row):'';setNotice('1');renderStatsNotice();reflectStatsToggles();
+    const msg=on?'Tus estadísticas de entrenamiento se muestran en tu perfil y en los rankings.':'Ocultaste tus estadísticas: ya no se muestran ni aparecés en los rankings.';
+    setStatus('communityStatsStatus',msg);toast(msg);
+    if(currentSubView==='ranking')loadRanking();
+    return true;
+  }
+
+  // ---------- Perfil completo (el mismo componente desde Todo el mundo, Ranking y Amigos) ----------
+  function statTile(label,value,sub=''){return `<div class="cm-stat"><small>${esc(label)}</small><b${value==null?' class="is-empty"':''}>${esc(value==null?'Sin datos disponibles':value)}</b>${sub?`<span>${esc(sub)}</span>`:''}</div>`;}
+  function statsSection(p){
+    if(!p.stats_visible)return `<section class="cm-section"><h4>Estadísticas</h4><p class="muted small">${p.is_self?'Ocultaste tus estadísticas. Activalas en Mi perfil para que otras personas las vean.':'Esta persona no comparte sus estadísticas de entrenamiento.'}</p></section>`;
+    const fresh=p.stats_fresh!==false,n=v=>Number(v)||0,km=n(p.run_km_30d);
+    const plank=n(p.best_plank_seconds)?formatMetric('plank',p.best_plank_seconds):null;
+    const when=p.stats_updated_at?new Date(p.stats_updated_at).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}):'';
+    return `<section class="cm-section"><h4>Estadísticas</h4>
+      <div class="cm-stats">
+        ${statTile('Constancia (30 días)',fresh?`${n(p.active_days_30d)} de 30 días`:null,fresh?'días con entrenamiento o actividad':'sin datos recientes')}
+        ${statTile('Entrenamientos (30 días)',fresh?String(n(p.workouts_30d)):null,fresh?'sesiones y actividades':'sin datos recientes')}
+        ${statTile('Actividades registradas',String(n(p.workouts_total)),'en total')}
+        ${statTile('Running (30 días)',fresh&&km>0?formatMetric('running',km):null,fresh&&km>0?`${n(p.run_count_30d)} carrera(s) · ${n(p.run_minutes_30d)} min`:'')}
+        ${statTile('Músculos con rango',`${n(p.ranked_muscles)} de 20`,'Mapa de avances')}
+        ${statTile('Insignias',String(n(p.badges_count)),'desafíos con insignia')}
+      </div>
+      <h5 class="cm-subhead">Mejores series</h5>
+      <div class="cm-stats cm-stats-4">
+        ${statTile('Flexiones clásicas',n(p.best_pushups)?`${n(p.best_pushups)} rep`:null)}
+        ${statTile('Dominadas',n(p.best_pullups)?`${n(p.best_pullups)} rep`:null)}
+        ${statTile('Sentadilla al aire',n(p.best_air_squats)?`${n(p.best_air_squats)} rep`:null)}
+        ${statTile('Plancha frontal',plank)}
+      </div>
+      <p class="muted small cm-footnote">Calculadas por la app con los registros de la persona${when?` (actualizado el ${esc(when)})`:''}. No son mediciones médicas ni de masa muscular.</p></section>`;
+  }
+  function badgesSection(p){
+    const E=BE();const list=p.stats_visible&&Array.isArray(p.badges)&&p.badges.length?p.badges:(Array.isArray(p.featured_badges)?p.featured_badges:[]);
+    if(!p.can_view)return '';
+    if(!list.length)return `<section class="cm-section"><h4>Insignias y logros</h4><p class="muted small">${p.stats_visible?'Todavía no tiene insignias.':'Sin insignias para mostrar.'}</p></section>`;
+    const ev={gps_device:'Con GPS del dispositivo',session:'Registrada en un entrenamiento',declared:'Autorregistrada'};
+    const items=list.map(b=>{const level=Math.min(12,Math.max(1,Number(b?.level)||1)),rank=E?E.rankForLevel(level-1):{label:'',key:'',numeral:''};
+      const medal=E?E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:b.exerciseId,name:b.exerciseName,category:b.category,measure:b.measure}),category:b.category,size:46,title:`${b.exerciseName} · ${rank.label}`}):'';
+      const cat=E&&b.category?E.categoryLabel(b.category):'';const date=b.earnedAt?dateLabel(b.earnedAt):'';
+      return `<li class="cm-badge">${medal}<div><strong>${esc(b.exerciseName||'Insignia')}</strong><small>${esc([cat,rank.label?`${rank.label} · nivel ${level}`:`Nivel ${level}`].filter(Boolean).join(' · '))}</small><small class="muted">${esc([date,b.evidence?ev[b.evidence]||ev.declared:''].filter(Boolean).join(' · '))}</small></div></li>`;}).join('');
+    return `<section class="cm-section"><h4>Insignias y logros <small class="muted">${list.length}${p.stats_visible&&Number(p.badges_count)>list.length?` de ${Number(p.badges_count)}`:''}</small></h4><ul class="cm-badges">${items}</ul><p class="muted small cm-footnote">Las insignias se ganan en la app. Ninguna está verificada por terceros: se indica si tiene GPS del dispositivo, si salió de un entrenamiento registrado o si fue autorregistrada.</p></section>`;
+  }
+  async function openUser(uid,opts={}){
+    if(!client||!uid)return;
+    if(user&&uid===user.id&&!opts.asOthers){showCommunitySubView('profile');return;}
+    if(athleteEnabled===false)return openUserLegacy(uid);
+    viewedUser=uid;showCommunitySubView('user');const root=$('communityUserProfile');root.innerHTML='<div class="cm-skeleton cm-skeleton-hero" aria-hidden="true"><i></i><i></i></div><p class="sr-only">Cargando perfil…</p>';
+    if(user&&uid===user.id)await syncStats();
+    const r=await client.rpc('community_athlete_profile',{p_user:uid});
+    if(r.error){if(isMissingFunction(r.error)){athleteEnabled=false;return openUserLegacy(uid);}root.innerHTML=`<div class="empty"><strong>No se pudo abrir el perfil</strong><p>${esc(friendlySupabaseError(r.error,'abrir el perfil'))}</p></div>`;return;}
+    athleteEnabled=true;const p=r.data?.[0];if(viewedUser!==uid)return;
+    if(!p){root.innerHTML='<div class="empty"><strong>Perfil no disponible</strong><p>Puede haber sido eliminado o haber un bloqueo entre las cuentas.</p></div>';return;}
+    const urlOf=await signedMany([p.avatar_path]),fs=p.follow_status||'',mutual=fs==='accepted'&&p.follows_me,priv=p.visibility==='private',meta=levelLine(p);
+    const counts=p.can_view?`<div class="community-profile-stats cm-counts">${statsHtml(p.posts,p.followers,p.following)}</div>`:'';
+    const actions=p.is_self?`<p class="muted small">Así ven tu perfil las demás personas.</p>`:user?`<div class="btn-row community-profile-actions"><button class="btn${fs?' secondary':''}" type="button" data-user-follow>${fs==='accepted'?'Dejar de seguir':fs==='pending'?'Cancelar solicitud':priv?'Solicitar seguir':'Seguir'}</button>${p.stats_visible?'<button class="btn ghost" type="button" data-user-compare>Comparar progreso</button>':''}${mutual?'<button class="btn ghost" type="button" data-user-message>Mensaje</button>':''}<button class="btn ghost" type="button" data-community-block>Bloquear</button></div>${!mutual&&fs==='accepted'?'<p class="muted small">Los mensajes privados se habilitan cuando se siguen mutuamente.</p>':''}`:'<p class="muted small">Iniciá sesión para seguir, comparar o escribir.</p>';
+    root.innerHTML=`<header class="cm-hero card">
+        <div class="cm-hero-top">${avatarHtml(p,urlOf,'xl')}<div class="cm-hero-id"><strong>${esc(p.display_name||p.username)}</strong><span class="muted small">@${esc(p.username)}${priv?' · Privado':''}${p.follows_me&&!p.is_self?' · Te sigue':''}</span>${meta?`<span class="cm-card-level">${esc(meta)}</span>`:''}</div></div>
+        <div class="cm-hero-rank">${p.stats_visible?`<div><small class="muted">Rango principal</small>${rankChip(p.overall_rank,44)}</div>`:''}<div class="community-featured" aria-label="Insignias destacadas">${featuredHtml(p.featured_badges,30)}</div></div>
+        ${p.bio?`<p class="community-profile-bio">${esc(p.bio)}</p>`:''}${counts}${actions}
+      </header>
+      ${p.can_view?'':`<div class="notice community-private-notice"><strong>Este perfil es privado.</strong><p class="small">${fs==='pending'?'Tu solicitud está pendiente: cuando la acepte vas a ver sus estadísticas, insignias y publicaciones.':'Seguilo y, cuando acepte tu solicitud, vas a ver sus estadísticas, insignias y publicaciones.'}</p></div>`}
+      ${p.can_view?statsSection(p)+badgesSection(p):''}
+      ${p.can_view?'<section class="cm-section"><h4>Publicaciones</h4><div class="community-grid" id="communityUserGrid"><p class="muted small">Cargando…</p></div></section>':''}`;
+    root.querySelector('[data-user-follow]')?.addEventListener('click',e=>toggleFollow(uid,e.currentTarget));
+    root.querySelector('[data-user-compare]')?.addEventListener('click',()=>openCompare(uid));
+    root.querySelector('[data-user-message]')?.addEventListener('click',async()=>{showCommunitySubView('messages');await loadChatContacts();openChat(uid);});
+    root.querySelector('[data-community-block]')?.addEventListener('click',()=>blockUser(uid));
+    if(p.can_view)loadUserPosts(uid,p);
+  }
+  async function loadUserPosts(uid,p){
+    const {data:posts}=await client.from('community_posts').select(postSelect()).eq('user_id',uid).order('created_at',{ascending:false}).limit(30);
+    const list=posts||[];const tileUrl=await signedMany(list.flatMap(x=>[x.image_path,(x.post_kind||'transformation')==='transformation'?x.after_path:null]));
+    const grid=$('communityUserGrid');if(grid&&viewedUser===uid){grid.innerHTML=list.length?list.map(x=>gridTile({...x,community_profiles:p},tileUrl)).join(''):'<div class="empty"><p>Todavía no publicó nada.</p></div>';bindGrid(grid);}
+  }
+
+  // Mosaicos de publicaciones dentro de un perfil (propio o ajeno).
   function gridTile(p,urlOf){const kind=p.post_kind||'transformation',img=urlOf(p.image_path)||(kind==='transformation'?urlOf(p.after_path):'');const E=window.FittFormaBadgeEngine;let inner='';
     if(img)inner=`<img src="${esc(img)}" alt="" loading="lazy" onerror="this.remove()">`;
     else if(kind==='achievement'&&E&&p.achievement){const level=Math.min(12,Math.max(1,Number(p.achievement.level)||1)),rank=E.rankForLevel(level-1);inner=`<span class="community-tile-badge">${E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:p.achievement.exerciseId,name:p.achievement.exerciseName,category:p.achievement.category,measure:p.achievement.measure}),category:p.achievement.category,size:52})}<small>${esc(p.achievement.exerciseName)}</small></span>`;}
@@ -643,23 +819,51 @@
     const label=kind==='transformation'?'Transformación':kind==='achievement'?'Logro':'Publicación';
     return `<button type="button" class="community-tile${img?'':' is-text'}" data-community-open-post="${esc(p.id)}" aria-label="Abrir ${label.toLowerCase()} de ${esc((Array.isArray(p.community_profiles)?p.community_profiles[0]:p.community_profiles)?.username||'usuario')}">${inner}${kind==='transformation'?'<span class="community-tile-kind">Antes/Después</span>':''}</button>`;}
   function bindGrid(root){root.querySelectorAll('[data-community-open-post]').forEach(b=>b.addEventListener('click',()=>openPostDialog(b.dataset.communityOpenPost)));}
-  async function loadExplore(){if(!client){status(authHint());return;}exploreLoaded=true;if(!searchTerm.startsWith('@')&&!searchTerm.startsWith('#'))peopleTerm=searchTerm;await Promise.all([loadDirectory(true),loadSuggested(),searchTerm?Promise.resolve():loadExploreGrid()]);}
-  function searchHashtag(tag){showCommunitySubView('explore');$('communitySearch').value='#'+tag;$('communitySearchForm').requestSubmit();}
-  async function searchUsers(e){e.preventDefault();searchTerm=$('communitySearch').value.trim();if(!client){status(authHint());return;}const root=$('communitySearchResults'),postRoot=$('communitySearchPosts');root.innerHTML='';if(postRoot)postRoot.innerHTML='';if(!searchTerm){status('Buscá personas por nombre o @usuario, o publicaciones por #hashtag.');$('communityExploreGrid').hidden=false;return loadExploreGrid();}$('communityExploreGrid').hidden=true;
-    if(searchTerm.startsWith('#')){status(`Publicaciones con ${searchTerm}.`);await loadFeed();return;}
-    const term=searchTerm.replace(/^@/,'').replace(/[,%()]/g,'');peopleTerm=term;if(directoryEnabled&&await loadDirectory(true)!==false){root.innerHTML='';status('Personas que coinciden con tu búsqueda. Los perfiles privados muestran solo nombre, usuario y foto.');await loadFeed();return;}const {data,error}=await client.rpc('search_community_profiles',{search_term:term});if(error){status(friendlySupabaseError(error,'buscar perfiles'));return;}if(!data?.length){root.innerHTML='<div class="empty"><strong>No encontramos perfiles</strong><p>Probá con otro apodo o nombre de usuario.</p></div>';status('No se encontraron perfiles públicos coincidentes.');await loadFeed();return;}
-    const urlOf=await signedMany(data.map(p=>p.avatar_path));
-    root.innerHTML=`<div class="community-suggested community-search-people">${data.map(p=>personCard(p,urlOf)).join('')}</div>`;bindPeople(root);status(`Perfiles encontrados: ${data.length}. Los perfiles privados muestran solo datos básicos y requieren aprobación para ver su contenido.`);await loadFeed();}
 
-  // ---------- Perfiles sociales ----------
-  let viewedUser=null;
-  async function openUser(uid){
+  // ---------- Comparación: «Tu progreso» y «Progreso de tu amigo», misma métrica, unidad y período ----------
+  function compareValue(row,v){
+    if(v==null)return 'Sin datos disponibles';
+    if(row.kind==='text')return LEVEL_LABEL[v]||'Sin datos disponibles';
+    if(row.kind==='rank')return MRK()?.RANKS?.[v]?.name||'Sin rango';
+    if(row.key==='best_plank_seconds')return formatMetric('plank',v);
+    if(row.key==='run_km_30d')return formatMetric('running',v);
+    return `${Number(v).toLocaleString(undefined,{maximumFractionDigits:1})}${row.unit?' '+row.unit:''}`;
+  }
+  async function openCompare(uid){
+    if(!authReady()){toast(authHint());return;}
+    compareUser=uid;showCommunitySubView('compare');const root=$('communityCompare');root.innerHTML='<div class="cm-skeleton" aria-hidden="true"><i></i><i></i><i></i></div>';
+    await syncStats();
+    const [a,b]=await Promise.all([client.rpc('community_athlete_profile',{p_user:user.id}),client.rpc('community_athlete_profile',{p_user:uid})]);
+    if(compareUser!==uid)return;
+    if(a.error||b.error){const err=a.error||b.error;root.innerHTML=`<div class="empty"><p>${esc(isMissingFunction(err)?V53_HINT:friendlySupabaseError(err,'comparar el progreso'))}</p></div>`;return;}
+    const me=a.data?.[0],them=b.data?.[0];
+    if(!me||!them){root.innerHTML='<div class="empty"><strong>No se puede comparar</strong><p>El perfil no está disponible.</p></div>';return;}
+    const urlOf=await signedMany([me.avatar_path,them.avatar_path]),theirName=esc(them.display_name||them.username);
+    const head=`<div class="cm-vs"><div class="cm-vs-side is-me">${avatarHtml(me,urlOf,'lg')}<strong>Tu progreso</strong><small class="muted">@${esc(me.username)}</small></div><span class="cm-vs-mid" aria-hidden="true">VS</span><div class="cm-vs-side">${avatarHtml(them,urlOf,'lg')}<strong>Progreso de ${theirName}</strong><small class="muted">@${esc(them.username)}</small></div></div>`;
+    let body='';
+    if(me.stats_public===false)body=`<div class="notice"><strong>Tus estadísticas están ocultas.</strong><p class="small">Para comparar, las dos personas tienen que mostrarlas. Podés activarlas en Mi perfil.</p><button class="btn btn-sm" type="button" data-community-go="profile">Ir a Mi perfil</button></div>`;
+    else if(!them.can_view||!them.stats_visible)body=`<div class="notice"><strong>No hay datos para comparar.</strong><p class="small">${!them.can_view?'Es un perfil privado: cuando acepte tu solicitud vas a poder comparar.':`${theirName} no comparte sus estadísticas de entrenamiento.`}</p></div>`;
+    else{
+      const rows=AS().compare(me,them);
+      body=`<ul class="cm-compare-list">${rows.map(row=>{
+        const both=row.mine!=null&&row.theirs!=null&&row.kind!=='text';
+        const max=both?Math.max(Number(row.mine),Number(row.theirs),row.kind==='rank'?8:0)||1:1;
+        const bar=v=>both?`<span class="cm-cmp-bar"><i style="width:${Math.max(4,Math.round(Number(v)/max*100))}%"></i></span>`:'';
+        const lead=both?(row.diff>0?`Vos +${compareValue({...row,kind:'num'},Math.abs(row.diff))}`:row.diff<0?`${esc(them.display_name||them.username)} +${compareValue({...row,kind:'num'},Math.abs(row.diff))}`:'Empate'):'';
+        return `<li class="cm-cmp-row"><div class="cm-cmp-label"><strong>${esc(row.label)}</strong><small class="muted">${esc(row.period)}</small></div><div class="cm-cmp-vals"><span class="is-me${row.mine==null?' is-empty':''}">${esc(compareValue(row,row.mine))}${bar(row.mine)}</span><span class="${row.theirs==null?'is-empty':''}">${esc(compareValue(row,row.theirs))}${bar(row.theirs)}</span></div>${lead&&row.kind!=='rank'?`<small class="cm-cmp-lead">${esc(lead)}</small>`:''}</li>`;}).join('')}</ul>
+        <p class="muted small cm-footnote">Se compara la misma métrica, con la misma unidad y el mismo período, con los registros de cada persona en la app. Cuando a alguien le falta un dato se muestra «Sin datos disponibles»: no se estima. La app publica solo los últimos 30 días, así que no hay comparación por semana. No es un diagnóstico médico ni una medición de masa muscular: sirve para motivarse y ponerse objetivos.</p>`;
+    }
+    root.innerHTML=head+body+`<div class="btn-row"><button class="btn ghost" type="button" data-compare-profile>Ver el perfil de ${theirName}</button></div>`;
+    bindGo(root);root.querySelector('[data-compare-profile]')?.addEventListener('click',()=>openUser(uid));
+  }
+  // Perfil sin la migración v53 (datos de v50): sin estadísticas.
+  async function openUserLegacy(uid){
     if(!client||!uid)return;if(user&&uid===user.id){showCommunitySubView('profile');return;}
     viewedUser=uid;showCommunitySubView('user');const root=$('communityUserProfile');root.innerHTML='<p class="muted small">Cargando perfil…</p>';
     const {data:p,error}=await client.from('community_profiles').select(profileCols()).eq('user_id',uid).maybeSingle();
     if(error||!p){
       // v50: perfil privado (o sin acceso al contenido): datos básicos y aviso claro, sin exponer publicaciones.
-      const b=directoryEnabled?await client.rpc('community_profile_basic',{p_user:uid}):{data:null};const bp=b.data?.[0];
+      const b=await client.rpc('community_profile_basic',{p_user:uid});const bp=b.data?.[0];
       if(!bp){root.innerHTML='<div class="empty"><strong>Perfil no disponible</strong><p>Puede haber sido eliminado o haber un bloqueo entre las cuentas.</p></div>';return;}
       const urlOfB=await signedMany([bp.avatar_path]),fs=bp.follow_status||'';
       root.innerHTML=`<div class="community-profile-header">${avatarHtml(bp,urlOfB,'lg')}<div class="community-profile-id"><strong>${esc(bp.display_name||bp.username)}</strong><span class="muted small">@${esc(bp.username)} · Privado</span></div></div><div class="notice community-private-notice"><strong>Este perfil es privado.</strong><p class="small">${fs==='pending'?'Tu solicitud está pendiente: vas a ver sus publicaciones cuando la acepte.':'Seguilo y, cuando acepte tu solicitud, vas a ver sus publicaciones, su descripción y sus insignias.'}</p></div>${user?`<div class="btn-row"><button class="btn${fs?' secondary':''}" type="button" data-user-follow>${fs==='pending'?'Cancelar solicitud':'Solicitar seguir'}</button><button class="btn ghost" type="button" data-community-block>Bloquear</button></div>`:''}`;
@@ -683,7 +887,7 @@
       if(!savedEnabled||schemaV49===false){grid.innerHTML='<div class="empty"><p>Para guardar publicaciones, aplicá la migración v49 de Comunidad en Supabase.</p></div>';return;}
       const s=await client.from('community_saved_posts').select('post_id,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(60);
       const ids=(s.data||[]).map(x=>x.post_id);
-      if(ids.length){const r=await client.from('community_posts').select(postSelect()+`,community_profiles!community_posts_user_id_fkey!inner(${profileCols()})`).in('id',ids);const byId=new Map((r.data||[]).map(x=>[x.id,x]));posts=ids.map(id=>byId.get(id)).filter(Boolean);}
+      if(ids.length){const r=await client.from('community_posts').select(postSelect()).in('id',ids);const byId=new Map((await withAuthors(r.data||[])).map(x=>[x.id,x]));posts=ids.map(id=>byId.get(id)).filter(Boolean);}
     }else{const r=await client.from('community_posts').select(postSelect()).eq('user_id',user.id).order('created_at',{ascending:false}).limit(60);posts=(r.data||[]).map(x=>({...x,community_profiles:ownProfile}));}
     const urlOf=await signedMany(posts.flatMap(x=>[x.image_path,(x.post_kind||'transformation')==='transformation'?x.after_path:null]));
     grid.innerHTML=posts.length?posts.map(x=>gridTile(x,urlOf)).join(''):`<div class="empty"><p>${ownTab==='saved'?'Todavía no guardaste publicaciones. Tocá el ícono de guardar en el feed.':'Todavía no publicaste nada.'}</p>${ownTab==='saved'?'':'<button class="btn" type="button" data-community-go="publish">Crear una publicación</button>'}</div>`;
@@ -691,9 +895,11 @@
   }
   // Una publicación abierta desde una grilla, con las mismas acciones que en el feed.
   async function openPostDialog(id){
+    dialogPostId=id;
     const dlg=$('communityPostDialog'),body=$('communityPostDialogBody');if(!dlg||!body||!client)return;
-    const {data,error}=await client.from('community_posts').select(postSelect()+`,community_profiles!community_posts_user_id_fkey!inner(${profileCols()})`).eq('id',id).maybeSingle();
-    if(error||!data){toast('La publicación ya no está disponible.');return;}
+    const r=await client.from('community_posts').select(postSelect()).eq('id',id).maybeSingle();
+    const data=r.data?(await withAuthors([r.data]))[0]:null;
+    if(r.error||!data){toast('La publicación ya no está disponible.');return;}
     const ctx=await bundle([data]);body.innerHTML=renderPostCard(data,ctx);bindFeedActions(body);
     if(typeof dlg.showModal==='function'&&!dlg.open)dlg.showModal();else dlg.setAttribute('open','');
   }
@@ -701,8 +907,25 @@
   async function emailLogin(e){e.preventDefault();if(!client)return setStatus('communityEmailStatus',authHint());const email=$('communityEmail').value.trim(),password=$('communityPassword').value;const {error}=await client.auth.signInWithPassword({email,password});if(error){setStatus('communityEmailStatus',`No se pudo iniciar sesión: ${error.message}`);return;}$('communityPassword').value='';setStatus('communityEmailStatus','Sesión iniciada.');}
   async function emailRegister(){if(!client)return setStatus('communityEmailStatus',authHint());const email=$('communityEmail').value.trim(),password=$('communityPassword').value;if(!email||password.length<8)return setStatus('communityEmailStatus','Ingresá un correo válido y una contraseña de al menos 8 caracteres.');const {data,error}=await client.auth.signUp({email,password});if(error){setStatus('communityEmailStatus',`No se pudo crear la cuenta: ${error.message}`);return;}if(data.session)setStatus('communityEmailStatus','Cuenta creada y sesión iniciada.');else setStatus('communityEmailStatus','Cuenta creada. Revisá tu correo para confirmar la dirección antes de iniciar sesión.');}
   async function googleLogin(){if(!client)return setStatus('communityProfileStatus',authHint());const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href.split('#')[0]}});if(error)setStatus('communityProfileStatus',`No se pudo iniciar con Google: ${error.message}`);}
-  async function refresh(){if(!client){setControls();return;}if(user){try{await ensureProfile();await loadFollowRequests();}catch(e){setStatus('communityProfileStatus',`No se pudo preparar el perfil: ${e.message}`);}}setControls();await loadFeed();await loadChatContacts();await loadBlockedUsers();updateKindAvailability();renderPostPreview();await loadModeration();if(currentSubView==='profile')renderOwnGrid();}
-  function init(supabase,userSession,diagnostic=''){client=supabase||null;user=userSession||null;connectionMessage=client?'':String(diagnostic||connectionMessage||'');if(client)connectionStatus('Cliente de Supabase inicializado. Comprobando tablas y permisos de Comunidad…');else configIssueStatus(diagnostic||'Supabase todavía no está conectado.');setControls();if(client)return refresh();return loadFeed();}
+  // v53: detecta qué columnas de publicaciones tiene el proyecto (antes lo hacía el feed) y confirma la conexión.
+  async function probeSchema(){
+    if(!client)return;
+    let r=await client.from('community_posts').select(postSelect()).limit(1);
+    if(r.error&&isMissingColumn(r.error)&&schemaV49!==false&&/linked_session|featured_badges/.test(String(r.error.message))){schemaV49=false;r=await client.from('community_posts').select(postSelect()).limit(1);}
+    if(r.error&&isMissingColumn(r.error)&&schemaV41!==false){markLegacySchema();updateKindAvailability();return;}
+    if(r.error){connectionStatus(friendlySupabaseError(r.error,'consultar las publicaciones'));return;}
+    if(schemaV41===null){schemaV41=true;updateKindAvailability();}
+  }
+  function loadCurrentView(){
+    if(currentSubView==='world')return loadDirectory(true);
+    if(currentSubView==='ranking')return loadRanking();
+    if(currentSubView==='friends')return loadFriends(true);
+    if(currentSubView==='profile')return renderOwnGrid();
+    if(currentSubView==='user'&&viewedUser)return openUser(viewedUser,{asOthers:viewedUser===user?.id});
+    if(currentSubView==='compare'&&compareUser)return openCompare(compareUser);
+  }
+  async function refresh(){if(!client){setControls();return;}if(user){try{await ensureProfile();await loadFollowRequests();}catch(e){setStatus('communityProfileStatus',`No se pudo preparar el perfil: ${e.message}`);}}setControls();await probeSchema();await loadCurrentView();renderStatsNotice();syncStats().then(()=>{if(currentSubView==='ranking')loadRanking();}).catch(()=>{});await loadChatContacts();await loadBlockedUsers();updateKindAvailability();renderPostPreview();await loadModeration();if(currentSubView==='profile')renderOwnGrid();}
+  function init(supabase,userSession,diagnostic=''){client=supabase||null;user=userSession||null;connectionMessage=client?'':String(diagnostic||connectionMessage||'');if(client)connectionStatus('Cliente de Supabase inicializado. Comprobando tablas y permisos de Comunidad…');else configIssueStatus(diagnostic||'Supabase todavía no está conectado.');setControls();if(client)return refresh();return loadCurrentView();}
   async function testConnection(){
     if(!client)return {ok:false,stage:'config',message:authHint()};
     const coreChecks=[['community_profiles','user_id'],['community_posts','id'],['community_follows','follower_id'],['community_likes','post_id'],['community_comments','id']];
@@ -718,6 +941,8 @@
       const failedFunction=functionChecks.find(result=>result.error);
       if(failedFunction)return {ok:false,stage:'functions',message:friendlySupabaseError(failedFunction.error,`comprobar la función ${failedFunction.name}`),function:failedFunction.name};
       const warnings=[];
+      const v53=await client.rpc('community_people',{p_search:'',p_after:null,p_limit:1,p_scope:'all'});
+      if(v53.error)warnings.push(isMissingFunction(v53.error)?V53_HINT:friendlySupabaseError(v53.error,'comprobar el directorio de deportistas'));
       if(authReady()){
         const optionalChecks=[
           ['community_messages',q=>q.or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)],
@@ -732,55 +957,62 @@
       return {ok:true,stage:'database',message:coreMessage+(authReady()?' También se comprobaron chat, bloqueos y sincronización de la cuenta.':' Iniciá sesión para comprobar además chat, bloqueos y sincronización de la cuenta.')};
     }catch(error){return {ok:false,stage:'network',message:friendlySupabaseError(error,'comprobar la conexión con Supabase')};}
   }
-  function setSession(supabase,userSession){client=supabase||client;user=userSession||null;if(!user){ownProfile=null;stopChatPoll();['communityChatMessages','communityReportsList'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});if($('communityChatText'))$('communityChatText').value='';if($('communityModerationCard'))$('communityModerationCard').hidden=true;if($('communityDisplayName'))$('communityDisplayName').value='';if($('communityUsername'))$('communityUsername').value='';if($('communityBio'))$('communityBio').value='';if($('communityVisibility'))$('communityVisibility').value='private';if($('communityOwnName'))$('communityOwnName').textContent='Tu perfil';if($('communityOwnAvatar'))$('communityOwnAvatar').innerHTML='<span aria-hidden="true">FF</span>';if($('communityOwnHandle'))$('communityOwnHandle').textContent='';if($('communityOwnBio'))$('communityOwnBio').textContent='';if($('communityOwnFeatured'))$('communityOwnFeatured').innerHTML='';if($('communityOwnStats'))$('communityOwnStats').innerHTML=statsHtml(0,0,0);if($('communityConversations'))$('communityConversations').innerHTML='';if($('communityFollowRequests'))$('communityFollowRequests').textContent='Iniciá sesión para administrar solicitudes.';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communityBlockedList'))$('communityBlockedList').textContent='Iniciá sesión para administrar los bloqueos.';}setControls();updateKindAvailability();if(client)Promise.resolve().then(()=>refresh());else loadFeed();}
-  const communityViews=['feed','explore','publish','messages','profile','user'];
+  function setSession(supabase,userSession){client=supabase||client;user=userSession||null;if(!user){ownProfile=null;stopChatPoll();['communityChatMessages','communityReportsList'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});if($('communityChatText'))$('communityChatText').value='';if($('communityModerationCard'))$('communityModerationCard').hidden=true;if($('communityDisplayName'))$('communityDisplayName').value='';if($('communityUsername'))$('communityUsername').value='';if($('communityBio'))$('communityBio').value='';if($('communityVisibility'))$('communityVisibility').value='private';if($('communityOwnName'))$('communityOwnName').textContent='Tu perfil';if($('communityOwnAvatar'))$('communityOwnAvatar').innerHTML='<span aria-hidden="true">FF</span>';if($('communityOwnHandle'))$('communityOwnHandle').textContent='';if($('communityOwnBio'))$('communityOwnBio').textContent='';if($('communityOwnFeatured'))$('communityOwnFeatured').innerHTML='';if($('communityOwnStats'))$('communityOwnStats').innerHTML=statsHtml(0,0,0);if($('communityConversations'))$('communityConversations').innerHTML='';if($('communityFollowRequests'))$('communityFollowRequests').textContent='Iniciá sesión para administrar solicitudes.';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communityBlockedList'))$('communityBlockedList').textContent='Iniciá sesión para administrar los bloqueos.';}setControls();updateKindAvailability();ownStats=null;ownStatsLoaded=false;statsSig='';friendPositions=new Map();reflectStatsToggles();renderStatsNotice();if(client)Promise.resolve().then(()=>refresh());else loadCurrentView();}
+  const communityViews=['world','ranking','friends','publish','messages','profile','user','compare'];
+  const MAIN_TABS=['world','ranking','friends'];
   function showCommunitySubView(name,focusTab=false){
-    if(!communityViews.includes(name))name='feed';
-    const previous=currentSubView;currentSubView=name;if(name!=='user')lastTab=name;
+    if(name==='feed'||name==='explore')name='world';
+    if(!communityViews.includes(name))name='world';
+    const previous=currentSubView;currentSubView=name;if(!['user','compare'].includes(name))lastTab=name;
     if(name!=='messages')stopChatPoll();
+    const activeTab=MAIN_TABS.includes(name)?name:['user','compare'].includes(name)&&MAIN_TABS.includes(lastTab)?lastTab:name;
     document.querySelectorAll('[data-community-tab]').forEach(button=>{
-      const selected=button.dataset.communityTab===name;
-      button.setAttribute('aria-selected',selected?'true':'false');button.tabIndex=selected||(name==='user'&&button.dataset.communityTab==='feed')?0:-1;
+      const selected=button.dataset.communityTab===activeTab;
+      if(button.getAttribute('role')==='tab'){button.setAttribute('aria-selected',selected?'true':'false');button.tabIndex=selected||(!MAIN_TABS.includes(activeTab)&&button.dataset.communityTab==='world')?0:-1;}
+      else button.setAttribute('aria-pressed',selected?'true':'false');
       button.classList.toggle('is-active',selected);if(selected&&focusTab)button.focus();
     });
     document.querySelectorAll('[data-community-panel]').forEach(panel=>{
       const active=panel.dataset.communityPanel===name;panel.hidden=!active;panel.classList.toggle('is-active',active);
     });
-    if(name==='feed'&&previous!=='feed'){
-      searchTerm='';if($('communitySearch'))$('communitySearch').value='';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communitySearchPosts'))$('communitySearchPosts').innerHTML='';if($('communityExploreGrid'))$('communityExploreGrid').hidden=false;
-      if(client)loadFeed();
-    }else if(name==='messages'&&client){loadChatContacts();}
-    else if(name==='explore'&&client){if(!exploreLoaded||!searchTerm)loadExplore();}
-    else if(name==='profile'){renderOwnGrid();if(authReady()){loadFollowRequests();loadBlockedUsers();loadModeration();refreshOwnCounts();syncFeaturedBadges();}}
+    renderStatsNotice();
+    if(name==='world'&&previous!=='world'&&client)loadDirectory(true);
+    else if(name==='ranking'&&client)loadRanking();
+    else if(name==='friends'&&client)loadFriends(true);
+    else if(name==='messages'&&client){loadChatContacts();}
+    else if(name==='profile'){renderOwnGrid();if(authReady()){loadFollowRequests();loadBlockedUsers();loadModeration();refreshOwnCounts();syncFeaturedBadges();syncStats();}}
     else if(name==='publish'){fillAchievementOptions();fillSessionOptions();renderPostPreview();}
     if(name!==previous)document.getElementById('view-community')?.scrollIntoView?.({block:'start'});
   }
   function bindCommunitySubnavigation(){
-    document.querySelectorAll('[data-community-tab]').forEach((button,index)=>{
-      button.addEventListener('click',()=>showCommunitySubView(button.dataset.communityTab));
-      button.addEventListener('keydown',event=>{
-        if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();
-        const tabs=[...document.querySelectorAll('[data-community-tab]')];let next=index;
-        if(event.key==='ArrowLeft')next=(index-1+tabs.length)%tabs.length;else if(event.key==='ArrowRight')next=(index+1)%tabs.length;else if(event.key==='Home')next=0;else next=tabs.length-1;
-        showCommunitySubView(tabs[next].dataset.communityTab,true);
-      });
-    });
-    showCommunitySubView('feed');
+    document.querySelectorAll('[data-community-tab]').forEach(button=>button.addEventListener('click',()=>showCommunitySubView(button.dataset.communityTab)));
+    const tabs=[...document.querySelectorAll('[role="tab"][data-community-tab]')];
+    tabs.forEach((button,index)=>button.addEventListener('keydown',event=>{
+      if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();
+      let next=index;
+      if(event.key==='ArrowLeft')next=(index-1+tabs.length)%tabs.length;else if(event.key==='ArrowRight')next=(index+1)%tabs.length;else if(event.key==='Home')next=0;else next=tabs.length-1;
+      showCommunitySubView(tabs[next].dataset.communityTab,true);
+    }));
+    showCommunitySubView('world');
   }
   function bind(){
     bindCommunitySubnavigation();
-    $('communityRetryConnection')?.addEventListener('click',async()=>{const button=$('communityRetryConnection');if(button)button.disabled=true;connectionStatus('Revisando la configuración y la conexión…');try{if(typeof window.FittFormaRetrySupabase==='function'){const result=await window.FittFormaRetrySupabase();if(!result?.ok&&result?.message)configIssueStatus(result.message);else if(result?.ok){const check=await testConnection();connectionStatus(check.message);if(check.ok)await loadFeed();}}else connectionStatus('La función de comprobación no está disponible. Publicá la última versión y recargá la página.');}catch(error){connectionStatus(`Falló la comprobación: ${error.message||'error desconocido'}`);}finally{if(button)button.disabled=false;}});
-    document.querySelectorAll('[data-feed-mode]').forEach(b=>b.addEventListener('click',()=>{feedSort=b.dataset.feedMode;feedLimit=30;document.querySelectorAll('[data-feed-mode]').forEach(x=>{const on=x===b;x.classList.toggle('is-active',on);x.setAttribute('aria-pressed',String(on));});loadFeed();}));
-    $('communityLoadMore')?.addEventListener('click',()=>{feedLimit=Math.min(feedLimit+20,200);loadFeed();});
-    document.querySelectorAll('[data-explore-filter]').forEach(b=>b.addEventListener('click',()=>{exploreFilter=b.dataset.exploreFilter;document.querySelectorAll('[data-explore-filter]').forEach(x=>{const on=x===b;x.classList.toggle('is-active',on);x.setAttribute('aria-pressed',String(on));});searchTerm='';if($('communitySearch'))$('communitySearch').value='';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communitySearchPosts'))$('communitySearchPosts').innerHTML='';$('communityExploreGrid').hidden=false;loadExploreGrid();}));
+    $('communityRetryConnection')?.addEventListener('click',async()=>{const button=$('communityRetryConnection');if(button)button.disabled=true;connectionStatus('Revisando la configuración y la conexión…');try{if(typeof window.FittFormaRetrySupabase==='function'){const result=await window.FittFormaRetrySupabase();if(!result?.ok&&result?.message)configIssueStatus(result.message);else if(result?.ok){const check=await testConnection();connectionStatus(check.message);if(check.ok)await loadCurrentView();}}else connectionStatus('La función de comprobación no está disponible. Publicá la última versión y recargá la página.');}catch(error){connectionStatus(`Falló la comprobación: ${error.message||'error desconocido'}`);}finally{if(button)button.disabled=false;}});
     document.querySelectorAll('[data-own-tab]').forEach(b=>b.addEventListener('click',()=>{ownTab=b.dataset.ownTab;document.querySelectorAll('[data-own-tab]').forEach(x=>{const on=x===b;x.classList.toggle('is-active',on);x.setAttribute('aria-pressed',String(on));});renderOwnGrid();}));
-    document.querySelector('[data-community-home]')?.addEventListener('click',()=>showCommunitySubView('feed'));
-    $('communityUserBack')?.addEventListener('click',()=>showCommunitySubView(lastTab||'feed'));
+    document.querySelector('[data-community-home]')?.addEventListener('click',()=>showCommunitySubView('world'));
+    $('communityUserBack')?.addEventListener('click',()=>showCommunitySubView(lastTab||'world'));$('communityCompareBack')?.addEventListener('click',()=>viewedUser&&viewedUser===compareUser?openUser(viewedUser):showCommunitySubView(lastTab||'world'));
+    document.querySelectorAll('[data-ranking-scope]').forEach(b=>b.addEventListener('click',()=>{rankScope=b.dataset.rankingScope;document.querySelectorAll('[data-ranking-scope]').forEach(x=>{const on=x===b;x.classList.toggle('active',on);x.setAttribute('aria-pressed',String(on));});loadRanking();}));
+    $('communityFriendsMore')?.addEventListener('click',()=>loadFriends(false));
+    document.querySelectorAll('#view-community [data-community-go]').forEach(b=>b.addEventListener('click',()=>showCommunitySubView(b.dataset.communityGo)));
+    $('communityViewOwnPublic')?.addEventListener('click',()=>{if(authReady())openUser(user.id,{asOthers:true});else toast(authHint());});
+    $('communityStatsPublic')?.addEventListener('change',async e=>{const ok=await setStatsPublic(e.target.checked);if(!ok)reflectStatsToggles();});
+    $('communityStatsNoticeOk')?.addEventListener('click',()=>{setNotice('1');renderStatsNotice();syncStats();});
+    $('communityStatsNoticeHide')?.addEventListener('click',()=>setStatsPublic(false));
     $('communityEditProfileToggle')?.addEventListener('click',e=>{const box=$('communityProfileEditor');const open=!box.classList.contains('is-open');box.classList.toggle('is-open',open);e.currentTarget.setAttribute('aria-expanded',String(open));if(open)box.scrollIntoView({behavior:'smooth',block:'start'});});
     $('communityAvatarInput')?.addEventListener('change',e=>changeAvatar(e.target.files?.[0]));$('communityAvatarRemove')?.addEventListener('click',removeAvatar);$('communityPeopleMore')?.addEventListener('click',()=>loadDirectory(false));
     $('communityChatBack')?.addEventListener('click',closeChat);
     $('communityPostDialog')?.addEventListener('click',e=>{if(e.target.closest('[data-close-post-dialog]')||e.target===e.currentTarget)$('communityPostDialog').close();});
-    $('communityProfileForm')?.addEventListener('submit',saveProfile);$('communityPostForm')?.addEventListener('submit',createPost);$('communityRefresh')?.addEventListener('click',()=>loadFeed());$('communitySearchForm')?.addEventListener('submit',searchUsers);$('communityClearSearch')?.addEventListener('click',()=>{searchTerm='';$('communitySearch').value='';$('communitySearchResults').innerHTML='';if($('communitySearchPosts'))$('communitySearchPosts').innerHTML='';$('communityExploreGrid').hidden=false;loadExploreGrid();status('Buscá personas por nombre o @usuario, o publicaciones por #hashtag.');});$('communityGoogleLogin')?.addEventListener('click',googleLogin);$('communityEmailAuthForm')?.addEventListener('submit',emailLogin);$('communityEmailRegister')?.addEventListener('click',emailRegister);$('communityChatContact')?.addEventListener('change',e=>{if(e.target.value)openChat(e.target.value);});$('communityChatForm')?.addEventListener('submit',sendMessage);$('communityChatRefresh')?.addEventListener('click',loadChatContacts);$('communityChatDeleteConversation')?.addEventListener('click',deleteConversation);$('communityChatBlockContact')?.addEventListener('click',()=>blockUser($('communityChatContact')?.value));$('communitySignOut')?.addEventListener('click',async()=>{if(client){const {error}=await client.auth.signOut();if(error)setStatus('communityProfileStatus',error.message);}});
+    $('communityProfileForm')?.addEventListener('submit',saveProfile);$('communityPostForm')?.addEventListener('submit',createPost);$('communitySearchForm')?.addEventListener('submit',searchUsers);$('communityClearSearch')?.addEventListener('click',clearSearch);$('communityGoogleLogin')?.addEventListener('click',googleLogin);$('communityEmailAuthForm')?.addEventListener('submit',emailLogin);$('communityEmailRegister')?.addEventListener('click',emailRegister);$('communityChatContact')?.addEventListener('change',e=>{if(e.target.value)openChat(e.target.value);});$('communityChatForm')?.addEventListener('submit',sendMessage);$('communityChatRefresh')?.addEventListener('click',loadChatContacts);$('communityChatDeleteConversation')?.addEventListener('click',deleteConversation);$('communityChatBlockContact')?.addEventListener('click',()=>blockUser($('communityChatContact')?.value));$('communitySignOut')?.addEventListener('click',async()=>{if(client){const {error}=await client.auth.signOut();if(error)setStatus('communityProfileStatus',error.message);}});
     document.querySelectorAll('[data-post-kind]').forEach((b,i,all)=>{b.addEventListener('click',()=>setPostKind(b.dataset.postKind));b.addEventListener('keydown',e=>{const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(!d)return;e.preventDefault();const next=all[(i+d+all.length)%all.length];setPostKind(next.dataset.postKind);next.focus();});});
     $('communityTextPostForm')?.addEventListener('submit',createKindPost);$('communityAchievementPostForm')?.addEventListener('submit',createKindPost);
     ['communityTextBody','communityTextImage','communityAchievementSelect','communityAchievementComment','communityLinkSession'].forEach(id=>{const el=$(id);if(el){el.addEventListener('input',renderPostPreview);el.addEventListener('change',renderPostPreview);}});
@@ -790,5 +1022,5 @@
     const today=localDateKey();if($('communityEndDate'))$('communityEndDate').value=today;if($('communityStartDate'))$('communityStartDate').value=today;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
-  window.FittFormaCommunity={init,setSession,refresh,loadChatContacts,loadMessages,loadBlockedUsers,testConnection};
+  window.FittFormaCommunity={init,setSession,refresh,loadChatContacts,loadMessages,loadBlockedUsers,testConnection,syncStats,setStatsPublic,show:name=>showCommunitySubView(name),openProfile:uid=>openUser(uid)};
 })();

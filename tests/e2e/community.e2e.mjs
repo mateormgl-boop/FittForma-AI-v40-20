@@ -84,7 +84,11 @@ await page.route(`${SUPA}/storage/v1/**`, async route => {
 const step = (name, ok, detail = '') => { console.log(`${ok ? 'PASA' : 'FALLA'}  ${name}${detail ? ' — ' + detail : ''}`); if (!ok) process.exitCode = 1; };
 await page.goto(APP + '/'); await page.waitForTimeout(800);
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(800);
-step('Feed anónimo carga el post público de B', (await page.textContent('#communityFeed')).includes('Primera semana completa'));
+step('Sin sesión: Comunidad abre en Todo el mundo con personas reales (sin feed)', (await page.getAttribute('#communityTabWorld', 'aria-selected')) === 'true' && /bruno_fit/.test(await page.textContent('#communityPeople')) && !(await page.$('#communityFeed')));
+// v53: publicar se hace desde Mi perfil; las publicaciones de otra persona se abren desde su perfil.
+const openPublish = async () => { await page.click('#communityTabProfile'); await page.waitForTimeout(400); await page.click('#communityOpenPublish'); await page.waitForTimeout(400); };
+const openBrunoPost = async () => { await page.click('#communityTabWorld'); await page.waitForTimeout(900); await page.click('#communityPeople .cm-card-open[aria-label*="Bruno"]'); await page.waitForTimeout(1300); await page.click('#communityUserGrid [data-community-open-post="b0000000-0000-0000-0000-0000000000b1"]'); await page.waitForTimeout(1000); };
+const POST_B = '#communityPostDialog [data-community-post="b0000000-0000-0000-0000-0000000000b1"]';
 
 await page.click('#communityTabProfile');
 await page.fill('#communityEmail', 'alice@example.test'); await page.fill('#communityPassword', 'clave-segura-123');
@@ -93,7 +97,7 @@ step('Inicio de sesión', /Sesión iniciada|Sesión online/.test(await page.text
 step('Indicador de 1 mensaje sin leer', await page.isVisible('#communityUnreadBadge') && (await page.textContent('#communityUnreadBadge')).trim() === '1');
 
 // Publicación de texto con foto, vista previa y consentimiento
-await page.click('#communityTabPublish');
+await openPublish();
 await page.fill('#communityTextBody', 'Hoy corrí 5 km sin parar por primera vez');
 const preview = await page.textContent('#communityPostPreview');
 step('Vista previa muestra texto y audiencia', preview.includes('Hoy corrí 5 km') && /Visible para cualquier persona/.test(preview), preview.slice(0, 90));
@@ -106,7 +110,7 @@ step('Post de texto con foto persistido', sql(`select count(*) from community_po
 step('Foto subida a la carpeta del usuario', uploaded.some(p => p.startsWith('aaaaaaaa-0000-0000-0000-000000000001/')), uploaded.join(','));
 
 // Logro
-await page.click('#communityTabPublish'); await page.click('[data-post-kind="achievement"]');
+await openPublish(); await page.click('[data-post-kind="achievement"]');
 const options = await page.$$eval('#communityAchievementSelect option', o => o.map(x => x.textContent));
 step('Selector ofrece la insignia local', options.some(o => /Plancha frontal · Plata I/.test(o)), options.join(' | '));
 await page.fill('#communityAchievementComment', 'Tres semanas para llegar');
@@ -114,46 +118,42 @@ step('Vista previa del logro dice "Declarada por el autor"', (await page.textCon
 await page.click('#communityAchievementPublish'); await page.waitForTimeout(1500);
 const ach = sql(`select achievement->>'rank', achievement->>'level', achievement->>'evidence' from community_posts where post_kind='achievement'`);
 step('Logro persistido con evidencia declarada', ach === 'silver|4|declared', ach);
-const feed = await page.textContent('#communityFeed');
-step('Feed muestra logro y texto', feed.includes('Plancha frontal · Plata I') && feed.includes('Hoy corrí 5 km'));
+await page.waitForTimeout(600);
+step('Después de publicar vuelve a Mi perfil con las publicaciones', await page.isVisible('#communityPanelProfile') && (await page.$$('#communityOwnGrid [data-community-open-post]')).length === 2 && /Plancha frontal/.test(await page.textContent('#communityOwnGrid')));
 
 // Me gusta, comentario y edición
-await page.click('#communityTabFeed'); await page.waitForTimeout(1000);
-await page.click('[data-community-post="b0000000-0000-0000-0000-0000000000b1"] [data-community-like]'); await page.waitForTimeout(900);
-await page.click('[data-community-post="b0000000-0000-0000-0000-0000000000b1"] [data-community-like]').catch(() => {}); await page.waitForTimeout(900);
+await openBrunoPost();
+await page.click(`${POST_B} [data-community-like]`); await page.waitForTimeout(1200);
+await page.click(`${POST_B} [data-community-like]`).catch(() => {}); await page.waitForTimeout(1200);
 step('Me gusta alterna sin duplicar', sql(`select count(*) from community_likes`) === '0');
-await page.click('[data-community-post="b0000000-0000-0000-0000-0000000000b1"] [data-community-like]'); await page.waitForTimeout(900);
+await page.click(`${POST_B} [data-community-like]`); await page.waitForTimeout(1200);
 step('Me gusta persistido', sql(`select count(*) from community_likes where user_id='aaaaaaaa-0000-0000-0000-000000000001'`) === '1');
-await page.fill('[data-community-comment-form="b0000000-0000-0000-0000-0000000000b1"] input', '¡Vamos Bruno!');
-await page.click('[data-community-comment-form="b0000000-0000-0000-0000-0000000000b1"] button'); await page.waitForTimeout(900);
+await page.fill('#communityPostDialog [data-community-comment-form="b0000000-0000-0000-0000-0000000000b1"] input', '¡Vamos Bruno!');
+await page.click('#communityPostDialog [data-community-comment-form="b0000000-0000-0000-0000-0000000000b1"] button'); await page.waitForTimeout(1300);
 step('Comentario persistido', sql(`select body from community_comments`) === '¡Vamos Bruno!');
 const textPostId = sql(`select id from community_posts where post_kind='text' and user_id='aaaaaaaa-0000-0000-0000-000000000001'`);
-// v49: editar, eliminar, denunciar y bloquear están en el menú «⋯» de cada publicación.
-await page.click(`[data-community-post="${textPostId}"] .community-post-menu summary`);
-await page.click(`[data-community-edit-post="${textPostId}"]`);
-await page.fill(`[data-community-post="${textPostId}"] .community-edit-form textarea`, 'Hoy corrí 5 km sin parar (editado)');
-await page.click(`[data-community-post="${textPostId}"] .community-edit-form button[type=submit]`); await page.waitForTimeout(1000);
-step('Edición propia persistida', sql(`select description from community_posts where id='${textPostId}'`) === 'Hoy corrí 5 km sin parar (editado)');
-step('Botón editar ausente en post ajeno', !(await page.$('[data-community-post="b0000000-0000-0000-0000-0000000000b1"] [data-community-edit-post]')));
-
-// v49: guardar una publicación (solo después de que la base confirma) y verla en el perfil.
-await page.click('[data-community-post="b0000000-0000-0000-0000-0000000000b1"] [data-community-save]'); await page.waitForTimeout(900);
+// v49: editar, eliminar, denunciar y bloquear están en el menú «⋯» de cada publicación (v53: abierta desde el perfil).
+step('Botón editar ausente en post ajeno', !(await page.$(`${POST_B} [data-community-edit-post]`)));
+// v49: guardar una publicación (solo después de que la base confirma).
+await page.click(`${POST_B} [data-community-save]`); await page.waitForTimeout(900);
 step('Publicación guardada en la base', sql(`select count(*) from community_saved_posts where user_id='aaaaaaaa-0000-0000-0000-000000000001'`) === '1');
-step('El botón guardar queda marcado', (await page.getAttribute('[data-community-post="b0000000-0000-0000-0000-0000000000b1"] [data-community-save]', 'aria-pressed')) === 'true');
-// v49: perfil social de otra persona con conteos reales.
-await page.click('[data-community-post="b0000000-0000-0000-0000-0000000000b1"] .community-author-name'); await page.waitForTimeout(1200);
+step('El botón guardar queda marcado', (await page.getAttribute(`${POST_B} [data-community-save]`, 'aria-pressed')) === 'true');
+await page.evaluate(() => document.getElementById('communityPostDialog').close());
 const otherProfile = await page.textContent('#communityUserProfile');
 step('Perfil de otra persona: nombre, usuario y conteos reales', /Bruno Fit/.test(otherProfile) && /@bruno_fit/.test(otherProfile) && /seguidores/.test(otherProfile), otherProfile.replace(/\s+/g, ' ').slice(0, 140));
 step('Mutuos: se ofrece escribir un mensaje', await page.isVisible('#communityUserProfile [data-user-message]'));
 step('La barra inferior principal sigue intacta', await page.$$eval('.mobile-nav-item', n => n.map(x => x.dataset.mobileView).join(',')) === 'plan,train,nutrition,progress,community,profile');
-await page.click('#communityUserBack'); await page.waitForTimeout(600);
-// v49: buscar por #hashtag en Explorar.
-sql(`set request.jwt.claim.sub='bbbbbbbb-0000-0000-0000-000000000002'; insert into community_posts(id,user_id,post_kind,description,visibility) values('b0000000-0000-0000-0000-0000000000b2','bbbbbbbb-0000-0000-0000-000000000002','text','Cuarto día seguido #constancia','public') on conflict do nothing`);
-await page.click('#communityTabExplore'); await page.waitForTimeout(800);
-await page.fill('#communitySearch', '#constancia'); await page.click('#communitySearchForm button[type=submit]'); await page.waitForTimeout(1200);
-step('Explorar encuentra publicaciones por #hashtag', /Cuarto día seguido/.test(await page.textContent('#communitySearchPosts')));
+await page.click('#communityTabProfile'); await page.waitForTimeout(900);
+await page.click(`#communityOwnGrid [data-community-open-post="${textPostId}"]`); await page.waitForTimeout(1000);
+await page.click(`#communityPostDialog [data-community-post="${textPostId}"] .community-post-menu summary`);
+await page.click(`#communityPostDialog [data-community-edit-post="${textPostId}"]`);
+await page.fill(`#communityPostDialog [data-community-post="${textPostId}"] .community-edit-form textarea`, 'Hoy corrí 5 km sin parar (editado)');
+await page.click(`#communityPostDialog [data-community-post="${textPostId}"] .community-edit-form button[type=submit]`); await page.waitForTimeout(1200);
+await page.evaluate(() => document.getElementById('communityPostDialog').close());
+step('Edición propia persistida', sql(`select description from community_posts where id='${textPostId}'`) === 'Hoy corrí 5 km sin parar (editado)');
+// v53: los #hashtags ya no abren una búsqueda de publicaciones (no hay feed general).
 // v49: publicación con un entrenamiento vinculado (resumen elegido por la persona).
-await page.click('#communityTabPublish'); await page.waitForTimeout(400); await page.click('[data-post-kind="text"]');
+await openPublish(); await page.click('[data-post-kind="text"]');
 await page.fill('#communityTextBody', 'Sesión de pecho completa #fuerza');
 await page.selectOption('#communityLinkSession', 's5');
 step('La vista previa muestra el entrenamiento vinculado', /Pecho y tríceps/.test(await page.textContent('#communityPostPreview')));
@@ -180,18 +180,18 @@ sql(`delete from community_follows where following_id='cccccccc-0000-0000-0000-0
 sql(`insert into auth.users(id,email,raw_user_meta_data) values('cccccccc-0000-0000-0000-0000000000c5','carla@example.test','{"full_name":"Carla"}'),('dddddddd-0000-0000-0000-0000000000d5','diego@example.test','{"full_name":"Diego"}')`);
 step('Un perfil nuevo empieza público', sql(`select visibility from community_profiles where user_id='dddddddd-0000-0000-0000-0000000000d5'`) === 'public');
 sql(`update community_profiles set username='carla_priv', visibility='private', bio='No deberías ver esto', avatar_path='cccccccc-0000-0000-0000-0000000000c5/avatar/c1.jpg' where user_id='cccccccc-0000-0000-0000-0000000000c5'; update community_profiles set username='diego_pub' where user_id='dddddddd-0000-0000-0000-0000000000d5'`);
-await page.click('#communityTabExplore'); await page.waitForTimeout(1200);
+await page.click('#communityTabWorld'); await page.waitForTimeout(1200);
 const people = await page.textContent('#communityPeople');
-step('Explorar lista usuarios reales de la app', /carla_priv/.test(people) && /diego_pub/.test(people) && /bruno_fit/.test(people), people.replace(/\s+/g, ' ').slice(0, 160));
+step('Todo el mundo lista usuarios reales de la app', /carla_priv/.test(people) && /diego_pub/.test(people) && /bruno_fit/.test(people), people.replace(/\s+/g, ' ').slice(0, 160));
 step('El perfil privado muestra solo datos básicos y la etiqueta', /Perfil privado/.test(people) && !/No deberías ver esto/.test(people));
-const carlaAvatar = await page.$$eval('#communityPeople .community-person', n => (n.find(x => /carla_priv/.test(x.textContent))?.querySelector('.community-avatar')?.outerHTML) || '');
+const carlaAvatar = await page.$$eval('#communityPeople .cm-card', n => (n.find(x => /carla_priv/.test(x.textContent))?.querySelector('.community-avatar')?.outerHTML) || '');
 step('Foto de perfil del privado visible como dato básico', /has-photo/.test(carlaAvatar) && /cccccccc-0000-0000-0000-0000000000c5\/avatar\/c1\.jpg/.test(carlaAvatar), carlaAvatar.slice(0, 200));
-await page.click('#communityPeople .community-person-open[aria-label*="Carla"]'); await page.waitForTimeout(900);
+await page.click('#communityPeople .cm-card-open[aria-label*="Carla"]'); await page.waitForTimeout(900);
 const priv = await page.textContent('#communityUserProfile');
 step('Abrir un perfil privado muestra el aviso, sin su contenido', /Este perfil es privado/.test(priv) && !/No deberías ver esto/.test(priv), priv.replace(/\s+/g, ' ').slice(0, 140));
 await page.click('#communityUserProfile [data-user-follow]'); await page.waitForTimeout(700);
 step('Solicitar seguir a un privado queda pendiente', sql(`select status from community_follows where follower_id='aaaaaaaa-0000-0000-0000-000000000001' and following_id='cccccccc-0000-0000-0000-0000000000c5'`) === 'pending');
-await page.click('#communityTabExplore'); await page.fill('#communitySearch', 'diego'); await page.press('#communitySearch', 'Enter'); await page.waitForTimeout(900);
+await page.click('#communityTabWorld'); await page.fill('#communitySearch', 'diego'); await page.press('#communitySearch', 'Enter'); await page.waitForTimeout(900);
 const found = await page.textContent('#communityPeople');
 step('Buscar personas por nombre o usuario', /diego_pub/.test(found) && !/carla_priv/.test(found), found.replace(/\s+/g, ' ').slice(0, 100));
 await page.fill('#communitySearch', ''); await page.press('#communitySearch', 'Enter'); await page.waitForTimeout(500);
@@ -208,16 +208,17 @@ await page.selectOption('#communityVisibility', 'public'); await page.evaluate((
 
 
 // Eliminación propia
-await page.click('#communityTabFeed'); await page.waitForTimeout(900);
-await page.click(`[data-community-post="${textPostId}"] .community-post-menu summary`);
-await page.click(`[data-community-post="${textPostId}"] [data-community-delete-post]`); await page.waitForTimeout(1200);
+await page.click('#communityTabProfile'); await page.waitForTimeout(900); await page.click('[data-own-tab="posts"]'); await page.waitForTimeout(900);
+await page.click(`#communityOwnGrid [data-community-open-post="${textPostId}"]`); await page.waitForTimeout(1000);
+await page.click(`#communityPostDialog [data-community-post="${textPostId}"] .community-post-menu summary`);
+await page.click(`#communityPostDialog [data-community-post="${textPostId}"] [data-community-delete-post]`); await page.waitForTimeout(1200);
 step('Eliminar publicación propia', sql(`select count(*) from community_posts where id='${textPostId}'`) === '0');
 // Moderación (v43): solo una cuenta agregada por SQL ve las denuncias.
 await page.click('#communityTabProfile'); await page.waitForTimeout(900);
 step('Sin rol de moderación no se ve la tarjeta', !(await page.isVisible('#communityModerationCard')));
 const achId = sql(`select id from community_posts where post_kind='achievement' and user_id='aaaaaaaa-0000-0000-0000-000000000001'`);
 sql(`insert into community_moderators(user_id) values('aaaaaaaa-0000-0000-0000-000000000001'); insert into community_reports(reporter_id,post_id,reason) values('bbbbbbbb-0000-0000-0000-000000000002','b0000000-0000-0000-0000-0000000000b1','Prueba descartar'),('bbbbbbbb-0000-0000-0000-000000000002','${achId}','Prueba eliminar')`);
-await page.click('#communityTabFeed'); await page.waitForTimeout(500); await page.click('#communityTabProfile'); await page.waitForTimeout(1200);
+await page.click('#communityTabWorld'); await page.waitForTimeout(500); await page.click('#communityTabProfile'); await page.waitForTimeout(1200);
 step('Moderador ve las denuncias abiertas', await page.isVisible('#communityModerationCard') && /Prueba descartar/.test(await page.textContent('#communityReportsList')));
 await page.click('#communityReportsList [data-report-dismiss]'); await page.waitForTimeout(1200);
 step('Descartar denuncia guarda estado y quién resolvió', sql(`select status, resolved_by is not null from community_reports where reason='Prueba descartar'`) === 'dismissed|t');
