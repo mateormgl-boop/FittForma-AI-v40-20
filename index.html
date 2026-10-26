@@ -2022,6 +2022,7 @@
         <button type="button" role="tab" class="ff-seg" id="progressTabBadges" data-progress-tab="badges" aria-controls="progressPanelBadges" aria-selected="false" tabindex="-1">Insignias</button>
         <button type="button" role="tab" class="ff-seg" id="progressTabHistory" data-progress-tab="history" aria-controls="progressPanelHistory" aria-selected="false" tabindex="-1">Historial</button>
         <button type="button" role="tab" class="ff-seg" id="progressTabBody" data-progress-tab="body" aria-controls="progressPanelBody" aria-selected="false" tabindex="-1">Cuerpo</button>
+        <button type="button" role="tab" class="ff-seg" id="progressTabMuscles" data-progress-tab="muscles" aria-controls="progressPanelMuscles" aria-selected="false" tabindex="-1">Músculos</button>
       </nav>
       <div class="progress-panel" id="progressPanelSummary" role="tabpanel" aria-labelledby="progressTabSummary" data-progress-panel="summary">
       <div class="progress-tiles" id="progressTiles" aria-label="Variación de las últimas 4 semanas"></div>
@@ -2064,6 +2065,18 @@
       <div class="card"><h3>Seguimiento de peso</h3><div class="ff-chips" role="group" aria-label="Período del peso"><button type="button" class="ff-chip" data-weight-period="1m" aria-pressed="false">1 mes</button><button type="button" class="ff-chip active" data-weight-period="3m" aria-pressed="true">3 meses</button><button type="button" class="ff-chip" data-weight-period="6m" aria-pressed="false">6 meses</button><button type="button" class="ff-chip" data-weight-period="all" aria-pressed="false">Todo</button></div><form id="weightForm" class="chat-form"><label class="sr-only" for="weightInput">Peso en kg</label><input id="weightInput" type="number" min="20" max="350" step="0.1" placeholder="Peso actual en kg" required><button class="btn" type="submit">Registrar</button></form><div id="weightChart" class="weight-chart"></div><div id="weightHistory"></div><p class="muted small">El peso puede fluctuar por hidratación, comidas y otros factores; mirá tendencias, no un único dato.</p></div>
       <div class="card" id="measureCard"><h3>Medidas corporales</h3><p class="muted small">Privadas. Completá solo las que quieras; mirá tendencias, no un único dato.</p><form id="measureForm" novalidate><div class="field"><label for="measureDate">Fecha</label><input id="measureDate" name="measureDate" type="date" required></div><div class="grid2"><div class="field"><label for="m_waist">Cintura (cm)</label><input id="m_waist" name="m_waist" type="number" min="40" max="200" step="0.1" inputmode="decimal" placeholder="—"></div><div class="field"><label for="m_hip">Cadera (cm)</label><input id="m_hip" name="m_hip" type="number" min="40" max="220" step="0.1" inputmode="decimal" placeholder="—"></div><div class="field"><label for="m_chest">Pecho (cm)</label><input id="m_chest" name="m_chest" type="number" min="40" max="220" step="0.1" inputmode="decimal" placeholder="—"></div><div class="field"><label for="m_arm">Brazo (cm)</label><input id="m_arm" name="m_arm" type="number" min="10" max="80" step="0.1" inputmode="decimal" placeholder="—"></div><div class="field"><label for="m_thigh">Muslo (cm)</label><input id="m_thigh" name="m_thigh" type="number" min="20" max="120" step="0.1" inputmode="decimal" placeholder="—"></div><div class="field"><label for="m_bodyFat">Grasa corporal (%)</label><input id="m_bodyFat" name="m_bodyFat" type="number" min="2" max="70" step="0.1" inputmode="decimal" placeholder="—"></div></div><button class="btn full" type="submit">Guardar medidas</button></form><div id="measureHistory"></div></div>
       <div class="card" id="progressPhotoCard"><h3>Fotos de progreso</h3><p class="muted small">Se guardan solo en este dispositivo, comprimidas y sin metadatos. No se suben a la nube ni se publican.</p><form id="progressPhotoForm" class="grid2"><div class="field"><label for="progressPhotoFile">Foto</label><input id="progressPhotoFile" name="progressPhotoFile" type="file" accept="image/jpeg,image/png,image/webp" required></div><div class="field"><label for="progressPhotoDate">Fecha</label><input id="progressPhotoDate" name="progressPhotoDate" type="date" required></div><button class="btn full" type="submit">Guardar foto</button></form><div id="progressPhotoList"></div></div>
+      </div>
+      <div class="progress-panel" id="progressPanelMuscles" role="tabpanel" aria-labelledby="progressTabMuscles" data-progress-panel="muscles" hidden>
+        <div class="card mr-hero" id="mrHero"></div>
+        <div class="card mr-compare">
+          <div class="section-head"><div><div class="eyebrow">Mapa de avances</div><h3>Tus músculos, rango por rango</h3></div>
+            <div class="ff-chips" role="group" aria-label="Lado del cuerpo"><button type="button" class="ff-chip" data-mr-side="front" aria-pressed="true">Frente</button><button type="button" class="ff-chip" data-mr-side="back" aria-pressed="false">Espalda</button></div></div>
+          <div class="mr-maps" id="mrMaps"></div>
+          <p class="muted small" id="mrCompareNote"></p>
+        </div>
+        <div class="card"><div class="eyebrow">Rangos</div><h3>De Hierro a Leyenda</h3><div class="mr-ladder" id="mrLadder"></div></div>
+        <div class="card"><div class="section-head"><div><div class="eyebrow">Por músculo</div><h3>Cuánto falta para subir</h3></div></div><ul class="mr-list" id="mrList"></ul></div>
+        <details class="card mr-how"><summary>¿Cómo se calcula?</summary><p class="muted small">Cada serie que marcás como hecha suma 1 al músculo principal del ejercicio y 0,5 a cada músculo secundario (los mismos del mapa de cada ficha). El rango de cada músculo depende de esas series acumuladas. El rango general es el del músculo «del medio»: sube cuando entrenás el cuerpo completo, no solo un grupo. El equilibrio indica qué tan parejo está el trabajo entre músculos. Mide constancia y volumen de entrenamiento, no fuerza ni tamaño muscular.</p></details>
       </div>
     </section>
 
@@ -2343,14 +2356,14 @@
         <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
         <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">51.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">52.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
       </details>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 51.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 52.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -2377,7 +2390,7 @@
   <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V51.0</p>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V52.0</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -2452,6 +2465,7 @@
 <script src="./ads.js"></script>
 <script src="./membership-config.js"></script>
 <script src="./anatomy.js"></script>
+<script src="./muscle-ranks.js"></script>
 <script src="./training-core.js"></script>
 <script src="./body-goals.js"></script>
 <script src="./exercise-guides.js"></script>
@@ -2543,6 +2557,7 @@
     out.plan=cleanPlan(st.plan);
     out.planHistory=objList(st.planHistory,8).map(h=>({...h,label:String(h.label??''),profile:isPlainObj(h.profile)?h.profile:{...out.profile},plan:cleanPlan(h.plan)}));
     out.proposal=isPlainObj(st.proposal)?st.proposal:null;
+    out.muscleRanksSeen=isPlainObj(st.muscleRanksSeen)?Object.fromEntries(Object.entries(st.muscleRanksSeen).filter(([k,v])=>/^[a-z_]{3,24}$/.test(k)&&Number.isInteger(v)&&v>=-1&&v<9)):undefined;
     for(const k of ['mealPlan','waterLogs','habitLogs','badgeUnlocks','nutritionGoals','reminders'])out[k]=isPlainObj(st[k])?st[k]:structuredClone(defaults[k]);
     out.water=isPlainObj(st.water)?st.water:structuredClone(defaults.water);
     // v48: progresión diaria, hidratación por registros y selección de insignias destacadas.
@@ -3382,7 +3397,7 @@ function findCatalogExercise(name){
     {const rec=caloriesRecord(FittFormaActivity.estimateStrengthCalories({minutes:manualSession.minutes,weightKg:state.profile?.currentWeightKg}));if(rec)manualSession.calories=rec;}
     // Se ubica por fecha (el historial va del más nuevo al más viejo): un registro atrasado no pasa a ser «la última vez».
     const at=state.sessions.findIndex(x=>String(x?.date||'')<=date);if(at<0)state.sessions.push(manualSession);else state.sessions.splice(at,0,manualSession);
-    const badgeDelta=syncBadgeUnlocks();save();$('manualLogHost').innerHTML='';renderAll();renderTrain();toast('Entrenamiento registrado manualmente.');celebrateBadges(badgeDelta.newlyUnlocked);
+    const badgeDelta=syncBadgeUnlocks();checkMuscleRankUps();save();$('manualLogHost').innerHTML='';renderAll();renderTrain();toast('Entrenamiento registrado manualmente.');celebrateBadges(badgeDelta.newlyUnlocked);
   }
   // Edición de la sesión en curso: series y ejercicios.
   function sessionAddSet(ei){const ex=activeSession?.exercises?.[ei];if(!ex)return;if(ex.entries.length>=ROUTINE_LIMITS.sets){toast(`Máximo ${ROUTINE_LIMITS.sets} series por ejercicio.`);return;}ex.entries.push({reps:'',weight:'',done:false});ex.sets=ex.entries.length;persistActiveSessionDraft();renderTrain();}
@@ -3614,7 +3629,7 @@ function findCatalogExercise(name){
       state.daily={...state.daily,seq:daily.seq,lastCompletedAt:daily.completedAt,nextAvailableAt:daily.nextAvailableAt,history:[...(state.daily?.history||[]),{seq:daily.seq,dayIndex:session.dayIndex,title:session.title,sessionId:savedSession.id,startedAt:savedSession.startedAt,completedAt:daily.completedAt,nextAvailableAt:daily.nextAvailableAt,status:'completed',source:daily.source,completedSets:summary.completedSets,totalSets:summary.totalSets,rewardXp:50}].slice(-2000)};
     }
     state.sessions.unshift(savedSession);lastWorkoutSummary={...summary,minutes,title:savedSession.title,date:savedSession.date,type,status,dailySeq:savedSession.dailySeq};activeSession=null;clearActiveSessionDraft();resetRestTimer();if(workoutClockInterval){clearInterval(workoutClockInterval);workoutClockInterval=null;}
-    const badgeDelta=syncBadgeUnlocks();save();renderAll();renderTrain();switchView('train');toast(notice);celebrateBadges(badgeDelta.newlyUnlocked);pendingAdBreak='workout-saved';
+    const badgeDelta=syncBadgeUnlocks();checkMuscleRankUps();save();renderAll();renderTrain();switchView('train');toast(notice);celebrateBadges(badgeDelta.newlyUnlocked);pendingAdBreak='workout-saved';
   }
 
   function streak(){
@@ -4030,6 +4045,43 @@ function findCatalogExercise(name){
     tabs.forEach(t=>{const on=t.dataset.progressTab===name;t.classList.toggle('active',on);t.setAttribute('aria-selected',String(on));t.tabIndex=on?0:-1;if(on&&focus)t.focus();});
     document.querySelectorAll('[data-progress-panel]').forEach(p=>{p.hidden=p.dataset.progressPanel!==name;});
     if(name==='body'){renderWeights();renderMeasures();renderProgressPhotos();}
+    if(name==='muscles')renderMuscleRanks();
+  }
+  // ---------- v52: Mapa de avances (rango por músculo) ----------
+  const MR=window.FittFormaMuscleRanks;let mrSide='front';
+  function musclesOfExercise(name,group){
+    const canon=FittFormaTraining.canonicalName(name),g=window.FittFormaExerciseGifs?.[canon]||window.FittFormaExerciseGifs?.[name];
+    if(g)return {primary:g.muscles||[],secondary:g.secondary||[]};
+    const guide=(window.FittFormaExerciseGuides||[]).find(x=>x.name===canon);
+    if(guide&&window.FittFormaAnatomy)return {primary:FittFormaAnatomy.musclesFromText(guide.primary),secondary:FittFormaAnatomy.musclesFromText(guide.secondary)};
+    const gm=MR.GROUP_MUSCLES[group||FittFormaTraining.libraryEntry(canon)?.group];return gm?{primary:gm[0],secondary:gm[1]}:{primary:[],secondary:[]};
+  }
+  const muscleRanksNow=until=>MR.compute(state.sessions,musclesOfExercise,until);
+  function rankColorFills(r){return Object.fromEntries(r.muscles.filter(m=>m.rank>=0).map(m=>[m.id,MR.RANKS[m.rank].color]));}
+  function renderMuscleRanks(){
+    if(!MR||!$('mrHero'))return;
+    const now=muscleRanksNow(),d=new Date();d.setDate(d.getDate()-30);const before=muscleRanksNow(dateKey(d));
+    const names=FittFormaAnatomy.MUSCLES,ov=now.overall,ovR=MR.RANKS[ov],step=MR.nextStep(now.median);
+    $('mrHero').innerHTML=`<div class="mr-hero-row"><div class="mr-emblem">${MR.emblemSvg(ov,112)}</div><div class="mr-hero-copy"><div class="eyebrow">Rango general</div><strong class="mr-rank-name" style="color:${ovR?.glow||'var(--text-2)'}">${ovR?esc(ovR.name):'Sin rango todavía'}</strong>${step.next?`<div class="mr-bar"><span style="width:${Math.round(step.pct*100)}%;background:${step.next.color}"></span></div><small class="muted">Próximo: ${esc(step.next.name)} · el músculo del medio necesita ${String(step.missing).replace('.',',')} series más</small>`:'<small class="muted">Llegaste al rango máximo.</small>'}</div></div>
+      <div class="mr-stats"><div><b>${now.ranked}/20</b><small>músculos con rango</small></div><div><b>${Math.round(now.total)}</b><small>series efectivas</small></div><div><b>${now.balance}%</b><small>equilibrio</small></div></div>
+      ${now.total?`<p class="mr-tip">Para subir tu rango general, sumá series de ${now.weakest.map(m=>esc(names[m.id])).join(', ')}.</p>`:'<p class="mr-tip">Completá tu primer entrenamiento y marcá las series como hechas: tus músculos empiezan a sumar rango.</p>'}
+      <button type="button" class="btn secondary btn-sm" data-goto-view="exercises">Ver ejercicios</button>`;
+    const map=(r,label)=>`<figure class="mr-map"><figcaption>${label}</figcaption>${FittFormaAnatomy.muscleFillSvg(rankColorFills(r),{sides:mrSide,label:`${label}: músculos coloreados según su rango`,className:'mr-fig'})}</figure>`;
+    $('mrMaps').innerHTML=map(before,'Hace 30 días')+'<div class="mr-arrow" aria-hidden="true">→</div>'+map(now,'Hoy');
+    const ups=MR.rankUps(before,now);
+    const upTop=ups.slice().sort((x,y)=>y.rank-x.rank);$('mrCompareNote').textContent=ups.length?`En los últimos 30 días subieron de rango ${ups.length} ${ups.length===1?'músculo':'músculos'}: ${upTop.slice(0,3).map(u=>`${names[u.id]} (${MR.RANKS[u.rank].name})`).join(', ')}${ups.length>3?' y más':''}.`:now.total?'En los últimos 30 días ningún músculo cambió de rango todavía.':'Los colores aparecen a medida que entrenás.';
+    document.querySelectorAll('[data-mr-side]').forEach(b=>{const on=b.dataset.mrSide===mrSide;b.setAttribute('aria-pressed',String(on));b.classList.toggle('active',on);});
+    $('mrLadder').innerHTML=MR.RANKS.map((r,i)=>`<div class="mr-step ${i<=ov?'is-on':''}">${MR.emblemSvg(i,58)}<b style="color:${r.glow}">${esc(r.name)}</b><small>${r.min} series</small></div>`).join('');
+    $('mrList').innerHTML=now.muscles.slice().sort((a,b)=>b.score-a.score).map(m=>{const r=MR.RANKS[m.rank],st=MR.nextStep(m.score);return `<li class="mr-row"><span class="mr-mini">${MR.emblemSvg(m.rank,40)}</span><div class="mr-row-copy"><div class="mr-row-top"><strong>${esc(names[m.id])}</strong><span style="color:${r?.glow||'var(--text-3)'}">${r?esc(r.name):'Sin rango'}</span></div><div class="mr-bar"><span style="width:${Math.round(st.pct*100)}%;background:${(st.next||r)?.color||'#5b6680'}"></span></div><small class="muted">${String(m.score).replace('.',',')} series${st.next?` · faltan ${String(st.missing).replace('.',',')} para ${esc(st.next.name)}`:' · rango máximo'}</small></div></li>`;}).join('');
+  }
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-mr-side]');if(b){mrSide=b.dataset.mrSide;renderMuscleRanks();}});
+  // Aviso cuando un músculo sube de rango (se compara con lo último que la persona ya vio).
+  function checkMuscleRankUps(){
+    if(!MR)return;const now=muscleRanksNow(),seen=isPlainObj(state.muscleRanksSeen)?state.muscleRanksSeen:null;
+    const cur=Object.fromEntries(now.muscles.map(m=>[m.id,m.rank]));state.muscleRanksSeen=cur;
+    if(!seen)return;const ups=now.muscles.filter(m=>m.rank>(seen[m.id]??-1));if(!ups.length)return;
+    const best=ups.sort((a,b)=>b.rank-a.rank)[0],names=FittFormaAnatomy.MUSCLES;
+    setTimeout(()=>toast(ups.length>1?`¡${ups.length} músculos subieron de rango! ${names[best.id]} llegó a ${MR.RANKS[best.rank].name}.`:`¡${names[best.id]} subió a ${MR.RANKS[best.rank].name}! Miralo en Progreso › Músculos.`),1600);
   }
   function initProgressTabs(){
     const tabs=[...document.querySelectorAll('[data-progress-tab]')];
@@ -4951,7 +5003,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.51.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.51.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.52.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.52.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -5779,7 +5831,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.51.0';
+  const APP_VERSION='0.52.0';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');
@@ -5827,7 +5879,7 @@ function findCatalogExercise(name){
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncServerTime().then(()=>{if(!activeSession)renderTrain();});});
   $('badgeCelebrationClose')?.addEventListener('click',()=>$('badgeCelebration').close());
   $('badgeCelebrationView')?.addEventListener('click',()=>{$('badgeCelebration').close();switchView('progress');showProgressTab('badges');});
-  initBadgeCenter();initProgressTabs();document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});$('coachMessages')?.addEventListener('click',e=>{const b=e.target.closest('[data-ai-go]');if(b)fittaiGo(b.dataset.aiGo);});initViewTabs();initRoutines();initBodyTracking();initNotifications();initTheme();$('homeRecentAll')?.addEventListener('click',()=>{switchView('progress');showProgressTab('history');});initAvatar();initQuickAdd();initWelcome();initMealPlanning();$('deleteCloudAccount')?.addEventListener('click',deleteCloudAccount);initSessionHistoryEditing();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
+  initBadgeCenter();initProgressTabs();if(MR&&!isPlainObj(state.muscleRanksSeen)){const r=muscleRanksNow();state.muscleRanksSeen=Object.fromEntries(r.muscles.map(m=>[m.id,m.rank]));}document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});$('coachMessages')?.addEventListener('click',e=>{const b=e.target.closest('[data-ai-go]');if(b)fittaiGo(b.dataset.aiGo);});initViewTabs();initRoutines();initBodyTracking();initNotifications();initTheme();$('homeRecentAll')?.addEventListener('click',()=>{switchView('progress');showProgressTab('history');});initAvatar();initQuickAdd();initWelcome();initMealPlanning();$('deleteCloudAccount')?.addEventListener('click',deleteCloudAccount);initSessionHistoryEditing();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
   setTimeout(()=>checkWorkoutReminders(),1200);setInterval(()=>{if(document.visibilityState==='visible')checkWorkoutReminders();},30000);window.addEventListener('focus',()=>{renderReminderSettings();checkWorkoutReminders();});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){renderReminderSettings();checkWorkoutReminders();}});
   document.addEventListener('visibilitychange',()=>{if(!activeSession)return;if(document.visibilityState==='hidden'&&!activeSession.pausedAt){activeSession.elapsedMs=activeSessionElapsedMs(activeSession);activeSession.segmentStartedAt=Date.now();activeSession.pausedAt=Date.now();activeSession.pauseReason='background';persistActiveSessionDraft();}else if(document.visibilityState==='visible'&&activeSession.pausedAt&&activeSession.pauseReason==='background'){activeSession.pausedAt=0;activeSession.pauseReason='';activeSession.segmentStartedAt=Date.now();persistActiveSessionDraft();updateWorkoutClock();}});
   window.addEventListener('pagehide',()=>{if(activeSession)persistActiveSessionDraft();});
@@ -5840,6 +5892,7 @@ function findCatalogExercise(name){
 <script src="./i18n-v48.js" defer></script>
 <script src="./i18n-v50.js" defer></script>
 <script src="./i18n-v51.js" defer></script>
+<script src="./i18n-v52.js" defer></script>
 <script src="./i18n.js" defer></script>
 </body>
 </html>

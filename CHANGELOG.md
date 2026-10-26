@@ -1,5 +1,22 @@
 # FittForma AI — Registro de cambios
 
+## v52.0 — Mapa de avances: rango por músculo (26 de octubre de 2026)
+
+- Nueva pestaña **Progreso › Músculos**.
+- **Rangos:** cada músculo sube de rango según las series que completás.
+  - Una serie hecha suma 1 al músculo principal del ejercicio y 0,5 a cada secundario.
+  - Son 9 rangos con emblemas propios: Hierro, Bronce, Plata, Oro, Rubí, Esmeralda, Diamante, Campeón y Leyenda.
+- **Mapa del cuerpo** de frente y de espalda, con cada músculo pintado del color de su rango. Se compara «Hace 30 días» con «Hoy».
+- **Rango general:** es el del músculo mediano, así que sube entrenando todo el cuerpo. Se muestra junto con el equilibrio entre músculos y los tres músculos que más conviene entrenar.
+- **Lista por músculo** con cuántas series faltan para el rango siguiente.
+- **Aviso al guardar un entrenamiento** cuando un músculo sube de rango.
+- **Lo que mide:** constancia y volumen de entrenamiento, no fuerza ni tamaño muscular. La pantalla lo explica.
+- **Otros cambios:**
+  - `muscle-ranks.js` (funciones puras con pruebas en `tests/v52.test.mjs`).
+  - `anatomy.js` suma `muscleFillSvg`.
+  - Traducciones en `i18n-v52.js`.
+  - Sin migraciones de base de datos.
+
 ## v51.0 — Galería de ejercicios, hidratación y «Objetivo y actualidad» (19 de octubre de 2026)
 
 **Galería de ejercicios**

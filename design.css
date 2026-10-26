@@ -916,3 +916,43 @@ body{font-feature-settings:"cv11","ss01"}
 .home-body-goal .bg-progress{margin:6px 0 0;height:6px}
 .bg-home-cta{flex:none;padding:7px 13px;border-radius:999px;background:linear-gradient(135deg,#7a5cff,#1aa7ff);color:#fff;font-weight:800;font-size:12.5px}
 .home-body-goal:focus-visible{outline:3px solid var(--ff-focus,#2f6bff);outline-offset:2px}
+
+/* ===== v52 · Mapa de avances (rango por músculo) ===== */
+.mr-hero{background:radial-gradient(circle at 18% 30%,rgba(95,184,255,.18),transparent 55%),linear-gradient(160deg,rgb(var(--surface2-rgb)/1),rgb(var(--surface-rgb)/1))!important}
+.mr-hero-row{display:flex;gap:16px;align-items:center}
+.mr-emblem{flex:none;width:112px;height:112px;display:grid;place-items:center}
+.mr-hero-copy{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.mr-rank-name{font-size:32px;font-weight:900;letter-spacing:-.02em;line-height:1.05}
+.mr-bar{height:8px;border-radius:999px;background:rgb(var(--surface2-rgb)/1);overflow:hidden}
+.mr-bar span{display:block;height:100%;border-radius:inherit;transition:width .6s ease}
+.mr-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 10px}
+.mr-stats div{display:flex;flex-direction:column;padding:9px 10px;border-radius:14px;background:rgba(95,184,255,.1);min-width:0}
+.mr-stats b{font-size:19px;font-weight:900;color:var(--text)}
+.mr-stats small{font-size:11px;color:var(--text-3);line-height:1.2}
+.mr-tip{margin:4px 0 10px;font-size:13.5px;color:var(--text-2)}
+.mr-maps{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;margin:6px 0 8px}
+.mr-map{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:18px;background:#05080f;border:1px solid var(--ff-border)}
+.mr-map figcaption{font-size:13px;font-weight:800;color:var(--text-2)}
+.mr-map .anatomy-map{width:100%;max-width:170px;height:auto}
+.mr-fig .am-body{fill:#c9ced8}
+.mr-fig .am-m{fill:#e7eaf0;stroke:#5b6475;stroke-width:.5}
+.mr-fig .am-m.is-ranked{stroke:#0b1222;stroke-width:.7}
+.mr-fig .am-cap{display:none}
+.mr-arrow{font-size:26px;font-weight:900;color:#5fb8ff}
+.mr-ladder{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:8px}
+@media(min-width:620px){.mr-ladder{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.mr-step{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:14px;background:#05080f;border:1px solid var(--ff-border);opacity:.45;filter:grayscale(.6)}
+.mr-step.is-on{opacity:1;filter:none;border-color:rgba(95,184,255,.45)}
+.mr-step b{font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.mr-step small{font-size:11px;color:var(--text-3)}
+.mr-list{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.mr-row{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:14px;background:rgb(var(--surface2-rgb)/.6);border:1px solid var(--ff-border)}
+.mr-mini{flex:none;width:40px;height:40px}
+.mr-row-copy{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.mr-row-top{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.mr-row-top span{font-weight:800;font-size:13px}
+.mr-how summary{cursor:pointer;font-weight:800}
+:root[data-theme="light"] .mr-map,:root[data-theme="light"] .mr-step{background:#0b1222}
+/* v52: Progreso tiene 5 pestañas; se reparten el ancho para que entren todas en el celular. */
+#view-progress .progress-subnav{display:grid!important;grid-template-columns:repeat(5,auto);justify-content:space-between;gap:0;overflow:visible;padding-inline:4px!important}
+#view-progress .progress-subnav .ff-seg{min-width:0;padding-inline:clamp(4px,1.4vw,14px)!important;font-size:clamp(11px,3.05vw,15px)!important;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;justify-content:center;text-align:center}

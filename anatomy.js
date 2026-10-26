@@ -127,5 +127,26 @@
     return `<svg class="anatomy-map anatomy-${opts.size || 'md'}" viewBox="${vb}" role="img" aria-labelledby="${id}"><title id="${id}">${label.replace(/[<&>"]/g, '')}</title>${content}</svg>`;
   }
 
-  root.FittFormaAnatomy = Object.freeze({ MUSCLES, SHAPES, musclesFromText, muscleMapSvg });
+  /**
+   * v52: mapa con un color por músculo (rangos del «Mapa de avances»). fills = { idMúsculo: '#color' };
+   * los que no figuran quedan en gris. opts: { label, sides: 'both'|'front'|'back', className }
+   */
+  function muscleFillSvg(fills, opts = {}) {
+    const sides = opts.sides || 'both', id = 'af' + (++uid);
+    const shape = (pts, attrs, mirrorX) => `<path ${attrs} d="${smooth(pts)}"/><path ${attrs} d="${smooth(pts)}" transform="translate(${mirrorX * 2},0) scale(-1,1)"/>`;
+    const fig = (side, cx) => {
+      const dx = side === 'back' ? 120 : 0;
+      const body = `<ellipse class="am-body" cx="${cx}" cy="16" rx="10" ry="12"/>` + shape(SILHOUETTE.map(([x, y]) => [x + dx, y]), 'class="am-body"', cx);
+      const muscles = SHAPES.filter(m => m.side === side).map(m => {
+        const c = fills && fills[m.id];
+        return shape(m.pts, c ? `class="am-m is-ranked" data-muscle="${m.id}" style="fill:${c}"` : `class="am-m" data-muscle="${m.id}"`, cx);
+      }).join('');
+      return `<g class="am-fig am-${side}">${body}${muscles}<text class="am-cap" x="${cx}" y="242" text-anchor="middle">${side === 'front' ? 'Frente' : 'Espalda'}</text></g>`;
+    };
+    const vb = sides === 'front' ? '0 0 120 248' : sides === 'back' ? '120 0 120 248' : '0 0 240 248';
+    const content = (sides !== 'back' ? fig('front', 60) : '') + (sides !== 'front' ? fig('back', 180) : '');
+    return `<svg class="anatomy-map ${opts.className || ''}" viewBox="${vb}" role="img" aria-labelledby="${id}"><title id="${id}">${String(opts.label || 'Mapa muscular').replace(/[<&>"]/g, '')}</title>${content}</svg>`;
+  }
+
+  root.FittFormaAnatomy = Object.freeze({ MUSCLES, SHAPES, musclesFromText, muscleMapSvg, muscleFillSvg });
 })(typeof window !== 'undefined' ? window : globalThis);
