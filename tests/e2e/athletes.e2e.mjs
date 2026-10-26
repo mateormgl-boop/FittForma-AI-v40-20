@@ -1,4 +1,4 @@
-// E2E v53: Comunidad de deportistas — Todo el mundo, perfil completo, Ranking, Amigos, comparación y privacidad.
+// E2E v53/v53.1: Comunidad de deportistas — Todos, perfil completo, Ranking, Amigos, comparación y privacidad.
 // Navegador real + supabase-js real + PostgREST real sobre PostgreSQL local (misma preparación que community.e2e.mjs).
 // Solo /auth/v1 y /storage/v1 se simulan en el navegador (sus permisos los cubre supabase/tests/run.sh).
 // Los usuarios de prueba (example.test) se identifican como tales; no se generan fotos de personas.
@@ -99,11 +99,14 @@ sql(`insert into community_athlete_stats(user_id,training_level,xp_level,overall
  ('${C}','beginner',2,5,10,1,'[]',30,12,10,70,0),
  ('${D}','beginner',3,1,6,0,'[]',20,8,6,12,0)`);
 sql(`insert into community_athlete_stats(user_id,stats_public,overall_rank,workouts_total,workouts_30d,active_days_30d,best_pushups) values('${E}',false,8,99,30,30,200)`);
+// v53.1: bandera y mapa de músculos de Bruno; «Mi físico» de Alicia se sube desde la app.
+sql(`update community_profiles set country_code='AR' where user_id='${B}'; update community_profiles set country_code=null, avatar_path=null where user_id='${A}'; update community_athlete_stats set muscle_ranks='{"biceps":3,"pectorales":2,"cuadriceps":1}' where user_id='${B}'`);
+sql(`delete from community_physique where user_id='${A}'; delete from community_memberships where user_id='${A}'`);
 
 await page.goto(APP + '/'); await page.waitForTimeout(800);
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(1200);
-step('1. Comunidad abre en «Todo el mundo»', (await page.getAttribute('#communityTabWorld', 'aria-selected')) === 'true' && await page.isVisible('#communityPanelWorld'));
-step('2. Tres apartados y ningún feed ni «Para vos»', (await page.$$eval('.cm-tabs [role=tab]', t => t.map(x => x.textContent.trim()).join('|'))) === 'Todo el mundo|Ranking|Amigos' && !(await page.$('#communityFeed')) && !(await page.$('[data-feed-mode]')) && !/Para vos/.test(await page.textContent('#view-community')));
+step('1. Comunidad abre en «Todos»', (await page.getAttribute('#communityTabWorld', 'aria-selected')) === 'true' && await page.isVisible('#communityPanelWorld'));
+step('2. Tres apartados y ningún feed ni «Para vos»', (await page.$$eval('.cm-tabs [role=tab]', t => t.map(x => x.textContent.trim()).join('|'))) === 'Todos|Ranking|Amigos' && !(await page.$('#communityFeed')) && !(await page.$('[data-feed-mode]')) && !/Para vos/.test(await page.textContent('#view-community')));
 let people = await page.textContent('#communityPeople');
 step('3. Sin sesión: perfiles públicos con nivel y rango', /Bruno Fit/.test(people) && /Avanzado/.test(people) && /Plata/.test(people) && !/carla_priv53/.test(people), people.replace(/\s+/g, ' ').slice(0, 160));
 step('3. Las estadísticas ocultas no aparecen', !/Leyenda/.test(people));
@@ -117,6 +120,8 @@ step('Aviso: qué estadísticas se ven (y que nunca peso ni medidas)', await pag
 await page.click('#communityStatsNoticeOk'); await page.waitForTimeout(1500);
 const mine = sql(`select stats_public||'|'||training_level||'|'||best_pushups||'|'||best_plank_seconds||'|'||run_km_30d||'|'||active_days_30d from community_athlete_stats where user_id='${A}'`);
 step('Estadísticas reales de Alicia publicadas (públicas por defecto)', mine === 'true|intermediate|23|60|5.00|6', mine);
+step('v53.1 También se publica el rango de cada músculo (sin datos corporales)', Number(sql(`select count(*) from jsonb_object_keys((select muscle_ranks from community_athlete_stats where user_id='${A}'))`)) >= 15);
+step('v53.1 La tarjeta muestra la bandera', /🇦🇷/.test(await page.textContent('#communityPeople')));
 step('La fila no tiene columnas de datos corporales', sql(`select count(*) from information_schema.columns where table_name='community_athlete_stats' and column_name ~ '(weight|height|peso|altura|waist|measure|photo|goal)'`) === '0');
 
 await page.fill('#communitySearch', 'diego'); await page.press('#communitySearch', 'Enter'); await page.waitForTimeout(900);
@@ -128,6 +133,7 @@ let prof = await page.textContent('#communityUserProfile');
 step('5. Al tocar la tarjeta se abre el perfil correcto', /Bruno Fit/.test(prof) && /@bruno_fit/.test(prof), prof.replace(/\s+/g, ' ').slice(0, 120));
 step('6. Perfil completo: rango, nivel, estadísticas e insignias', /Rango principal/.test(prof) && /Plata/.test(prof) && /Avanzado · Nivel 9/.test(prof) && /45 rep/.test(prof) && /Insignias y logros/.test(prof) && /Registrada en un entrenamiento/.test(prof));
 step('6. Lo que falta dice «Sin datos disponibles»', /Sin datos disponibles/.test(prof));
+step('v53.1 Perfil: bandera y mapa de músculos de Bruno', /🇦🇷/.test(prof) && /Mapa de músculos/.test(prof) && await page.isVisible('#communityUserProfile .cm-muscle-map svg') && /Oro/.test(await page.textContent('#communityUserProfile .cm-muscle-top')), prof.replace(/\s+/g, ' ').slice(0, 120));
 step('11. Mutuos: se ofrece mensaje; también comparar', await page.isVisible('#communityUserProfile [data-user-message]') && await page.isVisible('#communityUserProfile [data-user-compare]'));
 step('Publicaciones dentro del perfil', /Primera semana completa|Publicaciones/.test(prof));
 if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/profile.png`, fullPage: true });
@@ -201,6 +207,43 @@ await page.waitForTimeout(800);
 step('El perfil propio muestra lo publicado', (await page.$$('#communityOwnGrid [data-community-open-post]')).length >= 2);
 await page.click('#communityViewOwnPublic'); await page.waitForTimeout(1500);
 step('«Ver cómo me ven» usa el mismo perfil completo', /Así ven tu perfil/.test(await page.textContent('#communityUserProfile')) && /Rango principal/.test(await page.textContent('#communityUserProfile')));
+
+// v53.1: foto de perfil (tocar el avatar), bandera, «Mi físico», mapa de músculos y acceso desde Inicio.
+await page.click('#communityTabProfile'); await page.waitForTimeout(900);
+let [fc] = await Promise.all([page.waitForEvent('filechooser'), page.click('#communityOwnAvatarBtn')]);
+await fc.setFiles({ name: 'yo.png', mimeType: 'image/png', buffer: PNG }); await page.waitForTimeout(1500);
+step('v53.1 Tocar el avatar sin foto permite subir una', /^aaaaaaaa-0000-0000-0000-000000000001\/avatar\//.test(sql(`select coalesce(avatar_path,'') from community_profiles where user_id='${A}'`)) && /actualizada/.test(await page.textContent('#communityAvatarStatus')));
+await page.click('#communityOwnAvatarBtn'); await page.waitForTimeout(900);
+step('v53.1 Tocar el avatar con foto la muestra en grande con «Cambiar» y «Quitar»', await page.isVisible('#communityPhotoViewer img') && /Cambiar foto/.test(await page.textContent('#communityPhotoViewerActions')) && /Quitar foto/.test(await page.textContent('#communityPhotoViewerActions')));
+await page.click('#communityPhotoViewer [data-close-viewer]'); await page.waitForTimeout(300);
+await page.selectOption('#communityCountry', 'UY'); await page.evaluate(() => document.getElementById('communityProfileForm').requestSubmit()); await page.waitForTimeout(1300);
+step('v53.1 Bandera guardada y visible en el perfil propio', sql(`select country_code from community_profiles where user_id='${A}'`) === 'UY' && /🇺🇾/.test(await page.textContent('#communityOwnFlag')));
+const choose = async (button, files) => { let next = page.waitForEvent('filechooser'); await page.click(button); for (let i = 0; i < files.length; i++) { const chooser = await next; if (i + 1 < files.length) next = page.waitForEvent('filechooser'); await chooser.setFiles(files[i]); } await page.waitForTimeout(2200); };
+const img = n => ({ name: n + '.png', mimeType: 'image/png', buffer: PNG });
+await choose('[data-phys-upload="pair"]', [img('antes'), img('despues')]);
+step('v53.1 «Mi físico»: antes y después subido', sql(`select (before_path like '${A}/physique/%')::text||(after_path like '${A}/physique/%')::text from community_physique where user_id='${A}' and kind='pair'`) === 'truetrue' && (await page.$$('#communityPhysiqueEdit .cm-phys-pair img')).length === 2);
+await choose('[data-phys-upload="single"]', [img('una')]);
+step('v53.1 «Mi físico»: una foto subida', sql(`select count(*) from community_physique where user_id='${A}' and kind='single' and photo_path is not null`) === '1');
+const singleBefore = sql(`select photo_path from community_physique where user_id='${A}' and kind='single'`);
+await page.click('[data-phys-upload="single"]'); await page.waitForTimeout(500);
+step('v53.1 Sin Plus no se cambia antes de 30 días (y se explica)', /30 días/.test(await page.textContent('#communityPhysiqueStatus')) && sql(`select photo_path from community_physique where user_id='${A}' and kind='single'`) === singleBefore);
+await page.click('#communityPhysiqueEdit [data-phys-view]'); await page.waitForTimeout(600);
+step('v53.1 Las fotos de «Mi físico» se ven en grande', await page.isVisible('#communityPhotoViewer img'));
+await page.click('#communityPhotoViewer [data-close-viewer]'); await page.waitForTimeout(300);
+await page.click('#communityViewOwnPublic'); await page.waitForTimeout(1800);
+const asOthers = await page.textContent('#communityUserProfile');
+if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/asothers.png`, fullPage: true });
+step('v53.1 «Ver cómo me ven» abre el perfil con «Mi físico», mapa de músculos y bandera', /Así ven tu perfil/.test(asOthers) && /Mi físico/.test(asOthers) && /Mapa de músculos/.test(asOthers) && /🇺🇾/.test(asOthers), asOthers.replace(/\s+/g, ' ').slice(0, 160));
+await page.click('#communityTabProfile'); await page.waitForTimeout(900);
+await page.uncheck('#communityShowMuscles'); await page.waitForTimeout(1300);
+step('v53.1 Ocultar el mapa de músculos', sql(`select show_muscles from community_athlete_stats where user_id='${A}'`) === 'f');
+await page.click('#communityViewOwnPublic'); await page.waitForTimeout(1500);
+step('v53.1 Con el mapa oculto, el perfil propio lo sigue mostrando solo a vos', /Mapa de músculos/.test(await page.textContent('#communityUserProfile')));
+await page.click('#communityTabProfile'); await page.waitForTimeout(600); await page.check('#communityShowMuscles'); await page.waitForTimeout(1000);
+await page.click('.mobile-nav-item[data-mobile-view="plan"]'); await page.waitForTimeout(600);
+await page.click('[data-home-muscles]'); await page.waitForTimeout(1200);
+step('v53.1 Inicio tiene acceso directo a Músculos', await page.isVisible('#progressPanelMuscles'));
+await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(800);
 
 // Sin amigos: estado vacío.
 sql(`delete from community_follows where follower_id='${A}'`);

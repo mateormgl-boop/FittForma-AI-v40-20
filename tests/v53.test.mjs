@@ -97,7 +97,7 @@ test('comparación: misma métrica y unidad; lo que falta queda como «Sin datos
   for (const r of S.COMPARE) assert.ok(r.label && r.period, `fila ${r.key} con período`);
 });
 
-test('Comunidad: abre en Todo el mundo, sin feed, y el mismo perfil completo desde las tres pestañas', () => {
+test('Comunidad: abre en Todos, sin feed, y el mismo perfil completo desde las tres pestañas', () => {
   const view = html.slice(html.indexOf('id="view-community"'), html.indexOf('id="view-profile"'));
   const tabs = [...view.matchAll(/role="tab" data-community-tab="([a-z]+)"/g)].map(m => m[1]);
   assert.deepEqual(tabs, ['world', 'ranking', 'friends']);
@@ -130,7 +130,42 @@ test('mensajes solo con seguimiento mutuo; seguir y bloquear siguen disponibles 
 test('v53: archivos publicados, traducciones y versión', () => {
   const sw = readFileSync('sw.js', 'utf8'), server = readFileSync('backend/server.mjs', 'utf8'), i18n = readFileSync('i18n-v53.js', 'utf8');
   for (const f of ['athlete-stats.js', 'i18n-v53.js']) { assert.match(sw, new RegExp(`"\\./${f.replace('.', '\\.')}"`)); assert.match(server, new RegExp(`'/${f.replace('.', '\\.')}'`)); assert.match(html, new RegExp(`src="\\./${f.replace('.', '\\.')}"`)); }
-  for (const s of ['Todo el mundo', 'Ranking', 'Amigos', 'Todavía no tenés amigos en tu comunidad', 'Sin datos disponibles', 'Tu progreso']) assert.ok(i18n.includes(`["${s}"`), s);
+  for (const s of ['Todos', 'Ranking', 'Amigos', 'Todavía no tenés amigos en tu comunidad', 'Sin datos disponibles', 'Tu progreso']) assert.ok(i18n.includes(`["${s}"`), s);
   for (const row of i18n.matchAll(/^\s*\[("[^\n]*")\],?$/gm)) assert.equal(JSON.parse(`[${row[1]}]`).length, 6, row[1].slice(0, 40));
-  assert.match(sw, /fittforma-ai-static-v53-0/);
+  assert.match(sw, /fittforma-ai-static-v53-1/);
+});
+
+test('v53.1: rango por músculo validado (sin datos corporales) y misma regla en SQL', () => {
+  assert.deepEqual({ ...S.muscleRanks({ biceps: 3, cuadriceps: 12, gluteos: -1, 'Mal Nombre': 2, peso: 'x' }) }, { biceps: 3, cuadriceps: 8, gluteos: -1 });
+  const r = S.compute({ today: '2026-10-27', muscle: { overall: 2, ranked: 2, byMuscle: { biceps: 2, triceps: 1 } } });
+  assert.deepEqual({ ...r.muscle_ranks }, { biceps: 2, triceps: 1 });
+  const extras = readFileSync('supabase/migrations/2026-10-28_v53_profile_extras.sql', 'utf8'), code = extras.replace(/--[^\n]*/g, '');
+  assert.match(code, /not between -1 and 8/);
+  assert.match(code, /show_muscles boolean not null default true/);
+  assert.doesNotMatch(code, /drop table|disable row level security|delete from|drop function/i, 'migración aditiva');
+});
+
+test('v53.1: «Mi físico» una cosa por sección; sin Plus cada 30 días, controlado en el servidor', () => {
+  const code = readFileSync('supabase/migrations/2026-10-28_v53_profile_extras.sql', 'utf8').replace(/--[^\n]*/g, '');
+  assert.match(code, /primary key \(user_id, kind\)/);
+  assert.match(code, /kind in \('pair','single'\)/);
+  assert.match(code, /interval '30 days'[\s\S]*not public\.monetization_is_plus\(new\.user_id\)/);
+  assert.match(code, /revoke delete on public\.community_physique from anon, authenticated/, 'borrar y volver a subir no saltea el plazo');
+  assert.match(code, /community_media_read_physique[\s\S]*community_viewer_can_see/, 'las fotos respetan la privacidad del perfil');
+  assert.match(community, /Date\.parse\(row\.changed_at\)>Date\.now\(\)-30\*864e5/, 'la app avisa antes de subir');
+  assert.match(community, /uploadImage\(file,paths\[0\]\)/, 'se recomprime y se quitan los metadatos');
+});
+
+test('v53.1: Todos, bandera, foto de perfil editable, «Ver cómo me ven» y acceso a Músculos desde Inicio', () => {
+  assert.match(html, /role="tab" data-community-tab="world"[^>]*>Todos<\/button>/);
+  assert.match(html, /id="communityCountry"/);
+  assert.match(html, /id="communityOwnAvatarBtn"/);
+  assert.match(html, /id="communityPhotoViewer"/);
+  assert.match(html, /data-home-muscles[^>]*>[\s\S]{0,600}<b>Músculos<\/b>/);
+  assert.match(html, /function showMuscles\(\)\{switchView\('progress'\);showProgressTab\('muscles'\);\}/);
+  assert.match(community, /async function openUserLegacy\(uid,opts=\{\}\)\{\n\s+if\(!client\|\|!uid\)return;if\(user&&uid===user\.id&&!opts\.asOthers\)/, '«Ver cómo me ven» también sin la migración v53');
+  assert.match(community, /return openUserLegacy\(uid,opts\)/);
+  assert.match(community, /function flagEmoji\(/);
+  const i18n = readFileSync('i18n-v53.js', 'utf8');
+  for (const s of ['Mi físico', 'Mapa de músculos', 'Músculos', 'Bandera (opcional)']) assert.ok(i18n.includes(`["${s}"`), s);
 });

@@ -1,4 +1,4 @@
-/* FittForma AI v53 — comunidad de deportistas: Todo el mundo (directorio), Ranking, Amigos, perfil completo, comparación,
+/* FittForma AI v53 — comunidad de deportistas: Todos (directorio), Ranking, Amigos, perfil completo, comparación,
  * publicaciones dentro del perfil (sin feed general), mensajes, privacidad, bloqueos y moderación.
  * Requiere supabase/community.sql y las migraciones (v53: estadísticas deportivas, rankings y comparación).
  * Todo lo que se muestra sale de la base (RLS): no hay seguidores, publicaciones ni mensajes simulados. */
@@ -209,7 +209,7 @@
     if(display.length<1||!/^[a-z0-9_.-]{3,24}$/.test(username)){setStatus('communityProfileStatus','Revisá el nombre y el usuario (3–24 caracteres permitidos).');return;}
     setStatus('communityProfileStatus','Guardando perfil…');
     const {data,error}=await client.from('community_profiles').upsert({user_id:user.id,display_name:display,username,bio,visibility,updated_at:new Date().toISOString()},{onConflict:'user_id'}).select('*').single();
-    if(error){setStatus('communityProfileStatus',error.message.includes('unique')?'Ese usuario ya está ocupado. Elegí otro.':`No se pudo guardar: ${error.message}`);return;}fillProfile(data);setStatus('communityProfileStatus','Perfil guardado. Privacidad: '+(visibility==='public'?'público':'privado')+'.');await refreshPosts();
+    if(error){setStatus('communityProfileStatus',error.message.includes('unique')?'Ese usuario ya está ocupado. Elegí otro.':`No se pudo guardar: ${error.message}`);return;}fillProfile(data);setStatus('communityProfileStatus','Perfil guardado. Privacidad: '+(visibility==='public'?'público':'privado')+'.');if($('communityCountry')&&extrasEnabled!==false)await saveCountry($('communityCountry').value);await refreshPosts();
   }
   async function prepareImage(file,{max=1800,square=false}={}){
     if(!file)throw new Error('Elegí las dos fotos de antes y después.');
@@ -225,15 +225,15 @@
   // v49: foto de perfil propia (cuadrada, 512 px, sin metadatos), en la carpeta de la cuenta.
   async function changeAvatar(file){
     if(!authReady()||!file)return;if(schemaV49===false){setStatus('communityProfileStatus','Para usar foto de perfil, aplicá la migración v49 de Comunidad en Supabase.');return;}
-    setStatus('communityProfileStatus','Subiendo foto de perfil…');
+    setStatus('communityProfileStatus','Subiendo foto de perfil…');setStatus('communityAvatarStatus','Subiendo foto de perfil…');
     const path=`${user.id}/avatar/${Date.now().toString(36)}.jpg`,previous=ownProfile?.avatar_path||'';
     try{
       await uploadImage(file,path,{max:512,square:true});
       const {data,error}=await client.from('community_profiles').update({avatar_path:path,updated_at:new Date().toISOString()}).eq('user_id',user.id).select('*').single();
       if(error)throw error;
       if(previous&&previous!==path)await client.storage.from(bucket).remove([previous]).catch(()=>{});
-      fillProfile(data);setStatus('communityProfileStatus','Foto de perfil actualizada.');toast('Foto de perfil actualizada.');
-    }catch(error){await client.storage.from(bucket).remove([path]).catch(()=>{});setStatus('communityProfileStatus',error?.code?friendlySupabaseError(error,'guardar la foto de perfil'):`No se pudo guardar la foto: ${error.message}`);}
+      fillProfile(data);setStatus('communityProfileStatus','Foto de perfil actualizada.');setStatus('communityAvatarStatus','Foto de perfil actualizada.');toast('Foto de perfil actualizada.');closeViewer();
+    }catch(error){await client.storage.from(bucket).remove([path]).catch(()=>{});const msg=error?.code?friendlySupabaseError(error,'guardar la foto de perfil'):`No se pudo guardar la foto: ${error.message}`;setStatus('communityProfileStatus',msg);setStatus('communityAvatarStatus',msg);}
     finally{if($('communityAvatarInput'))$('communityAvatarInput').value='';}
   }
   // v50: quitar la foto de perfil (vuelve la imagen predeterminada con iniciales).
@@ -242,7 +242,7 @@
     const previous=ownProfile.avatar_path;setStatus('communityProfileStatus','Quitando foto…');
     const {data,error}=await client.from('community_profiles').update({avatar_path:null,updated_at:new Date().toISOString()}).eq('user_id',user.id).select('*').single();
     if(error){setStatus('communityProfileStatus',friendlySupabaseError(error,'quitar la foto de perfil'));return;}
-    await client.storage.from(bucket).remove([previous]).catch(()=>{});fillProfile(data);setStatus('communityProfileStatus','Foto de perfil quitada.');toast('Foto de perfil quitada.');
+    await client.storage.from(bucket).remove([previous]).catch(()=>{});fillProfile(data);setStatus('communityProfileStatus','Foto de perfil quitada.');setStatus('communityAvatarStatus','Foto de perfil quitada.');toast('Foto de perfil quitada.');
   }
   // v48: fotos por día. La base aplica el límite (si está activo); acá solo se avisa antes de subir y se ofrece
   // el video voluntario. El formulario nunca se borra y la foto no se publica sola después del video.
@@ -418,6 +418,7 @@
     }catch(error){
       if(imagePath){try{await client.storage.from(bucket).remove([imagePath]);}catch(cleanupError){console.warn('No se pudo limpiar la foto subida:',cleanupError);}}
       if(photoLimitError(error)){setStatus('communityComposeStatus','Ya publicaste las fotos de hoy. Tu publicación sigue en el formulario.');photoGate('communityComposeStatus');return;}
+      if(String(error?.code)==='23514'&&postKind==='achievement'){setStatus('communityComposeStatus','La base de datos rechazó esta insignia: falta aplicar en Supabase la migración supabase/migrations/2026-10-22_v49_badges.sql (acepta las insignias de entrenamientos, rachas y peso corporal).');return;}
       setStatus('communityComposeStatus',error?.code?friendlySupabaseError(error,'publicar'):`No se pudo publicar: ${error.message}`);
     }finally{button.disabled=!authReady()||schemaV41===false;}
   }
@@ -555,7 +556,7 @@
 
   // ---------- Explorar ----------
   // ---------- v53: comunidad de deportistas ----------
-  // Todo el mundo y Amigos (community_people), Ranking (community_leaderboard), perfil completo (community_athlete_profile)
+  // Todos y Amigos (community_people), Ranking (community_leaderboard), perfil completo (community_athlete_profile)
   // y comparación. Todo sale de funciones del servidor: el cliente nunca lee la tabla de estadísticas de otra persona.
   // Si el proyecto todavía no aplicó la migración v53, se usa el directorio de v50 sin estadísticas.
   const AS=()=>window.FittFormaAthleteStats,MRK=()=>window.FittFormaMuscleRanks,BE=()=>window.FittFormaBadgeEngine;
@@ -574,7 +575,7 @@
     const actions=[opts.position?`<span class="cm-pos" title="Puesto en el ranking de rango general entre tus amigos">#${Number(opts.position)} en rango</span>`:'',
       user&&!p.is_self?`<button class="btn btn-sm${fs?' secondary':''}" type="button" data-community-search-follow="${uid}">${followLabel(fs,p.visibility==='private')}</button>`:'',
       opts.compare&&user&&!p.is_self&&p.stats_visible?`<button class="btn ghost btn-sm" type="button" data-community-compare="${uid}">Comparar</button>`:''].filter(Boolean).join('');
-    return `<article class="cm-card${locked?' is-private':''}${p.is_self?' is-self':''}"><button type="button" class="cm-card-open" data-community-open-user="${uid}" aria-label="Ver el perfil de ${name}">${avatarHtml(p,urlOf,'lg')}<span class="cm-card-id"><strong>${name}</strong><small class="muted">@${esc(p.username)}${p.is_self?' · Vos':mutual?' · Se siguen':''}</small>${meta?`<small class="cm-card-level">${esc(meta)}</small>`:''}${latest}</span><span class="cm-card-side">${side}<span class="cm-card-badges">${featuredHtml(p.featured_badges,20)}</span></span></button>${actions?`<div class="cm-card-actions">${actions}</div>`:''}</article>`;
+    return `<article class="cm-card${locked?' is-private':''}${p.is_self?' is-self':''}"><button type="button" class="cm-card-open" data-community-open-user="${uid}" aria-label="Ver el perfil de ${name}">${avatarHtml(p,urlOf,'lg')}<span class="cm-card-id"><strong>${name} <span data-flag-for="${uid}"></span></strong><small class="muted">@${esc(p.username)}${p.is_self?' · Vos':mutual?' · Se siguen':''}</small>${meta?`<small class="cm-card-level">${esc(meta)}</small>`:''}${latest}</span><span class="cm-card-side">${side}<span class="cm-card-badges">${featuredHtml(p.featured_badges,20)}</span></span></button>${actions?`<div class="cm-card-actions">${actions}</div>`:''}</article>`;
   }
   // Tarjeta del directorio de v50 (sin estadísticas), para proyectos sin la migración v53.
   function legacyToAthlete(p){return {...p,stats_visible:false,follows_me:false};}
@@ -594,7 +595,7 @@
     const r=await client.rpc('community_directory',{p_search:term,p_after:after,p_limit:limit});
     return r.error?r:{data:(r.data||[]).map(legacyToAthlete),error:null};
   }
-  // Todo el mundo: usuarios reales, por @usuario, de a 20 (carga progresiva).
+  // Todos: usuarios reales, por @usuario, de a 20 (carga progresiva).
   let peopleAfter=null,peopleTerm='',peopleBusy=false;
   async function loadDirectory(reset=true){
     const root=$('communityPeople'),more=$('communityPeopleMore');if(!root)return;
@@ -607,7 +608,7 @@
       const list=r.data||[];const urlOf=await signedMany(list.map(x=>x.avatar_path));
       const html=list.map(p=>athleteCard(p,urlOf)).join('');
       if(reset)root.innerHTML=html||`<div class="empty"><strong>${peopleTerm?'No encontramos personas':'Todavía no hay otras personas'}</strong><p>${peopleTerm?'Probá con otro nombre o @usuario.':'Cuando más deportistas usen FittForma, van a aparecer acá.'}</p></div>`;else root.insertAdjacentHTML('beforeend',html);
-      bindPeople(root);peopleAfter=list.length?list[list.length-1].username:peopleAfter;if(more)more.hidden=list.length<20;
+      bindPeople(root);fillFlags(root);peopleAfter=list.length?list[list.length-1].username:peopleAfter;if(more)more.hidden=list.length<20;
       setStatus('communityPeopleHint',peopleTerm?`Resultados para «${peopleTerm}»`:'Usuarios reales de la app, por orden alfabético');
       setStatus('communityWorldStatus',athleteEnabled===false?'Las estadísticas de los perfiles requieren la actualización v53 de la base de datos.':user?'':'Iniciá sesión para seguir personas y ver perfiles privados que te acepten.');
       connectionStatus('Supabase responde correctamente: el directorio de Comunidad se pudo consultar.');
@@ -635,7 +636,7 @@
       const list=r.data||[];const urlOf=await signedMany(list.map(x=>x.avatar_path));
       const html=list.map(p=>athleteCard(p,urlOf,{compare:true,position:friendPositions.get(p.user_id)})).join('');
       if(reset)root.innerHTML=html||`<div class="empty cm-empty"><svg class="cm-empty-art" viewBox="0 0 64 64" aria-hidden="true"><circle cx="24" cy="22" r="9"/><circle cx="43" cy="26" r="7"/><path d="M8 52c1.5-9 8-14 16-14s14.5 5 16 14M38 40c7 0 12 4 14 12"/></svg><strong>Todavía no tenés amigos en tu comunidad</strong><p>Seguí a otros deportistas para ver su progreso, compararte y competir en el ranking de amigos.</p><div class="btn-row"><button class="btn" type="button" data-community-go="world">Descubrir personas</button><button class="btn ghost" type="button" data-community-search-focus>Buscar a alguien</button></div></div>`;else root.insertAdjacentHTML('beforeend',html);
-      bindPeople(root);bindGo(root);root.querySelector('[data-community-search-focus]')?.addEventListener('click',()=>{showCommunitySubView('world');$('communitySearch')?.focus();});
+      bindPeople(root);bindGo(root);fillFlags(root);root.querySelector('[data-community-search-focus]')?.addEventListener('click',()=>{showCommunitySubView('world');$('communitySearch')?.focus();});
       friendsAfter=list.length?list[list.length-1].username:friendsAfter;if(more)more.hidden=list.length<20;
       setStatus('communityFriendsStatus',list.length&&reset?`${list.length}${list.length>=20?'+':''} amigo(s). Para escribirle a alguien, tienen que seguirse mutuamente.`:'');
     }finally{friendsBusy=false;}
@@ -666,7 +667,7 @@
     const name=esc(x.is_self?'Vos':(x.display_name||x.username)),uid=esc(x.user_id),pos=Number(x.pos)||0,lvl=LEVEL_LABEL[x.training_level]||'';
     const value=formatMetric(rankCategory,x.value);
     if(podium)return `<li class="cm-podium-step p${Math.min(pos,3)}${x.is_self?' is-self':''}"><button type="button" data-community-open-user="${uid}" aria-label="Puesto ${pos}: ${name}, ${esc(value)}">${avatarHtml(x,urlOf,'lg')}<span class="cm-podium-pos">${pos}</span><strong>${name}</strong><small>${esc(value)}</small></button></li>`;
-    return `<li class="cm-board-row${x.is_self?' is-self':''}"><button type="button" data-community-open-user="${uid}" aria-label="Puesto ${pos}: ${name}, ${esc(value)}"><span class="cm-board-pos">${pos}</span>${avatarHtml(x,urlOf)}<span class="cm-board-who"><strong>${name}</strong><small class="muted">@${esc(x.username)}${lvl?' · '+esc(lvl):''}</small></span><span class="cm-board-meta">${rankCategory==='rank'?'':rankChip(x.overall_rank,22)}<span class="cm-card-badges">${featuredHtml(x.featured_badges,16)}</span></span><b class="cm-board-value">${esc(value)}</b></button></li>`;
+    return `<li class="cm-board-row${x.is_self?' is-self':''}"><button type="button" data-community-open-user="${uid}" aria-label="Puesto ${pos}: ${name}, ${esc(value)}"><span class="cm-board-pos">${pos}</span>${avatarHtml(x,urlOf)}<span class="cm-board-who"><strong>${name} <span data-flag-for="${uid}"></span></strong><small class="muted">@${esc(x.username)}${lvl?' · '+esc(lvl):''}</small></span><span class="cm-board-meta">${rankCategory==='rank'?'':rankChip(x.overall_rank,22)}<span class="cm-card-badges">${featuredHtml(x.featured_badges,16)}</span></span><b class="cm-board-value">${esc(value)}</b></button></li>`;
   }
   async function loadRanking(){
     renderRankingChips();const podium=$('rankingPodium'),list=$('rankingList');if(!podium||!list)return;
@@ -684,7 +685,7 @@
       const top=rows.filter(x=>Number(x.pos)<=3).slice(0,3),rest=rows.slice(top.length);
       podium.innerHTML=top.map(x=>rankRow(x,urlOf,true)).join('');podium.hidden=!top.length;
       list.innerHTML=rest.map(x=>rankRow(x,urlOf)).join('');
-      bindPeople(podium);bindPeople(list);
+      bindPeople(podium);bindPeople(list);fillFlags(list);
       const mine=rows.find(x=>x.is_self);
       setStatus('rankingStatus',!rows.length?(scope==='friends'?'Todavía no hay datos de tus amigos en esta categoría. Seguí a más personas o probá otra categoría.':'Todavía nadie tiene datos en esta categoría.'):mine?`Tu puesto: ${Number(mine.pos)} de ${rows.length}${rows.length>=50?'+':''}.`:user?(ownStats?.stats_public===false?'Tus estadísticas están ocultas: no aparecés en los rankings.':'Todavía no tenés datos en esta categoría.'):'Iniciá sesión para aparecer en el ranking.');
     }finally{rankBusy=false;}
@@ -718,7 +719,8 @@
         const row=window.FittFormaAthleteStatsNow?.();if(!row)return ownStats;
         const sig=JSON.stringify(row);if(!force&&ownStats&&sig===statsSig)return ownStats;
         const version=statsVersion;
-        const {data,error}=await client.from('community_athlete_stats').upsert({...row,user_id:user.id}).select('stats_public,stats_date,updated_at').maybeSingle();
+        let {data,error}=await client.from('community_athlete_stats').upsert(statsPayload({...row,user_id:user.id})).select('stats_public,stats_date,updated_at').maybeSingle();
+        if(error&&extrasEnabled!==false&&missingExtras(error)){extrasEnabled=false;({data,error}=await client.from('community_athlete_stats').upsert(statsPayload({...row,user_id:user.id})).select('stats_public,stats_date,updated_at').maybeSingle());}
         if(error){console.warn('No se pudieron publicar las estadísticas de Comunidad:',error.message);return ownStats;}
         if(version!==statsVersion)return ownStats; // la persona cambió la preferencia mientras tanto
         statsSig=sig;ownStats=data||ownStats;athleteEnabled=true;reflectStatsToggles();return ownStats;
@@ -727,13 +729,16 @@
     const current=statsBusy;current.finally(()=>{if(statsBusy===current)statsBusy=null;});
     return current;
   }
+  // Sin la migración v53.1 la columna muscle_ranks no existe: se publica el resto.
+  function statsPayload(row){if(extrasEnabled!==false)return row;const {muscle_ranks,...rest}=row;return rest;}
   async function setStatsPublic(on){
     if(!authReady()){toast(authHint());return false;}
     if(athleteEnabled===false){setStatus('communityStatsStatus',V53_HINT);return false;}
     statsVersion++;if(statsBusy)await statsBusy.catch(()=>{});
     const row=on?(window.FittFormaAthleteStatsNow?.()||{}):{stats_date:localDateKey()};
     const payload=ownStats&&!on?{user_id:user.id,stats_public:false,stats_date:localDateKey()}:{...row,user_id:user.id,stats_public:!!on};
-    const {data,error}=await client.from('community_athlete_stats').upsert(payload).select('stats_public,stats_date,updated_at').maybeSingle();
+    let {data,error}=await client.from('community_athlete_stats').upsert(statsPayload(payload)).select('stats_public,stats_date,updated_at').maybeSingle();
+    if(error&&extrasEnabled!==false&&missingExtras(error)){extrasEnabled=false;({data,error}=await client.from('community_athlete_stats').upsert(statsPayload(payload)).select('stats_public,stats_date,updated_at').maybeSingle());}
     if(error){setStatus('communityStatsStatus',friendlySupabaseError(error,'guardar la preferencia de estadísticas'));reflectStatsToggles();return false;}
     ownStats=data;ownStatsLoaded=true;statsSig=on?JSON.stringify(row):'';setNotice('1');renderStatsNotice();reflectStatsToggles();
     const msg=on?'Tus estadísticas de entrenamiento se muestran en tu perfil y en los rankings.':'Ocultaste tus estadísticas: ya no se muestran ni aparecés en los rankings.';
@@ -742,7 +747,7 @@
     return true;
   }
 
-  // ---------- Perfil completo (el mismo componente desde Todo el mundo, Ranking y Amigos) ----------
+  // ---------- Perfil completo (el mismo componente desde Todos, Ranking y Amigos) ----------
   function statTile(label,value,sub=''){return `<div class="cm-stat"><small>${esc(label)}</small><b${value==null?' class="is-empty"':''}>${esc(value==null?'Sin datos disponibles':value)}</b>${sub?`<span>${esc(sub)}</span>`:''}</div>`;}
   function statsSection(p){
     if(!p.stats_visible)return `<section class="cm-section"><h4>Estadísticas</h4><p class="muted small">${p.is_self?'Ocultaste tus estadísticas. Activalas en Mi perfil para que otras personas las vean.':'Esta persona no comparte sus estadísticas de entrenamiento.'}</p></section>`;
@@ -781,26 +786,28 @@
   async function openUser(uid,opts={}){
     if(!client||!uid)return;
     if(user&&uid===user.id&&!opts.asOthers){showCommunitySubView('profile');return;}
-    if(athleteEnabled===false)return openUserLegacy(uid);
+    if(athleteEnabled===false)return openUserLegacy(uid,opts);
     viewedUser=uid;showCommunitySubView('user');const root=$('communityUserProfile');root.innerHTML='<div class="cm-skeleton cm-skeleton-hero" aria-hidden="true"><i></i><i></i></div><p class="sr-only">Cargando perfil…</p>';
     if(user&&uid===user.id)await syncStats();
     const r=await client.rpc('community_athlete_profile',{p_user:uid});
-    if(r.error){if(isMissingFunction(r.error)){athleteEnabled=false;return openUserLegacy(uid);}root.innerHTML=`<div class="empty"><strong>No se pudo abrir el perfil</strong><p>${esc(friendlySupabaseError(r.error,'abrir el perfil'))}</p></div>`;return;}
+    if(r.error){if(isMissingFunction(r.error)){athleteEnabled=false;return openUserLegacy(uid,opts);}root.innerHTML=`<div class="empty"><strong>No se pudo abrir el perfil</strong><p>${esc(friendlySupabaseError(r.error,'abrir el perfil'))}</p></div>`;return;}
     athleteEnabled=true;const p=r.data?.[0];if(viewedUser!==uid)return;
     if(!p){root.innerHTML='<div class="empty"><strong>Perfil no disponible</strong><p>Puede haber sido eliminado o haber un bloqueo entre las cuentas.</p></div>';return;}
-    const urlOf=await signedMany([p.avatar_path]),fs=p.follow_status||'',mutual=fs==='accepted'&&p.follows_me,priv=p.visibility==='private',meta=levelLine(p);
+    const [urlOf,extra]=await Promise.all([signedMany([p.avatar_path]),profileExtrasHtml(uid,p)]),fs=p.follow_status||'',mutual=fs==='accepted'&&p.follows_me,priv=p.visibility==='private',meta=levelLine(p);if(viewedUser!==uid)return;
     const counts=p.can_view?`<div class="community-profile-stats cm-counts">${statsHtml(p.posts,p.followers,p.following)}</div>`:'';
     const actions=p.is_self?`<p class="muted small">Así ven tu perfil las demás personas.</p>`:user?`<div class="btn-row community-profile-actions"><button class="btn${fs?' secondary':''}" type="button" data-user-follow>${fs==='accepted'?'Dejar de seguir':fs==='pending'?'Cancelar solicitud':priv?'Solicitar seguir':'Seguir'}</button>${p.stats_visible?'<button class="btn ghost" type="button" data-user-compare>Comparar progreso</button>':''}${mutual?'<button class="btn ghost" type="button" data-user-message>Mensaje</button>':''}<button class="btn ghost" type="button" data-community-block>Bloquear</button></div>${!mutual&&fs==='accepted'?'<p class="muted small">Los mensajes privados se habilitan cuando se siguen mutuamente.</p>':''}`:'<p class="muted small">Iniciá sesión para seguir, comparar o escribir.</p>';
     root.innerHTML=`<header class="cm-hero card">
-        <div class="cm-hero-top">${avatarHtml(p,urlOf,'xl')}<div class="cm-hero-id"><strong>${esc(p.display_name||p.username)}</strong><span class="muted small">@${esc(p.username)}${priv?' · Privado':''}${p.follows_me&&!p.is_self?' · Te sigue':''}</span>${meta?`<span class="cm-card-level">${esc(meta)}</span>`:''}</div></div>
+        <div class="cm-hero-top"><button type="button" class="cm-avatar-btn" data-hero-avatar aria-label="Ver la foto de perfil">${avatarHtml(p,urlOf,'xl')}</button><div class="cm-hero-id"><strong>${esc(p.display_name||p.username)} ${flagHtml(extra.country)}</strong><span class="muted small">@${esc(p.username)}${priv?' · Privado':''}${p.follows_me&&!p.is_self?' · Te sigue':''}</span>${meta?`<span class="cm-card-level">${esc(meta)}</span>`:''}</div></div>
         <div class="cm-hero-rank">${p.stats_visible?`<div><small class="muted">Rango principal</small>${rankChip(p.overall_rank,44)}</div>`:''}<div class="community-featured" aria-label="Insignias destacadas">${featuredHtml(p.featured_badges,30)}</div></div>
         ${p.bio?`<p class="community-profile-bio">${esc(p.bio)}</p>`:''}${counts}${actions}
       </header>
       ${p.can_view?'':`<div class="notice community-private-notice"><strong>Este perfil es privado.</strong><p class="small">${fs==='pending'?'Tu solicitud está pendiente: cuando la acepte vas a ver sus estadísticas, insignias y publicaciones.':'Seguilo y, cuando acepte tu solicitud, vas a ver sus estadísticas, insignias y publicaciones.'}</p></div>`}
-      ${p.can_view?statsSection(p)+badgesSection(p):''}
+      ${p.can_view?extra.html+statsSection(p)+badgesSection(p):''}
       ${p.can_view?'<section class="cm-section"><h4>Publicaciones</h4><div class="community-grid" id="communityUserGrid"><p class="muted small">Cargando…</p></div></section>':''}`;
     root.querySelector('[data-user-follow]')?.addEventListener('click',e=>toggleFollow(uid,e.currentTarget));
     root.querySelector('[data-user-compare]')?.addEventListener('click',()=>openCompare(uid));
+    bindPhysiqueViews(root,extra.urlOf);
+    root.querySelector('[data-hero-avatar]')?.addEventListener('click',()=>{const u=p.avatar_path?urlOf(p.avatar_path):'';if(u)openViewer(u,p.display_name||p.username);});
     root.querySelector('[data-user-message]')?.addEventListener('click',async()=>{showCommunitySubView('messages');await loadChatContacts();openChat(uid);});
     root.querySelector('[data-community-block]')?.addEventListener('click',()=>blockUser(uid));
     if(p.can_view)loadUserPosts(uid,p);
@@ -819,6 +826,156 @@
     const label=kind==='transformation'?'Transformación':kind==='achievement'?'Logro':'Publicación';
     return `<button type="button" class="community-tile${img?'':' is-text'}" data-community-open-post="${esc(p.id)}" aria-label="Abrir ${label.toLowerCase()} de ${esc((Array.isArray(p.community_profiles)?p.community_profiles[0]:p.community_profiles)?.username||'usuario')}">${inner}${kind==='transformation'?'<span class="community-tile-kind">Antes/Después</span>':''}</button>`;}
   function bindGrid(root){root.querySelectorAll('[data-community-open-post]').forEach(b=>b.addEventListener('click',()=>openPostDialog(b.dataset.communityOpenPost)));}
+
+  // ---------- v53.1: bandera, «Mi físico», mapa de músculos y visor de fotos ----------
+  // Requieren supabase/migrations/2026-10-28_v53_profile_extras.sql. Sin esa migración se ocultan (extrasEnabled=false).
+  let extrasEnabled=null,ownPhysique={pair:null,single:null};
+  const COUNTRY_CODES='AR BO BR CL CO CR CU DO EC SV GT HN MX NI PA PY PE PR UY VE US CA ES PT FR IT DE GB IE NL BE CH AT SE NO DK FI PL CZ GR RO HU UA RU TR IL MA EG ZA NG KE AU NZ JP CN KR IN PH TH VN ID MY SG AE SA QA'.split(' ');
+  function flagEmoji(code){const c=String(code||'').toUpperCase();return /^[A-Z]{2}$/.test(c)?String.fromCodePoint(...[...c].map(ch=>0x1F1A5+ch.charCodeAt(0))):'';}
+  let regionNames=null;
+  function countryName(code){try{regionNames=regionNames||new Intl.DisplayNames([document.documentElement.lang||'es'],{type:'region'});return regionNames.of(code)||code;}catch{return code;}}
+  function flagHtml(code){const c=String(code||'').toUpperCase();return /^[A-Z]{2}$/.test(c)?`<span class="cm-flag" title="${esc(countryName(c))}" aria-label="${esc(countryName(c))}">${flagEmoji(c)}</span>`:'';}
+  function fillCountryOptions(){
+    const sel=$('communityCountry');if(!sel||sel.options.length>1)return;
+    const items=COUNTRY_CODES.map(c=>({c,n:countryName(c)})).sort((a,b)=>a.n.localeCompare(b.n));
+    sel.insertAdjacentHTML('beforeend',items.map(x=>`<option value="${x.c}">${flagEmoji(x.c)} ${esc(x.n)}</option>`).join(''));
+  }
+  const missingExtras=error=>isMissingFunction(error)||isMissingColumn(error)||String(error?.code)==='42P01'||String(error?.code)==='PGRST205'||String(error?.code)==='PGRST204'||/community_physique|country_code|muscle_ranks|show_muscles/.test(String(error?.message||''));
+  // Banderas en tarjetas, podio y filas: se completan después de dibujar (una consulta por lista).
+  async function fillFlags(root){
+    if(!client||!root||extrasEnabled===false)return;
+    const ids=[...new Set([...root.querySelectorAll('[data-flag-for]')].map(x=>x.dataset.flagFor))].slice(0,60);if(!ids.length)return;
+    const r=await client.rpc('community_flags',{p_users:ids});
+    if(r.error){if(missingExtras(r.error))extrasEnabled=false;return;}
+    extrasEnabled=true;const by=new Map((r.data||[]).map(x=>[x.user_id,x.country_code]));
+    root.querySelectorAll('[data-flag-for]').forEach(el=>{el.innerHTML=flagHtml(by.get(el.dataset.flagFor));});
+  }
+
+  // Visor de fotos (foto de perfil y «Mi físico»). Con acciones opcionales (cambiar o quitar la foto propia).
+  function openViewer(url,caption='',actions=''){
+    const dlg=$('communityPhotoViewer');if(!dlg||!url)return;
+    $('communityPhotoViewerImg').src=url;$('communityPhotoViewerImg').alt=caption||'Foto';
+    $('communityPhotoViewerCaption').textContent=caption;$('communityPhotoViewerActions').innerHTML=actions;
+    if(typeof dlg.showModal==='function'&&!dlg.open)dlg.showModal();else dlg.setAttribute('open','');
+  }
+  function closeViewer(){const d=$('communityPhotoViewer');if(d?.open)d.close();}
+  async function ownAvatarTapped(){
+    if(!authReady()){toast(authHint());return;}
+    const path=ownProfile?.avatar_path;
+    if(!path){$('communityAvatarInput')?.click();return;}
+    const urlOf=await signedMany([path]);
+    openViewer(urlOf(path),'Tu foto de perfil',`<label class="btn" for="communityAvatarInput">Cambiar foto</label><button class="btn ghost" type="button" data-viewer-remove-avatar>Quitar foto</button>`);
+    $('communityPhotoViewerActions').querySelector('[data-viewer-remove-avatar]')?.addEventListener('click',()=>{closeViewer();removeAvatar();});
+  }
+
+  // «Mi físico» propio: una cosa por sección; sin Plus, cambio cada 30 días (lo controla el servidor).
+  async function loadOwnPhysique(){
+    const root=$('communityPhysiqueEdit');if(!root)return;
+    const card=$('communityPhysiqueCard');
+    if(!authReady()){root.innerHTML='<p class="muted small">Iniciá sesión para subir tus fotos.</p>';return;}
+    if(extrasEnabled===false){if(card)card.hidden=true;return;}
+    const r=await client.from('community_physique').select('kind,before_path,after_path,photo_path,description,changed_at').eq('user_id',user.id);
+    if(r.error){if(missingExtras(r.error)){extrasEnabled=false;if(card)card.hidden=true;}else setStatus('communityPhysiqueStatus',friendlySupabaseError(r.error,'cargar «Mi físico»'));return;}
+    extrasEnabled=true;if(card)card.hidden=false;
+    ownPhysique={pair:null,single:null};(r.data||[]).forEach(x=>{ownPhysique[x.kind]=x;});
+    const pair=ownPhysique.pair,single=ownPhysique.single,urlOf=await signedMany([pair?.before_path,pair?.after_path,single?.photo_path]);
+    const wait=row=>{if(!row?.changed_at||ownPlus())return '';const next=new Date(Date.parse(row.changed_at)+30*864e5);return next>new Date()?`<small class="muted">Podés cambiarla desde el ${esc(next.toLocaleDateString(undefined,{day:'numeric',month:'short'}))} (con Plus, cuando quieras).</small>`:'';};
+    const hasPair=pair?.before_path&&pair?.after_path,hasSingle=single?.photo_path;
+    root.innerHTML=`<section class="cm-phys-slot"><h4>Antes y después</h4>${hasPair?`<div class="cm-phys-pair"><button type="button" data-phys-view="${esc(pair.before_path)}" data-caption="Antes"><img src="${esc(urlOf(pair.before_path))}" alt="Antes"><span>Antes</span></button><button type="button" data-phys-view="${esc(pair.after_path)}" data-caption="Después"><img src="${esc(urlOf(pair.after_path))}" alt="Después"><span>Después</span></button></div>`:'<p class="muted small">Todavía no subiste tu antes y después.</p>'}
+        <div class="btn-row"><button class="btn btn-sm" type="button" data-phys-upload="pair">${hasPair?'Cambiar antes y después':'Subir antes y después'}</button>${hasPair?'<button class="btn ghost btn-sm" type="button" data-phys-remove="pair">Quitar</button>':''}</div>${hasPair?wait(pair):''}</section>
+      <section class="cm-phys-slot"><h4>Una foto</h4>${hasSingle?`<div class="cm-phys-single"><button type="button" data-phys-view="${esc(single.photo_path)}" data-caption="${esc(single.description||'Mi físico')}"><img src="${esc(urlOf(single.photo_path))}" alt="Mi físico"></button></div>${single.description?`<p class="small">${esc(single.description)}</p>`:''}`:'<p class="muted small">Todavía no subiste una foto de tu físico.</p>'}
+        <div class="btn-row"><button class="btn btn-sm" type="button" data-phys-upload="single">${hasSingle?'Cambiar foto':'Subir una foto'}</button>${hasSingle?'<button class="btn ghost btn-sm" type="button" data-phys-remove="single">Quitar</button>':''}</div>${hasSingle?wait(single):''}</section>`;
+    bindPhysiqueViews(root,urlOf);
+    root.querySelectorAll('[data-phys-upload]').forEach(b=>b.addEventListener('click',()=>startPhysiqueUpload(b.dataset.physUpload)));
+    root.querySelectorAll('[data-phys-remove]').forEach(b=>b.addEventListener('click',()=>removePhysique(b.dataset.physRemove)));
+  }
+  function ownPlus(){try{return Boolean(window.FittFormaAds?.isPlus?.());}catch{return false;}}
+  function bindPhysiqueViews(root,urlOf){root.querySelectorAll('[data-phys-view]').forEach(b=>b.addEventListener('click',()=>openViewer(urlOf(b.dataset.physView),b.dataset.caption||'')));}
+  let physiquePending=null;
+  function startPhysiqueUpload(kind){
+    if(!authReady()){toast(authHint());return;}
+    // Aviso antes de subir nada (el servidor igual lo controla): sin Plus, una vez cada 30 días por sección.
+    const row=ownPhysique[kind],has=row&&(row.photo_path||row.before_path);
+    if(has&&row.changed_at&&!ownPlus()&&Date.parse(row.changed_at)>Date.now()-30*864e5){setStatus('communityPhysiqueStatus','Sin membresía Plus podés cambiar esta sección una vez cada 30 días. Con Plus, cuando quieras. Igual podés quitarla.');return;}
+    physiquePending={kind,before:null};
+    if(kind==='pair'){setStatus('communityPhysiqueStatus','Elegí primero la foto de ANTES.');$('communityPhysiqueBefore').click();}
+    else $('communityPhysiqueSingle').click();
+  }
+  async function physiqueFileChosen(input){
+    const file=input.files?.[0];input.value='';if(!file||!physiquePending)return;
+    if(input.id==='communityPhysiqueBefore'){physiquePending.before=file;setStatus('communityPhysiqueStatus','Ahora elegí la foto de DESPUÉS.');$('communityPhysiqueAfter').click();return;}
+    const kind=physiquePending.kind,before=physiquePending.before;physiquePending=null;
+    if(!confirm(tr('¿Publicar esta foto en «Mi físico»? Confirmá que sos vos y que tenés derecho a publicarla.')))return;
+    let description='';if(kind==='single')description=String(prompt(tr('Descripción (opcional, hasta 300 caracteres):'))??'').trim().slice(0,300);
+    setStatus('communityPhysiqueStatus','Subiendo…');
+    const stamp=Date.now().toString(36),paths=kind==='pair'?[`${user.id}/physique/${stamp}-antes.jpg`,`${user.id}/physique/${stamp}-despues.jpg`]:[`${user.id}/physique/${stamp}.jpg`];
+    const old=ownPhysique[kind],oldPaths=[old?.before_path,old?.after_path,old?.photo_path].filter(Boolean);
+    try{
+      if(kind==='pair'){await uploadImage(before,paths[0]);await uploadImage(file,paths[1]);}else await uploadImage(file,paths[0]);
+      const row=kind==='pair'?{user_id:user.id,kind,before_path:paths[0],after_path:paths[1],photo_path:null,description:''}:{user_id:user.id,kind,photo_path:paths[0],before_path:null,after_path:null,description};
+      const {error}=await client.from('community_physique').upsert(row,{onConflict:'user_id,kind'});
+      if(error)throw error;
+      if(oldPaths.length)await client.storage.from(bucket).remove(oldPaths).catch(()=>{});
+      setStatus('communityPhysiqueStatus','Listo: ya se ve en tu perfil.');toast('«Mi físico» actualizado.');
+    }catch(error){
+      await client.storage.from(bucket).remove(paths).catch(()=>{});
+      setStatus('communityPhysiqueStatus',/physique_wait/.test(String(error?.message))?'Sin membresía Plus podés cambiar esta sección una vez cada 30 días. Con Plus, cuando quieras. Igual podés quitarla.':error?.code?friendlySupabaseError(error,'guardar «Mi físico»'):`No se pudo subir la foto: ${error.message}`);
+    }
+    loadOwnPhysique();
+  }
+  async function removePhysique(kind){
+    if(!confirm(tr('¿Quitar esta sección de tu perfil? Las fotos se borran.')))return;
+    const old=ownPhysique[kind],paths=[old?.before_path,old?.after_path,old?.photo_path].filter(Boolean);
+    const {error}=await client.from('community_physique').update({before_path:null,after_path:null,photo_path:null,description:''}).eq('user_id',user.id).eq('kind',kind);
+    if(error){setStatus('communityPhysiqueStatus',friendlySupabaseError(error,'quitar la foto'));return;}
+    if(paths.length)await client.storage.from(bucket).remove(paths).catch(()=>{});
+    setStatus('communityPhysiqueStatus','Sección quitada.');loadOwnPhysique();
+  }
+  // Bandera propia y ajuste del mapa de músculos.
+  async function loadOwnExtras(){
+    fillCountryOptions();
+    if(!authReady()||extrasEnabled===false)return;
+    const r=await client.rpc('community_athlete_extras',{p_user:user.id});
+    if(r.error){if(missingExtras(r.error)){extrasEnabled=false;['communityPhysiqueCard'].forEach(id=>{const el=$(id);if(el)el.hidden=true;});}return;}
+    extrasEnabled=true;const x=r.data?.[0];
+    if($('communityCountry'))$('communityCountry').value=x?.country_code||'';
+    if($('communityOwnFlag'))$('communityOwnFlag').innerHTML=flagHtml(x?.country_code);
+    if($('communityShowMuscles'))$('communityShowMuscles').checked=x?.show_muscles!==false;
+  }
+  async function saveCountry(code){
+    if(!authReady()||extrasEnabled===false)return;
+    const {error}=await client.from('community_profiles').update({country_code:code||null}).eq('user_id',user.id);
+    if(error){setStatus('communityProfileStatus',missingExtras(error)?'La bandera necesita la actualización v53.1 de la base de datos.':friendlySupabaseError(error,'guardar la bandera'));return;}
+    if($('communityOwnFlag'))$('communityOwnFlag').innerHTML=flagHtml(code);
+  }
+  async function setShowMuscles(on){
+    if(!authReady())return;
+    await syncStats(true);
+    const {error}=await client.from('community_athlete_stats').update({show_muscles:!!on}).eq('user_id',user.id);
+    if(error){setStatus('communityStatsStatus',missingExtras(error)?'El mapa de músculos necesita la actualización v53.1 de la base de datos.':friendlySupabaseError(error,'guardar la preferencia del mapa'));if($('communityShowMuscles'))$('communityShowMuscles').checked=!on;return;}
+    const msg=on?'Tu mapa de músculos se muestra en tu perfil.':'Ocultaste tu mapa de músculos.';setStatus('communityStatsStatus',msg);toast(msg);
+  }
+  // Secciones del perfil de otra persona: «Mi físico» y mapa de músculos.
+  async function profileExtrasHtml(uid,p){
+    if(extrasEnabled===false||!p.can_view)return {html:'',urlOf:()=>''};
+    const [x,f]=await Promise.all([client.rpc('community_athlete_extras',{p_user:uid}),client.from('community_physique').select('kind,before_path,after_path,photo_path,description').eq('user_id',uid)]);
+    if(x.error&&missingExtras(x.error)){extrasEnabled=false;return {html:'',urlOf:()=>''};}
+    extrasEnabled=true;
+    const ex=x.data?.[0]||{},rows=f.data||[],pair=rows.find(r=>r.kind==='pair'&&r.before_path&&r.after_path),single=rows.find(r=>r.kind==='single'&&r.photo_path);
+    const urlOf=await signedMany([pair?.before_path,pair?.after_path,single?.photo_path]);
+    let html='';
+    if(pair||single)html+=`<section class="cm-section cm-physique"><h4>${p.is_self?'Mi físico':'Físico'}</h4><div class="cm-phys-show">${pair?`<div class="cm-phys-pair"><button type="button" data-phys-view="${esc(pair.before_path)}" data-caption="Antes"><img src="${esc(urlOf(pair.before_path))}" alt="Antes"><span>Antes</span></button><button type="button" data-phys-view="${esc(pair.after_path)}" data-caption="Después"><img src="${esc(urlOf(pair.after_path))}" alt="Después"><span>Después</span></button></div>`:''}${single?`<div class="cm-phys-single"><button type="button" data-phys-view="${esc(single.photo_path)}" data-caption="${esc(single.description||'')}"><img src="${esc(urlOf(single.photo_path))}" alt="Foto de físico"></button>${single.description?`<p class="small">${esc(single.description)}</p>`:''}</div>`:''}</div><p class="muted small cm-footnote">Fotos compartidas por la persona. Tocá una para verla en grande.</p></section>`;
+    html+=muscleMapSection(ex.muscle_ranks,p);
+    return {html,urlOf,country:ex.country_code};
+  }
+  function muscleMapSection(ranks,p){
+    const A=window.FittFormaAnatomy,R=MRK();
+    if(!ranks||typeof ranks!=='object'||!Object.keys(ranks).length||!A?.muscleFillSvg||!R)return '';
+    const fills={};for(const [id,v] of Object.entries(ranks)){const n=Number(v);if(n>=0&&R.RANKS[n])fills[id]=R.RANKS[n].color;}
+    const names=A.MUSCLES||{};
+    const top=Object.entries(ranks).filter(([,v])=>Number(v)>=0).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    return `<section class="cm-section cm-muscles"><h4>Mapa de músculos</h4><div class="cm-muscle-map">${A.muscleFillSvg(fills,{label:`Rango por músculo de ${p.display_name||p.username}`})}</div>${top.length?`<ul class="cm-muscle-top">${top.map(([id,v])=>`<li>${rankChip(Number(v),22)}<span>${esc(names[id]||id)}</span></li>`).join('')}</ul>`:'<p class="muted small">Todavía no tiene músculos con rango.</p>'}<p class="muted small cm-footnote">Rango de cada músculo según las series completadas (constancia y volumen de entrenamiento), no tamaño ni fuerza.</p></section>`;
+  }
 
   // ---------- Comparación: «Tu progreso» y «Progreso de tu amigo», misma métrica, unidad y período ----------
   function compareValue(row,v){
@@ -857,8 +1014,8 @@
     bindGo(root);root.querySelector('[data-compare-profile]')?.addEventListener('click',()=>openUser(uid));
   }
   // Perfil sin la migración v53 (datos de v50): sin estadísticas.
-  async function openUserLegacy(uid){
-    if(!client||!uid)return;if(user&&uid===user.id){showCommunitySubView('profile');return;}
+  async function openUserLegacy(uid,opts={}){
+    if(!client||!uid)return;if(user&&uid===user.id&&!opts.asOthers){showCommunitySubView('profile');return;}
     viewedUser=uid;showCommunitySubView('user');const root=$('communityUserProfile');root.innerHTML='<p class="muted small">Cargando perfil…</p>';
     const {data:p,error}=await client.from('community_profiles').select(profileCols()).eq('user_id',uid).maybeSingle();
     if(error||!p){
@@ -920,7 +1077,7 @@
     if(currentSubView==='world')return loadDirectory(true);
     if(currentSubView==='ranking')return loadRanking();
     if(currentSubView==='friends')return loadFriends(true);
-    if(currentSubView==='profile')return renderOwnGrid();
+    if(currentSubView==='profile'){if(authReady()){loadOwnExtras();loadOwnPhysique();}return renderOwnGrid();}
     if(currentSubView==='user'&&viewedUser)return openUser(viewedUser,{asOthers:viewedUser===user?.id});
     if(currentSubView==='compare'&&compareUser)return openCompare(compareUser);
   }
@@ -957,7 +1114,7 @@
       return {ok:true,stage:'database',message:coreMessage+(authReady()?' También se comprobaron chat, bloqueos y sincronización de la cuenta.':' Iniciá sesión para comprobar además chat, bloqueos y sincronización de la cuenta.')};
     }catch(error){return {ok:false,stage:'network',message:friendlySupabaseError(error,'comprobar la conexión con Supabase')};}
   }
-  function setSession(supabase,userSession){client=supabase||client;user=userSession||null;if(!user){ownProfile=null;stopChatPoll();['communityChatMessages','communityReportsList'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});if($('communityChatText'))$('communityChatText').value='';if($('communityModerationCard'))$('communityModerationCard').hidden=true;if($('communityDisplayName'))$('communityDisplayName').value='';if($('communityUsername'))$('communityUsername').value='';if($('communityBio'))$('communityBio').value='';if($('communityVisibility'))$('communityVisibility').value='private';if($('communityOwnName'))$('communityOwnName').textContent='Tu perfil';if($('communityOwnAvatar'))$('communityOwnAvatar').innerHTML='<span aria-hidden="true">FF</span>';if($('communityOwnHandle'))$('communityOwnHandle').textContent='';if($('communityOwnBio'))$('communityOwnBio').textContent='';if($('communityOwnFeatured'))$('communityOwnFeatured').innerHTML='';if($('communityOwnStats'))$('communityOwnStats').innerHTML=statsHtml(0,0,0);if($('communityConversations'))$('communityConversations').innerHTML='';if($('communityFollowRequests'))$('communityFollowRequests').textContent='Iniciá sesión para administrar solicitudes.';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communityBlockedList'))$('communityBlockedList').textContent='Iniciá sesión para administrar los bloqueos.';}setControls();updateKindAvailability();ownStats=null;ownStatsLoaded=false;statsSig='';friendPositions=new Map();reflectStatsToggles();renderStatsNotice();if(client)Promise.resolve().then(()=>refresh());else loadCurrentView();}
+  function setSession(supabase,userSession){client=supabase||client;user=userSession||null;if(!user){ownProfile=null;stopChatPoll();['communityChatMessages','communityReportsList'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});if($('communityChatText'))$('communityChatText').value='';if($('communityModerationCard'))$('communityModerationCard').hidden=true;if($('communityDisplayName'))$('communityDisplayName').value='';if($('communityUsername'))$('communityUsername').value='';if($('communityBio'))$('communityBio').value='';if($('communityVisibility'))$('communityVisibility').value='private';if($('communityOwnName'))$('communityOwnName').textContent='Tu perfil';if($('communityOwnAvatar'))$('communityOwnAvatar').innerHTML='<span aria-hidden="true">FF</span>';if($('communityOwnHandle'))$('communityOwnHandle').textContent='';if($('communityOwnBio'))$('communityOwnBio').textContent='';if($('communityOwnFeatured'))$('communityOwnFeatured').innerHTML='';if($('communityOwnStats'))$('communityOwnStats').innerHTML=statsHtml(0,0,0);if($('communityConversations'))$('communityConversations').innerHTML='';if($('communityFollowRequests'))$('communityFollowRequests').textContent='Iniciá sesión para administrar solicitudes.';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communityBlockedList'))$('communityBlockedList').textContent='Iniciá sesión para administrar los bloqueos.';}setControls();updateKindAvailability();ownStats=null;ownStatsLoaded=false;statsSig='';friendPositions=new Map();ownPhysique={pair:null,single:null};if($('communityOwnFlag'))$('communityOwnFlag').innerHTML='';if($('communityPhysiqueEdit'))$('communityPhysiqueEdit').innerHTML='';reflectStatsToggles();renderStatsNotice();if(client)Promise.resolve().then(()=>refresh());else loadCurrentView();}
   const communityViews=['world','ranking','friends','publish','messages','profile','user','compare'];
   const MAIN_TABS=['world','ranking','friends'];
   function showCommunitySubView(name,focusTab=false){
@@ -980,7 +1137,7 @@
     else if(name==='ranking'&&client)loadRanking();
     else if(name==='friends'&&client)loadFriends(true);
     else if(name==='messages'&&client){loadChatContacts();}
-    else if(name==='profile'){renderOwnGrid();if(authReady()){loadFollowRequests();loadBlockedUsers();loadModeration();refreshOwnCounts();syncFeaturedBadges();syncStats();}}
+    else if(name==='profile'){renderOwnGrid();fillCountryOptions();if(authReady()){loadFollowRequests();loadBlockedUsers();loadModeration();refreshOwnCounts();syncFeaturedBadges();syncStats();loadOwnExtras();loadOwnPhysique();}}
     else if(name==='publish'){fillAchievementOptions();fillSessionOptions();renderPostPreview();}
     if(name!==previous)document.getElementById('view-community')?.scrollIntoView?.({block:'start'});
   }
@@ -1008,6 +1165,10 @@
     $('communityStatsPublic')?.addEventListener('change',async e=>{const ok=await setStatsPublic(e.target.checked);if(!ok)reflectStatsToggles();});
     $('communityStatsNoticeOk')?.addEventListener('click',()=>{setNotice('1');renderStatsNotice();syncStats();});
     $('communityStatsNoticeHide')?.addEventListener('click',()=>setStatsPublic(false));
+    $('communityOwnAvatarBtn')?.addEventListener('click',ownAvatarTapped);
+    $('communityPhotoViewer')?.addEventListener('click',e=>{if(e.target.closest('[data-close-viewer]')||e.target===e.currentTarget)closeViewer();});
+    ['communityPhysiqueBefore','communityPhysiqueAfter','communityPhysiqueSingle'].forEach(id=>$(id)?.addEventListener('change',e=>physiqueFileChosen(e.target)));
+    $('communityShowMuscles')?.addEventListener('change',e=>setShowMuscles(e.target.checked));
     $('communityEditProfileToggle')?.addEventListener('click',e=>{const box=$('communityProfileEditor');const open=!box.classList.contains('is-open');box.classList.toggle('is-open',open);e.currentTarget.setAttribute('aria-expanded',String(open));if(open)box.scrollIntoView({behavior:'smooth',block:'start'});});
     $('communityAvatarInput')?.addEventListener('change',e=>changeAvatar(e.target.files?.[0]));$('communityAvatarRemove')?.addEventListener('click',removeAvatar);$('communityPeopleMore')?.addEventListener('click',()=>loadDirectory(false));
     $('communityChatBack')?.addEventListener('click',closeChat);

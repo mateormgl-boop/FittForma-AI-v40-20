@@ -1,9 +1,25 @@
-# Despliegue de FittForma AI v53.0
+# Despliegue de FittForma AI v53.1
 
-Esta guía es la lista de pasos para publicar v53.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v53.1. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
-## Qué cambia en v53.0
+## Qué cambia en v53.1
+
+- **Migración nueva (aditiva):** `supabase/migrations/2026-10-28_v53_profile_extras.sql`. Se aplica después de la de v53.
+  - `community_profiles.country_code`: bandera opcional, código ISO de 2 letras.
+  - Tabla `community_physique` con RLS para «Mi físico».
+    - Hay una fila por persona y sección.
+    - Un trigger exige 30 días entre cambios sin Plus (`monetization_is_plus`).
+    - No se permite DELETE, así que el plazo no se saltea.
+    - La política de Storage solo deja leer las fotos actuales de perfiles visibles.
+  - `community_athlete_stats.muscle_ranks` (validado de -1 a 8 por músculo) y `show_muscles`.
+  - Funciones `community_athlete_extras`, `community_flags` y `community_viewer_can_see`.
+  - No borra ni cambia nada existente y se puede ejecutar más de una vez.
+- **Sin esta migración:** no aparecen la bandera, «Mi físico» ni el mapa de músculos. El resto funciona igual.
+- **Insignias que no se publican:** si la app dice que falta `2026-10-22_v49_badges.sql`, aplicala. Sin esa migración la base rechaza las insignias de entrenamientos, rachas y peso corporal.
+- **Orden recomendado en el editor SQL de Supabase:** todas las migraciones de `supabase/migrations/` por fecha, empezando por la primera que falte. Todas se pueden volver a ejecutar sin problema.
+
+## Qué cambió en v53.0
 
 - **Archivos nuevos:** `athlete-stats.js` e `i18n-v53.js`. Ya están en la lista del servidor y en el service worker.
 - **Migración nueva (aditiva):** `supabase/migrations/2026-10-27_v53_athlete_community.sql`. Hay que aplicarla para que

@@ -9,6 +9,17 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v53.1
+
+- `supabase/tests/rls_v53b_test.sql` (33 comprobaciones):
+  - Bandera válida y propia.
+  - «Mi físico»: una cosa por sección, 30 días sin Plus, sin atajo de borrar y volver a subir, cambio libre con Plus, carpeta propia.
+  - Privacidad, bloqueos y mapa de músculos validado y ocultable.
+- `tests/e2e/athletes.e2e.mjs` (53 pasos) suma:
+  - Foto de perfil tocando el avatar y visor en grande.
+  - Bandera, «Mi físico» (antes y después, una foto, límite de 30 días, visor) y mapa de músculos.
+  - «Ver cómo me ven» y acceso a Músculos desde Inicio.
+
 ### v53
 
 - `npm test` incluye `tests/v53.test.mjs`:

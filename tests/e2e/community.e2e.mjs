@@ -84,7 +84,7 @@ await page.route(`${SUPA}/storage/v1/**`, async route => {
 const step = (name, ok, detail = '') => { console.log(`${ok ? 'PASA' : 'FALLA'}  ${name}${detail ? ' — ' + detail : ''}`); if (!ok) process.exitCode = 1; };
 await page.goto(APP + '/'); await page.waitForTimeout(800);
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(800);
-step('Sin sesión: Comunidad abre en Todo el mundo con personas reales (sin feed)', (await page.getAttribute('#communityTabWorld', 'aria-selected')) === 'true' && /bruno_fit/.test(await page.textContent('#communityPeople')) && !(await page.$('#communityFeed')));
+step('Sin sesión: Comunidad abre en Todos con personas reales (sin feed)', (await page.getAttribute('#communityTabWorld', 'aria-selected')) === 'true' && /bruno_fit/.test(await page.textContent('#communityPeople')) && !(await page.$('#communityFeed')));
 // v53: publicar se hace desde Mi perfil; las publicaciones de otra persona se abren desde su perfil.
 const openPublish = async () => { await page.click('#communityTabProfile'); await page.waitForTimeout(400); await page.click('#communityOpenPublish'); await page.waitForTimeout(400); };
 const openBrunoPost = async () => { await page.click('#communityTabWorld'); await page.waitForTimeout(900); await page.click('#communityPeople .cm-card-open[aria-label*="Bruno"]'); await page.waitForTimeout(1300); await page.click('#communityUserGrid [data-community-open-post="b0000000-0000-0000-0000-0000000000b1"]'); await page.waitForTimeout(1000); };
@@ -182,7 +182,7 @@ step('Un perfil nuevo empieza público', sql(`select visibility from community_p
 sql(`update community_profiles set username='carla_priv', visibility='private', bio='No deberías ver esto', avatar_path='cccccccc-0000-0000-0000-0000000000c5/avatar/c1.jpg' where user_id='cccccccc-0000-0000-0000-0000000000c5'; update community_profiles set username='diego_pub' where user_id='dddddddd-0000-0000-0000-0000000000d5'`);
 await page.click('#communityTabWorld'); await page.waitForTimeout(1200);
 const people = await page.textContent('#communityPeople');
-step('Todo el mundo lista usuarios reales de la app', /carla_priv/.test(people) && /diego_pub/.test(people) && /bruno_fit/.test(people), people.replace(/\s+/g, ' ').slice(0, 160));
+step('Todos lista usuarios reales de la app', /carla_priv/.test(people) && /diego_pub/.test(people) && /bruno_fit/.test(people), people.replace(/\s+/g, ' ').slice(0, 160));
 step('El perfil privado muestra solo datos básicos y la etiqueta', /Perfil privado/.test(people) && !/No deberías ver esto/.test(people));
 const carlaAvatar = await page.$$eval('#communityPeople .cm-card', n => (n.find(x => /carla_priv/.test(x.textContent))?.querySelector('.community-avatar')?.outerHTML) || '');
 step('Foto de perfil del privado visible como dato básico', /has-photo/.test(carlaAvatar) && /cccccccc-0000-0000-0000-0000000000c5\/avatar\/c1\.jpg/.test(carlaAvatar), carlaAvatar.slice(0, 200));

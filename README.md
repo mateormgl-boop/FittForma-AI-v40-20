@@ -1,8 +1,14 @@
-# FittForma AI — v53.0
+# FittForma AI — v53.1
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v53.1
+
+- Comunidad: «Todos», mapa de músculos en el perfil, bandera, «Mi físico» (antes y después y una foto) y foto de perfil que se ve en grande y se cambia tocándola.
+- Acceso a Músculos desde Inicio.
+- Requiere aplicar `2026-10-28_v53_profile_extras.sql` (ver `docs/DESPLIEGUE.md`).
 
 ## Novedades v53.0
 

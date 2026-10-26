@@ -1758,6 +1758,7 @@
       <button class="home-tile t-teal" type="button" data-shortcut-view="running"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><b>Correr con GPS</b><span>O registrar a mano</span></button>
       <button class="home-tile t-violet" type="button" data-show-badges><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 19.5 7v10L12 21.5 4.5 17V7z"/><path d="M12 8v5l3 2"/></svg><b>Insignias</b><span>Tus desafíos</span></button>
       <button class="home-tile t-amber" type="button" data-shortcut-view="coach" aria-label="Consultar a la IA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><b>FittAI</b><span>Preguntá o pedí un plan</span></button>
+      <button class="home-tile t-violet" type="button" data-home-muscles aria-label="Ver mis músculos (Mapa de avances)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 14c-2-1-3-3-2.5-5.5C5.2 6 7.5 5 9 6.5l1 1.5M17 14c2-1 3-3 2.5-5.5C18.8 6 16.5 5 15 6.5L14 8"/><path d="M9 6.5c0-2 1.3-3.5 3-3.5s3 1.5 3 3.5M8 20c0-3 1.8-5 4-5s4 2 4 5M10 11h4"/></svg><b>Músculos</b><span>Tu rango por músculo</span></button>
     </div>
     <section class="home-quote" aria-label="Frase del día"><p>“Disciplina hoy,<br>resultados mañana.”</p></section>
     <h2 class="home-h">Resumen de hoy</h2>
@@ -2087,7 +2088,7 @@
     </section>
 
     <section class="view" id="view-community">
-      <!-- v53: Comunidad de deportistas. Tres apartados (Todo el mundo, Ranking, Amigos); sin feed general.
+      <!-- v53: Comunidad de deportistas. Tres apartados (Todos, Ranking, Amigos); sin feed general.
            Mensajes y Mi perfil quedan como accesos en la cabecera. La barra inferior principal de la app no cambia. -->
       <header class="community-topbar cm-topbar">
         <div class="cm-head">
@@ -2098,7 +2099,7 @@
           </div>
         </div>
         <nav class="community-subnav cm-tabs" role="tablist" aria-label="Secciones de Comunidad">
-          <button class="community-subtab is-active" id="communityTabWorld" type="button" role="tab" data-community-tab="world" aria-controls="communityPanelWorld" aria-selected="true">Todo el mundo</button>
+          <button class="community-subtab is-active" id="communityTabWorld" type="button" role="tab" data-community-tab="world" aria-controls="communityPanelWorld" aria-selected="true">Todos</button>
           <button class="community-subtab" id="communityTabRanking" type="button" role="tab" data-community-tab="ranking" aria-controls="communityPanelRanking" aria-selected="false" tabindex="-1">Ranking</button>
           <button class="community-subtab" id="communityTabFriends" type="button" role="tab" data-community-tab="friends" aria-controls="communityPanelFriends" aria-selected="false" tabindex="-1">Amigos</button>
         </nav>
@@ -2117,7 +2118,7 @@
 
       <section id="communityPanelRanking" class="community-subpanel" data-community-panel="ranking" role="tabpanel" aria-labelledby="communityTabRanking" hidden>
         <div class="cm-chips" id="rankingCategories" role="group" aria-label="Categoría del ranking"></div>
-        <div class="ff-segmented cm-scope" role="group" aria-label="Quiénes participan"><button type="button" class="ff-seg active" data-ranking-scope="all" aria-pressed="true">Todo el mundo</button><button type="button" class="ff-seg" data-ranking-scope="friends" aria-pressed="false">Amigos</button></div>
+        <div class="ff-segmented cm-scope" role="group" aria-label="Quiénes participan"><button type="button" class="ff-seg active" data-ranking-scope="all" aria-pressed="true">Todos</button><button type="button" class="ff-seg" data-ranking-scope="friends" aria-pressed="false">Amigos</button></div>
         <div class="cm-explain" id="rankingExplain"></div>
         <div id="rankingStatus" class="community-status" role="status" aria-live="polite"></div>
         <ol class="cm-podium" id="rankingPodium" aria-label="Primeros puestos"></ol>
@@ -2194,19 +2195,29 @@
       <section id="communityPanelProfile" class="community-subpanel" data-community-panel="profile" role="tabpanel" aria-labelledby="communityTabProfile" hidden>
         <div class="card community-social-profile" id="communityOwnProfile">
           <div class="community-profile-header">
-            <div class="community-avatar community-avatar-lg" id="communityOwnAvatar">FF</div>
-            <div class="community-profile-id"><strong id="communityOwnName">Tu perfil</strong><span class="muted small" id="communityOwnHandle"></span><div class="community-featured" id="communityOwnFeatured" aria-label="Insignias destacadas"></div></div>
+            <button type="button" class="cm-avatar-btn" id="communityOwnAvatarBtn" aria-label="Ver o cambiar tu foto de perfil"><div class="community-avatar community-avatar-lg" id="communityOwnAvatar">FF</div><span class="cm-avatar-cam" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span></button>
+            <div class="community-profile-id"><strong id="communityOwnName">Tu perfil</strong><span class="cm-flag" id="communityOwnFlag"></span><span class="muted small" id="communityOwnHandle"></span><div class="community-featured" id="communityOwnFeatured" aria-label="Insignias destacadas"></div></div>
           </div>
           <p class="community-profile-bio" id="communityOwnBio"></p>
           <div class="community-profile-stats" id="communityOwnStats" aria-live="polite"><span><b>0</b> publicaciones</span><span><b>0</b> seguidores</span><span><b>0</b> seguidos</span></div>
           <div class="btn-row community-profile-actions"><button class="btn" type="button" id="communityOpenPublish" data-community-go="publish">Publicar en mi perfil</button><button class="btn ghost" type="button" id="communityViewOwnPublic">Ver cómo me ven</button><button class="btn secondary" type="button" id="communityEditProfileToggle" aria-expanded="false" aria-controls="communityProfileEditor">Editar perfil</button><label class="btn ghost" id="communityAvatarLabel" for="communityAvatarInput">Cambiar foto</label><button class="btn ghost" type="button" id="communityAvatarRemove" hidden>Quitar foto</button><input id="communityAvatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden></div>
+          <div class="community-status" id="communityAvatarStatus" role="status" aria-live="polite"></div>
           <div class="community-profile-tabs" role="group" aria-label="Contenido del perfil"><button type="button" class="community-feed-tab is-active" data-own-tab="posts" aria-pressed="true">Publicaciones</button><button type="button" class="community-feed-tab" data-own-tab="saved" aria-pressed="false">Guardadas</button></div>
           <div id="communityOwnGrid" class="community-grid"></div>
+        </div>
+        <div class="card cm-physique-card" id="communityPhysiqueCard">
+          <h3>Mi físico</h3>
+          <p class="muted small">Aparece arriba de tu perfil. Hay una sola cosa por sección: tu antes y después, y una foto de tu físico. Sin membresía Plus podés cambiar cada sección una vez cada 30 días; con Plus, cuando quieras. Quitarla se puede siempre. Subí solo fotos tuyas: se recomprimen en tu dispositivo y se borran los metadatos (incluida la ubicación). Las ve quien puede ver tu perfil.</p>
+          <div class="cm-physique-edit" id="communityPhysiqueEdit"></div>
+          <input id="communityPhysiqueBefore" type="file" accept="image/jpeg,image/png,image/webp" hidden><input id="communityPhysiqueAfter" type="file" accept="image/jpeg,image/png,image/webp" hidden><input id="communityPhysiqueSingle" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+          <div class="community-status" id="communityPhysiqueStatus" role="status" aria-live="polite"></div>
         </div>
         <div class="card cm-stats-card" id="communityStatsCard">
           <h3>Estadísticas en tu perfil</h3>
           <label class="reminder-pref-row"><input id="communityStatsPublic" type="checkbox" checked><span>Mostrar mis estadísticas de entrenamiento en Comunidad</span></label>
           <p class="muted small">Se comparten tu nivel de entrenamiento, tu nivel de XP, tu rango general del Mapa de avances, tus insignias, tu constancia y tu running de los últimos 30 días y tus mejores series de flexiones, dominadas, sentadilla al aire y plancha. Las ve quien puede ver tu perfil (si es privado, solo tus seguidores aceptados) y sirven para los rankings y las comparaciones. Nunca se publican tu peso, tu altura, tus medidas, tus objetivos ni tus fotos de progreso. Si las ocultás, salís de los rankings.</p>
+          <label class="reminder-pref-row"><input id="communityShowMuscles" type="checkbox" checked><span>Mostrar mi mapa de músculos en el perfil</span></label>
+          <p class="muted small">El mapa del cuerpo con el rango de cada músculo (de Hierro a Leyenda), calculado con tus series completadas. No muestra medidas ni fotos.</p>
           <div class="community-status" id="communityStatsStatus" role="status" aria-live="polite"></div>
         </div>
         <div class="card community-account-card" id="communityProfileEditor">
@@ -2215,6 +2226,7 @@
             <div class="field"><label for="communityDisplayName">Nombre visible</label><input id="communityDisplayName" maxlength="60" placeholder="Nombre o apodo" required></div>
             <div class="field"><label for="communityUsername">Usuario público</label><input id="communityUsername" maxlength="24" pattern="[A-Za-z0-9_.\-]{3,24}" placeholder="ej. mateo_fit" required><small class="muted">3–24 caracteres: letras, números, punto, guion o guion bajo.</small></div>
             <div class="field"><label for="communityBio">Descripción (opcional)</label><textarea id="communityBio" maxlength="280" rows="3" placeholder="Contá algo sobre tus objetivos…"></textarea></div>
+            <div class="field"><label for="communityCountry">Bandera (opcional)</label><select id="communityCountry"><option value="">Sin bandera</option></select><small class="muted">Se muestra junto a tu nombre en Comunidad.</small></div>
             <div class="field"><label for="communityVisibility">Privacidad del perfil</label><select id="communityVisibility"><option value="public">Público: cualquiera puede ver lo que compartís</option><option value="private">Privado: tu contenido solo para seguidores aceptados</option></select><small class="muted">Los perfiles nuevos empiezan públicos. En privado seguís apareciendo en Comunidad con tu nombre, @usuario y foto, pero tus publicaciones, descripción e insignias solo las ven tus seguidores aceptados. El cambio se aplica al instante.</small></div>
             <button class="btn full" type="submit">Guardar perfil online</button>
           </form>
@@ -2237,6 +2249,7 @@
         <div class="cm-compare" id="communityCompare"></div>
       </section>
 
+      <dialog class="cm-viewer" id="communityPhotoViewer" aria-label="Foto"><button class="modal-close" type="button" data-close-viewer aria-label="Cerrar">×</button><img id="communityPhotoViewerImg" alt=""><p class="cm-viewer-caption" id="communityPhotoViewerCaption"></p><div class="btn-row cm-viewer-actions" id="communityPhotoViewerActions"></div></dialog>
       <dialog class="community-post-dialog" id="communityPostDialog" aria-label="Publicación"><button class="modal-close" type="button" data-close-post-dialog aria-label="Cerrar">×</button><div id="communityPostDialogBody"></div></dialog>
     </section>
     <section class="view" id="view-profile">
@@ -2385,14 +2398,14 @@
         <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
         <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">53.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">53.1</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
       </details>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 53.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 53.1 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -2419,7 +2432,7 @@
   <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V53.0</p>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V53.1</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -4010,7 +4023,7 @@ function findCatalogExercise(name){
   window.FittFormaAthleteStatsNow=function(){
     const S=window.FittFormaAthleteStats;if(!S)return null;
     const r=MR?muscleRanksNow():{overall:-1,ranked:0};
-    return S.compute({sessions:state.sessions,activities:state.activities,badges:window.FittFormaShareableBadges(),xp:profileXp().xp,trainingLevel:state.profile?.level,muscle:{overall:r.overall,ranked:r.ranked},today:dateKey(),canonical:n=>FittFormaTraining.canonicalName(n)});
+    return S.compute({sessions:state.sessions,activities:state.activities,badges:window.FittFormaShareableBadges(),xp:profileXp().xp,trainingLevel:state.profile?.level,muscle:{overall:r.overall,ranked:r.ranked,byMuscle:Object.fromEntries((r.muscles||[]).map(m=>[m.id,m.rank]))},today:dateKey(),canonical:n=>FittFormaTraining.canonicalName(n)});
   };
   // La insignia más cercana a subir de nivel, para Inicio.
   function closestNextBadge(){
@@ -4057,6 +4070,9 @@ function findCatalogExercise(name){
     $('profileViewBadges')?.addEventListener('click',()=>showBadges());
   }
   function showBadges(){switchView('progress');showProgressTab('badges');}
+  // v53.1: acceso a Progreso › Músculos desde Inicio.
+  function showMuscles(){switchView('progress');showProgressTab('muscles');}
+  document.querySelectorAll('[data-home-muscles]').forEach(b=>b.addEventListener('click',showMuscles));
   function notifyBadgeChanges(delta,baseMessage){
     if(!delta)return;celebrateBadges(delta.newlyUnlocked);
     const count=delta.newlyUnlocked.length,upgraded=delta.upgraded.length;
@@ -5106,7 +5122,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.53.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.53.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.53.1')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.53.1. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -5934,7 +5950,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.53.0';
+  const APP_VERSION='0.53.1';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');
