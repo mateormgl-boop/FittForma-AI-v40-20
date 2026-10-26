@@ -1,9 +1,43 @@
-# Despliegue de FittForma AI v52.0
+# Despliegue de FittForma AI v53.0
 
-Esta guía es la lista de pasos para publicar v52.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v53.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
-## Qué cambia en v52.0
+## Qué cambia en v53.0
+
+- **Archivos nuevos:** `athlete-stats.js` e `i18n-v53.js`. Ya están en la lista del servidor y en el service worker.
+- **Migración nueva (aditiva):** `supabase/migrations/2026-10-27_v53_athlete_community.sql`. Hay que aplicarla para que
+  funcionen las estadísticas, el Ranking, Amigos y la comparación.
+  - Crea la tabla `community_athlete_stats` con RLS: cada persona solo lee y escribe su propia fila.
+    - Las columnas son solo deportivas: no hay peso, altura, medidas, objetivos ni fotos.
+    - Los topes y la coherencia se validan con `CHECK`.
+    - Un trigger del servidor fija la fecha y limita cuánto pueden subir los récords por día.
+  - Crea las funciones `community_people`, `community_athlete_profile`, `community_leaderboard` y
+    `community_follow_requests` (`security definer`).
+    - Respetan perfiles privados, bloqueos y la opción de ocultar las estadísticas.
+  - No borra ni modifica tablas, registros, funciones ni políticas. `community_rank_shares` y `community_rank_board` de
+    v52 quedan instaladas, aunque el cliente ya no las usa.
+  - Se puede ejecutar más de una vez.
+- **Cómo aplicarla:**
+  1. En el panel de Supabase, abrí el editor SQL del proyecto.
+  2. Pegá el archivo completo y ejecutalo.
+  3. Recargá el esquema de la API (Settings › API › «Reload schema») si las funciones no aparecen enseguida.
+  4. Probá antes en un proyecto de prueba con `bash supabase/tests/run.sh`.
+- **Sin la migración:**
+  - «Todo el mundo» usa el directorio de v50, sin estadísticas.
+  - Ranking y Amigos muestran que falta la actualización v53.
+  - El resto de la app funciona.
+- **Privacidad:** las estadísticas son públicas por defecto, por decisión del producto. Cada persona las publica recién
+  cuando ve el aviso en Comunidad y puede ocultarlas en Mi perfil.
+- **Límite conocido:** los entrenamientos se registran en el dispositivo, así que el servidor no puede demostrar que
+  un número sea real. Las defensas son:
+  - Topes y coherencia entre columnas.
+  - Fecha del servidor.
+  - Récords que suben como mucho una vez cada 20 h y hasta +50 %.
+  - Orden calculado en el servidor.
+- **No hay insignia de cuenta verificada:** la app no tiene un sistema de verificación, así que no se muestra.
+
+## Qué cambió en v52.0
 
 - **Archivos nuevos:** `muscle-ranks.js` e `i18n-v52.js`. Ya están en la lista del servidor y en el service worker.
 - **Migración nueva (aditiva):** `supabase/migrations/2026-10-26_v52_rank_board.sql`.

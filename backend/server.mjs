@@ -19,7 +19,7 @@ const root=rootCandidates.find(candidate=>existsSync(path.join(candidate,'index.
 const rawPort=String(process.env.PORT||'8787');
 const port=Number(rawPort);
 if(!Number.isInteger(port)||port<0||port>65535)throw new Error(`PORT debe ser un entero entre 0 y 65535; se recibió ${JSON.stringify(rawPort)}.`);
-const appVersion='0.52.0';
+const appVersion='0.53.0';
 const apiKey=String(process.env.GEMINI_API_KEY||'').trim(), model=String(process.env.GEMINI_MODEL||'gemini-3.8-flash').trim()||'gemini-3.8-flash';
 const trustRenderClientIp=String(process.env.TRUST_RENDER_CLIENT_IP||'').toLowerCase()==='true';
 // If the primary model temporarily returns 503, try a lighter official model automatically.
@@ -103,7 +103,7 @@ const adsCsp=adsCspAdditions(monetization.settings.ads);
 const limits=new Map();
 const MAX_TRACKED_CLIENTS=5000;
 const PUBLIC_ROOT_FILES=new Set([
-  '/index.html','/i18n.js','/i18n-extra.js','/i18n-v48.js','/i18n-v50.js','/i18n-v51.js','/i18n-v52.js','/anatomy.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js','/training-core.js','/body-goals.js','/muscle-ranks.js','/monetization-core.js','/exercise-guides.js','/exercise-media.js','/exercise-gifs.js','/activity-core.js','/native-gps.js','/food-db.js','/food-core.js',
+  '/index.html','/i18n.js','/i18n-extra.js','/i18n-v48.js','/i18n-v50.js','/i18n-v51.js','/i18n-v52.js','/i18n-v53.js','/anatomy.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js','/training-core.js','/body-goals.js','/muscle-ranks.js','/athlete-stats.js','/monetization-core.js','/exercise-guides.js','/exercise-media.js','/exercise-gifs.js','/activity-core.js','/native-gps.js','/food-db.js','/food-core.js',
   '/manifest.json','/icon.svg','/icon-180.png','/icon-192.png','/icon-512.png',
   '/supabase-config.js','/achievements.js','/sw.js'
 ]);
@@ -218,7 +218,7 @@ const APP_GUIDE=`GUÍA DE FITTFORMA AI (usala para explicar dónde está cada co
 - FittAI [coach]: este chat.
 - Nutrición [nutrition]: Hoy (resumen de macros, comidas del día, hidratación), Registrar [nutrition:registrar] (texto con estimación, código de barras, foto con IA, base de alimentos, favoritas), Objetivos [nutrition:plan] (objetivos de calorías y macros, menú diario), Historial [nutrition:historial] (tendencia semanal).
 - Progreso [progress]: Resumen (variación 4 semanas, actividad por 7 días/4/12 semanas, retos, comparación), Insignias [progress:badges] (12 niveles Bronce→Diamante por desafío, registrar marcas), Historial [progress:history] (sesiones editables, récords, exportar/importar), Cuerpo [progress:body] (peso, medidas, fotos privadas).
-- Comunidad [community]: feed, explorar perfiles [community:explore], publicar texto/logros/transformaciones [community:publish], mensajes privados con seguimiento mutuo [community:messages], perfil público, bloqueo y denuncias.
+- Comunidad [community]: Todo el mundo (directorio de deportistas), Ranking y Amigos, perfiles con estadísticas deportivas [community:explore], publicar texto/logros/transformaciones [community:publish], mensajes privados con seguimiento mutuo [community:messages], perfil público, bloqueo y denuncias.
 - Perfil [profile]: foto de perfil, nivel y XP, objetivos y datos físicos [profile:goals], recordatorios [profile:reminders], cuenta y sincronización en la nube [profile:account], privacidad, membresía, versión.
 Cuando la persona pregunte dónde o cómo hacer algo, explicalo en una o dos frases e incluí hasta 3 acciones con los destinos exactos entre corchetes. No inventes funciones que no estén en esta guía.`;
 function sanitizeActions(list){return Array.isArray(list)?list.filter(a=>a&&APP_TARGETS.has(String(a.target))).slice(0,3).map(a=>({target:String(a.target),label:cleanText(a.label,40)||'Ir'})):[];}

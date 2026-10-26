@@ -44,7 +44,7 @@ test('la comprobación manual de Comunidad hace una lectura real sin escribir da
   assert.match(community, /coreChecks=\[\['community_profiles','user_id'\]/);
   assert.match(community, /coreChecks\.map\(async\(\[table,column\]\)/);
   assert.match(community, /communityRetryConnection/);
-  assert.match(community, /window\.FittFormaCommunity=\{init,setSession,refresh,loadChatContacts,loadMessages,loadBlockedUsers,testConnection\}/);
+  assert.match(community, /window\.FittFormaCommunity=\{init,setSession,refresh,loadChatContacts,loadMessages,loadBlockedUsers,testConnection,/);
 });
 
 

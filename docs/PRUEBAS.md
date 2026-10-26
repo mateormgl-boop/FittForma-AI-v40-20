@@ -9,6 +9,31 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v53
+
+- `npm test` incluye `tests/v53.test.mjs`:
+  - Cálculo de estadísticas: 30 días, running plausible y mejores series del mismo ejercicio sin lastre.
+  - Topes iguales a los de SQL y ausencia de datos corporales.
+  - Categorías del ranking iguales en la app y en el servidor.
+  - Comparación con «Sin datos disponibles».
+  - Estructura de Comunidad sin feed.
+  - Traducciones y versión.
+- `supabase/tests/rls_v53_test.sql` (52 comprobaciones):
+  - Públicas por defecto y ocultables.
+  - Solo la fila propia y topes.
+  - Perfiles privados y bloqueos.
+  - Alcance amigos, orden del servidor y datos de 30 días frescos.
+  - Límite de subida de récords y solicitudes de seguimiento sin embed.
+- `tests/e2e/athletes.e2e.mjs` (mismas variables que `community.e2e.mjs`, 39 pasos): cubre las pruebas 1 a 15 del
+  pedido de rediseño.
+  - Todo el mundo por defecto, sin feed, tarjetas y búsqueda.
+  - Perfil completo, comparación, ranking y amigos.
+  - Seguir y dejar de seguir, mensajes solo mutuos y perfil privado.
+  - Ocultar estadísticas, Mapa de avances, publicar en el perfil, estado vacío y consola sin errores.
+- `tests/e2e/community.e2e.mjs` y `tests/e2e/rank-board.e2e.mjs` se adaptaron: publicaciones dentro del perfil y
+  ranking con las estadísticas v53. Los pasos del feed y de la búsqueda por #hashtag se quitaron porque esas funciones
+  ya no existen en la interfaz.
+
 ### v52
 
 - `npm test` incluye `tests/v52.test.mjs`:

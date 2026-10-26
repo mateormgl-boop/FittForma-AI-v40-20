@@ -1,0 +1,213 @@
+// E2E v53: Comunidad de deportistas — Todo el mundo, perfil completo, Ranking, Amigos, comparación y privacidad.
+// Navegador real + supabase-js real + PostgREST real sobre PostgreSQL local (misma preparación que community.e2e.mjs).
+// Solo /auth/v1 y /storage/v1 se simulan en el navegador (sus permisos los cubre supabase/tests/run.sh).
+// Los usuarios de prueba (example.test) se identifican como tales; no se generan fotos de personas.
+// Preparación y variables: ver docs/PRUEBAS.md. NO apuntar nunca a un proyecto real.
+//   APP_URL (http://localhost:8787)  POSTGREST_URL (http://127.0.0.1:3300)  JWT_SECRET_FILE
+//   SUPABASE_UMD (ruta a @supabase/supabase-js/dist/umd/supabase.js)  PLAYWRIGHT_DIR  E2E_DB (ff_e2e)
+import { createRequire } from 'module';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+
+// v48: la pantalla de logro es modal; las pruebas la registran y la cierran para seguir navegando.
+const CLOSE_CELEBRATION = () => { window.__celebrations = []; setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d && d.open) { window.__celebrations.push(document.getElementById('badgeCelebrationName')?.textContent || ''); d.close(); } }, 50); };
+import { execFileSync } from 'node:child_process';
+const require = createRequire((process.env.PLAYWRIGHT_DIR || '/opt/node-tools/node_modules') + '/');
+const { chromium } = require('playwright');
+const SECRET = fs.readFileSync(process.env.JWT_SECRET_FILE || '/var/tmp/ff_jwt_secret', 'utf8').trim();
+const b64 = o => Buffer.from(JSON.stringify(o)).toString('base64url');
+const jwt = payload => { const h = b64({ alg: 'HS256', typ: 'JWT' }), p = b64(payload); return `${h}.${p}.${crypto.createHmac('sha256', SECRET).update(`${h}.${p}`).digest('base64url')}`; };
+const exp = Math.floor(Date.now() / 1000) + 3600;
+const ANON = jwt({ role: 'anon', iss: 'supabase', exp });
+const USERS = { 'alice@example.test': 'aaaaaaaa-0000-0000-0000-000000000001', 'bob@example.test': 'bbbbbbbb-0000-0000-0000-000000000002' };
+const userObj = email => ({ id: USERS[email], aud: 'authenticated', role: 'authenticated', email, app_metadata: { provider: 'email' }, user_metadata: {}, created_at: new Date().toISOString() });
+const tokenFor = email => jwt({ sub: USERS[email], role: 'authenticated', aud: 'authenticated', email, exp });
+const sql = q => execFileSync('psql', ['-d', process.env.E2E_DB || 'ff_e2e', '-Atc', q], { env: process.env }).toString().trim();
+const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+const SUPA = 'https://e2e.supabase.co';
+const APP = process.env.APP_URL || 'http://localhost:8787';
+const PGRST = process.env.POSTGREST_URL || 'http://127.0.0.1:3300';
+const uploaded = [];
+const APP_VERSION = (await (await fetch(APP + '/api/public-config')).json()).version;
+
+// Datos externos: B publica un texto y le escribe a A (con auth.uid() de B para pasar el trigger anti-spam).
+// Fixture propio (el último paso elimina la cuenta de A, así que se recrea en cada ejecución).
+sql(`insert into auth.users(id,email) values('aaaaaaaa-0000-0000-0000-000000000001','alice@example.test'),('bbbbbbbb-0000-0000-0000-000000000002','bob@example.test') on conflict do nothing`);
+sql(`insert into community_profiles(user_id,username,display_name,visibility) values('aaaaaaaa-0000-0000-0000-000000000001','alicia_fit','Alicia','public'),('bbbbbbbb-0000-0000-0000-000000000002','bruno_fit','Bruno Fit','public') on conflict (user_id) do update set visibility='public'`);
+sql(`insert into community_follows(follower_id,following_id,status) values('aaaaaaaa-0000-0000-0000-000000000001','bbbbbbbb-0000-0000-0000-000000000002','accepted'),('bbbbbbbb-0000-0000-0000-000000000002','aaaaaaaa-0000-0000-0000-000000000001','accepted') on conflict do nothing`);
+sql(`delete from user_app_data where user_id='aaaaaaaa-0000-0000-0000-000000000001'; delete from community_messages; delete from community_reports; delete from community_posts; delete from community_moderators;`);
+sql(`insert into community_posts(id,user_id,post_kind,description,visibility) values('b0000000-0000-0000-0000-0000000000b1','bbbbbbbb-0000-0000-0000-000000000002','text','Primera semana completa de entrenamientos','public')`);
+sql(`set request.jwt.claim.sub='bbbbbbbb-0000-0000-0000-000000000002'; insert into community_messages(sender_id,recipient_id,body) values('bbbbbbbb-0000-0000-0000-000000000002','aaaaaaaa-0000-0000-0000-000000000001','¡Hola Alicia! ¿Entrenamos el sábado?')`);
+
+// Alicia tiene entrenamientos de todo el cuerpo: su rango general es real, calculado por la app.
+// Alicia entrena de verdad en la app: flexiones, plancha y todo el cuerpo en los últimos días, y una carrera.
+const day = n => { const d = new Date(); d.setDate(d.getDate() - n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const seed = { profile: { goal: 'fitness', level: 'intermediate' }, activities: [{ id: 900, type: 'Correr', date: day(2), distance: 5, minutes: 30 }], sessions: Array.from({ length: 6 }, (_, i) => ({ id: 100 + i, date: day(1 + i), status: 'completed', type: 'custom', title: 'Cuerpo completo', minutes: 45,
+  exercises: ['Sentadilla goblet', 'Press de banca con barra', 'Remo con barra', 'Press militar con mancuernas', 'Peso muerto rumano con mancuernas', 'Curl de bíceps con mancuernas', 'Elevación de talones con apoyo'].map(name => ({ name, entries: [1, 2, 3].map(() => ({ reps: '10', weight: '20', done: true })) }))
+    .concat([{ name: 'Flexiones clásicas', entries: [{ reps: String(18 + i), weight: '', done: true }] }, { name: 'Plancha frontal', entries: [{ reps: '60', weight: '', done: true }] }]) })) };
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+const errors = []; page.on('pageerror', e => errors.push('PAGEERR ' + e.message));
+page.on('console', m => { if (m.type() === 'error' && !/leaflet|ERR_FAILED|unpkg/i.test(m.text())) errors.push(m.text()); });
+page.on('dialog', d => d.type() === 'prompt' ? d.accept('ELIMINAR') : /dispositivo/.test(d.message()) ? d.dismiss() : d.accept());
+await page.addInitScript(CLOSE_CELEBRATION);
+  await page.addInitScript(s => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('fittforma-ai-v4', s); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(seed));
+await page.route(/unpkg\.com/, r => r.abort());
+await page.addInitScript(() => localStorage.setItem('fittforma-welcome-v1', '1'));
+await page.route(/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js/, r => r.fulfill({ contentType: 'text/javascript', headers: { 'access-control-allow-origin': '*' }, body: fs.readFileSync(process.env.SUPABASE_UMD) }));
+await page.route('**/api/public-config', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ version: APP_VERSION, supabase: { configured: true, url: SUPA, anonKey: ANON, keyType: 'legacy_anon' }, missing: [], issue: null }) }));
+await page.route(`${SUPA}/rest/v1/**`, async route => {
+  const req = route.request(), url = new URL(req.url());
+  const headers = { ...req.headers() }; delete headers.host; delete headers.origin; delete headers.referer;
+  const res = await fetch(PGRST + url.pathname.replace('/rest/v1', '') + url.search, { method: req.method(), headers, body: ['GET', 'HEAD'].includes(req.method()) ? undefined : req.postDataBuffer() });
+  const body = Buffer.from(await res.arrayBuffer());
+  const outHeaders = Object.fromEntries([...res.headers].filter(([k]) => !['content-encoding', 'transfer-encoding', 'connection'].includes(k)));
+  await route.fulfill({ status: res.status, headers: { ...outHeaders, 'access-control-allow-origin': '*', 'access-control-expose-headers': 'content-range' }, body });
+});
+await page.route(`${SUPA}/auth/v1/**`, async route => {
+  const req = route.request(), url = new URL(req.url());
+  const cors = { 'access-control-allow-origin': '*' };
+  if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { ...cors, 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' } });
+  if (url.pathname.endsWith('/token')) {
+    const { email, password } = JSON.parse(req.postData() || '{}');
+    if (!USERS[email] || password !== 'clave-segura-123') return route.fulfill({ status: 400, headers: cors, contentType: 'application/json', body: JSON.stringify({ error: 'invalid_grant', error_description: 'Invalid login credentials' }) });
+    return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ access_token: tokenFor(email), token_type: 'bearer', expires_in: 3600, expires_at: exp, refresh_token: 'r-' + email, user: userObj(email) }) });
+  }
+  if (url.pathname.endsWith('/user')) { const tok = (req.headers().authorization || '').split(' ')[1]; const sub = tok && JSON.parse(Buffer.from(tok.split('.')[1], 'base64url')).sub; const email = Object.keys(USERS).find(e => USERS[e] === sub); return email ? route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify(userObj(email)) }) : route.fulfill({ status: 401, headers: cors, body: '{}' }); }
+  if (url.pathname.endsWith('/logout')) return route.fulfill({ status: 204, headers: cors });
+  return route.fulfill({ status: 404, headers: cors, body: '{}' });
+});
+await page.route(`${SUPA}/storage/v1/**`, async route => {
+  const req = route.request(), url = new URL(req.url()), cors = { 'access-control-allow-origin': '*' };
+  if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { ...cors, 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' } });
+  if (url.pathname.includes('/object/sign/') && req.method() === 'GET') return route.fulfill({ headers: cors, contentType: 'image/png', body: PNG }); // la URL firmada devuelve la imagen
+  if (url.pathname.includes('/object/sign/')) { const path = url.pathname.split('/object/sign/community-media/')[1]; return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ signedURL: `/object/sign/community-media/${path}?token=t` }) }); }
+  if (url.pathname.includes('/object/community-media/') && req.method() === 'POST') { const path = url.pathname.split('/object/community-media/')[1]; uploaded.push(path); return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ Key: 'community-media/' + path, Id: crypto.randomUUID() }) }); }
+  if (req.method() === 'GET') return route.fulfill({ headers: cors, contentType: 'image/png', body: PNG });
+  return route.fulfill({ headers: cors, contentType: 'application/json', body: '[]' });
+});
+
+const step = (name, ok, detail = '') => { console.log(`${ok ? 'PASA' : 'FALLA'}  ${name}${detail ? ' — ' + detail : ''}`); if (!ok) process.exitCode = 1; };
+const A = 'aaaaaaaa-0000-0000-0000-000000000001', B = 'bbbbbbbb-0000-0000-0000-000000000002';
+const C = 'cccccccc-0000-0000-0000-0000000000c6', D = 'dddddddd-0000-0000-0000-0000000000d6', E = 'eeeeeeee-0000-0000-0000-0000000000e6';
+sql(`delete from community_athlete_stats; delete from community_follows where follower_id in ('${C}','${D}','${E}') or following_id in ('${C}','${D}','${E}'); delete from community_profiles where user_id in ('${C}','${D}','${E}'); delete from auth.users where id in ('${C}','${D}','${E}')`);
+sql(`insert into auth.users(id,email,raw_user_meta_data) values('${C}','carla53@example.test','{"full_name":"Carla"}'),('${D}','diego53@example.test','{"full_name":"Diego"}'),('${E}','eva53@example.test','{"full_name":"Eva"}')`);
+sql(`update community_profiles set username='carla_priv53', visibility='private', bio='Bio solo para seguidores' where user_id='${C}'; update community_profiles set username='diego_pub53', display_name='Diego' where user_id='${D}'; update community_profiles set username='eva_oculta53', display_name='Eva' where user_id='${E}'`);
+// Estadísticas de prueba de los demás (las de Alicia las calcula y publica la app).
+sql(`insert into community_athlete_stats(user_id,training_level,xp_level,overall_rank,ranked_muscles,badges_count,badges,workouts_total,workouts_30d,active_days_30d,best_pushups,best_pullups) values
+ ('${B}','advanced',9,2,18,2,'[{"exerciseId":"exercise-flexiones","exerciseName":"Flexiones","category":"calisthenics","rank":"silver","level":4,"measure":"reps","evidence":"session","earnedAt":"2026-10-20"}]',80,20,16,45,8),
+ ('${C}','beginner',2,5,10,1,'[]',30,12,10,70,0),
+ ('${D}','beginner',3,1,6,0,'[]',20,8,6,12,0)`);
+sql(`insert into community_athlete_stats(user_id,stats_public,overall_rank,workouts_total,workouts_30d,active_days_30d,best_pushups) values('${E}',false,8,99,30,30,200)`);
+
+await page.goto(APP + '/'); await page.waitForTimeout(800);
+await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(1200);
+step('1. Comunidad abre en «Todo el mundo»', (await page.getAttribute('#communityTabWorld', 'aria-selected')) === 'true' && await page.isVisible('#communityPanelWorld'));
+step('2. Tres apartados y ningún feed ni «Para vos»', (await page.$$eval('.cm-tabs [role=tab]', t => t.map(x => x.textContent.trim()).join('|'))) === 'Todo el mundo|Ranking|Amigos' && !(await page.$('#communityFeed')) && !(await page.$('[data-feed-mode]')) && !/Para vos/.test(await page.textContent('#view-community')));
+let people = await page.textContent('#communityPeople');
+step('3. Sin sesión: perfiles públicos con nivel y rango', /Bruno Fit/.test(people) && /Avanzado/.test(people) && /Plata/.test(people) && !/carla_priv53/.test(people), people.replace(/\s+/g, ' ').slice(0, 160));
+step('3. Las estadísticas ocultas no aparecen', !/Leyenda/.test(people));
+
+await page.click('#communityTabProfile');
+await page.fill('#communityEmail', 'alice@example.test'); await page.fill('#communityPassword', 'clave-segura-123');
+await page.click('#communityEmailLogin'); await page.waitForTimeout(1800);
+step('Antes de ver el aviso no se publica nada', sql(`select count(*) from community_athlete_stats where user_id='${A}'`) === '0');
+await page.click('#communityTabWorld'); await page.waitForTimeout(1000);
+step('Aviso: qué estadísticas se ven (y que nunca peso ni medidas)', await page.isVisible('#communityStatsNotice') && /Nunca tu peso/.test(await page.textContent('#communityStatsNotice')));
+await page.click('#communityStatsNoticeOk'); await page.waitForTimeout(1500);
+const mine = sql(`select stats_public||'|'||training_level||'|'||best_pushups||'|'||best_plank_seconds||'|'||run_km_30d||'|'||active_days_30d from community_athlete_stats where user_id='${A}'`);
+step('Estadísticas reales de Alicia publicadas (públicas por defecto)', mine === 'true|intermediate|23|60|5.00|6', mine);
+step('La fila no tiene columnas de datos corporales', sql(`select count(*) from information_schema.columns where table_name='community_athlete_stats' and column_name ~ '(weight|height|peso|altura|waist|measure|photo|goal)'`) === '0');
+
+await page.fill('#communitySearch', 'diego'); await page.press('#communitySearch', 'Enter'); await page.waitForTimeout(900);
+people = await page.textContent('#communityPeople');
+step('4. La búsqueda encuentra usuarios reales', /diego_pub53/.test(people) && !/bruno_fit/.test(people), people.replace(/\s+/g, ' ').slice(0, 100));
+await page.click('#communityClearSearch'); await page.waitForTimeout(900);
+await page.click('#communityPeople .cm-card-open[aria-label*="Bruno"]'); await page.waitForTimeout(1500);
+let prof = await page.textContent('#communityUserProfile');
+step('5. Al tocar la tarjeta se abre el perfil correcto', /Bruno Fit/.test(prof) && /@bruno_fit/.test(prof), prof.replace(/\s+/g, ' ').slice(0, 120));
+step('6. Perfil completo: rango, nivel, estadísticas e insignias', /Rango principal/.test(prof) && /Plata/.test(prof) && /Avanzado · Nivel 9/.test(prof) && /45 rep/.test(prof) && /Insignias y logros/.test(prof) && /Registrada en un entrenamiento/.test(prof));
+step('6. Lo que falta dice «Sin datos disponibles»', /Sin datos disponibles/.test(prof));
+step('11. Mutuos: se ofrece mensaje; también comparar', await page.isVisible('#communityUserProfile [data-user-message]') && await page.isVisible('#communityUserProfile [data-user-compare]'));
+step('Publicaciones dentro del perfil', /Primera semana completa|Publicaciones/.test(prof));
+if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/profile.png`, fullPage: true });
+await page.click('#communityUserProfile [data-user-compare]'); await page.waitForTimeout(1500);
+if (process.env.SHOTS) { await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark')); await page.screenshot({ path: `${process.env.SHOTS}/compare.png`, fullPage: true }); await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light')); }
+const cmp = await page.textContent('#communityCompare');
+step('10. Comparación: «Tu progreso» y «Progreso de Bruno Fit»', /Tu progreso/.test(cmp) && /Progreso de Bruno Fit/.test(cmp));
+step('10. Misma métrica y unidad; lo faltante sin estimar', /Flexiones clásicas/.test(cmp) && /23 rep/.test(cmp) && /45 rep/.test(cmp) && /Sin datos disponibles/.test(cmp) && /No es un diagnóstico médico/.test(cmp), cmp.replace(/\s+/g, ' ').slice(0, 200));
+
+await page.click('#communityTabRanking'); await page.waitForTimeout(1500);
+step('8. Ranking explica qué mide, el período y el orden', /Período/.test(await page.textContent('#rankingExplain')) && /Orden/.test(await page.textContent('#rankingExplain')));
+let board = await page.textContent('#communityPanelRanking');
+step('8. Ranking general con datos reales (sin ocultos ni privados no aceptados)', /Bruno Fit/.test(board) && /Diego/.test(board) && !/Eva/.test(board) && !/carla/i.test(board), board.replace(/\s+/g, ' ').slice(0, 200));
+await page.click('[data-ranking-category="pushups"]'); await page.waitForTimeout(1200);
+const pushOrder = await page.$$eval('#communityPanelRanking [data-community-open-user]', b => b.map(x => x.getAttribute('aria-label')));
+step('8. Ranking de flexiones ordenado por el servidor', /Puesto 1: Bruno Fit, 45 rep/.test(pushOrder.join('|')) && /Puesto 2: Vos, 23 rep/.test(pushOrder.join('|')) && /Puesto 3: Diego, 12 rep/.test(pushOrder.join('|')), pushOrder.join(' | '));
+await page.click('[data-ranking-scope="friends"]'); await page.waitForTimeout(1200);
+board = await page.textContent('#communityPanelRanking');
+step('8. Ranking de amigos: solo vos y quienes seguís', /Bruno Fit/.test(board) && !/Diego/.test(board), board.replace(/\s+/g, ' ').slice(0, 160));
+await page.click('#rankingPodium [data-community-open-user]'); await page.waitForTimeout(1200);
+step('7. El ranking abre el mismo perfil completo', /Rango principal/.test(await page.textContent('#communityUserProfile')));
+
+await page.click('#communityTabFriends'); await page.waitForTimeout(1500);
+let friends = await page.textContent('#communityFriends');
+step('9. Amigos refleja el seguimiento aceptado', /Bruno Fit/.test(friends) && !/Diego/.test(friends) && /Comparar/.test(friends) && /en rango/.test(friends), friends.replace(/\s+/g, ' ').slice(0, 160));
+await page.click('#communityTabWorld'); await page.waitForTimeout(900);
+await page.click(`#communityPeople [data-community-search-follow="${D}"]`); await page.waitForTimeout(1000);
+step('11. Seguir actualiza la relación real', sql(`select status from community_follows where follower_id='${A}' and following_id='${D}'`) === 'accepted');
+await page.click('#communityTabFriends'); await page.waitForTimeout(1500);
+step('9. Amigos se actualiza al seguir', /Diego/.test(await page.textContent('#communityFriends')));
+await page.click('#communityFriends .cm-card-open[aria-label*="Diego"]'); await page.waitForTimeout(1200);
+step('11. Sin seguimiento mutuo no hay mensaje', !(await page.$('#communityUserProfile [data-user-message]')) && /mutuamente/.test(await page.textContent('#communityUserProfile')));
+await page.click('#communityUserProfile [data-user-follow]'); await page.waitForTimeout(1200);
+step('11. Dejar de seguir borra la relación', sql(`select count(*) from community_follows where follower_id='${A}' and following_id='${D}'`) === '0');
+
+await page.click('#communityUserBack'); await page.waitForTimeout(600);
+await page.click('#communityTabWorld'); await page.waitForTimeout(900);
+await page.click('#communityPeople .cm-card-open[aria-label*="Carla"]'); await page.waitForTimeout(1200);
+prof = await page.textContent('#communityUserProfile');
+step('12. Perfil privado: sin bio ni estadísticas', /Este perfil es privado/.test(prof) && !/Bio solo para seguidores/.test(prof) && !/Estadísticas/.test(prof) && !/70 rep/.test(prof));
+step('12. La tabla no se puede leer directamente', sql(`set role authenticated; set request.jwt.claim.sub='${A}'; select count(*) from community_athlete_stats`) === 'SET\nSET\n1');
+
+// Ocultar las propias estadísticas.
+await page.click('#communityTabProfile'); await page.waitForTimeout(900);
+step('Mi perfil: interruptor de estadísticas activado por defecto', await page.isChecked('#communityStatsPublic'));
+await page.uncheck('#communityStatsPublic'); await page.waitForTimeout(1200);
+step('Ocultar se guarda en la base', sql(`select stats_public from community_athlete_stats where user_id='${A}'`) === 'f');
+await page.click('#communityTabRanking'); await page.waitForTimeout(1200);
+step('Con estadísticas ocultas no aparece en el ranking', !(await page.$$eval('#communityPanelRanking [data-community-open-user]', b => b.map(x => x.getAttribute('aria-label')).join('|'))).includes(': Vos,'));
+// Mapa de avances (Progreso › Músculos) usa la misma preferencia.
+await page.evaluate(() => document.querySelector('[data-view="progress"]').click()); await page.waitForTimeout(300);
+await page.evaluate(() => document.querySelector('[data-progress-tab="muscles"]').click()); await page.waitForTimeout(1800);
+step('13. Mapa de avances: la casilla refleja la preferencia', !(await page.isChecked('#rkShareToggle')));
+await page.check('#rkShareToggle'); await page.waitForTimeout(1800);
+let names = await page.$$eval('#rkBoard .rk-who strong', l => l.map(x => x.textContent));
+step('13. Al mostrarlas vuelve al ranking con amigos', sql(`select stats_public from community_athlete_stats where user_id='${A}'`) === 't' && names.includes('Vos') && names.includes('Bruno Fit'), names.join(','));
+await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(800);
+
+// Publicar en el perfil: foto con descripción y antes/después.
+await page.click('#communityTabProfile'); await page.waitForTimeout(600); await page.click('#communityOpenPublish'); await page.waitForTimeout(400);
+await page.fill('#communityTextBody', 'Mi primera dominada completa');
+await page.setInputFiles('#communityTextImage', { name: 'foto.png', mimeType: 'image/png', buffer: PNG }); await page.check('#communityTextPhotoConsent');
+await page.click('#communityTextPublish'); await page.waitForTimeout(1800);
+step('Foto con descripción publicada en el perfil', sql(`select count(*) from community_posts where user_id='${A}' and description='Mi primera dominada completa' and image_path is not null`) === '1' && await page.isVisible('#communityPanelProfile'));
+await page.click('#communityOpenPublish'); await page.waitForTimeout(300); await page.click('[data-post-kind="transformation"]');
+await page.setInputFiles('#communityBeforePhoto', { name: 'a.png', mimeType: 'image/png', buffer: PNG }); await page.setInputFiles('#communityAfterPhoto', { name: 'b.png', mimeType: 'image/png', buffer: PNG });
+await page.fill('#communityPostDescription', 'Tres meses de constancia'); await page.check('#communityPhotoConsent');
+await page.click('#communityPublish'); await page.waitForTimeout(2000);
+step('Antes y después publicado en el perfil', sql(`select count(*) from community_posts where user_id='${A}' and post_kind='transformation' and description='Tres meses de constancia'`) === '1');
+await page.waitForTimeout(800);
+step('El perfil propio muestra lo publicado', (await page.$$('#communityOwnGrid [data-community-open-post]')).length >= 2);
+await page.click('#communityViewOwnPublic'); await page.waitForTimeout(1500);
+step('«Ver cómo me ven» usa el mismo perfil completo', /Así ven tu perfil/.test(await page.textContent('#communityUserProfile')) && /Rango principal/.test(await page.textContent('#communityUserProfile')));
+
+// Sin amigos: estado vacío.
+sql(`delete from community_follows where follower_id='${A}'`);
+await page.click('#communityTabFriends'); await page.waitForTimeout(1500);
+step('Amigos vacío: «Todavía no tenés amigos en tu comunidad»', /Todavía no tenés amigos en tu comunidad/.test(await page.textContent('#communityFriends')));
+if (process.env.SHOTS) { for (const t of ['world', 'ranking']) { await page.click(`[data-community-tab="${t}"]`); await page.waitForTimeout(1300); await page.screenshot({ path: `${process.env.SHOTS}/${t}.png`, fullPage: true }); } }
+step('14. Sin errores de página ni de consola', errors.length === 0, errors.slice(0, 4).join(' || '));
+// Restaura el seguimiento mutuo que usan las demás pruebas.
+sql(`insert into community_follows(follower_id,following_id,status) values('${A}','${B}','accepted') on conflict do nothing`);
+await browser.close();

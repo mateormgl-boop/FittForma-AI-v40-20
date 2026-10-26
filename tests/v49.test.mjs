@@ -189,21 +189,22 @@ const communitySql = await read('supabase/migrations/2026-10-23_v49_community.sq
 
 test('comunidad: barra propia dentro del contenido y barra inferior principal intacta', () => {
   const view = html.slice(html.indexOf('id="view-community"'), html.indexOf('id="view-profile"'));
-  assert.match(view, /<header class="community-topbar">/);
-  for (const tab of ['feed', 'explore', 'publish', 'messages', 'profile']) assert.match(view, new RegExp(`data-community-tab="${tab}"`));
+  assert.match(view, /<header class="community-topbar cm-topbar">/);
+  for (const tab of ['world', 'ranking', 'friends', 'messages', 'profile']) assert.match(view, new RegExp(`data-community-tab="${tab}"`));
   assert.doesNotMatch(view, /mobile-nav-item|data-mobile-view/, 'Comunidad no agrega otra barra de navegación general');
   const nav = [...html.matchAll(/class="mobile-nav-item[^"]*"[^>]*data-mobile-view="([a-z]+)"/g)].map(m => m[1]);
   assert.deepEqual(nav, ['plan', 'train', 'nutrition', 'progress', 'community', 'profile']);
   assert.match(css, /#view-community header\.community-topbar\{position:relative!important/);
 });
 
-test('comunidad: feed, explorar, mensajes y perfiles sociales con datos reales', () => {
-  for (const id of ['communityStories', 'communityLoadMore', 'communitySuggested', 'communityExploreGrid', 'communityConversations', 'communityChatView', 'communityChatBack', 'communityOwnGrid', 'communityPanelUser', 'communityPostDialog', 'communityLinkSession', 'communityAvatarInput']) assert.match(html, new RegExp(`id="${id}"`), id);
+// v53: sin feed (historias, «cargar más», sugeridas ni grilla de explorar); las publicaciones viven en el perfil.
+test('comunidad: directorio, mensajes y perfiles sociales con datos reales', () => {
+  for (const id of ['communityPeople', 'communityFriends', 'rankingList', 'communityCompare', 'communityConversations', 'communityChatView', 'communityChatBack', 'communityOwnGrid', 'communityPanelUser', 'communityPostDialog', 'communityLinkSession', 'communityAvatarInput']) assert.match(html, new RegExp(`id="${id}"`), id);
   assert.match(communityJs, /client\.rpc\('community_conversations'\)/);
-  assert.match(communityJs, /client\.rpc\('community_suggested_profiles'\)/);
-  assert.match(communityJs, /client\.rpc\('community_profile_stats',\{p_user:uid\}\)/);
+  assert.match(communityJs, /client\.rpc\('community_athlete_profile',\{p_user:uid\}\)/);
+  assert.match(communityJs, /client\.rpc\('community_profile_stats',\{p_user:uid\}\)/, 'perfil sin la migración v53');
   assert.match(communityJs, /from\('community_saved_posts'\)/);
-  assert.match(communityJs, /ilike\('description',`%#\$\{hashtag\}%`\)/, 'búsqueda por #hashtag');
+  assert.doesNotMatch(communityJs, /ilike\('description'/, 'v53: sin búsqueda de publicaciones que arme un feed');
   assert.doesNotMatch(communityJs, /Math\.random\(\)[^;]*(seguidores|followers|likes)/, 'no se inventan cifras');
 });
 
