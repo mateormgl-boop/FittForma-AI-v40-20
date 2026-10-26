@@ -116,7 +116,7 @@ test('el service worker y los paquetes están alineados con v41.0 para refrescar
   const sw = await readFile(path.join(root, 'sw.js'), 'utf8');
   const pkg = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
   const backendPkg = JSON.parse(await readFile(path.join(root, 'backend/package.json'), 'utf8'));
-  assert.match(sw, /fittforma-ai-static-v53-0/);
-  assert.equal(pkg.version, '0.53.0');
-  assert.equal(backendPkg.version, '0.53.0');
+  assert.match(sw, /fittforma-ai-static-v53-1/);
+  assert.equal(pkg.version, '0.53.1');
+  assert.equal(backendPkg.version, '0.53.1');
 });

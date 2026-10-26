@@ -1,5 +1,24 @@
 # FittForma AI — Registro de cambios
 
+## v53.1 — Perfil de Comunidad: músculos, bandera, «Mi físico» y foto de perfil (28 de octubre de 2026)
+
+- **«Todo el mundo» ahora se llama «Todos».**
+- **Mapa de músculos en el perfil de Comunidad:**
+  - Cuerpo de frente y de espalda, pintado con el rango de cada músculo, más los tres mejores.
+  - Se muestra por defecto y se oculta en Mi perfil › «Mostrar mi mapa de músculos en el perfil».
+- **Acceso a Músculos desde Inicio:** nuevo mosaico «Músculos», junto a FittAI, Hidratación y Nutrición.
+- **Bandera:** se elige el país en Mi perfil › Editar perfil. Se ve junto al nombre en el perfil, las tarjetas y el ranking.
+- **«Mi físico»** arriba del perfil, con dos secciones:
+  - «Antes y después» (dos fotos) y «Una foto» con descripción.
+  - Una sola cosa por sección. Sin membresía Plus se puede cambiar cada 30 días; con Plus, cuando quieras. Quitarla se puede siempre.
+  - El límite lo controla el servidor: borrar y volver a subir no saltea el plazo.
+- **Foto de perfil:** tocar tu foto en Mi perfil la muestra en grande, con «Cambiar foto» y «Quitar foto». Si no tenés foto, abre el selector.
+  - El estado de la subida se ve al lado.
+  - Las fotos de otros perfiles y de «Mi físico» también se abren en grande.
+- **«Ver cómo me ven» funciona aunque falte la migración v53.** Antes, sin la migración, volvía a Mi perfil.
+- **Insignias:** si Supabase rechaza una insignia porque falta la migración v49, la app ahora lo dice claramente en lugar de mostrar un error técnico.
+- **Migración aditiva** `2026-10-28_v53_profile_extras.sql`, probada en `supabase/tests/rls_v53b_test.sql`.
+
 ## v53.0 — Comunidad de deportistas (27 de octubre de 2026)
 
 - **Comunidad sin feed:** tres apartados, «Todo el mundo» (predeterminado), «Ranking» y «Amigos».

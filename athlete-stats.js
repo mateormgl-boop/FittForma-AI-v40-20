@@ -143,8 +143,20 @@
       run_km_30d: Math.min(kmR, 1500, Math.min(runs, 120) * 150),
       run_minutes_30d: clamp(Math.ceil(minutes), 0, 20000),
       best_pushups: best.pushups, best_pullups: best.pullups, best_air_squats: best.squats, best_plank_seconds: best.plank,
+      muscle_ranks: muscleRanks(o.muscle && o.muscle.byMuscle),
       stats_date: today
     };
+  }
+
+  // v53.1: rango de cada músculo del Mapa de avances (-1 a 8), para el mapa del perfil. Sin datos corporales.
+  function muscleRanks(map) {
+    const out = {};
+    if (!map || typeof map !== 'object') return out;
+    for (const [k, v] of Object.entries(map).slice(0, 30)) {
+      const n = Number(v);
+      if (/^[a-z_]{2,30}$/.test(k) && Number.isInteger(n)) out[k] = clamp(n, -1, 8);
+    }
+    return out;
   }
 
   // Valor de una categoría del ranking para una fila de estadísticas (mismo criterio que el servidor).
@@ -191,7 +203,7 @@
     });
   }
 
-  const api = { CATEGORIES, EXERCISES, LEVELS, COMPARE, XP_PER_LEVEL, compute, compare, categoryValue, exerciseKey, plausibleRun, windowStart };
+  const api = { CATEGORIES, EXERCISES, LEVELS, COMPARE, XP_PER_LEVEL, compute, muscleRanks, compare, categoryValue, exerciseKey, plausibleRun, windowStart };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaAthleteStats = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);

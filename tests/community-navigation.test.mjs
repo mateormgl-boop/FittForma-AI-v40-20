@@ -15,7 +15,7 @@ test('v53 evita el error PGRST201: publicaciones sin embed ambiguo, solicitudes 
  assert.match(js,/error\.code==='PGRST201'\|\|results\[1\]\.error\.code==='PGRST200'/);
 });
 
-test('Comunidad v53: Todo el mundo, Ranking y Amigos como pestañas; Mensajes y Mi perfil en la cabecera; sin feed',async()=>{
+test('Comunidad v53: Todos, Ranking y Amigos como pestañas; Mensajes y Mi perfil en la cabecera; sin feed',async()=>{
  const html=await read('index.html'),js=await read('community.js');
  for(const name of ['world','ranking','friends','messages','profile']){
   assert.match(html,new RegExp(`data-community-tab="${name}"`));
@@ -29,7 +29,7 @@ test('Comunidad v53: Todo el mundo, Ranking y Amigos como pestañas; Mensajes y 
  assert.match(js,/ArrowLeft.*ArrowRight.*Home.*End/);
 });
 
-test('la búsqueda de Todo el mundo busca personas y limpiarla vuelve al directorio',async()=>{
+test('la búsqueda de Todos busca personas y limpiarla vuelve al directorio',async()=>{
  const js=await read('community.js');
  assert.match(js,/peopleTerm=searchTerm\.replace\(\/\^\[@#\]\/,''\)/);
  assert.match(js,/\$\('communityClearSearch'\)\?\.addEventListener\('click',clearSearch\)/);
@@ -38,9 +38,9 @@ test('la búsqueda de Todo el mundo busca personas y limpiarla vuelve al directo
 
 test('version, backend and service-worker cache match v41.0',async()=>{
  const a=JSON.parse(await read('package.json')),b=JSON.parse(await read('backend/package.json'));
- assert.equal(a.version,'0.53.0');assert.equal(b.version,'0.53.0');
+ assert.equal(a.version,'0.53.1');assert.equal(b.version,'0.53.1');
  const server=await read('backend/server.mjs'),html=await read('index.html'),sw=await read('sw.js');
- assert.match(server,/0\.53\.0/);assert.match(html,/Versión 53\.0/);assert.match(sw,/fittforma-ai-static-v53-0/);
+ assert.match(server,/0\.53\.1/);assert.match(html,/Versión 53\.1/);assert.match(sw,/fittforma-ai-static-v53-1/);
 });
 
 test('la navegación y los títulos principales de Comunidad están traducidos en los seis idiomas',async()=>{
