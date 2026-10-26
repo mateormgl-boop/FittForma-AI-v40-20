@@ -201,7 +201,9 @@ try {
   step('Sesión iniciada y plan gratis verificado en el servidor', ent3.signedIn === true && ent3.plan === 'free' && ent3.planVerified === true, JSON.stringify({ s: ent3.signedIn, p: ent3.plan, v: ent3.planVerified }));
   const photoCount = () => Number(sql(`select count(*) from community_posts where user_id='${C}' and image_path is not null`));
   const publishPhoto = async text => {
-    await p3.click('#communityTabPublish'); await p3.fill('#communityTextBody', text);
+    // v53: se publica desde Mi perfil › «Publicar en mi perfil».
+    if (!(await p3.isVisible('#communityPanelPublish'))) { await p3.click('#communityTabProfile'); await p3.waitForTimeout(300); await p3.click('#communityOpenPublish'); await p3.waitForTimeout(300); }
+    await p3.fill('#communityTextBody', text);
     await p3.setInputFiles('#communityTextImage', { name: 'foto.png', mimeType: 'image/png', buffer: PNG });
     await p3.check('#communityTextPhotoConsent'); await p3.click('#communityTextPublish'); await p3.waitForTimeout(1500);
   };
@@ -223,9 +225,9 @@ try {
   step('La base bloquea una 4.ª foto aunque se salteen los controles de la app', !direct.ok && /photo_daily_limit/.test(directBody), `${direct.status}`);
   await publishPhoto('Foto cuatro');
   step('Con el tope diario de videos alcanzado no se ofrece otro y el borrador se conserva', !(await p3.$('.ad-overlay')) && photoCount() === 3 && (await p3.inputValue('#communityTextBody')) === 'Foto cuatro');
-  await p3.click('#communityTabFeed').catch(() => {}); await p3.waitForTimeout(800);
+  await p3.click('#communityTabWorld').catch(() => {}); await p3.waitForTimeout(1200);
   await p3.evaluate(() => document.getElementById('adSlotCommunity')?.scrollIntoView()); await p3.waitForTimeout(400);
-  step('Banner de Comunidad entre publicaciones', await p3.evaluate(() => { const s = document.getElementById('adSlotCommunity'); return Boolean(s?.classList.contains('is-visible') && /Anuncio de prueba/.test(s.textContent)); }));
+  step('Banner de Comunidad debajo del directorio (no entre perfiles)', await p3.evaluate(() => { const s = document.getElementById('adSlotCommunity'); return Boolean(s?.classList.contains('is-visible') && /Anuncio de prueba/.test(s.textContent)); }));
   step('Sin errores de página (fotos)', p3.errors.length === 0, p3.errors.join(' | '));
   await p3.close();
 
