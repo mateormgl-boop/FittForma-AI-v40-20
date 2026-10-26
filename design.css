@@ -1020,3 +1020,17 @@ body{font-feature-settings:"cv11","ss01"}
 .rk-step{row-gap:0;padding-block:5px}
 .rk-step small{margin-top:0}
 .rk-ladder{gap:2px}
+/* v52: fila de ejercicios en la sesión en curso */
+.ex-strip{position:sticky;top:64px;z-index:5;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;margin:0 0 12px;padding:10px 12px;border-radius:18px;background:rgba(5,7,13,.92);border:1px solid rgba(63,140,255,.25);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.ex-strip::-webkit-scrollbar{display:none}
+.ex-strip-item{flex:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0;border:0;background:none;color:#8b9ab8;font:inherit;cursor:pointer}
+.ex-strip-thumb{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;overflow:hidden;background:#16202a;border:2.5px solid rgba(255,255,255,.18);transition:border-color .2s,box-shadow .2s}
+.ex-strip-thumb img{width:100%;height:100%;object-fit:cover}
+.ex-strip-thumb b{color:#eef3ff;font-size:18px}
+.ex-strip-item small{font-size:11px;font-weight:800}
+.ex-strip-item.is-started .ex-strip-thumb{border-color:#3fa9ff}
+.ex-strip-item.is-done .ex-strip-thumb{border-color:#22c993;box-shadow:0 0 12px rgba(34,201,147,.45)}
+.ex-strip-item.is-done small{color:#5ee6b0}
+.ex-strip-item.is-current .ex-strip-thumb{border-color:#fff;box-shadow:0 0 0 3px rgba(63,169,255,.55)}
+.ex-strip-item:focus-visible .ex-strip-thumb{outline:3px solid #2f6bff;outline-offset:2px}
+[data-ex-card]{scroll-margin-top:170px}

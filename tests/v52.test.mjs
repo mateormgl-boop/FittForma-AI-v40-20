@@ -95,3 +95,10 @@ test('la ficha, la sesión en curso, el resumen y el historial muestran lo nuevo
   assert.match(html, /history-muscles/);
   assert.match(html, /id="mrVolume"/);
 });
+
+test('sesión en curso: fila de ejercicios con salto y estado que se actualiza al marcar series', () => {
+  assert.match(html, /function exerciseStripMarkup\(\)/);
+  assert.match(html, /exerciseStripMarkup\(\)\+\n\s+`<div class="card rest-timer-card">/);
+  assert.match(html, /data-ex-jump/);
+  assert.match(html, /querySelector\(`\[data-ex-jump="\$\{ei\}"\]`\)/);
+});
