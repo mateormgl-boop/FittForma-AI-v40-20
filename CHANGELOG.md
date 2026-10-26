@@ -11,11 +11,17 @@
 - **Lista por músculo** con cuántas series faltan para el rango siguiente.
 - **Aviso al guardar un entrenamiento** cuando un músculo sube de rango.
 - **Lo que mide:** constancia y volumen de entrenamiento, no fuerza ni tamaño muscular. La pantalla lo explica.
+- **Rango por ejercicio** en la ficha: mejora desde tu primera vez (1RM estimado, repeticiones o segundos), mejor serie y «serie para el siguiente rango». No compara con otras personas.
+- **Músculos que trabajaste** al terminar cada entrenamiento y en el historial.
+- **Kilos levantados por semana** (8 semanas) con la variación frente a la semana anterior.
+- **Estilo «arena»** en los rangos: negro profundo y azul eléctrico, nombre gigante y emblema con brillo, y escalera vertical con haz de luz y la marca «Vos».
+- **Fila de ejercicios** en la sesión en curso, para saltar entre ejercicios y ver cuáles completaste.
+- **Ranking con amigos** (opcional, apagado por defecto). Solo se comparte el rango general y solo lo ven los seguidores que aprobaste. Requiere la migración `2026-10-26_v52_rank_board.sql`.
 - **Otros cambios:**
   - `muscle-ranks.js` (funciones puras con pruebas en `tests/v52.test.mjs`).
   - `anatomy.js` suma `muscleFillSvg`.
   - Traducciones en `i18n-v52.js`.
-  - Sin migraciones de base de datos.
+  - Migración aditiva `2026-10-26_v52_rank_board.sql` (tabla `community_rank_shares` con RLS y función `community_rank_board`), probada en `supabase/tests/rls_v52_test.sql` y `tests/e2e/rank-board.e2e.mjs`.
 
 ## v51.0 — Galería de ejercicios, hidratación y «Objetivo y actualidad» (19 de octubre de 2026)
 

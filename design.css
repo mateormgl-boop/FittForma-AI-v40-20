@@ -1034,3 +1034,21 @@ body{font-feature-settings:"cv11","ss01"}
 .ex-strip-item.is-current .ex-strip-thumb{border-color:#fff;box-shadow:0 0 0 3px rgba(63,169,255,.55)}
 .ex-strip-item:focus-visible .ex-strip-thumb{outline:3px solid #2f6bff;outline-offset:2px}
 [data-ex-card]{scroll-margin-top:170px}
+/* v52: ranking con amigos */
+.rk-board-top{display:flex;gap:12px;align-items:flex-start}
+.rk-laurel{flex:none;width:56px;height:56px;display:grid;place-items:center;font-size:30px;border-radius:50%;background:radial-gradient(circle,rgba(255,214,107,.35),transparent 70%)}
+.rk-share{display:flex;gap:10px;align-items:center;margin:12px 0 8px;padding:10px 12px;border-radius:12px;background:rgba(47,123,255,.1);border:1px solid rgba(63,140,255,.25);font-weight:700}
+.rk-share input{width:20px;height:20px;accent-color:#2f7bff}
+.rk-board{list-style:none;margin:6px 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.rk-board:empty{display:none}
+.rk-row{display:grid;grid-template-columns:24px 40px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+.rk-row.is-first{background:linear-gradient(90deg,rgba(255,214,107,.18),rgba(255,214,107,.04));border-color:rgba(255,214,107,.45)}
+.rk-row.is-self{border-color:#3fa9ff;box-shadow:0 0 14px rgba(63,169,255,.3)}
+.rk-pos{font-weight:900;color:#8b9ab8;text-align:center}
+.rk-row.is-first .rk-pos{color:#ffd66b}
+.rk-avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:900;background:linear-gradient(135deg,#2f5fe8,#6a4cf2);color:#fff}
+.rk-who{display:flex;flex-direction:column;min-width:0}
+.rk-who strong{font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk-who small{font-size:11.5px;color:#8b9ab8}
+.rk-badge{display:flex;align-items:center;gap:4px;font-size:12.5px}
+.rk-share span{color:#eef3ff!important;font-size:14.5px!important;font-weight:700;line-height:1.3}

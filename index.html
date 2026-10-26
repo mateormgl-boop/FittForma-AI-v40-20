@@ -2068,6 +2068,11 @@
       </div>
       <div class="progress-panel" id="progressPanelMuscles" role="tabpanel" aria-labelledby="progressTabMuscles" data-progress-panel="muscles" hidden>
         <div class="card mr-hero" id="mrHero"></div>
+        <div class="card rk-board-card" id="rkBoardCard"><div class="rk-board-top"><div class="rk-laurel" aria-hidden="true"><svg viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="#ffd66b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 38c-6-3-10-9-10-16 0-3 1-6 2-8"/><path d="M31 38c6-3 10-9 10-16 0-3-1-6-2-8"/><path d="M9 20c3 0 5 2 5 5M8 27c3-1 6 1 7 3M12 33c3-1 6 0 7 2M39 20c-3 0-5 2-5 5M40 27c-3-1-6 1-7 3M36 33c-3-1-6 0-7 2"/><path d="M18 14l3 3 3-6 3 6 3-3-1 8H19z" fill="#ffd66b"/></svg></div><div><div class="eyebrow">Ranking</div><h3>Competí con tus amigos</h3><p class="muted small">Compará tu rango general con las personas que seguís. Compartir el tuyo es opcional: solo se comparte el rango (no tu peso ni tus entrenamientos) y solo lo ven quienes te siguen con tu aprobación.</p></div></div>
+          <label class="rk-share"><input type="checkbox" id="rkShareToggle"> <span>Compartir mi rango con quienes me siguen</span></label>
+          <ol class="rk-board" id="rkBoard" aria-live="polite"></ol>
+          <p class="muted small" id="rkBoardStatus"></p>
+          <button type="button" class="btn secondary btn-sm" id="rkFindFriends">Buscar amigos</button></div>
         <div class="card mr-volume-card"><div class="eyebrow">Volumen por semana</div><h3>Kilos levantados</h3><p id="mrVolumeHead" class="mr-vol-head"></p><div class="mr-vol" id="mrVolume" role="img" aria-label="Kilos levantados en las últimas 8 semanas"></div><p class="muted small">Suma de peso × repeticiones de las series hechas. Los ejercicios sin carga suman series pero no kilos.</p></div>
         <div class="card mr-compare">
           <div class="section-head"><div><div class="eyebrow">Mapa de avances</div><h3>Tus músculos, rango por rango</h3></div>
@@ -2559,6 +2564,7 @@
     out.plan=cleanPlan(st.plan);
     out.planHistory=objList(st.planHistory,8).map(h=>({...h,label:String(h.label??''),profile:isPlainObj(h.profile)?h.profile:{...out.profile},plan:cleanPlan(h.plan)}));
     out.proposal=isPlainObj(st.proposal)?st.proposal:null;
+    out.rankShare=st.rankShare===true;
     out.muscleRanksSeen=isPlainObj(st.muscleRanksSeen)?Object.fromEntries(Object.entries(st.muscleRanksSeen).filter(([k,v])=>/^[a-z_]{3,24}$/.test(k)&&Number.isInteger(v)&&v>=-1&&v<9)):undefined;
     for(const k of ['mealPlan','waterLogs','habitLogs','badgeUnlocks','nutritionGoals','reminders'])out[k]=isPlainObj(st[k])?st[k]:structuredClone(defaults[k]);
     out.water=isPlainObj(st.water)?st.water:structuredClone(defaults.water);
@@ -4093,6 +4099,35 @@ function findCatalogExercise(name){
     const names=FittFormaAnatomy.MUSCLES;
     return `<div class="session-muscles"><div class="session-muscles-map">${FittFormaAnatomy.muscleMapSvg(m.primary,m.secondary,{size:'md',label:`${label}: ${m.primary.map(x=>names[x]).join(', ')}`})}</div><div><div class="eyebrow">Músculos que trabajaste</div><p class="small">${m.primary.map(x=>esc(names[x])).join(', ')}</p>${m.secondary.length?`<p class="muted small">También: ${m.secondary.map(x=>esc(names[x])).join(', ')}</p>`:''}</div></div>`;
   }
+  // v52: ranking con amigos. Solo el rango general, solo si la persona lo activa (tabla community_rank_shares + RLS).
+  let rkBoardLoading=false,rkLastShared='';
+  async function syncRankShare(){
+    if(!state.rankShare||!supabaseClient||!cloudUser||!MR)return;
+    const r=muscleRanksNow(),row={user_id:cloudUser.id,overall_rank:r.overall,median_sets:Math.min(99999,Math.round(r.median*10)/10),balance:r.balance,ranked_muscles:r.ranked,updated_at:new Date().toISOString()};
+    const sig=[row.overall_rank,row.median_sets,row.balance,row.ranked_muscles].join('|');if(sig===rkLastShared)return;
+    const {error}=await supabaseClient.from('community_rank_shares').upsert(row);if(!error)rkLastShared=sig;return error;
+  }
+  async function renderRankBoard(){
+    const list=$('rkBoard'),status=$('rkBoardStatus'),toggle=$('rkShareToggle');if(!list||!MR)return;
+    toggle.checked=!!state.rankShare;
+    if(!supabaseClient||!cloudUser){list.innerHTML='';status.textContent='Iniciá sesión en tu cuenta (Perfil › Cuenta) para competir con las personas que seguís en Comunidad.';toggle.disabled=true;return;}
+    toggle.disabled=false;if(rkBoardLoading)return;rkBoardLoading=true;status.textContent='Cargando ranking…';
+    try{
+      await syncRankShare();
+      const {data,error}=await supabaseClient.rpc('community_rank_board');
+      if(error){list.innerHTML='';status.textContent=/function|does not exist|schema cache/i.test(error.message||'')?'El ranking todavía no está activado en el servidor (falta aplicar la actualización v52 de la base de datos).':'No se pudo cargar el ranking. Probá de nuevo más tarde.';return;}
+      const rows=Array.isArray(data)?data:[];
+      list.innerHTML=rows.map((x,i)=>{const r=MR.RANKS[x.overall_rank];return `<li class="rk-row ${x.is_self?'is-self':''} ${i===0?'is-first':''}"><span class="rk-pos">${i+1}</span><span class="rk-avatar" aria-hidden="true">${esc(String(x.display_name||x.username||'?').trim().charAt(0).toUpperCase())}</span><span class="rk-who"><strong>${x.is_self?'Vos':esc(x.display_name||x.username)}</strong><small>@${esc(x.username)}</small></span><span class="rk-badge">${MR.emblemSvg(x.overall_rank,34)}<b style="color:${r?.glow||'#8b9ab8'}">${r?esc(r.name):'Sin rango'}</b></span></li>`;}).join('');
+      status.textContent=!rows.length?(state.rankShare?'Todavía nadie de las personas que seguís comparte su rango.':'Activá «Compartir mi rango» para aparecer y ver a tus amigos que también lo comparten.'):rows.length===1&&rows[0].is_self?'Cuando las personas que seguís compartan su rango, van a aparecer acá.':'';
+    }finally{rkBoardLoading=false;}
+  }
+  $('rkShareToggle')?.addEventListener('change',async e=>{
+    state.rankShare=e.target.checked;save();rkLastShared='';
+    if(!state.rankShare&&supabaseClient&&cloudUser){const {error}=await supabaseClient.from('community_rank_shares').delete().eq('user_id',cloudUser.id);toast(error?'No se pudo dejar de compartir. Probá de nuevo.':'Dejaste de compartir tu rango.');}
+    else if(state.rankShare)toast('Tu rango general se comparte con quienes te siguen.');
+    renderRankBoard();
+  });
+  $('rkFindFriends')?.addEventListener('click',()=>switchView('community'));
   function renderWeeklyVolume(){
     const box=$('mrVolume');if(!box||!MR)return;const w=MR.weeklyVolume(state.sessions,dateKey(),8),max=Math.max(1,...w.map(x=>x.kg));
     const cur=w[w.length-1],prev=w[w.length-2],pct=prev.kg>0?Math.round((cur.kg-prev.kg)/prev.kg*100):null;
@@ -4103,7 +4138,7 @@ function findCatalogExercise(name){
   function rankColorFills(r){return Object.fromEntries(r.muscles.filter(m=>m.rank>=0).map(m=>[m.id,MR.RANKS[m.rank].color]));}
   function renderMuscleRanks(){
     if(!MR||!$('mrHero'))return;
-    renderWeeklyVolume();
+    renderWeeklyVolume();renderRankBoard();
     const now=muscleRanksNow(),d=new Date();d.setDate(d.getDate()-30);const before=muscleRanksNow(dateKey(d));
     const names=FittFormaAnatomy.MUSCLES,ov=now.overall,ovR=MR.RANKS[ov],step=MR.nextStep(now.median);
     $('mrHero').innerHTML=`<div class="rk-hero" style="--rk:${ovR?.color||'#5b6680'};--rkg:${ovR?.glow||'#9fb0d0'}"><div class="eyebrow">Rango general</div><strong class="rk-big">${ovR?esc(ovR.name):'Sin rango todavía'}</strong><div class="rk-hero-emblem">${MR.emblemSvg(ov,170)}</div>${step.next?`<div class="rk-bar"><span style="width:${Math.round(step.pct*100)}%"></span></div><small class="muted">Próximo: ${esc(step.next.name)} · el músculo del medio necesita ${String(step.missing).replace('.',',')} series más</small>`:'<small class="muted">Llegaste al rango máximo.</small>'}</div>
@@ -4121,7 +4156,7 @@ function findCatalogExercise(name){
   document.addEventListener('click',e=>{const b=e.target.closest('[data-mr-side]');if(b){mrSide=b.dataset.mrSide;renderMuscleRanks();}});
   // Aviso cuando un músculo sube de rango (se compara con lo último que la persona ya vio).
   function checkMuscleRankUps(){
-    if(!MR)return;const now=muscleRanksNow(),seen=isPlainObj(state.muscleRanksSeen)?state.muscleRanksSeen:null;
+    if(!MR)return;setTimeout(()=>syncRankShare()?.catch?.(()=>{}),0);const now=muscleRanksNow(),seen=isPlainObj(state.muscleRanksSeen)?state.muscleRanksSeen:null;
     const cur=Object.fromEntries(now.muscles.map(m=>[m.id,m.rank]));state.muscleRanksSeen=cur;
     if(!seen)return;const ups=now.muscles.filter(m=>m.rank>(seen[m.id]??-1));if(!ups.length)return;
     const best=ups.sort((a,b)=>b.rank-a.rank)[0],names=FittFormaAnatomy.MUSCLES;

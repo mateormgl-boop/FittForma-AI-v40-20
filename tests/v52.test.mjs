@@ -102,3 +102,14 @@ test('sesión en curso: fila de ejercicios con salto y estado que se actualiza a
   assert.match(html, /data-ex-jump/);
   assert.match(html, /querySelector\(`\[data-ex-jump="\$\{ei\}"\]`\)/);
 });
+
+test('ranking con amigos: opcional, migración aditiva con RLS y sin datos de salud', () => {
+  const mig = readFileSync('supabase/migrations/2026-10-26_v52_rank_board.sql', 'utf8');
+  assert.match(mig, /create table if not exists public\.community_rank_shares/);
+  assert.match(mig, /enable row level security/);
+  assert.doesNotMatch(mig, /drop table|truncate|delete from public\.(?!community_rank_shares)/i);
+  assert.doesNotMatch(mig.replace(/--.*$/gm, ''), /weight|peso|altura|height/i, 'no comparte datos corporales (sin contar comentarios)');
+  assert.match(mig, /f\.status = 'accepted'/);
+  assert.match(html, /id="rkShareToggle"/);
+  assert.match(html, /out\.rankShare=st\.rankShare===true;/, 'apagado por defecto');
+});
