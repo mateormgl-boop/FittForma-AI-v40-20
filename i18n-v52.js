@@ -70,3 +70,7 @@ window.FittFormaI18nDynamic = [
   [/^¡(.+) subió a (\S+)! Miralo en Progreso › Músculos\.$/, (m, i, t) => [`${t(m[1])} reached ${mrRank(m[2], 0)}! See it in Progress › Muscles.`, `${t(m[1])} subiu para ${mrRank(m[2], 1)}! Veja em Progresso › Músculos.`, `${t(m[1])} passe ${mrRank(m[2], 2)} ! À voir dans Progrès › Muscles.`, `${t(m[1])} è salito a ${mrRank(m[2], 3)}! Guardalo in Progressi › Muscoli.`, `${t(m[1])} ist jetzt ${mrRank(m[2], 4)}! Sieh es dir unter Fortschritt › Muskeln an.`][i]],
   [/^¡(\d+) músculos subieron de rango! (.+) llegó a (\S+)\.$/, (m, i, t) => [`${m[1]} muscles ranked up! ${t(m[2])} reached ${mrRank(m[3], 0)}.`, `${m[1]} músculos subiram de nível! ${t(m[2])} chegou a ${mrRank(m[3], 1)}.`, `${m[1]} muscles ont monté de rang ! ${t(m[2])} atteint ${mrRank(m[3], 2)}.`, `${m[1]} muscoli sono saliti di grado! ${t(m[2])} è arrivato a ${mrRank(m[3], 3)}.`, `${m[1]} Muskeln sind aufgestiegen! ${t(m[2])} hat ${mrRank(m[3], 4)} erreicht.`][i]]
 ].concat(window.FittFormaI18nDynamic || []);
+(window.FittFormaI18nExtra = window.FittFormaI18nExtra || []).push(
+  ["Escalera de rangos", "Rank ladder", "Escada de níveis", "Échelle des rangs", "Scala dei gradi", "Rangleiter"],
+  ["Vos", "You", "Você", "Toi", "Tu", "Du"]
+);
