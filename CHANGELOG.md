@@ -1,5 +1,28 @@
 # FittForma AI — Registro de cambios
 
+## v52.0 — Mapa de avances: rango por músculo (26 de octubre de 2026)
+
+- Nueva pestaña **Progreso › Músculos**.
+- **Rangos:** cada músculo sube de rango según las series que completás.
+  - Una serie hecha suma 1 al músculo principal del ejercicio y 0,5 a cada secundario.
+  - Son 9 rangos con emblemas propios: Hierro, Bronce, Plata, Oro, Rubí, Esmeralda, Diamante, Campeón y Leyenda.
+- **Mapa del cuerpo** de frente y de espalda, con cada músculo pintado del color de su rango. Se compara «Hace 30 días» con «Hoy».
+- **Rango general:** es el del músculo mediano, así que sube entrenando todo el cuerpo. Se muestra junto con el equilibrio entre músculos y los tres músculos que más conviene entrenar.
+- **Lista por músculo** con cuántas series faltan para el rango siguiente.
+- **Aviso al guardar un entrenamiento** cuando un músculo sube de rango.
+- **Lo que mide:** constancia y volumen de entrenamiento, no fuerza ni tamaño muscular. La pantalla lo explica.
+- **Rango por ejercicio** en la ficha: mejora desde tu primera vez (1RM estimado, repeticiones o segundos), mejor serie y «serie para el siguiente rango». No compara con otras personas.
+- **Músculos que trabajaste** al terminar cada entrenamiento y en el historial.
+- **Kilos levantados por semana** (8 semanas) con la variación frente a la semana anterior.
+- **Estilo «arena»** en los rangos: negro profundo y azul eléctrico, nombre gigante y emblema con brillo, y escalera vertical con haz de luz y la marca «Vos».
+- **Fila de ejercicios** en la sesión en curso, para saltar entre ejercicios y ver cuáles completaste.
+- **Ranking con amigos** (opcional, apagado por defecto). Solo se comparte el rango general y solo lo ven los seguidores que aprobaste. Requiere la migración `2026-10-26_v52_rank_board.sql`.
+- **Otros cambios:**
+  - `muscle-ranks.js` (funciones puras con pruebas en `tests/v52.test.mjs`).
+  - `anatomy.js` suma `muscleFillSvg`.
+  - Traducciones en `i18n-v52.js`.
+  - Migración aditiva `2026-10-26_v52_rank_board.sql` (tabla `community_rank_shares` con RLS y función `community_rank_board`), probada en `supabase/tests/rls_v52_test.sql` y `tests/e2e/rank-board.e2e.mjs`.
+
 ## v51.0 — Galería de ejercicios, hidratación y «Objetivo y actualidad» (19 de octubre de 2026)
 
 **Galería de ejercicios**

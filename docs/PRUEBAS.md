@@ -9,6 +9,22 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v52
+
+- `npm test` incluye `tests/v52.test.mjs`:
+  - Rangos por músculo y por ejercicio.
+  - Volumen semanal y músculos de la sesión.
+  - Fila de ejercicios y contrato de la migración del ranking.
+- `supabase/tests/rls_v52_test.sql` (20 comprobaciones):
+  - Compartir es opcional y solo se escribe la fila propia.
+  - Sin sesión no se ve nada.
+  - Solo se ve el rango de quienes seguís con solicitud aceptada, sin bloqueos.
+  - Al desactivar, se borra.
+- `tests/e2e/rank-board.e2e.mjs` (mismas variables que `community.e2e.mjs`):
+  - Ranking apagado por defecto.
+  - Activar y desactivar.
+  - La marca «Vos» y el orden del ranking.
+
 ### v51
 
 - `npm test` incluye `tests/v51.test.mjs`:

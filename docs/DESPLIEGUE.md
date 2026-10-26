@@ -1,9 +1,18 @@
-# Despliegue de FittForma AI v51.0
+# Despliegue de FittForma AI v52.0
 
-Esta guía es la lista de pasos para publicar v51.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v52.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
-## Qué cambia en v51.0
+## Qué cambia en v52.0
+
+- **Archivos nuevos:** `muscle-ranks.js` e `i18n-v52.js`. Ya están en la lista del servidor y en el service worker.
+- **Migración nueva (aditiva):** `supabase/migrations/2026-10-26_v52_rank_board.sql`.
+  - Crea la tabla `community_rank_shares` con RLS: cada persona solo escribe su fila.
+  - Crea la función `community_rank_board()`: tu rango y el de quienes seguís con solicitud aceptada, sin bloqueos.
+  - No modifica ni borra datos existentes y se puede ejecutar más de una vez.
+- **Sin la migración:** todo lo demás funciona; la tarjeta del ranking muestra que falta aplicar la actualización.
+
+## Qué cambió en v51.0
 
 - **Archivos nuevos:** `body-goals.js` e `i18n-v51.js`. Ya están en la lista de archivos que entrega el servidor y en
   el service worker.

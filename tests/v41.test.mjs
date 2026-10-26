@@ -72,7 +72,7 @@ test('v41: medallas SVG por rango sin emojis', () => {
 
 test('v41: Progreso separado en Resumen, Insignias, Historial y Peso con tabs accesibles', () => {
   const tabs = [...html.matchAll(/data-progress-tab="([^"]+)"/g)].map(m => m[1]);
-  assert.deepEqual(tabs, ['summary', 'badges', 'history', 'body']);
+  assert.deepEqual(tabs, ['summary', 'badges', 'history', 'body', 'muscles'], 'v52 suma Músculos (Mapa de avances)');
   for (const id of ['progressPanelSummary', 'progressPanelBadges', 'progressPanelHistory', 'progressPanelBody']) assert.match(html, new RegExp(`id="${id}"[^>]*role="tabpanel"`));
   assert.match(html, /id="badgeGallery"/);
   assert.match(html, /id="badgeRecordList"/);
