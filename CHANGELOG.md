@@ -1,5 +1,30 @@
 # FittForma AI — Registro de cambios
 
+## v54.0 — Comunidad: semana, reto entre amigos, evolución, avisos e historial privado (29 de octubre de 2026)
+
+- **Ranking de esta semana:** en Constancia y Running se elige «Últimos 30 días» o «Esta semana». La semana va de lunes a hoy y se reinicia cada lunes.
+- **Reto de la semana** en Amigos:
+  - Gana quien suma más días activos de lunes a domingo, entre vos y las personas que seguís.
+  - Muestra cuántos días quedan, una barra por persona (de 0 a 7 días) y quién ganó la semana pasada.
+- **Evolución semanal** en «Comparar»: barras de las últimas 8 semanas, tuyas y de tu amigo.
+  - Muestra los días activos y los entrenamientos y actividades.
+  - Si una semana no tiene datos, se ve gris («Sin datos disponibles»); no se estima nada.
+  - El servidor guarda una foto de las estadísticas por semana.
+- **Avisos (campanita)** en la cabecera de Comunidad, con la cantidad sin leer.
+  - Avisa cuando alguien te sigue, te pide seguirte, acepta tu solicitud, te escribe o te supera en el rango general.
+  - Los crea solo el servidor y no se repiten.
+  - Al abrirlos quedan leídos. Tocar uno lleva al perfil, al chat o a las solicitudes.
+- **Historial privado de «Mi físico»:** al cambiar una sección, las fotos anteriores quedan guardadas y solo las ve su dueño. Se pueden borrar.
+- **Revisión visual a 320 px en tema claro y oscuro:**
+  - Tarjetas sin superposiciones.
+  - Rango legible en el tema claro.
+  - Buscador con más espacio.
+  - Línea del ganador corregida.
+- **Correcciones de v53.1 que no habían llegado a `main`:**
+  - La búsqueda de Todos ya no se pierde si llega durante una carga.
+  - Se tradujo el acceso a Músculos.
+- **Migración aditiva** `2026-10-29_v54_weekly_alerts.sql`, probada en `supabase/tests/rls_v54_test.sql`. Pruebas en `tests/v54.test.mjs` y `tests/e2e/athletes.e2e.mjs`.
+
 ## v53.1 — Perfil de Comunidad: músculos, bandera, «Mi físico» y foto de perfil (28 de octubre de 2026)
 
 - **«Todo el mundo» ahora se llama «Todos».**

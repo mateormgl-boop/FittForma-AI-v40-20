@@ -101,7 +101,7 @@ sql(`insert into community_athlete_stats(user_id,training_level,xp_level,overall
 sql(`insert into community_athlete_stats(user_id,stats_public,overall_rank,workouts_total,workouts_30d,active_days_30d,best_pushups) values('${E}',false,8,99,30,30,200)`);
 // v53.1: bandera y mapa de músculos de Bruno; «Mi físico» de Alicia se sube desde la app.
 sql(`update community_profiles set country_code='AR' where user_id='${B}'; update community_profiles set country_code=null, avatar_path=null where user_id='${A}'; update community_athlete_stats set muscle_ranks='{"biceps":3,"pectorales":2,"cuadriceps":1}' where user_id='${B}'`);
-sql(`delete from community_physique where user_id='${A}'; delete from community_memberships where user_id='${A}'`);
+sql(`delete from community_physique where user_id='${A}'; delete from community_physique_history where user_id='${A}'; delete from community_memberships where user_id='${A}'`);
 
 await page.goto(APP + '/'); await page.waitForTimeout(800);
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(1200);
@@ -245,10 +245,56 @@ await page.click('[data-home-muscles]'); await page.waitForTimeout(1200);
 step('v53.1 Inicio tiene acceso directo a Músculos', await page.isVisible('#progressPanelMuscles'));
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(800);
 
+// ---------- v54: semana actual, reto entre amigos, evolución semanal, avisos e historial de «Mi físico» ----------
+step('v54 La app publica la semana actual (lunes a hoy)', sql(`select (week_start = date_trunc('week', current_date)::date)::text||'|'||(workouts_week>0)::text from community_athlete_stats where user_id='${A}'`) === 'true|true');
+sql(`update community_athlete_stats set workouts_week=5, active_days_week=4 where user_id='${B}'`);
+sql(`delete from community_athlete_weekly where user_id in ('${A}','${B}') and week_start < date_trunc('week', current_date)::date; insert into community_athlete_weekly(user_id,week_start,active_days,workouts) values ('${A}',date_trunc('week',current_date)::date-7,3,4),('${B}',date_trunc('week',current_date)::date-7,5,6),('${A}',date_trunc('week',current_date)::date-14,2,2),('${B}',date_trunc('week',current_date)::date-14,1,1)`);
+sql(`insert into community_follows(follower_id,following_id,status) values('${A}','${B}','accepted') on conflict do nothing`);
+await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(600);
+await page.click('#communityTabRanking'); await page.waitForTimeout(1000);
+await page.click('[data-ranking-category="constancy"]'); await page.waitForTimeout(900);
+step('v54 Constancia ofrece «Esta semana»', await page.isVisible('#rankingPeriod'));
+await page.click('[data-ranking-period="week"]'); await page.waitForTimeout(1200);
+const weekBoard = await page.$$eval('#communityPanelRanking [data-community-open-user]', b => b.map(x => x.getAttribute('aria-label')).join('|'));
+step('v54 Ranking de esta semana ordenado por el servidor', /Bruno Fit, 4 días/.test(weekBoard) && /Esta semana/.test(await page.textContent('#rankingExplain')), weekBoard);
+await page.click('[data-ranking-period="30d"]'); await page.waitForTimeout(300);
+await page.click('#communityTabFriends'); await page.waitForTimeout(1600);
+const ch = await page.textContent('#communityChallenge');
+step('v54 Reto de la semana entre amigos, con quién ganó la semana pasada', await page.isVisible('#communityChallenge') && /Más días activos/.test(ch) && /4 de 7/.test(ch) && /Semana pasada: Bruno Fit con 5 días activos/.test(ch), ch.replace(/\s+/g, ' ').slice(0, 200));
+await page.click(`#communityFriends [data-community-compare="${B}"]`); await page.waitForTimeout(1800);
+const evo = await page.textContent('#communityCompare');
+step('v54 La comparación muestra la evolución semanal de las dos personas', /Evolución semanal/.test(evo) && (await page.$$('#communityCompare .cm-evo-bars .cm-evo-wk')).length === 16, evo.replace(/\s+/g, ' ').slice(-200));
+if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/v54-compare.png`, fullPage: true });
+// Aviso real: Bruno empieza a seguir a Alicia (lo crea el servidor con un trigger).
+sql(`delete from community_notifications where user_id='${A}'; delete from community_follows where follower_id='${B}' and following_id='${A}'; insert into community_follows(follower_id,following_id,status) values('${B}','${A}','accepted')`);
+await page.click('#communityTabAlerts'); await page.waitForTimeout(1500);
+step('v54 Avisos: «Bruno Fit empezó a seguirte»', /Bruno Fit\s*empezó a seguirte/.test(await page.textContent('#communityAlerts')));
+step('v54 Al abrir los avisos quedan leídos en la base', sql(`select count(*) from community_notifications where user_id='${A}' and read_at is null`) === '0');
+await page.click('#communityAlerts [data-alert-actor]'); await page.waitForTimeout(1300);
+step('v54 Tocar el aviso abre el perfil de quien lo generó', /Bruno Fit/.test(await page.textContent('#communityUserProfile')) && await page.isVisible('#communityPanelUser'));
+// Historial privado de «Mi físico»: con el plazo cumplido, cambiar una foto guarda la anterior.
+sql(`alter table community_physique disable trigger community_physique_guard; update community_physique set changed_at=now()-interval '40 days' where user_id='${A}'; alter table community_physique enable trigger community_physique_guard`);
+await page.click('#communityTabProfile'); await page.waitForTimeout(1500);
+const oldSingle = sql(`select photo_path from community_physique where user_id='${A}' and kind='single'`);
+await choose('[data-phys-upload="single"]', [img('nueva')]);
+step('v54 Al cambiar la foto, la anterior queda en el historial privado', sql(`select photo_path from community_physique_history where user_id='${A}' order by id desc limit 1`) === oldSingle && /Historial privado/.test(await page.textContent('#communityPhysiqueHistory')));
+await page.click('#communityPhysiqueHistory [data-phys-history-delete]'); await page.waitForTimeout(1200);
+step('v54 Se puede borrar del historial', sql(`select count(*) from community_physique_history where user_id='${A}'`) === '0');
+
 // Sin amigos: estado vacío.
 sql(`delete from community_follows where follower_id='${A}'`);
 await page.click('#communityTabFriends'); await page.waitForTimeout(1500);
 step('Amigos vacío: «Todavía no tenés amigos en tu comunidad»', /Todavía no tenés amigos en tu comunidad/.test(await page.textContent('#communityFriends')));
+if (process.env.SHOTS_NARROW) {
+  await page.setViewportSize({ width: 320, height: 700 });
+  for (const theme of ['dark', 'light']) {
+    await page.evaluate(t => document.documentElement.setAttribute('data-theme', t), theme);
+    for (const t of ['world', 'ranking', 'friends', 'alerts', 'profile']) { await page.click(`[data-community-tab="${t}"]`); await page.waitForTimeout(1300); await page.screenshot({ path: `${process.env.SHOTS_NARROW}/${theme}-${t}.png`, fullPage: true }); }
+    await page.click('.mobile-nav-item[data-mobile-view="plan"]'); await page.waitForTimeout(800); await page.screenshot({ path: `${process.env.SHOTS_NARROW}/${theme}-home.png`, fullPage: false });
+    await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(600);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+}
 if (process.env.SHOTS) { for (const t of ['world', 'ranking']) { await page.click(`[data-community-tab="${t}"]`); await page.waitForTimeout(1300); await page.screenshot({ path: `${process.env.SHOTS}/${t}.png`, fullPage: true }); } }
 step('14. Sin errores de página ni de consola', errors.length === 0, errors.slice(0, 4).join(' || '));
 // Restaura el seguimiento mutuo que usan las demás pruebas.
