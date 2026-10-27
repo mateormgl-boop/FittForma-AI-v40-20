@@ -2005,6 +2005,7 @@
       <div class="card"><h3>Ideas sencillas de comidas</h3><p class="muted small">Ejemplos orientativos. Las cantidades, marcas y preparación cambian los valores reales.</p><div class="exercise"><div><strong>Avena con leche y banana</strong><div class="muted small">Desayuno · ajustar porciones a tu apetito</div></div><button type="button" class="btn secondary addMealIdea" data-name="Avena con leche y banana" data-cal="400" data-pro="16" data-carbs="67" data-fat="9">Usar</button></div><div class="exercise"><div><strong>Arroz con atún y verduras</strong><div class="muted small">Almuerzo · fuente de carbohidratos y proteína</div></div><button type="button" class="btn secondary addMealIdea" data-name="Arroz con atún y verduras" data-cal="500" data-pro="30" data-carbs="68" data-fat="8">Usar</button></div><div class="exercise"><div><strong>Huevos con pan integral</strong><div class="muted small">Comida rápida · valores según porción</div></div><button type="button" class="btn secondary addMealIdea" data-name="Huevos con pan integral" data-cal="350" data-pro="22" data-carbs="30" data-fat="14">Usar</button></div><p class="muted small">Al elegir “Usar”, la idea se carga en el formulario para que la revises antes de registrarla.</p></div>
       </div>
       <div class="view-panel" role="tabpanel" data-view-panel="plan" hidden>
+      <div class="card ng-card" id="nutritionGuideCard"></div>
       <div class="card"><div class="eyebrow">Objetivos diarios orientativos</div><div class="grid2"><div class="field"><label for="calorieGoal">Calorías (kcal)</label><input id="calorieGoal" type="number" min="800" max="6000" step="50" value="2400"></div><div class="field"><label for="proteinGoal">Proteínas (g)</label><input id="proteinGoal" type="number" min="20" max="400" step="5" value="120"></div><div class="field"><label for="carbGoal">Carbohidratos (g)</label><input id="carbGoal" type="number" min="0" max="800" step="5" value="280"></div><div class="field"><label for="fatGoal">Grasas (g)</label><input id="fatGoal" type="number" min="0" max="300" step="5" value="80"></div></div><button class="btn secondary full" id="estimateNutritionGoals" type="button">Calcular objetivos con mi perfil</button><button type="button" class="btn full" id="saveNutritionGoals">Guardar objetivos</button><p id="nutritionGoalHint" class="muted small" aria-live="polite">Podés calcular una referencia con edad, altura, peso actual, objetivo de peso y actividad en Perfil. Revisá la propuesta antes de guardarla.</p><p class="muted small">Son estimaciones generales para adultos, no una prescripción médica o dietética. Para menores de 18 años, embarazo, enfermedades o necesidades específicas, consultá con un profesional.</p></div>
       <div class="card"><h3>Menú diario orientativo</h3><p class="muted small">Arma una propuesta con alimentos de la base local teniendo en cuenta tus objetivos de calorías y proteínas. No es una dieta clínica ni contempla alergias o condiciones médicas. Revisá ingredientes y porciones antes de agregarla.</p><button class="btn secondary full" id="generateMenu" type="button">Generar menú para hoy</button><div id="menuProposal"></div></div>
       <div class="card" id="mealPlanCard"><div class="section-head"><div><div class="eyebrow">Plan semanal</div><h3>Tus comidas de la semana</h3><p class="muted small">Planificá por día. Nada se registra hasta que vos lo confirmes.</p></div></div><div class="ff-chips" id="mealPlanDays" role="group" aria-label="Día de la semana"></div><div class="field"><label for="mealPlanFavorite" class="sr-only">Agregar una comida favorita</label><select id="mealPlanFavorite"></select></div><div id="mealPlanList"></div></div>
@@ -2069,20 +2070,22 @@
       </div>
       <div class="progress-panel" id="progressPanelMuscles" role="tabpanel" aria-labelledby="progressTabMuscles" data-progress-panel="muscles" hidden>
         <div class="card mr-hero" id="mrHero"></div>
+        <div class="card mr-next" id="mrNext"></div>
+        <div class="card mr-compare">
+          <div class="section-head"><div><div class="eyebrow">Mapa de avances</div><h3>Tu cuerpo, pintado por rango</h3></div>
+            <div class="ff-chips" role="group" aria-label="Lado del cuerpo"><button type="button" class="ff-chip" data-mr-side="front" aria-pressed="true">Frente</button><button type="button" class="ff-chip" data-mr-side="back" aria-pressed="false">Espalda</button></div></div>
+          <div class="mr-maps" id="mrMaps"></div>
+          <div class="mr-legend" id="mrLegend" aria-label="Colores de los rangos"></div>
+          <p class="muted small" id="mrCompareNote"></p>
+        </div>
+        <div class="card"><div class="section-head"><div><div class="eyebrow">Músculo por músculo</div><h3>Cuánto falta para el próximo rango</h3><p class="muted small">Agrupados por zona del cuerpo. La barra muestra el avance hacia el rango siguiente.</p></div></div><div class="mr-zones" id="mrList"></div></div>
+        <div class="card mr-volume-card"><div class="eyebrow">Volumen por semana</div><h3>Kilos levantados</h3><p id="mrVolumeHead" class="mr-vol-head"></p><div class="mr-vol" id="mrVolume" role="img" aria-label="Kilos levantados en las últimas 8 semanas"></div><p class="muted small">Suma de peso × repeticiones de las series hechas. Los ejercicios sin carga suman series pero no kilos.</p></div>
         <div class="card rk-board-card" id="rkBoardCard"><div class="rk-board-top"><div class="rk-laurel" aria-hidden="true"><svg viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="#ffd66b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 38c-6-3-10-9-10-16 0-3 1-6 2-8"/><path d="M31 38c6-3 10-9 10-16 0-3-1-6-2-8"/><path d="M9 20c3 0 5 2 5 5M8 27c3-1 6 1 7 3M12 33c3-1 6 0 7 2M39 20c-3 0-5 2-5 5M40 27c-3-1-6 1-7 3M36 33c-3-1-6 0-7 2"/><path d="M18 14l3 3 3-6 3 6 3-3-1 8H19z" fill="#ffd66b"/></svg></div><div><div class="eyebrow">Ranking</div><h3>Competí con tus amigos</h3><p class="muted small">Compará tu rango general con las personas que seguís. Sale de las estadísticas de tu perfil de Comunidad: solo datos de entrenamiento (nunca tu peso ni tus medidas), visibles para quien puede ver tu perfil. Podés ocultarlas.</p></div></div>
           <label class="rk-share"><input type="checkbox" id="rkShareToggle"> <span>Mostrar mis estadísticas en Comunidad</span></label>
           <ol class="rk-board" id="rkBoard" aria-live="polite"></ol>
           <p class="muted small" id="rkBoardStatus"></p>
           <button type="button" class="btn secondary btn-sm" id="rkFindFriends">Buscar amigos</button></div>
-        <div class="card mr-volume-card"><div class="eyebrow">Volumen por semana</div><h3>Kilos levantados</h3><p id="mrVolumeHead" class="mr-vol-head"></p><div class="mr-vol" id="mrVolume" role="img" aria-label="Kilos levantados en las últimas 8 semanas"></div><p class="muted small">Suma de peso × repeticiones de las series hechas. Los ejercicios sin carga suman series pero no kilos.</p></div>
-        <div class="card mr-compare">
-          <div class="section-head"><div><div class="eyebrow">Mapa de avances</div><h3>Tus músculos, rango por rango</h3></div>
-            <div class="ff-chips" role="group" aria-label="Lado del cuerpo"><button type="button" class="ff-chip" data-mr-side="front" aria-pressed="true">Frente</button><button type="button" class="ff-chip" data-mr-side="back" aria-pressed="false">Espalda</button></div></div>
-          <div class="mr-maps" id="mrMaps"></div>
-          <p class="muted small" id="mrCompareNote"></p>
-        </div>
-        <div class="card"><div class="eyebrow">Rangos</div><h3>De Hierro a Leyenda</h3><div class="mr-ladder" id="mrLadder"></div></div>
-        <div class="card"><div class="section-head"><div><div class="eyebrow">Por músculo</div><h3>Cuánto falta para subir</h3></div></div><ul class="mr-list" id="mrList"></ul></div>
+        <details class="card mr-ladder-card"><summary><span class="eyebrow">Rangos</span><strong>Ver los 9 rangos, de Hierro a Leyenda</strong></summary><div class="mr-ladder" id="mrLadder"></div></details>
         <details class="card mr-how"><summary>¿Cómo se calcula?</summary><p class="muted small">Cada serie que marcás como hecha suma 1 al músculo principal del ejercicio y 0,5 a cada músculo secundario (los mismos del mapa de cada ficha). El rango de cada músculo depende de esas series acumuladas. El rango general es el del músculo «del medio»: sube cuando entrenás el cuerpo completo, no solo un grupo. El equilibrio indica qué tan parejo está el trabajo entre músculos. Mide constancia y volumen de entrenamiento, no fuerza ni tamaño muscular.</p></details>
       </div>
     </section>
@@ -2110,6 +2113,7 @@
 
       <section id="communityPanelWorld" class="community-subpanel is-active" data-community-panel="world" role="tabpanel" aria-labelledby="communityTabWorld">
         <form id="communitySearchForm" class="community-search-bar cm-search" role="search"><label class="sr-only" for="communitySearch">Buscar personas por nombre o @usuario</label><span class="community-search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.2 4.2"/></svg></span><input id="communitySearch" maxlength="40" placeholder="Nombre o @usuario" autocomplete="off" enterkeyhint="search"><button class="btn" type="submit">Buscar</button><button class="btn ghost" id="communityClearSearch" type="button" aria-label="Limpiar búsqueda">×</button></form>
+        <section class="cm-sugg-wrap" id="communitySuggestedWrap" aria-labelledby="communitySuggestedTitle" hidden><div class="community-section-head"><h4 id="communitySuggestedTitle">Personas sugeridas</h4><small class="muted">Perfiles públicos que todavía no seguís</small></div><div class="cm-sugg-row" id="communitySuggested"></div></section>
         <div class="community-section-head"><h4 id="communityPeopleTitle">Deportistas en FittForma</h4><small class="muted" id="communityPeopleHint">Usuarios reales de la app</small></div>
         <div id="communityWorldStatus" class="community-status" role="status" aria-live="polite"></div>
         <div id="communityPeople" class="cm-people" aria-labelledby="communityPeopleTitle"></div>
@@ -2199,7 +2203,7 @@
         <div class="card community-social-profile" id="communityOwnProfile">
           <div class="community-profile-header">
             <button type="button" class="cm-avatar-btn" id="communityOwnAvatarBtn" aria-label="Ver o cambiar tu foto de perfil"><div class="community-avatar community-avatar-lg" id="communityOwnAvatar">FF</div><span class="cm-avatar-cam" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span></button>
-            <div class="community-profile-id"><strong id="communityOwnName">Tu perfil</strong><span class="cm-flag" id="communityOwnFlag"></span><span class="muted small" id="communityOwnHandle"></span><div class="community-featured" id="communityOwnFeatured" aria-label="Insignias destacadas"></div></div>
+            <div class="community-profile-id"><strong id="communityOwnName">Tu perfil</strong><span class="cm-flag" id="communityOwnFlag"></span><span id="communityOwnRank"></span><span class="muted small" id="communityOwnHandle"></span><div class="community-featured" id="communityOwnFeatured" aria-label="Insignias destacadas"></div></div>
           </div>
           <p class="community-profile-bio" id="communityOwnBio"></p>
           <div class="community-profile-stats" id="communityOwnStats" aria-live="polite"><span><b>0</b> publicaciones</span><span><b>0</b> seguidores</span><span><b>0</b> seguidos</span></div>
@@ -2208,6 +2212,7 @@
           <div class="community-profile-tabs" role="group" aria-label="Contenido del perfil"><button type="button" class="community-feed-tab is-active" data-own-tab="posts" aria-pressed="true">Publicaciones</button><button type="button" class="community-feed-tab" data-own-tab="saved" aria-pressed="false">Guardadas</button></div>
           <div id="communityOwnGrid" class="community-grid"></div>
         </div>
+        <div class="card cm-own-muscles" id="communityOwnMuscles" hidden></div>
         <div class="card cm-physique-card" id="communityPhysiqueCard">
           <h3>Mi físico</h3>
           <p class="muted small">Aparece arriba de tu perfil. Hay una sola cosa por sección: tu antes y después, y una foto de tu físico. Sin membresía Plus podés cambiar cada sección una vez cada 30 días; con Plus, cuando quieras. Quitarla se puede siempre. Subí solo fotos tuyas: se recomprimen en tu dispositivo y se borran los metadatos (incluida la ubicación). Las ve quien puede ver tu perfil.</p>
@@ -2452,6 +2457,7 @@
     <div class="exercise-sheet-hero"><div class="exercise-sheet-map" id="exerciseModalMap"></div><dl class="exercise-sheet-muscles" id="exerciseModalMuscles"></dl></div>
     <div class="exercise-sheet-chips" id="exerciseModalChips"></div>
     <section class="ex-rank" id="exerciseModalRank" aria-label="Tu rango en este ejercicio" hidden></section>
+    <section class="ex-quicklog" id="exerciseQuickLog" aria-label="Registrar este ejercicio"></section>
     <div class="exercise-sheet-start" id="exerciseModalStart" hidden></div>
     <section class="exercise-progression" aria-label="Ejecución paso a paso"><h3>Ejecución paso a paso</h3><div id="exerciseModalProgression" class="exercise-progression-grid"></div></section>
     <div class="exercise-sheet-columns"><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">⇄</span>Respiración</h3><p id="exerciseModalBreathing" class="muted small"></p></div><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">!</span>Errores comunes</h3><ul id="exerciseModalErrors"></ul></div><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">✓</span>Recomendaciones</h3><ul id="exerciseModalTips"></ul></div></div>
@@ -2528,6 +2534,7 @@
 <script src="./native-gps.js"></script>
 <script src="./food-db.js"></script>
 <script src="./food-core.js"></script>
+<script src="./nutrition-guides.js"></script>
 <script src="./achievements.js"></script>
 <script>
 (() => {
@@ -3047,12 +3054,59 @@ function findCatalogExercise(name){
     const m=exerciseMuscleTexts(name,group);
     return window.FittFormaAnatomy.muscleMapSvg(m.primary,m.secondary,{size,label:`Músculos que trabaja ${name}: ${m.primary}`});
   }
+  // v55: «Lo hice» — registrar este ejercicio suelto (sin rutina ni sesión). Se guarda en el historial como registro
+  // manual de un solo ejercicio: suma a tus marcas, insignias y al Mapa de avances igual que «Registrar uno ya hecho».
+  function renderQuickLog(name,group,kind){
+    const box=$('exerciseQuickLog');if(!box)return;
+    const timed=kind!=='cardio'&&TIMED_EXERCISE_RE.test(name),cardio=kind==='cardio';
+    const valueLabel=cardio?'Minutos':timed?'Segundos por serie':'Repeticiones por serie';
+    box.innerHTML=`<button type="button" class="btn full ex-quicklog-open" id="quickLogOpen" aria-expanded="false" aria-controls="quickLogForm"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>Lo hice: registrarlo</button>
+      <form class="ex-quicklog-form" id="quickLogForm" hidden novalidate>
+        <p class="muted small">Se guarda en tu historial como un registro de este ejercicio solo. Cuenta para tus marcas, insignias y músculos.</p>
+        <div class="ex-quicklog-grid">
+          ${cardio?'':`<div class="field"><label for="qlSets">Series</label><input id="qlSets" type="number" inputmode="numeric" min="1" max="${ROUTINE_LIMITS.sets}" value="3" required></div>`}
+          <div class="field"><label for="qlValue">${valueLabel}</label><input id="qlValue" inputmode="numeric" maxlength="40" placeholder="${cardio?'30':timed?'45':'10 o 12,10,8'}" required></div>
+          ${cardio?`<div class="field"><label for="qlKm">Distancia (km, opcional)</label><input id="qlKm" type="number" inputmode="decimal" min="0" max="300" step="0.01"></div>`:`<div class="field"><label for="qlWeight">Peso (kg, opcional)</label><input id="qlWeight" inputmode="decimal" maxlength="40" placeholder="Ej. 20 o 20,22,24"></div>`}
+          ${cardio?'':`<div class="field"><label for="qlMinutes">Minutos (opcional)</label><input id="qlMinutes" type="number" inputmode="numeric" min="1" max="600"></div>`}
+          <div class="field"><label for="qlDate">Fecha</label><input id="qlDate" type="date" value="${dateKey()}" max="${dateKey()}" min="${dateKey(new Date(Date.now()-366*86400000))}"></div>
+        </div>
+        <p class="community-status" id="qlStatus" role="status" aria-live="polite"></p>
+        <div class="btn-row"><button class="btn" type="submit">Guardar en el historial</button><button class="btn ghost" type="button" id="quickLogCancel">Cancelar</button></div>
+      </form>`;
+    const form=$('quickLogForm'),open=$('quickLogOpen');
+    open.onclick=()=>{const show=form.hidden;form.hidden=!show;open.setAttribute('aria-expanded',String(show));if(show)$('qlValue').focus();};
+    $('quickLogCancel').onclick=()=>{form.hidden=true;open.setAttribute('aria-expanded','false');};
+    form.onsubmit=e=>{e.preventDefault();saveQuickLog(name,group,kind,timed,cardio);};
+  }
+  function saveQuickLog(name,group,kind,timed,cardio){
+    const status=$('qlStatus'),date=$('qlDate').value||dateKey();
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>dateKey()){status.textContent='Elegí una fecha válida que no sea futura.';return;}
+    const list=v=>String(v||'').trim()===''?[]:String(v).trim().split(/[;,]\s*|\s+/).filter(Boolean).map(x=>x.replace(',','.'));
+    const sets=cardio?1:Number($('qlSets').value),values=list($('qlValue').value),weights=cardio?[]:list($('qlWeight')?.value);
+    if(!Number.isInteger(sets)||sets<1||sets>ROUTINE_LIMITS.sets){status.textContent=`Las series deben ser un entero entre 1 y ${ROUTINE_LIMITS.sets}.`;return;}
+    if(!values.length){status.textContent=cardio?'Poné los minutos.':timed?'Poné los segundos.':'Poné las repeticiones.';return;}
+    if(values.length>1&&values.length!==sets||weights.length>1&&weights.length!==sets){status.textContent=`Si cargás un valor por serie, tienen que ser ${sets} valores.`;return;}
+    const max=cardio?600:timed?3600:300;
+    if(values.some(v=>!Number.isInteger(Number(v))||Number(v)<1||Number(v)>max)){status.textContent=`Revisá ${cardio?'los minutos':timed?'los segundos':'las repeticiones'} (entre 1 y ${max}).`;return;}
+    if(weights.some(w=>!Number.isFinite(Number(w))||Number(w)<0||Number(w)>ROUTINE_LIMITS.weight)){status.textContent='Revisá el peso.';return;}
+    const km=cardio?Number($('qlKm').value||0):0;if(cardio&&(!Number.isFinite(km)||km<0||km>300)){status.textContent='Revisá la distancia.';return;}
+    const at=(arr,i)=>arr.length>1?arr[i]:(arr[0]??'');
+    const ex={name:String(name).slice(0,72),group,kind:kind||'strength',measure:sessionMeasure({name,kind}),entries:Array.from({length:sets},(_,i)=>({reps:at(values,i),weight:cardio?'':at(weights,i),distance:cardio&&km?String(km):'',done:true}))};
+    // Sin minutos cargados no se estiman (ni la duración ni las calorías).
+    const minutes=cardio?Number(values[0]):Math.max(0,Math.min(600,Math.round(Number($('qlMinutes').value)||0)));
+    const session={id:Date.now(),type:'manual',status:'completed',source:'quick',date,title:String(name).slice(0,60),minutes,notes:'Ejercicio registrado desde su ficha',completedSets:sets,totalSets:sets,recordedSets:sets,completedExercises:1,totalExercises:1,volumeKg:calculateWorkoutSummary({exercises:[ex]}).volumeKg,exercises:[ex]};
+    const pos=state.sessions.findIndex(x=>String(x?.date||'')<=date);if(pos<0)state.sessions.push(session);else state.sessions.splice(pos,0,session);
+    const badgeDelta=syncBadgeUnlocks();checkMuscleRankUps();if(!save()){status.textContent='No se pudo guardar en este dispositivo.';return;}
+    renderAll();renderQuickLog(name,group,kind);{const box=$('exerciseModalRank');if(box&&kind!=='cardio'){box.innerHTML=exerciseRankMarkup(name,false);box.hidden=!box.innerHTML;}}
+    toast(`${name}: registrado en tu historial.`);celebrateBadges(badgeDelta.newlyUnlocked);
+  }
   function openExerciseDetails(name,group,kind,equipmentMode=''){
     const modal=$('exerciseModal');if(!modal)return;
     $('exerciseModalTitle').textContent=name;
     $('exerciseModalDescription').textContent=kind==='cardio'?'Actividad cardiovascular':kind==='mobility'?'Movilidad y control':'Ejercicio de fuerza y control';
     $('exerciseModalGroup').textContent=group||'';
     {const box=$('exerciseModalRank');if(box){const html=kind==='cardio'?'':exerciseRankMarkup(name,false);box.innerHTML=html;box.hidden=!html;}}
+    renderQuickLog(name,group,kind);
     const inPlan=(state.plan?.days||[]).flatMap(d=>d.exercises).find(e=>normalizeExerciseName(e.name)===normalizeExerciseName(FittFormaTraining.canonicalName(name)));
     const prescription=inPlan||findExercisePrescription(FittFormaTraining.canonicalName(name)),guide=exerciseGuide(name);
     const muscles=exerciseMuscleTexts(name,group);
@@ -3362,9 +3416,42 @@ function findCatalogExercise(name){
     if(st.state==='cooldown')return `<div class="daily-card is-waiting">${head}<div class="daily-wait"><span class="daily-wait-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span><div><small>Próximo: ${dayLine}</small><p>Se habilita en <b id="dailyCountdown" data-until="${esc(st.availableAt)}">${FittFormaTraining.formatRemaining(st.remainingMs)}</b> · ${esc(dailyAvailableLabel(st.availableAt))}</p></div></div><p class="muted small">Mientras tanto podés hacer una rutina adicional, una propia o un entrenamiento libre: se guardan en tu historial y no cambian esta progresión.</p></div>`;
     return `<div class="daily-card is-waiting">${head}<div class="daily-wait"><div><small>Próximo: ${dayLine}</small><p>No pudimos confirmar el horario con el servidor. Conectate a internet para habilitar el próximo entrenamiento diario.</p></div></div><button type="button" class="btn secondary btn-sm" id="retryServerTime">Reintentar</button></div>`;
   }
+  // v55: «¿Qué entrenás hoy?» — sesión por grupos musculares (combinaciones habituales o elegidas a mano).
+  let focusDraft=null;
+  function focusPickerMarkup(){
+    const T=FittFormaTraining;if(!T.FOCUS)return '';
+    const bySplit={};for(const [k,f] of Object.entries(T.FOCUS))(bySplit[f.split]=bySplit[f.split]||[]).push([k,f]);
+    return `<div class="focus-picker" id="focusPicker"><div class="focus-head"><strong>Entrenar por grupos musculares</strong><small class="muted">Combinaciones que se suelen entrenar juntas, o elegí vos los grupos. Se arma con tu equipamiento y tu nivel.</small></div>
+      ${Object.entries(bySplit).map(([split,items])=>`<div class="focus-split"><small>${esc(split)}</small><div class="ff-chips">${items.map(([k,f])=>`<button type="button" class="ff-chip${focusDraft?.key===k?' active':''}" data-focus="${k}" aria-pressed="${focusDraft?.key===k}">${esc(f.title)}</button>`).join('')}</div></div>`).join('')}
+      <details class="focus-custom"${focusDraft?.key==='custom'?' open':''}><summary>Elegí vos los grupos</summary><div class="focus-groups">${Object.entries(T.MUSCLE_GROUPS).map(([k,g])=>`<label class="focus-group"><input type="checkbox" data-focus-group="${k}"${focusDraft?.key==='custom'&&focusDraft.groups.includes(k)?' checked':''}><span>${esc(g.label)}</span></label>`).join('')}</div><button type="button" class="btn secondary btn-sm" id="focusBuildCustom">Armar sesión con estos grupos</button></details>
+      <div id="focusPreview">${focusPreviewMarkup()}</div></div>`;
+  }
+  function focusPreviewMarkup(){
+    const d=focusDraft;if(!d)return '';
+    if(!d.exercises.length)return `<p class="notice small">Con tu equipamiento no hay ejercicios para ${esc(d.groupLabels.join(', '))}. Cambiá el equipamiento en Rutinas (por ejemplo, gimnasio o casa con mancuernas) o elegí otros grupos.</p>`;
+    return `<div class="focus-preview"><div class="focus-preview-head"><div><small>${esc(d.split)}</small><strong>${esc(d.title)}</strong><span class="muted small">${esc(d.groupLabels.join(' · '))} · ${d.exercises.length} ejercicios</span></div></div>
+      <ol>${d.exercises.map(e=>`<li><span>${esc(e.name)}</span><small>${esc(String(e.sets))} × ${esc(String(e.reps))}</small></li>`).join('')}</ol>
+      ${d.missing.length?`<p class="muted small">Sin ejercicios para ${esc(d.missing.join(', '))} con tu equipamiento actual: se reemplazó por lo más parecido.</p>`:''}
+      <div class="btn-row"><button type="button" class="btn" id="focusStart">Empezar ahora</button><button type="button" class="btn ghost" id="focusSave">Guardar como rutina</button></div></div>`;
+  }
+  function focusProfile(){const p=state.profile||{};return {goal:p.goal,level:p.level,equipment:p.equipment,duration:p.duration};}
+  function setFocusDraft(d){focusDraft=d;const host=$('focusPreview');if(host){host.innerHTML=focusPreviewMarkup();bindFocusPreview();}document.querySelectorAll('[data-focus]').forEach(b=>{const on=b.dataset.focus===d?.key;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});}
+  function bindFocusPreview(){
+    if($('focusStart'))$('focusStart').onclick=()=>{if(focusDraft&&beginSession({type:'custom',title:focusDraft.title},focusDraft.exercises))toast(`Empezaste «${focusDraft.title}».`);};
+    if($('focusSave'))$('focusSave').onclick=()=>{
+      const d=focusDraft;if(!d)return;state.routines=Array.isArray(state.routines)?state.routines:[];const now=new Date().toISOString();
+      state.routines.unshift({id:'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:d.title.slice(0,ROUTINE_LIMITS.name),notes:`Grupos: ${d.groupLabels.join(', ')}.`.slice(0,ROUTINE_LIMITS.notes),exercises:d.exercises.map(e=>({name:e.name,group:e.group,kind:e.kind,sets:e.sets,reps:String(e.reps).slice(0,12),weight:'',rest:e.rest})),createdAt:now,updatedAt:now});
+      if(save()){toast('Guardada en Mis rutinas.');renderRoutines();renderTrain();}
+    };
+  }
+  function bindFocusPicker(root){
+    root.querySelectorAll('[data-focus]').forEach(b=>b.onclick=()=>setFocusDraft(FittFormaTraining.buildFocusDay(b.dataset.focus,focusProfile())));
+    if($('focusBuildCustom'))$('focusBuildCustom').onclick=()=>{const groups=[...root.querySelectorAll('[data-focus-group]:checked')].map(x=>x.dataset.focusGroup);if(!groups.length){toast('Elegí al menos un grupo muscular.');return;}setFocusDraft(FittFormaTraining.buildGroupsDay(groups,focusProfile()));};
+    bindFocusPreview();
+  }
   function trainLauncherMarkup(){
     const routines=(state.routines||[]).slice(0,6),days=state.plan?.days||[];
-    return `<div class="card train-launch"><div class="eyebrow">Empezar a entrenar</div><h3>¿Qué vas a entrenar hoy?</h3>`+dailyCardMarkup()+
+    return `<div class="card train-launch"><div class="eyebrow">Empezar a entrenar</div><h3>¿Qué vas a entrenar hoy?</h3>`+dailyCardMarkup()+focusPickerMarkup()+
       (days.length?`<details class="train-extra"><summary>Hacer un día del plan como rutina adicional</summary><div class="train-launch-list">${days.map((d,i)=>`<button type="button" class="ff-list-row train-launch-row" data-start-plan-extra="${i}"><span><b>${esc(d.title)}</b><small>${d.exercises.length} ejercicios · no cambia la progresión diaria</small></span><span class="link-btn">Iniciar</span></button>`).join('')}</div></details>`:'')+
       (routines.length?`<div class="train-launch-list"><strong>Mis rutinas</strong>${routines.map(r=>`<button type="button" class="ff-list-row train-launch-row" data-start-routine="${esc(String(r.id))}"><span><b>${esc(r.name)}</b><small>${r.exercises.length} ejercicios</small></span><span class="link-btn">Iniciar</span></button>`).join('')}</div>`:'')+
       `<div class="btn-row"><button type="button" class="btn ${days.length||routines.length?'secondary':''}" id="startFreeWorkout">Entrenamiento libre</button><button type="button" class="btn ghost" id="openManualLog">Registrar uno ya hecho</button><button type="button" class="btn ghost" id="goPlan">${state.plan||routines.length?'Rutinas y plan':'Crear una rutina'}</button></div>`+
@@ -3383,6 +3470,7 @@ function findCatalogExercise(name){
     root.querySelectorAll('[data-start-routine]').forEach(b=>b.onclick=()=>startRoutine(b.dataset.startRoutine));
     if($('startFreeWorkout'))$('startFreeWorkout').onclick=startFreeWorkout;
     if($('openManualLog'))$('openManualLog').onclick=openManualLog;
+    bindFocusPicker(root);
     if($('goPlan'))$('goPlan').onclick=()=>switchView('routines');
     clearInterval(dailyCountdownTimer);dailyCountdownTimer=$('dailyCountdown')?setInterval(tickDailyCountdown,1000):null;
   }
@@ -4081,6 +4169,8 @@ function findCatalogExercise(name){
   function showBadges(){switchView('progress');showProgressTab('badges');}
   // v53.1: acceso a Progreso › Músculos desde Inicio.
   function showMuscles(){switchView('progress');showProgressTab('muscles');}
+  window.FittFormaShowMuscles=showMuscles;
+  window.FittFormaMyMuscles=()=>{try{return MR?muscleRanksNow():null;}catch{return null;}};
   document.querySelectorAll('[data-home-muscles]').forEach(b=>b.addEventListener('click',showMuscles));
   function notifyBadgeChanges(delta,baseMessage){
     if(!delta)return;celebrateBadges(delta.newlyUnlocked);
@@ -4185,22 +4275,36 @@ function findCatalogExercise(name){
     box.innerHTML=w.map((x,i)=>`<div class="mr-vol-col ${i===w.length-1?'cur':''}" title="Semana del ${prettyDate(x.start)} · ${fmt(x.kg)} · ${x.sets} series"><span class="mr-vol-bar"><i style="height:${Math.round(x.kg/max*100)}%"></i></span><small>${new Date(x.start+'T12:00:00').toLocaleDateString(uiLocale(),{day:'numeric',month:'short'})}</small></div>`).join('');
   }
   function rankColorFills(r){return Object.fromEntries(r.muscles.filter(m=>m.rank>=0).map(m=>[m.id,MR.RANKS[m.rank].color]));}
+  // v55: Músculos explicado en criollo. Zonas del cuerpo y qué grupo de «Entrenar por grupos» trabaja cada músculo.
+  const MR_ZONES=[['Pecho',['pectorales']],['Espalda',['dorsales','espalda_media','trapecio','lumbares']],['Hombros',['deltoides_anterior','deltoides_lateral','deltoides_posterior']],['Brazos',['biceps','triceps','antebrazos']],['Core',['abdominales','oblicuos']],['Piernas y glúteos',['cuadriceps','isquiotibiales','gluteos','gluteo_medio','aductores','gemelos','tibiales']]];
+  const MR_GROUP={pectorales:'chest',dorsales:'back',espalda_media:'back',trapecio:'back',lumbares:'core',deltoides_anterior:'shoulders',deltoides_lateral:'shoulders',deltoides_posterior:'rear_delts',biceps:'biceps',triceps:'triceps',antebrazos:'biceps',abdominales:'core',oblicuos:'core',cuadriceps:'legs_quads',isquiotibiales:'legs_post',gluteos:'legs_post',gluteo_medio:'legs_post',aductores:'legs_post',gemelos:'calves',tibiales:'calves'};
   function renderMuscleRanks(){
     if(!MR||!$('mrHero'))return;
     renderWeeklyVolume();renderRankBoard();
     const now=muscleRanksNow(),d=new Date();d.setDate(d.getDate()-30);const before=muscleRanksNow(dateKey(d));
     const names=FittFormaAnatomy.MUSCLES,ov=now.overall,ovR=MR.RANKS[ov],step=MR.nextStep(now.median);
-    $('mrHero').innerHTML=`<div class="rk-hero" style="--rk:${ovR?.color||'#5b6680'};--rkg:${ovR?.glow||'#9fb0d0'}"><div class="eyebrow">Rango general</div><strong class="rk-big">${ovR?esc(ovR.name):'Sin rango todavía'}</strong><div class="rk-hero-emblem">${MR.emblemSvg(ov,170)}</div>${step.next?`<div class="rk-bar"><span style="width:${Math.round(step.pct*100)}%"></span></div><small class="muted">Próximo: ${esc(step.next.name)} · el músculo del medio necesita ${String(step.missing).replace('.',',')} series más</small>`:'<small class="muted">Llegaste al rango máximo.</small>'}</div>
-      <div class="mr-stats"><div><b>${now.ranked}/20</b><small>músculos con rango</small></div><div><b>${Math.round(now.total)}</b><small>series efectivas</small></div><div><b>${now.balance}%</b><small>equilibrio</small></div></div>
-      ${now.total?`<p class="mr-tip">Para subir tu rango general, sumá series de ${now.weakest.map(m=>esc(names[m.id])).join(', ')}.</p>`:'<p class="mr-tip">Completá tu primer entrenamiento y marcá las series como hechas: tus músculos empiezan a sumar rango.</p>'}
-      <button type="button" class="btn secondary btn-sm" data-goto-view="exercises">Ver ejercicios</button>`;
+    const behind=now.muscles.filter(m=>m.score<(step.next?.min??Infinity)).length;
+    const series=n=>`${String(n).replace('.',',')} ${Number(n)===1?'serie':'series'}`;
+    $('mrHero').innerHTML=`<div class="rk-hero" style="--rk:${ovR?.color||'#5b6680'};--rkg:${ovR?.glow||'#9fb0d0'}"><div class="eyebrow">Tu rango general</div><strong class="rk-big">${ovR?esc(ovR.name):'Sin rango todavía'}</strong><div class="rk-hero-emblem">${MR.emblemSvg(ov,150)}</div>
+        ${step.next?`<div class="rk-bar"><span style="width:${Math.round(step.pct*100)}%"></span></div><p class="mr-hero-next">Para llegar a <b>${esc(step.next.name)}</b>, la mitad de tus músculos tiene que tener al menos ${step.next.min} series. Hoy te faltan unas ${series(step.missing)} en los músculos del medio.</p>`:'<p class="mr-hero-next">Llegaste al rango máximo.</p>'}</div>
+      <p class="mr-explain">Cada serie que completás suma al músculo que trabaja (1 al principal y 0,5 a los que ayudan). Cuantas más series acumula un músculo, más alto su rango. Tu rango general es el del músculo «del medio»: sube cuando entrenás todo el cuerpo, no un solo músculo. Mide constancia y volumen, no tamaño ni fuerza.</p>
+      <div class="mr-stats"><div><b>${now.ranked}<small>/20</small></b><small>músculos con rango</small></div><div><b>${Math.round(now.total)}</b><small>series sumadas</small></div><div><b>${now.balance}%</b><small>parejo entre músculos</small></div></div>`;
+    // Qué entrenar para subir: los músculos más atrasados y una sesión armada con esos grupos.
+    const weakest=now.weakest||[],groups=[...new Set(weakest.map(m=>MR_GROUP[m.id]).filter(Boolean))];
+    $('mrNext').innerHTML=`<div class="eyebrow">Qué entrenar para subir</div><h3>${now.total?'Tus músculos más atrasados':'Empezá por acá'}</h3>
+      ${now.total?`<ul class="mr-next-list">${weakest.map(m=>{const r=MR.RANKS[m.rank],st=MR.nextStep(m.score);return `<li><span class="mr-mini">${MR.emblemSvg(m.rank,34)}</span><div><strong>${esc(names[m.id])}</strong><small>${r?esc(r.name):'Sin rango'} · ${st.next?`faltan ${series(st.missing)} para ${esc(st.next.name)}`:'rango máximo'}</small></div></li>`;}).join('')}</ul>
+      <p class="muted small">Entrenarlos es lo que más rápido sube tu rango general${behind?` (${behind} de 20 músculos están por debajo del próximo rango)`:''}.</p>`:'<p class="muted small">Completá tu primer entrenamiento marcando las series como hechas y tus músculos empiezan a sumar.</p>'}
+      <div class="btn-row">${groups.length?`<button type="button" class="btn" id="mrTrainWeak">Entrenar esto hoy</button>`:''}<button type="button" class="btn ghost" data-goto-view="exercises">Ver ejercicios</button></div>`;
+    $('mrTrainWeak')?.addEventListener('click',()=>{const d=FittFormaTraining.buildGroupsDay(groups,focusProfile(),{key:'custom',title:'Músculos atrasados',split:'Para subir tu rango'});if(!d)return;switchView('train');setTimeout(()=>{setFocusDraft(d);$('focusPicker')?.scrollIntoView({behavior:'smooth',block:'start'});},60);});
     const map=(r,label)=>`<figure class="mr-map"><figcaption>${label}</figcaption>${FittFormaAnatomy.muscleFillSvg(rankColorFills(r),{sides:mrSide,label:`${label}: músculos coloreados según su rango`,className:'mr-fig'})}</figure>`;
     $('mrMaps').innerHTML=map(before,'Hace 30 días')+'<div class="mr-arrow" aria-hidden="true">→</div>'+map(now,'Hoy');
+    $('mrLegend').innerHTML=`<span><i class="is-none"></i>Sin rango</span>`+MR.RANKS.map(r=>`<span><i style="background:${r.color}"></i>${esc(r.name)}</span>`).join('');
     const ups=MR.rankUps(before,now);
     const upTop=ups.slice().sort((x,y)=>y.rank-x.rank);$('mrCompareNote').textContent=ups.length?`En los últimos 30 días subieron de rango ${ups.length} ${ups.length===1?'músculo':'músculos'}: ${upTop.slice(0,3).map(u=>`${names[u.id]} (${MR.RANKS[u.rank].name})`).join(', ')}${ups.length>3?' y más':''}.`:now.total?'En los últimos 30 días ningún músculo cambió de rango todavía.':'Los colores aparecen a medida que entrenás.';
     document.querySelectorAll('[data-mr-side]').forEach(b=>{const on=b.dataset.mrSide===mrSide;b.setAttribute('aria-pressed',String(on));b.classList.toggle('active',on);});
     $('mrLadder').innerHTML=rankLadderMarkup(ov,r=>`${r.min} series`);
-    $('mrList').innerHTML=now.muscles.slice().sort((a,b)=>b.score-a.score).map(m=>{const r=MR.RANKS[m.rank],st=MR.nextStep(m.score);return `<li class="mr-row"><span class="mr-mini">${MR.emblemSvg(m.rank,40)}</span><div class="mr-row-copy"><div class="mr-row-top"><strong>${esc(names[m.id])}</strong><span style="color:${r?.glow||'var(--text-3)'}">${r?esc(r.name):'Sin rango'}</span></div><div class="mr-bar"><span style="width:${Math.round(st.pct*100)}%;background:${(st.next||r)?.color||'#5b6680'}"></span></div><small class="muted">${String(m.score).replace('.',',')} series${st.next?` · faltan ${String(st.missing).replace('.',',')} para ${esc(st.next.name)}`:' · rango máximo'}</small></div></li>`;}).join('');
+    const row=m=>{const r=MR.RANKS[m.rank],st=MR.nextStep(m.score);return `<li class="mr-row"><span class="mr-mini">${MR.emblemSvg(m.rank,36)}</span><div class="mr-row-copy"><div class="mr-row-top"><strong>${esc(names[m.id])}</strong><span style="color:${r?.glow||'#8b9ab8'}">${r?esc(r.name):'Sin rango'}</span></div><div class="mr-bar"><span style="width:${Math.round(st.pct*100)}%;background:${(st.next||r)?.color||'#5b6680'}"></span></div><small>${series(Math.round(m.score*10)/10)}${st.next?` · faltan ${series(st.missing)} para ${esc(st.next.name)}`:' · rango máximo'}</small></div></li>`;};
+    $('mrList').innerHTML=MR_ZONES.map(([zone,ids])=>{const ms=now.muscles.filter(m=>ids.includes(m.id));const best=Math.max(-1,...ms.map(m=>m.rank));return `<section class="mr-zone"><h4>${esc(zone)}<span>${best>=0?esc(MR.RANKS[best].name):'Sin rango'}</span></h4><ul class="mr-list">${ms.sort((a,b)=>b.score-a.score).map(row).join('')}</ul></section>`;}).join('');
   }
   document.addEventListener('click',e=>{const b=e.target.closest('[data-mr-side]');if(b){mrSide=b.dataset.mrSide;renderMuscleRanks();}});
   // Aviso cuando un músculo sube de rango (se compara con lo último que la persona ya vio).
@@ -4644,12 +4748,36 @@ function findCatalogExercise(name){
     {id:'salmon-papas',name:'Salmón con papas y ensalada',type:'Cena',minutes:30,portions:1,kcal:580,protein:36,carbs:38,fat:30,ingredients:['150 g de salmón','200 g de papa','Ensalada de hojas y tomate','5 ml de aceite de oliva'],steps:['Horneá las papas en cubos 20 minutos.','Cociná el salmón a la plancha 4 minutos por lado.','Serví con la ensalada condimentada.']},
     {id:'carne-fideos',name:'Carne magra salteada con fideos',type:'Cena',minutes:20,portions:1,kcal:610,protein:40,carbs:58,fat:22,ingredients:['130 g de carne magra','70 g de fideos (crudos)','150 g de verduras','10 ml de aceite'],steps:['Hervi los fideos.','Saltá la carne en tiras a fuego fuerte.','Agregá verduras y fideos y salteá 2 minutos.']}
   ];
+  // v55: recetas nuevas calculadas con la base de alimentos (nutrition-guides.js); se suman a las anteriores.
+  if(window.FittFormaNutritionGuides)RECIPES.push(...FittFormaNutritionGuides.recipesWithValues(window.FittFormaFoodDb||[]));
+  let recipeFilter='all';
   const MEAL_TYPES=['Desayuno','Almuerzo','Merienda','Cena','Colación'],WEEKDAYS=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
   let mealPlanDay=((new Date().getDay()+6)%7);
   const mealSlugOf=t=>({Desayuno:'desayuno',Almuerzo:'almuerzo',Merienda:'merienda',Cena:'cena','Colación':'colacion'})[t]||'colacion';
   function renderRecipes(){
     const root=$('recipeList');if(!root)return;
-    root.innerHTML=RECIPES.map(r=>`<details class="recipe"><summary><img src="./assets/illustrations/meal-${mealSlugOf(r.type)}.svg" alt="" width="56" height="56" loading="lazy"><span><strong>${esc(r.name)}</strong><small>${esc(r.type)} · ${r.minutes} min · ${r.kcal} kcal · ${r.protein} g proteína</small></span></summary><div class="recipe-body"><p class="muted small">Por porción (estimación): ${r.kcal} kcal · P ${r.protein} g · C ${r.carbs} g · G ${r.fat} g. Verificá cantidades y marcas.</p><h5>Ingredientes</h5><ul>${r.ingredients.map(i=>`<li>${esc(i)}</li>`).join('')}</ul><h5>Preparación</h5><ol>${r.steps.map(i=>`<li>${esc(i)}</li>`).join('')}</ol><div class="btn-row"><button class="btn btn-sm" type="button" data-recipe-log="${r.id}">Cargar en el registro</button><button class="btn ghost btn-sm" type="button" data-recipe-plan="${r.id}">Agregar al plan del ${esc(WEEKDAYS[mealPlanDay].toLowerCase())}</button></div></div></details>`).join('');
+    const NG=window.FittFormaNutritionGuides,gk=currentGuideKey(),gTitle=NG?.GUIDES?.[gk]?.title||'';
+    const list=recipeFilter==='goal'?RECIPES.filter(r=>(r.tags||[]).includes(gk)):RECIPES;
+    const filters=NG?`<div class="ff-chips recipe-filters" role="group" aria-label="Filtrar recetas"><button type="button" class="ff-chip${recipeFilter==='all'?' active':''}" data-recipe-filter="all" aria-pressed="${recipeFilter==='all'}">Todas (${RECIPES.length})</button><button type="button" class="ff-chip${recipeFilter==='goal'?' active':''}" data-recipe-filter="goal" aria-pressed="${recipeFilter==='goal'}">Para ${esc(gTitle.toLowerCase())}</button></div>`:'';
+    root.innerHTML=filters+list.map(r=>`<details class="recipe"><summary><img src="./assets/illustrations/meal-${mealSlugOf(r.type)}.svg" alt="" width="56" height="56" loading="lazy"><span><strong>${esc(r.name)}</strong><small>${esc(r.type)} · ${r.minutes} min · ${r.kcal} kcal · ${r.protein} g proteína</small></span></summary><div class="recipe-body"><p class="muted small">${r.computed?`Por porción (${r.grams} g), calculado con la base de alimentos (USDA) según los ingredientes: ${r.kcal} kcal · P ${r.protein} g · C ${r.carbs} g · G ${r.fat} g. Puede variar con las marcas y la cocción.`:`Por porción (estimación): ${r.kcal} kcal · P ${r.protein} g · C ${r.carbs} g · G ${r.fat} g. Verificá cantidades y marcas.`}</p><h5>Ingredientes</h5><ul>${r.ingredients.map(i=>`<li>${esc(i)}</li>`).join('')}</ul><h5>Preparación</h5><ol>${r.steps.map(i=>`<li>${esc(i)}</li>`).join('')}</ol><div class="btn-row"><button class="btn btn-sm" type="button" data-recipe-log="${r.id}">Cargar en el registro</button><button class="btn ghost btn-sm" type="button" data-recipe-plan="${r.id}">Agregar al plan del ${esc(WEEKDAYS[mealPlanDay].toLowerCase())}</button></div></div></details>`).join('');
+  }
+  // v55: guía de alimentación según el objetivo (nutrition-guides.js). Orientativa; no es un plan clínico.
+  let guideKeyChoice='';
+  function currentGuideKey(){const NG=window.FittFormaNutritionGuides;if(!NG)return 'maintain';if(guideKeyChoice&&NG.GUIDES[guideKeyChoice])return guideKeyChoice;const s=bodyGoalSummary();return NG.guideFor({bodyGoal:s?.direction,goal:state.profile?.goal});}
+  function renderNutritionGuide(){
+    const root=$('nutritionGuideCard'),NG=window.FittFormaNutritionGuides;if(!root||!NG)return;
+    const key=currentGuideKey(),g=NG.GUIDES[key],auto=NG.guideFor({bodyGoal:bodyGoalSummary()?.direction,goal:state.profile?.goal});
+    const w=Number(state.profile?.currentWeightKg),prot=NG.proteinRange(key,w);
+    const carbs=g.carbs&&w>=30?g.carbs.map(c=>`${c.label}: ${Math.round(c.min*w/10)*10}–${Math.round(c.max*w/10)*10} g de carbohidratos`).join(' · '):'';
+    const recs=RECIPES.filter(r=>(r.tags||[]).includes(key)).slice(0,4);
+    root.innerHTML=`<div class="eyebrow">Cómo comer según tu objetivo</div><div class="ff-chips ng-goals" role="group" aria-label="Objetivo">${Object.entries(NG.GUIDES).map(([k,x])=>`<button type="button" class="ff-chip${k===key?' active':''}" data-guide="${k}" aria-pressed="${k===key}">${esc(x.title)}${k===auto?' ·  tu objetivo':''}</button>`).join('')}</div>
+      <h3>${esc(g.title)}</h3><p class="ng-idea">${esc(g.idea)}</p>
+      <div class="ng-plate-row"><div class="ng-plate" role="img" aria-label="Plato: ${g.plate.veg} % verduras y frutas, ${g.plate.carbs} % cereales y tubérculos, ${g.plate.protein} % proteína" style="--veg:${g.plate.veg};--carb:${g.plate.carbs}"></div>
+        <ul class="ng-legend"><li><i class="v"></i>Verduras y frutas ${g.plate.veg} %</li><li><i class="c"></i>Cereales, legumbres y tubérculos ${g.plate.carbs} %</li><li><i class="p"></i>Proteína ${g.plate.protein} %</li><li class="muted small">Sumá una porción de grasa buena (aceite de oliva, palta o frutos secos) y agua.</li></ul></div>
+      <div class="ng-facts"><div><small>Energía</small><p>${esc(g.energy)}</p></div><div><small>Proteína</small><p>${g.protein.min.toString().replace('.',',')}–${g.protein.max.toString().replace('.',',')} g por kg de peso al día${prot?` (con tu peso, unos ${prot.min}–${prot.max} g)`:' (cargá tu peso en Perfil › Objetivo y actualidad para verlo en gramos)'}. ${esc(g.protein.note)}</p></div>${carbs?`<div><small>Carbohidratos</small><p>${esc(carbs)}.</p></div>`:''}</div>
+      <div class="ng-lists"><div><h4>Priorizá</h4><ul>${g.more.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div><div><h4>Moderá</h4><ul>${g.less.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div>
+      ${recs.length?`<h4>Recetas que encajan</h4><div class="ng-recipes">${recs.map(r=>`<button type="button" class="ng-recipe" data-guide-recipe="${esc(r.id)}"><strong>${esc(r.name)}</strong><small>${esc(r.type)} · ${r.kcal} kcal · ${r.protein} g proteína</small></button>`).join('')}</div>`:''}
+      <p class="muted small ng-sources">Guía orientativa para personas sanas que entrenan; no reemplaza a un profesional de la nutrición ni contempla enfermedades, embarazo o alergias. Fuentes: ${g.sources.map(k=>`<a href="${NG.SOURCES[k].url}" target="_blank" rel="noopener">${esc(NG.SOURCES[k].label)}</a>`).join(' · ')}.</p>`;
   }
   function mealPlanDayList(day){state.mealPlan=state.mealPlan&&typeof state.mealPlan==='object'?state.mealPlan:{};state.mealPlan[day]=Array.isArray(state.mealPlan[day])?state.mealPlan[day]:[];return state.mealPlan[day];}
   function renderMealPlan(){
@@ -4677,6 +4805,9 @@ function findCatalogExercise(name){
     view.addEventListener('click',e=>{
       const b=e.target.closest('button');if(!b)return;
       if(b.dataset.planDay){mealPlanDay=Number(b.dataset.planDay);renderMealPlan();renderRecipes();return;}
+      if(b.dataset.guide){guideKeyChoice=b.dataset.guide;renderNutritionGuide();renderRecipes();return;}
+      if(b.dataset.recipeFilter){recipeFilter=b.dataset.recipeFilter;renderRecipes();return;}
+      if(b.dataset.guideRecipe){const el=document.querySelector(`[data-recipe-log="${CSS.escape(b.dataset.guideRecipe)}"]`)?.closest('details');if(!el){recipeFilter='all';renderRecipes();}const d=document.querySelector(`[data-recipe-log="${CSS.escape(b.dataset.guideRecipe)}"]`)?.closest('details');if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'center'});}return;}
       const recipe=RECIPES.find(r=>r.id===(b.dataset.recipeLog||b.dataset.recipePlan));
       if(b.dataset.recipeLog&&recipe)loadIntoMealForm(recipe);
       else if(b.dataset.recipePlan&&recipe)addToMealPlan({name:recipe.name,type:recipe.type,calories:recipe.kcal,protein:recipe.protein,carbs:recipe.carbs,fat:recipe.fat});
@@ -4684,7 +4815,7 @@ function findCatalogExercise(name){
       else if(b.dataset.planLog!=null){const x=mealPlanDayList(mealPlanDay)[Number(b.dataset.planLog)];if(x)loadIntoMealForm(x);}
     });
     $('mealPlanFavorite')?.addEventListener('change',e=>{const f=(state.mealFavorites||[]).find(x=>String(x.id)===e.target.value);if(f)addToMealPlan(f);e.target.value='';});
-    renderRecipes();renderMealPlan();
+    renderNutritionGuide();renderRecipes();renderMealPlan();
   }
 
   // ---------- v43: eliminar la cuenta en la nube ----------
