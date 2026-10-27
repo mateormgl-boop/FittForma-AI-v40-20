@@ -2094,6 +2094,7 @@
         <div class="cm-head">
           <button class="community-brand" type="button" data-community-home aria-label="Ir al inicio de Comunidad"><h2>Comunidad</h2></button>
           <div class="cm-head-actions">
+            <button class="community-icon-btn cm-head-btn" id="communityTabAlerts" type="button" data-community-tab="alerts" aria-controls="communityPanelAlerts" aria-pressed="false" aria-label="Avisos" title="Avisos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0"/></svg><span class="community-unread" id="communityAlertsBadge" hidden></span></button>
             <button class="community-icon-btn cm-head-btn" id="communityTabMessages" type="button" data-community-tab="messages" aria-controls="communityPanelMessages" aria-pressed="false" aria-label="Mensajes" title="Mensajes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v11H10l-5 3v-3H4z"/></svg><span class="community-unread" id="communityUnreadBadge" hidden></span></button>
             <button class="community-icon-btn cm-head-btn cm-head-avatar" id="communityTabProfile" type="button" data-community-tab="profile" aria-controls="communityPanelProfile" aria-pressed="false" aria-label="Mi perfil" title="Mi perfil"><span class="community-subtab-avatar" id="communityTabAvatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.8 20c.7-3.4 3.3-5.2 7.2-5.2s6.5 1.8 7.2 5.2"/></svg></span></button>
           </div>
@@ -2118,6 +2119,7 @@
 
       <section id="communityPanelRanking" class="community-subpanel" data-community-panel="ranking" role="tabpanel" aria-labelledby="communityTabRanking" hidden>
         <div class="cm-chips" id="rankingCategories" role="group" aria-label="Categoría del ranking"></div>
+        <div class="ff-segmented cm-scope cm-period" id="rankingPeriod" role="group" aria-label="Período" hidden><button type="button" class="ff-seg active" data-ranking-period="30d" aria-pressed="true">Últimos 30 días</button><button type="button" class="ff-seg" data-ranking-period="week" aria-pressed="false">Esta semana</button></div>
         <div class="ff-segmented cm-scope" role="group" aria-label="Quiénes participan"><button type="button" class="ff-seg active" data-ranking-scope="all" aria-pressed="true">Todos</button><button type="button" class="ff-seg" data-ranking-scope="friends" aria-pressed="false">Amigos</button></div>
         <div class="cm-explain" id="rankingExplain"></div>
         <div id="rankingStatus" class="community-status" role="status" aria-live="polite"></div>
@@ -2126,6 +2128,7 @@
       </section>
 
       <section id="communityPanelFriends" class="community-subpanel" data-community-panel="friends" role="tabpanel" aria-labelledby="communityTabFriends" hidden>
+        <section class="card cm-challenge" id="communityChallenge" aria-label="Reto de la semana" hidden></section>
         <div class="community-section-head"><h4>Tus amigos</h4><small class="muted">Personas que seguís con la solicitud aceptada</small></div>
         <div id="communityFriendsStatus" class="community-status" role="status" aria-live="polite"></div>
         <div id="communityFriends" class="cm-people"></div>
@@ -2211,6 +2214,7 @@
           <div class="cm-physique-edit" id="communityPhysiqueEdit"></div>
           <input id="communityPhysiqueBefore" type="file" accept="image/jpeg,image/png,image/webp" hidden><input id="communityPhysiqueAfter" type="file" accept="image/jpeg,image/png,image/webp" hidden><input id="communityPhysiqueSingle" type="file" accept="image/jpeg,image/png,image/webp" hidden>
           <div class="community-status" id="communityPhysiqueStatus" role="status" aria-live="polite"></div>
+          <div class="cm-phys-history-box" id="communityPhysiqueHistory" hidden></div>
         </div>
         <div class="card cm-stats-card" id="communityStatsCard">
           <h3>Estadísticas en tu perfil</h3>
@@ -2242,6 +2246,11 @@
       <section id="communityPanelUser" class="community-subpanel" data-community-panel="user" aria-label="Perfil de la comunidad" hidden>
         <button class="btn ghost btn-sm community-back" type="button" id="communityUserBack">← Volver</button>
         <div class="cm-profile" id="communityUserProfile"></div>
+      </section>
+
+      <section id="communityPanelAlerts" class="community-subpanel" data-community-panel="alerts" aria-label="Avisos" hidden>
+        <div class="community-section-head"><h4>Avisos</h4><small class="muted">Seguimientos, mensajes y ranking</small></div>
+        <div id="communityAlerts"></div>
       </section>
 
       <section id="communityPanelCompare" class="community-subpanel" data-community-panel="compare" aria-label="Comparar progreso" hidden>

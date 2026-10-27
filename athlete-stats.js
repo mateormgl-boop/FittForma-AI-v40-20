@@ -54,6 +54,12 @@
 
   const pad = n => String(n).padStart(2, '0');
   const dayKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  // Lunes de la semana de «today» (AAAA-MM-DD).
+  function weekStart(today) {
+    const d = new Date(String(today) + 'T12:00:00');
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    return dayKey(d);
+  }
   function windowStart(today) {
     const d = new Date(String(today) + 'T12:00:00');
     d.setDate(d.getDate() - (WINDOW_DAYS - 1));
@@ -107,13 +113,16 @@
     const inWindow = d => validDate(d) && String(d).slice(0, 10) >= start && String(d).slice(0, 10) <= today;
     const sessions = (Array.isArray(o.sessions) ? o.sessions : []).filter(s => s && (!s.status || s.status === 'completed'));
     const activities = (Array.isArray(o.activities) ? o.activities : []).filter(a => a && validDate(a.date));
-    const days = new Set(); let w30 = 0;
-    for (const s of sessions) if (inWindow(s.date)) { w30++; days.add(String(s.date).slice(0, 10)); }
+    // v54: semana actual, de lunes a hoy (la misma semana que fija el servidor con date_trunc('week')).
+    const wStart = weekStart(today), inWeek = d => inWindow(d) && String(d).slice(0, 10) >= wStart;
+    const days = new Set(), wDays = new Set(); let w30 = 0, wCount = 0, wKm = 0;
+    for (const s of sessions) if (inWindow(s.date)) { w30++; days.add(String(s.date).slice(0, 10)); if (inWeek(s.date)) { wCount++; wDays.add(String(s.date).slice(0, 10)); } }
     let runs = 0, km = 0, minutes = 0;
     for (const a of activities) {
       if (!inWindow(a.date)) continue;
       w30++; days.add(String(a.date).slice(0, 10));
-      if (RUN_RE.test(String(a.type || '')) && plausibleRun(a)) { runs++; km += num(a.distance); minutes += num(a.minutes); }
+      const week = inWeek(a.date); if (week) { wCount++; wDays.add(String(a.date).slice(0, 10)); }
+      if (RUN_RE.test(String(a.type || '')) && plausibleRun(a)) { runs++; km += num(a.distance); minutes += num(a.minutes); if (week) wKm += num(a.distance); }
     }
     const best = bestSets(o.sessions, o.canonical);
     const badges = (Array.isArray(o.badges) ? o.badges : []).map(b => b && b.payload ? b.payload : b).filter(b => b && b.exerciseName)
@@ -144,8 +153,13 @@
       run_minutes_30d: clamp(Math.ceil(minutes), 0, 20000),
       best_pushups: best.pushups, best_pullups: best.pullups, best_air_squats: best.squats, best_plank_seconds: best.plank,
       muscle_ranks: muscleRanks(o.muscle && o.muscle.byMuscle),
+      ...weekFields(),
       stats_date: today
     };
+    function weekFields() {
+      const workoutsWeek = Math.min(wCount, 60, workouts30), activeWeek = Math.min(wDays.size, 7, workoutsWeek, Math.min(days.size, 30, workouts30));
+      return { workouts_week: workoutsWeek, active_days_week: activeWeek, run_km_week: Math.min(Math.round(wKm * 100) / 100, 500, Math.min(kmR, 1500, Math.min(runs, 120) * 150)) };
+    }
   }
 
   // v53.1: rango de cada músculo del Mapa de avances (-1 a 8), para el mapa del perfil. Sin datos corporales.
@@ -203,7 +217,7 @@
     });
   }
 
-  const api = { CATEGORIES, EXERCISES, LEVELS, COMPARE, XP_PER_LEVEL, compute, muscleRanks, compare, categoryValue, exerciseKey, plausibleRun, windowStart };
+  const api = { CATEGORIES, EXERCISES, LEVELS, COMPARE, XP_PER_LEVEL, compute, muscleRanks, weekStart, compare, categoryValue, exerciseKey, plausibleRun, windowStart };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaAthleteStats = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);
