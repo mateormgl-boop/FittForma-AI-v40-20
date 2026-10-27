@@ -1093,6 +1093,7 @@ body{font-feature-settings:"cv11","ss01"}
 .cm-card .community-private-tag{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:var(--text-2)}
 .cm-card .community-private-tag svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
 .cm-rank{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:800;color:color-mix(in srgb,var(--rk,#8b9ab8) 55%,var(--text));white-space:nowrap}
+:root[data-theme="light"] .cm-rank:not(.is-none){color:color-mix(in srgb,var(--rk,#8b9ab8) 30%,var(--text))}
 .cm-rank svg{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--rk,#8b9ab8) 55%,transparent))}
 .cm-rank.is-none{color:var(--text-3);font-weight:600}
 .cm-skeleton{display:grid;gap:10px}
@@ -1229,7 +1230,8 @@ body{font-feature-settings:"cv11","ss01"}
 .cm-ch-bar{display:block;height:6px;border-radius:99px;background:var(--ff-panel);overflow:hidden}
 .cm-ch-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#f0b384,#ffd66b)}
 .cm-ch-row b{font-size:12.5px;white-space:nowrap}
-.cm-ch-prev{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:10px 0 0;font-size:13px}
+.cm-ch-prev{margin:10px 0 0;font-size:13px;line-height:1.45}
+.cm-ch-prev .cm-ch-trophy{display:inline-block;vertical-align:-3px;margin-right:4px}
 .cm-ch-trophy{width:18px;height:18px;fill:none;stroke:#e0a800;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .cm-evo{margin-top:10px}
 .cm-evo-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:13px}
@@ -1256,3 +1258,14 @@ body{font-feature-settings:"cv11","ss01"}
 .cm-phys-hthumbs img{display:block;width:48px;height:60px;object-fit:cover}
 #view-community .cm-head-actions{gap:6px}
 @media(max-width:360px){.cm-head-btn{width:38px!important;height:38px!important}#view-community .community-brand h2{font-size:20px}}
+
+/* v54: pantallas angostas (320–380 px) */
+@media(max-width:380px){
+  .cm-card-open{grid-template-columns:auto minmax(0,1fr);gap:10px;padding:12px 12px 8px}
+  .cm-card .community-avatar-lg{width:54px!important;height:54px!important;flex-basis:54px!important}
+  .cm-card-side{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .cm-search{gap:6px}
+  .cm-search .btn{padding-inline:10px}
+  .cm-explain dl div{grid-template-columns:72px 1fr}
+}
+.cm-search input:placeholder-shown ~ #communityClearSearch{display:none}

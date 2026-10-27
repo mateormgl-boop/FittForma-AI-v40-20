@@ -285,6 +285,16 @@ step('v54 Se puede borrar del historial', sql(`select count(*) from community_ph
 sql(`delete from community_follows where follower_id='${A}'`);
 await page.click('#communityTabFriends'); await page.waitForTimeout(1500);
 step('Amigos vacío: «Todavía no tenés amigos en tu comunidad»', /Todavía no tenés amigos en tu comunidad/.test(await page.textContent('#communityFriends')));
+if (process.env.SHOTS_NARROW) {
+  await page.setViewportSize({ width: 320, height: 700 });
+  for (const theme of ['dark', 'light']) {
+    await page.evaluate(t => document.documentElement.setAttribute('data-theme', t), theme);
+    for (const t of ['world', 'ranking', 'friends', 'alerts', 'profile']) { await page.click(`[data-community-tab="${t}"]`); await page.waitForTimeout(1300); await page.screenshot({ path: `${process.env.SHOTS_NARROW}/${theme}-${t}.png`, fullPage: true }); }
+    await page.click('.mobile-nav-item[data-mobile-view="plan"]'); await page.waitForTimeout(800); await page.screenshot({ path: `${process.env.SHOTS_NARROW}/${theme}-home.png`, fullPage: false });
+    await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(600);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+}
 if (process.env.SHOTS) { for (const t of ['world', 'ranking']) { await page.click(`[data-community-tab="${t}"]`); await page.waitForTimeout(1300); await page.screenshot({ path: `${process.env.SHOTS}/${t}.png`, fullPage: true }); } }
 step('14. Sin errores de página ni de consola', errors.length === 0, errors.slice(0, 4).join(' || '));
 // Restaura el seguimiento mutuo que usan las demás pruebas.

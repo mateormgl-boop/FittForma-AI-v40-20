@@ -1,5 +1,6 @@
 /* FittForma AI v53 — traducciones de la Comunidad de deportistas (Todos, Ranking, Amigos, perfil y comparación). */
 (window.FittFormaI18nExtra = window.FittFormaI18nExtra || []).push(
+  ["Nombre o @usuario", "Name or @username", "Nome ou @usuário", "Nom ou @pseudo", "Nome o @utente", "Name oder @Nutzer"],
   ["Todos", "Everyone", "Todos", "Tout le monde", "Tutti", "Alle"],
   ["Todo el mundo", "Everyone", "Todo mundo", "Tout le monde", "Tutti", "Alle"],
   ["Avisos", "Alerts", "Avisos", "Notifications", "Avvisi", "Benachrichtigungen"],

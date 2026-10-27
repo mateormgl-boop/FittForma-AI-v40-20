@@ -9,6 +9,21 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v54
+
+- `supabase/tests/rls_v54_test.sql` (41 comprobaciones):
+  - Avisos: los crea el servidor, son privados, no se duplican y se ocultan con bloqueo.
+  - Semana validada y fijada por el servidor.
+  - Ranking semanal con alcance «amigos».
+  - Ganador de la semana pasada.
+  - Evolución que respeta la opción de ocultar.
+  - «Te superó en el rango».
+  - Historial privado de «Mi físico».
+- `tests/v54.test.mjs`: cálculo de la semana y contratos de la migración y de la interfaz.
+- `tests/e2e/athletes.e2e.mjs` (63 pasos):
+  - Suma ranking de esta semana, reto, evolución en la comparación, avisos reales e historial privado.
+  - Con `SHOTS_NARROW=<carpeta>` guarda capturas a 320 px en tema claro y oscuro.
+
 ### v53.1
 
 - `supabase/tests/rls_v53b_test.sql` (33 comprobaciones):

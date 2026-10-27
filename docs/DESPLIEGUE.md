@@ -1,9 +1,23 @@
-# Despliegue de FittForma AI v53.1
+# Despliegue de FittForma AI v54.0
 
-Esta guía es la lista de pasos para publicar v53.1. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v54.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
-## Qué cambia en v53.1
+## Qué cambia en v54.0
+
+- **Migración nueva (aditiva):** `supabase/migrations/2026-10-29_v54_weekly_alerts.sql`. Se aplica después de las dos de v53.
+  - Semana actual en `community_athlete_stats` (`week_start` lo fija el servidor, más días, entrenamientos y km de la semana) con validación `CHECK`.
+  - Tabla `community_athlete_weekly`: una foto por semana, guardada por un trigger. Solo se lee con funciones.
+  - Funciones `community_week_board`, `community_week_winners` y `community_weekly_history`.
+  - Tabla `community_notifications`:
+    - Los avisos los crean solo triggers (seguir, solicitud, aceptar, mensaje y rango superado).
+    - Cada persona lee, marca como leídos o borra solo los suyos.
+    - Función `community_notifications_list`.
+  - Tabla `community_physique_history`: privada, con una política de Storage que deja a cada persona leer sus propias fotos de «Mi físico».
+  - No borra ni cambia nada existente y se puede ejecutar más de una vez.
+- **Sin esta migración:** la app sigue funcionando. Se ocultan la campanita, el reto y el historial, el ranking semanal avisa que falta la actualización, y las estadísticas se publican sin las columnas nuevas.
+
+## Qué cambió en v53.1
 
 - **Migración nueva (aditiva):** `supabase/migrations/2026-10-28_v53_profile_extras.sql`. Se aplica después de la de v53.
   - `community_profiles.country_code`: bandera opcional, código ISO de 2 letras.
