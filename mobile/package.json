@@ -1,7 +1,7 @@
 {
   "name": "fittforma-ai-mobile",
   "private": true,
-  "version": "0.53.1",
+  "version": "0.54.0",
   "description": "App Android de FittForma AI (Capacitor): la misma app web con GPS en segundo plano.",
   "type": "module",
   "scripts": {

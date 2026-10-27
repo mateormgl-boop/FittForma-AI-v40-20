@@ -38,9 +38,9 @@ test('la búsqueda de Todos busca personas y limpiarla vuelve al directorio',asy
 
 test('version, backend and service-worker cache match v41.0',async()=>{
  const a=JSON.parse(await read('package.json')),b=JSON.parse(await read('backend/package.json'));
- assert.equal(a.version,'0.53.1');assert.equal(b.version,'0.53.1');
+ assert.equal(a.version,'0.54.0');assert.equal(b.version,'0.54.0');
  const server=await read('backend/server.mjs'),html=await read('index.html'),sw=await read('sw.js');
- assert.match(server,/0\.53\.1/);assert.match(html,/Versión 53\.1/);assert.match(sw,/fittforma-ai-static-v53-1/);
+ assert.match(server,/0\.54\.0/);assert.match(html,/Versión 54\.0/);assert.match(sw,/fittforma-ai-static-v54-0/);
 });
 
 test('la navegación y los títulos principales de Comunidad están traducidos en los seis idiomas',async()=>{
