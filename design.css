@@ -1327,3 +1327,26 @@ body{font-feature-settings:"cv11","ss01"}
 .cm-sugg{flex:0 0 112px;display:grid;justify-items:center;gap:3px;padding:12px 8px;border-radius:18px;border:1px solid var(--ff-border);background:var(--ff-panel);color:inherit;font:inherit;text-align:center;cursor:pointer}
 .cm-sugg strong{font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cm-sugg small{font-size:11px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Nutrición: guía según el objetivo y filtro de recetas */
+.ng-card h3{margin:8px 0 4px}
+.ng-goals{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ng-idea{margin:0 0 12px;color:var(--text-2);line-height:1.55}
+.ng-plate-row{display:flex;align-items:center;gap:16px;margin:4px 0 14px}
+.ng-plate{--veg:50;--carb:25;flex:0 0 112px;width:112px;height:112px;border-radius:50%;border:6px solid var(--ff-panel-2);background:conic-gradient(#2f9e62 0 calc(var(--veg) * 1%),#d79a2b 0 calc((var(--veg) + var(--carb)) * 1%),#d4574e 0 100%);box-shadow:var(--ff-shadow-sm)}
+.ng-legend{list-style:none;margin:0;padding:0;display:grid;gap:5px;font-size:13.5px;min-width:0}
+.ng-legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:7px;vertical-align:-1px}
+.ng-legend i.v{background:#2f9e62}.ng-legend i.c{background:#d79a2b}.ng-legend i.p{background:#d4574e}
+.ng-facts{display:grid;gap:8px;margin-bottom:12px}
+.ng-facts>div{padding:10px 12px;border-radius:14px;background:var(--ff-panel-2);border:1px solid var(--ff-border)}
+.ng-facts small{display:block;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3)}
+.ng-facts p{margin:3px 0 0;font-size:14px;line-height:1.5}
+.ng-lists{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.ng-lists h4{margin:0 0 6px;font-size:14px}
+.ng-lists ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:13.5px;color:var(--text-2)}
+.ng-recipes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:6px 0 12px}
+.ng-recipe{display:grid;gap:2px;text-align:left;padding:10px 12px;border-radius:14px;border:1px solid var(--ff-border);background:var(--ff-panel);color:inherit;font:inherit;cursor:pointer}
+.ng-recipe strong{font-size:13.5px}
+.ng-recipe small{font-size:11.5px;color:var(--text-3)}
+.ng-sources a{color:inherit;text-decoration:underline}
+.recipe-filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+@media(max-width:420px){.ng-plate-row{flex-direction:column;align-items:flex-start}.ng-lists,.ng-recipes{grid-template-columns:1fr}}

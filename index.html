@@ -2009,7 +2009,7 @@
       <div class="card"><div class="eyebrow">Objetivos diarios orientativos</div><div class="grid2"><div class="field"><label for="calorieGoal">Calorías (kcal)</label><input id="calorieGoal" type="number" min="800" max="6000" step="50" value="2400"></div><div class="field"><label for="proteinGoal">Proteínas (g)</label><input id="proteinGoal" type="number" min="20" max="400" step="5" value="120"></div><div class="field"><label for="carbGoal">Carbohidratos (g)</label><input id="carbGoal" type="number" min="0" max="800" step="5" value="280"></div><div class="field"><label for="fatGoal">Grasas (g)</label><input id="fatGoal" type="number" min="0" max="300" step="5" value="80"></div></div><button class="btn secondary full" id="estimateNutritionGoals" type="button">Calcular objetivos con mi perfil</button><button type="button" class="btn full" id="saveNutritionGoals">Guardar objetivos</button><p id="nutritionGoalHint" class="muted small" aria-live="polite">Podés calcular una referencia con edad, altura, peso actual, objetivo de peso y actividad en Perfil. Revisá la propuesta antes de guardarla.</p><p class="muted small">Son estimaciones generales para adultos, no una prescripción médica o dietética. Para menores de 18 años, embarazo, enfermedades o necesidades específicas, consultá con un profesional.</p></div>
       <div class="card"><h3>Menú diario orientativo</h3><p class="muted small">Arma una propuesta con alimentos de la base local teniendo en cuenta tus objetivos de calorías y proteínas. No es una dieta clínica ni contempla alergias o condiciones médicas. Revisá ingredientes y porciones antes de agregarla.</p><button class="btn secondary full" id="generateMenu" type="button">Generar menú para hoy</button><div id="menuProposal"></div></div>
       <div class="card" id="mealPlanCard"><div class="section-head"><div><div class="eyebrow">Plan semanal</div><h3>Tus comidas de la semana</h3><p class="muted small">Planificá por día. Nada se registra hasta que vos lo confirmes.</p></div></div><div class="ff-chips" id="mealPlanDays" role="group" aria-label="Día de la semana"></div><div class="field"><label for="mealPlanFavorite" class="sr-only">Agregar una comida favorita</label><select id="mealPlanFavorite"></select></div><div id="mealPlanList"></div></div>
-      <div class="card" id="recipesCard"><div class="section-head"><div><div class="eyebrow">Recetas</div><h3>Ideas con valores estimados</h3><p class="muted small">Cargalas en el registro o agregalas al plan del día elegido.</p></div></div><div id="recipeList" class="recipe-list"></div></div>
+      <div class="card" id="recipesCard"><div class="section-head"><div><div class="eyebrow">Recetas</div><h3>Ideas con valores estimados</h3><p class="muted small">Cargalas en el registro o agregalas al plan del día elegido.</p></div></div><div id="recipeFilters"></div><div id="recipeList" class="recipe-list"></div></div>
       </div>
       <div class="view-panel" role="tabpanel" data-view-panel="historial" hidden>
       <div class="card nutrition-week-card"><div class="section-head"><div><h3>Tu tendencia semanal</h3><p class="muted small">Compará tus registros recientes de comida e hidratación. Los días sin registro no se cuentan como cero consumo.</p></div><span class="tag">7 días</span></div><div id="nutritionWeekSummary" class="progress-insight-grid"></div><div class="nutrition-week-legend"><span><i class="nutrition-legend-cal"></i>Calorías vs. objetivo</span><span><i class="nutrition-legend-protein"></i>Proteína vs. objetivo</span><span><i class="nutrition-legend-water"></i>Vasos vs. objetivo</span></div><div id="nutritionWeekChart" class="nutrition-week-chart"></div><p class="muted small">Son estimaciones a partir de lo que registraste, no un análisis de tu alimentación completa. Verificá porciones, preparación y etiquetas.</p></div>
@@ -2412,14 +2412,14 @@
         <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
         <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">54.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">55.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
       </details>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 54.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 55.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -2446,7 +2446,7 @@
   <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V54.0</p>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V55.0</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -3431,7 +3431,7 @@ function findCatalogExercise(name){
     if(!d.exercises.length)return `<p class="notice small">Con tu equipamiento no hay ejercicios para ${esc(d.groupLabels.join(', '))}. Cambiá el equipamiento en Rutinas (por ejemplo, gimnasio o casa con mancuernas) o elegí otros grupos.</p>`;
     return `<div class="focus-preview"><div class="focus-preview-head"><div><small>${esc(d.split)}</small><strong>${esc(d.title)}</strong><span class="muted small">${esc(d.groupLabels.join(' · '))} · ${d.exercises.length} ejercicios</span></div></div>
       <ol>${d.exercises.map(e=>`<li><span>${esc(e.name)}</span><small>${esc(String(e.sets))} × ${esc(String(e.reps))}</small></li>`).join('')}</ol>
-      ${d.missing.length?`<p class="muted small">Sin ejercicios para ${esc(d.missing.join(', '))} con tu equipamiento actual: se reemplazó por lo más parecido.</p>`:''}
+      ${d.missing.length?`<p class="muted small">Sin ejercicios para ${esc(d.missing.join(', '))} con tu equipamiento actual: se completó con ejercicios de los otros grupos.</p>`:''}
       <div class="btn-row"><button type="button" class="btn" id="focusStart">Empezar ahora</button><button type="button" class="btn ghost" id="focusSave">Guardar como rutina</button></div></div>`;
   }
   function focusProfile(){const p=state.profile||{};return {goal:p.goal,level:p.level,equipment:p.equipment,duration:p.duration};}
@@ -4292,7 +4292,7 @@ function findCatalogExercise(name){
     // Qué entrenar para subir: los músculos más atrasados y una sesión armada con esos grupos.
     const weakest=now.weakest||[],groups=[...new Set(weakest.map(m=>MR_GROUP[m.id]).filter(Boolean))];
     $('mrNext').innerHTML=`<div class="eyebrow">Qué entrenar para subir</div><h3>${now.total?'Tus músculos más atrasados':'Empezá por acá'}</h3>
-      ${now.total?`<ul class="mr-next-list">${weakest.map(m=>{const r=MR.RANKS[m.rank],st=MR.nextStep(m.score);return `<li><span class="mr-mini">${MR.emblemSvg(m.rank,34)}</span><div><strong>${esc(names[m.id])}</strong><small>${r?esc(r.name):'Sin rango'} · ${st.next?`faltan ${series(st.missing)} para ${esc(st.next.name)}`:'rango máximo'}</small></div></li>`;}).join('')}</ul>
+      ${now.total?`<ul class="mr-next-list">${weakest.map(m=>{const r=MR.RANKS[m.rank],st=MR.nextStep(m.score);return `<li><span class="mr-mini">${MR.emblemSvg(m.rank,34)}</span><div><strong>${esc(names[m.id])}</strong><small>${r?esc(r.name):'Sin rango'} · ${st.next?`${Number(st.missing)===1?'falta':'faltan'} ${series(st.missing)} para ${esc(st.next.name)}`:'rango máximo'}</small></div></li>`;}).join('')}</ul>
       <p class="muted small">Entrenarlos es lo que más rápido sube tu rango general${behind?` (${behind} de 20 músculos están por debajo del próximo rango)`:''}.</p>`:'<p class="muted small">Completá tu primer entrenamiento marcando las series como hechas y tus músculos empiezan a sumar.</p>'}
       <div class="btn-row">${groups.length?`<button type="button" class="btn" id="mrTrainWeak">Entrenar esto hoy</button>`:''}<button type="button" class="btn ghost" data-goto-view="exercises">Ver ejercicios</button></div>`;
     $('mrTrainWeak')?.addEventListener('click',()=>{const d=FittFormaTraining.buildGroupsDay(groups,focusProfile(),{key:'custom',title:'Músculos atrasados',split:'Para subir tu rango'});if(!d)return;switchView('train');setTimeout(()=>{setFocusDraft(d);$('focusPicker')?.scrollIntoView({behavior:'smooth',block:'start'});},60);});
@@ -4303,7 +4303,7 @@ function findCatalogExercise(name){
     const upTop=ups.slice().sort((x,y)=>y.rank-x.rank);$('mrCompareNote').textContent=ups.length?`En los últimos 30 días subieron de rango ${ups.length} ${ups.length===1?'músculo':'músculos'}: ${upTop.slice(0,3).map(u=>`${names[u.id]} (${MR.RANKS[u.rank].name})`).join(', ')}${ups.length>3?' y más':''}.`:now.total?'En los últimos 30 días ningún músculo cambió de rango todavía.':'Los colores aparecen a medida que entrenás.';
     document.querySelectorAll('[data-mr-side]').forEach(b=>{const on=b.dataset.mrSide===mrSide;b.setAttribute('aria-pressed',String(on));b.classList.toggle('active',on);});
     $('mrLadder').innerHTML=rankLadderMarkup(ov,r=>`${r.min} series`);
-    const row=m=>{const r=MR.RANKS[m.rank],st=MR.nextStep(m.score);return `<li class="mr-row"><span class="mr-mini">${MR.emblemSvg(m.rank,36)}</span><div class="mr-row-copy"><div class="mr-row-top"><strong>${esc(names[m.id])}</strong><span style="color:${r?.glow||'#8b9ab8'}">${r?esc(r.name):'Sin rango'}</span></div><div class="mr-bar"><span style="width:${Math.round(st.pct*100)}%;background:${(st.next||r)?.color||'#5b6680'}"></span></div><small>${series(Math.round(m.score*10)/10)}${st.next?` · faltan ${series(st.missing)} para ${esc(st.next.name)}`:' · rango máximo'}</small></div></li>`;};
+    const row=m=>{const r=MR.RANKS[m.rank],st=MR.nextStep(m.score);return `<li class="mr-row"><span class="mr-mini">${MR.emblemSvg(m.rank,36)}</span><div class="mr-row-copy"><div class="mr-row-top"><strong>${esc(names[m.id])}</strong><span style="color:${r?.glow||'#8b9ab8'}">${r?esc(r.name):'Sin rango'}</span></div><div class="mr-bar"><span style="width:${Math.round(st.pct*100)}%;background:${(st.next||r)?.color||'#5b6680'}"></span></div><small>${series(Math.round(m.score*10)/10)}${st.next?` · ${Number(st.missing)===1?'falta':'faltan'} ${series(st.missing)} para ${esc(st.next.name)}`:' · rango máximo'}</small></div></li>`;};
     $('mrList').innerHTML=MR_ZONES.map(([zone,ids])=>{const ms=now.muscles.filter(m=>ids.includes(m.id));const best=Math.max(-1,...ms.map(m=>m.rank));return `<section class="mr-zone"><h4>${esc(zone)}<span>${best>=0?esc(MR.RANKS[best].name):'Sin rango'}</span></h4><ul class="mr-list">${ms.sort((a,b)=>b.score-a.score).map(row).join('')}</ul></section>`;}).join('');
   }
   document.addEventListener('click',e=>{const b=e.target.closest('[data-mr-side]');if(b){mrSide=b.dataset.mrSide;renderMuscleRanks();}});
@@ -4759,7 +4759,8 @@ function findCatalogExercise(name){
     const NG=window.FittFormaNutritionGuides,gk=currentGuideKey(),gTitle=NG?.GUIDES?.[gk]?.title||'';
     const list=recipeFilter==='goal'?RECIPES.filter(r=>(r.tags||[]).includes(gk)):RECIPES;
     const filters=NG?`<div class="ff-chips recipe-filters" role="group" aria-label="Filtrar recetas"><button type="button" class="ff-chip${recipeFilter==='all'?' active':''}" data-recipe-filter="all" aria-pressed="${recipeFilter==='all'}">Todas (${RECIPES.length})</button><button type="button" class="ff-chip${recipeFilter==='goal'?' active':''}" data-recipe-filter="goal" aria-pressed="${recipeFilter==='goal'}">Para ${esc(gTitle.toLowerCase())}</button></div>`:'';
-    root.innerHTML=filters+list.map(r=>`<details class="recipe"><summary><img src="./assets/illustrations/meal-${mealSlugOf(r.type)}.svg" alt="" width="56" height="56" loading="lazy"><span><strong>${esc(r.name)}</strong><small>${esc(r.type)} · ${r.minutes} min · ${r.kcal} kcal · ${r.protein} g proteína</small></span></summary><div class="recipe-body"><p class="muted small">${r.computed?`Por porción (${r.grams} g), calculado con la base de alimentos (USDA) según los ingredientes: ${r.kcal} kcal · P ${r.protein} g · C ${r.carbs} g · G ${r.fat} g. Puede variar con las marcas y la cocción.`:`Por porción (estimación): ${r.kcal} kcal · P ${r.protein} g · C ${r.carbs} g · G ${r.fat} g. Verificá cantidades y marcas.`}</p><h5>Ingredientes</h5><ul>${r.ingredients.map(i=>`<li>${esc(i)}</li>`).join('')}</ul><h5>Preparación</h5><ol>${r.steps.map(i=>`<li>${esc(i)}</li>`).join('')}</ol><div class="btn-row"><button class="btn btn-sm" type="button" data-recipe-log="${r.id}">Cargar en el registro</button><button class="btn ghost btn-sm" type="button" data-recipe-plan="${r.id}">Agregar al plan del ${esc(WEEKDAYS[mealPlanDay].toLowerCase())}</button></div></div></details>`).join('');
+    const fbox=$('recipeFilters');if(fbox)fbox.innerHTML=filters;
+    root.innerHTML=list.map(r=>`<details class="recipe"><summary><img src="./assets/illustrations/meal-${mealSlugOf(r.type)}.svg" alt="" width="56" height="56" loading="lazy"><span><strong>${esc(r.name)}</strong><small>${esc(r.type)} · ${r.minutes} min · ${r.kcal} kcal · ${r.protein} g proteína</small></span></summary><div class="recipe-body"><p class="muted small">${r.computed?`Por porción (${r.grams} g), calculado con la base de alimentos (USDA) según los ingredientes: ${r.kcal} kcal · P ${r.protein} g · C ${r.carbs} g · G ${r.fat} g. Puede variar con las marcas y la cocción.`:`Por porción (estimación): ${r.kcal} kcal · P ${r.protein} g · C ${r.carbs} g · G ${r.fat} g. Verificá cantidades y marcas.`}</p><h5>Ingredientes</h5><ul>${r.ingredients.map(i=>`<li>${esc(i)}</li>`).join('')}</ul><h5>Preparación</h5><ol>${r.steps.map(i=>`<li>${esc(i)}</li>`).join('')}</ol><div class="btn-row"><button class="btn btn-sm" type="button" data-recipe-log="${r.id}">Cargar en el registro</button><button class="btn ghost btn-sm" type="button" data-recipe-plan="${r.id}">Agregar al plan del ${esc(WEEKDAYS[mealPlanDay].toLowerCase())}</button></div></div></details>`).join('');
   }
   // v55: guía de alimentación según el objetivo (nutrition-guides.js). Orientativa; no es un plan clínico.
   let guideKeyChoice='';
@@ -4770,7 +4771,7 @@ function findCatalogExercise(name){
     const w=Number(state.profile?.currentWeightKg),prot=NG.proteinRange(key,w);
     const carbs=g.carbs&&w>=30?g.carbs.map(c=>`${c.label}: ${Math.round(c.min*w/10)*10}–${Math.round(c.max*w/10)*10} g de carbohidratos`).join(' · '):'';
     const recs=RECIPES.filter(r=>(r.tags||[]).includes(key)).slice(0,4);
-    root.innerHTML=`<div class="eyebrow">Cómo comer según tu objetivo</div><div class="ff-chips ng-goals" role="group" aria-label="Objetivo">${Object.entries(NG.GUIDES).map(([k,x])=>`<button type="button" class="ff-chip${k===key?' active':''}" data-guide="${k}" aria-pressed="${k===key}">${esc(x.title)}${k===auto?' ·  tu objetivo':''}</button>`).join('')}</div>
+    root.innerHTML=`<div class="eyebrow">Cómo comer según tu objetivo</div><div class="ff-chips ng-goals" role="group" aria-label="Objetivo">${Object.entries(NG.GUIDES).map(([k,x])=>`<button type="button" class="ff-chip${k===key?' active':''}" data-guide="${k}" aria-pressed="${k===key}">${esc(x.title)}${k===auto?' · tu objetivo':''}</button>`).join('')}</div>
       <h3>${esc(g.title)}</h3><p class="ng-idea">${esc(g.idea)}</p>
       <div class="ng-plate-row"><div class="ng-plate" role="img" aria-label="Plato: ${g.plate.veg} % verduras y frutas, ${g.plate.carbs} % cereales y tubérculos, ${g.plate.protein} % proteína" style="--veg:${g.plate.veg};--carb:${g.plate.carbs}"></div>
         <ul class="ng-legend"><li><i class="v"></i>Verduras y frutas ${g.plate.veg} %</li><li><i class="c"></i>Cereales, legumbres y tubérculos ${g.plate.carbs} %</li><li><i class="p"></i>Proteína ${g.plate.protein} %</li><li class="muted small">Sumá una porción de grasa buena (aceite de oliva, palta o frutos secos) y agua.</li></ul></div>
@@ -5262,7 +5263,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.54.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.54.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.55.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.55.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -5771,7 +5772,7 @@ function findCatalogExercise(name){
     if(name==='train')renderTrain();
     if(name==='running'){renderRunningPlan();renderRunningHistory();updateRunPacePreview();initGpsMap();if(gpsMapInstance)setTimeout(()=>gpsMapInstance.invalidateSize(),140);}
     if(name==='progress'){renderProgress();renderWeights();}
-    if(name==='nutrition')renderNutrition();
+    if(name==='nutrition'){renderNutrition();renderNutritionGuide();renderRecipes();}
     if(name==='coach')renderCoach();
     if(name==='community')window.FittFormaCommunity?.refresh?.();
     document.querySelectorAll('.subnav-item[data-subview]').forEach(b=>{const on=b.dataset.subview===name;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
@@ -6090,7 +6091,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.54.0';
+  const APP_VERSION='0.55.0';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');

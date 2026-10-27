@@ -1,7 +1,19 @@
-# Despliegue de FittForma AI v54.0
+# Despliegue de FittForma AI v55.0
 
-Esta guía es la lista de pasos para publicar v54.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v55.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
+
+## Qué cambia en v55.0
+
+- **No hay migraciones nuevas.** Todo lo de v55 funciona en el dispositivo o con funciones que ya existían.
+- Archivo nuevo: `nutrition-guides.js`. Ya está en la caché del service worker y en la lista del servidor.
+- **Importante si en producción no se ve la foto de perfil, los músculos o las insignias en Comunidad:** casi seguro faltan migraciones anteriores en Supabase. Hay que aplicarlas en este orden:
+  1. `2026-10-22_v49_badges.sql`
+  2. las de v50
+  3. `2026-10-27_v53_athlete_community.sql`
+  4. `2026-10-28_v53_profile_extras.sql`
+  5. `2026-10-29_v54_weekly_alerts.sql`
+- Desde v55 la app dice qué falta (por ejemplo, «falta el bucket» o «falta la columna») en vez de un error genérico.
 
 ## Qué cambia en v54.0
 
