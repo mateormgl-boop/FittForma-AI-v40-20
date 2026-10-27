@@ -1,5 +1,42 @@
 # FittForma AI — Registro de cambios
 
+## v55.0 — Entrenar por grupos, «Lo hice», Músculos más claro y guía de alimentación (27 de octubre de 2026)
+
+- **Entrenar por grupos musculares** («¿Qué vas a entrenar hoy?»):
+  - Combinaciones que se entrenan juntas habitualmente:
+    - Empuje · Tracción · Piernas.
+    - Torso · Tren inferior.
+    - Pares clásicos: pecho y tríceps, espalda y bíceps, hombros y core.
+    - Músculos opuestos: pecho y espalda, brazos.
+    - Cuerpo completo.
+  - «Elegí vos los grupos»: se marcan los grupos a mano (por ejemplo, pecho y gemelos).
+  - La sesión se arma con tu equipamiento, nivel y objetivo, y se ve antes de empezar. Después se puede empezar ahora o guardar como rutina.
+  - Si con tu equipamiento no hay ejercicios para un grupo (por ejemplo, bíceps solo con peso corporal), se avisa en vez de inventar.
+- **«Lo hice» en la ficha de cada ejercicio:** registra un ejercicio suelto (series, repeticiones o segundos, peso, fecha) sin hacer una rutina.
+  - Cuenta para marcas, insignias y músculos.
+  - Si no cargás minutos, no se estiman.
+- **Comunidad:**
+  - Tu rango aparece al lado de tu nombre y del de cada persona (tarjetas, perfil y ranking).
+  - «Mis músculos» en tu perfil, calculado en el dispositivo aunque el servidor todavía no tenga la migración de v53.1.
+  - Volvieron las cuentas sugeridas en Todos.
+  - Mensajes más claros cuando no se puede cambiar la foto de perfil, explicando qué falta en el servidor.
+- **Músculos rediseñado:**
+  - Explica en palabras simples qué es tu rango.
+  - «Qué entrenar para subir» muestra tus músculos más atrasados, con el botón «Entrenar esto hoy» que arma la sesión.
+  - Leyenda de colores y músculos agrupados por zona.
+  - Contraste correcto en el tema claro.
+- **Nutrición:**
+  - Guía «Cómo comer según tu objetivo» (bajar grasa, mantener, ganar músculo, fuerza, resistencia) con:
+    - el plato por proporciones;
+    - energía;
+    - proteína en g/kg y en gramos con tu peso;
+    - carbohidratos para resistencia;
+    - «Priorizá» y «Moderá»;
+    - fuentes.
+  - 17 recetas nuevas (25 en total) calculadas con la base de alimentos (USDA), con filtro «Para tu objetivo».
+  - Es orientativa y no reemplaza a un profesional.
+- **Sin migraciones nuevas.** Pruebas en `tests/v55.test.mjs` y `tests/e2e/v55.e2e.mjs`.
+
 ## v54.0 — Comunidad: semana, reto entre amigos, evolución, avisos e historial privado (29 de octubre de 2026)
 
 - **Ranking de esta semana:** en Constancia y Running se elige «Últimos 30 días» o «Esta semana». La semana va de lunes a hoy y se reinicia cada lunes.

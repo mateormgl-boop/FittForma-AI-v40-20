@@ -103,7 +103,18 @@
     avatar.outerHTML=avatarHtml(p||{display_name:'FF'},urlOf,'lg').replace('<span class="community-avatar','<span id="communityOwnAvatar" class="community-avatar');
     const tab=$('communityTabAvatar');const url=p?.avatar_path&&urlOf?urlOf(p.avatar_path):'';
     if(tab){tab.classList.toggle('has-photo',Boolean(url));if(url)tab.innerHTML=`<img src="${esc(url)}" alt="">`;}
+    renderOwnRankAndMuscles();
     const featured=$('communityOwnFeatured');if(featured)featured.innerHTML=featuredHtml(p?.featured_badges?.length?p.featured_badges:(window.FittFormaFeaturedBadgesPayload?.()||[]),26);
+  }
+  // v55: tu rango y tu mapa de músculos en Mi perfil, calculados en el dispositivo (se ven aunque falte una migración).
+  function renderOwnRankAndMuscles(){
+    const mine=window.FittFormaMyMuscles?.();const rk=$('communityOwnRank');if(rk)rk.innerHTML=mine?rankMini(mine.overall):'';
+    const box=$('communityOwnMuscles');if(!box)return;
+    const A=window.FittFormaAnatomy,R=MRK();if(!mine||!A?.muscleFillSvg||!R){box.hidden=true;return;}
+    box.hidden=false;const fills={};for(const m of mine.muscles||[])if(m.rank>=0&&R.RANKS[m.rank])fills[m.id]=R.RANKS[m.rank].color;
+    const ranked=(mine.muscles||[]).filter(m=>m.rank>=0).sort((a,b)=>b.rank-a.rank||b.score-a.score);
+    box.innerHTML=`<div class="cm-own-muscles-head"><div><h3>Mis músculos</h3><p class="muted small">${ranked.length} de 20 con rango · así se ve en tu perfil${$('communityShowMuscles')&&!$('communityShowMuscles').checked?' (ahora oculto para los demás)':''}.</p></div><button class="btn ghost btn-sm" type="button" id="communityOwnMusclesGo">Ver detalle</button></div><div class="cm-muscle-map">${A.muscleFillSvg(fills,{label:'Tu rango por músculo'})}</div>${ranked.length?`<ul class="cm-muscle-top">${ranked.slice(0,3).map(m=>`<li>${rankChip(m.rank,20)}<span>${esc((A.MUSCLES||{})[m.id]||m.id)}</span></li>`).join('')}</ul>`:'<p class="muted small">Completá series en tus entrenamientos y tus músculos se van a ir pintando.</p>'}`;
+    $('communityOwnMusclesGo')?.addEventListener('click',()=>window.FittFormaShowMuscles?.());
   }
   function statsHtml(posts,followers,following){return `<span><b>${Number(posts)||0}</b> publicaciones</span><span><b>${Number(followers)||0}</b> seguidores</span><span><b>${Number(following)||0}</b> seguidos</span>`;}
   async function refreshOwnCounts(){if(!client||!user)return;try{
@@ -233,7 +244,7 @@
       if(error)throw error;
       if(previous&&previous!==path)await client.storage.from(bucket).remove([previous]).catch(()=>{});
       fillProfile(data);setStatus('communityProfileStatus','Foto de perfil actualizada.');setStatus('communityAvatarStatus','Foto de perfil actualizada.');toast('Foto de perfil actualizada.');closeViewer();
-    }catch(error){await client.storage.from(bucket).remove([path]).catch(()=>{});const msg=error?.code?friendlySupabaseError(error,'guardar la foto de perfil'):`No se pudo guardar la foto: ${error.message}`;setStatus('communityProfileStatus',msg);setStatus('communityAvatarStatus',msg);}
+    }catch(error){await client.storage.from(bucket).remove([path]).catch(()=>{});const raw=String(error?.message||''),msg=/bucket not found/i.test(raw)?'Falta crear el espacio de fotos «community-media» en Supabase (se crea con supabase/community.sql).':/row-level security|unauthorized|403/i.test(raw)?'Supabase no permitió subir la foto: revisá que estén aplicadas las migraciones de Comunidad (v49 y v50).':/avatar_path|column/i.test(raw)?'Falta aplicar la migración v49 de Comunidad (foto de perfil).':error?.code?friendlySupabaseError(error,'guardar la foto de perfil'):`No se pudo guardar la foto: ${raw}`;toast(msg);setStatus('communityProfileStatus',msg);setStatus('communityAvatarStatus',msg);}
     finally{if($('communityAvatarInput'))$('communityAvatarInput').value='';}
   }
   // v50: quitar la foto de perfil (vuelve la imagen predeterminada con iniciales).
@@ -566,17 +577,19 @@
   let athleteEnabled=null,viewedUser=null,compareUser=null;
   const LOCK_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
   function rankChip(i,size=26){const R=MRK();if(!R||!Number.isInteger(Number(i))||Number(i)<0||!R.RANKS[Number(i)])return '<span class="cm-rank is-none">Sin rango</span>';const r=R.RANKS[Number(i)];return `<span class="cm-rank" style="--rk:${esc(r.glow||r.color||'#8b9ab8')}">${R.emblemSvg(Number(i),size)}<b>${esc(r.name)}</b></span>`;}
+  // v55: rango junto al nombre (emblema chico y nombre del rango).
+  function rankMini(i){const R=MRK();const n=Number(i);if(!R||!Number.isInteger(n)||n<0||!R.RANKS[n])return '';const r=R.RANKS[n];return ` <span class="cm-rank cm-rank-mini" style="--rk:${esc(r.glow||r.color)}" title="Rango general: ${esc(r.name)}">${R.emblemSvg(n,18)}<b>${esc(r.name)}</b></span>`;}
   function levelLine(p){if(!p?.stats_visible)return '';return [LEVEL_LABEL[p.training_level]||'',p.xp_level?`Nivel ${Number(p.xp_level)}`:''].filter(Boolean).join(' · ');}
   function followLabel(fs,priv){return fs==='accepted'?'Siguiendo':fs==='pending'?'Solicitud enviada':priv?'Solicitar seguir':'Seguir';}
   function athleteCard(p,urlOf,opts={}){
     const uid=esc(p.user_id),name=esc(p.display_name||p.username),locked=p.can_view===false,fs=p.follow_status||'',meta=levelLine(p);
-    const side=p.stats_visible?rankChip(p.overall_rank,30):locked?`<small class="community-private-tag">${LOCK_SVG}Perfil privado</small>`:'<span class="cm-rank is-none">Sin estadísticas</span>';
+    const side=p.stats_visible?'':locked?`<small class="community-private-tag">${LOCK_SVG}Perfil privado</small>`:'<span class="cm-rank is-none">Sin estadísticas</span>';
     const latest=p.stats_visible&&p.latest_badge?.exerciseName?`<small class="cm-latest">Último logro: ${esc(p.latest_badge.exerciseName)}</small>`:'';
     const mutual=fs==='accepted'&&p.follows_me;
     const actions=[opts.position?`<span class="cm-pos" title="Puesto en el ranking de rango general entre tus amigos">#${Number(opts.position)} en rango</span>`:'',
       user&&!p.is_self?`<button class="btn btn-sm${fs?' secondary':''}" type="button" data-community-search-follow="${uid}">${followLabel(fs,p.visibility==='private')}</button>`:'',
       opts.compare&&user&&!p.is_self&&p.stats_visible?`<button class="btn ghost btn-sm" type="button" data-community-compare="${uid}">Comparar</button>`:''].filter(Boolean).join('');
-    return `<article class="cm-card${locked?' is-private':''}${p.is_self?' is-self':''}"><button type="button" class="cm-card-open" data-community-open-user="${uid}" aria-label="Ver el perfil de ${name}">${avatarHtml(p,urlOf,'lg')}<span class="cm-card-id"><strong>${name} <span data-flag-for="${uid}"></span></strong><small class="muted">@${esc(p.username)}${p.is_self?' · Vos':mutual?' · Se siguen':''}</small>${meta?`<small class="cm-card-level">${esc(meta)}</small>`:''}${latest}</span><span class="cm-card-side">${side}<span class="cm-card-badges">${featuredHtml(p.featured_badges,20)}</span></span></button>${actions?`<div class="cm-card-actions">${actions}</div>`:''}</article>`;
+    return `<article class="cm-card${locked?' is-private':''}${p.is_self?' is-self':''}"><button type="button" class="cm-card-open" data-community-open-user="${uid}" aria-label="Ver el perfil de ${name}">${avatarHtml(p,urlOf,'lg')}<span class="cm-card-id"><strong>${name} <span data-flag-for="${uid}"></span>${p.stats_visible?rankMini(p.overall_rank):''}</strong><small class="muted">@${esc(p.username)}${p.is_self?' · Vos':mutual?' · Se siguen':''}</small>${meta?`<small class="cm-card-level">${esc(meta)}</small>`:''}${latest}</span><span class="cm-card-side">${side}<span class="cm-card-badges">${featuredHtml(p.featured_badges,20)}</span></span></button>${actions?`<div class="cm-card-actions">${actions}</div>`:''}</article>`;
   }
   // Tarjeta del directorio de v50 (sin estadísticas), para proyectos sin la migración v53.
   function legacyToAthlete(p){return {...p,stats_visible:false,follows_me:false};}
@@ -619,7 +632,17 @@
   async function searchUsers(e){
     e.preventDefault();searchTerm=$('communitySearch').value.trim();
     if(!client){setStatus('communityWorldStatus',authHint());return;}
-    peopleTerm=searchTerm.replace(/^[@#]/,'').replace(/[,%()]/g,'');await loadDirectory(true);
+    peopleTerm=searchTerm.replace(/^[@#]/,'').replace(/[,%()]/g,'');loadSuggested();await loadDirectory(true);
+  }
+  // «Personas sugeridas» (perfiles públicos que todavía no seguís), arriba del directorio cuando no hay búsqueda.
+  async function loadSuggested(){
+    const wrap=$('communitySuggestedWrap'),root=$('communitySuggested');if(!wrap||!root||!client)return;
+    if(!user||peopleTerm){wrap.hidden=true;return;}
+    const r=await client.rpc('community_suggested_profiles');
+    if(r.error||!r.data?.length){wrap.hidden=true;return;}
+    const list=r.data.slice(0,10),urlOf=await signedMany(list.map(x=>x.avatar_path));
+    root.innerHTML=list.map(p=>`<button type="button" class="cm-sugg" data-community-open-user="${esc(p.user_id)}">${avatarHtml(p,urlOf,'lg')}<strong>${esc(p.display_name||p.username)}</strong><small class="muted">@${esc(p.username)}</small></button>`).join('');
+    wrap.hidden=false;bindPeople(root);
   }
   function clearSearch(){searchTerm='';peopleTerm='';$('communitySearch').value='';loadDirectory(true);}
 
@@ -673,7 +696,7 @@
     const name=esc(x.is_self?'Vos':(x.display_name||x.username)),uid=esc(x.user_id),pos=Number(x.pos)||0,lvl=LEVEL_LABEL[x.training_level]||'';
     const value=formatMetric(rankCategory,x.value);
     if(podium)return `<li class="cm-podium-step p${Math.min(pos,3)}${x.is_self?' is-self':''}"><button type="button" data-community-open-user="${uid}" aria-label="Puesto ${pos}: ${name}, ${esc(value)}">${avatarHtml(x,urlOf,'lg')}<span class="cm-podium-pos">${pos}</span><strong>${name}</strong><small>${esc(value)}</small></button></li>`;
-    return `<li class="cm-board-row${x.is_self?' is-self':''}"><button type="button" data-community-open-user="${uid}" aria-label="Puesto ${pos}: ${name}, ${esc(value)}"><span class="cm-board-pos">${pos}</span>${avatarHtml(x,urlOf)}<span class="cm-board-who"><strong>${name} <span data-flag-for="${uid}"></span></strong><small class="muted">@${esc(x.username)}${lvl?' · '+esc(lvl):''}</small></span><span class="cm-board-meta">${rankCategory==='rank'?'':rankChip(x.overall_rank,22)}<span class="cm-card-badges">${featuredHtml(x.featured_badges,16)}</span></span><b class="cm-board-value">${esc(value)}</b></button></li>`;
+    return `<li class="cm-board-row${x.is_self?' is-self':''}"><button type="button" data-community-open-user="${uid}" aria-label="Puesto ${pos}: ${name}, ${esc(value)}"><span class="cm-board-pos">${pos}</span>${avatarHtml(x,urlOf)}<span class="cm-board-who"><strong>${name} <span data-flag-for="${uid}"></span>${rankCategory==='rank'?'':rankMini(x.overall_rank)}</strong><small class="muted">@${esc(x.username)}${lvl?' · '+esc(lvl):''}</small></span><span class="cm-board-meta"><span class="cm-card-badges">${featuredHtml(x.featured_badges,16)}</span></span><b class="cm-board-value">${esc(value)}</b></button></li>`;
   }
   async function loadRanking(){
     renderRankingChips();const podium=$('rankingPodium'),list=$('rankingList');if(!podium||!list)return;
@@ -809,7 +832,7 @@
     const counts=p.can_view?`<div class="community-profile-stats cm-counts">${statsHtml(p.posts,p.followers,p.following)}</div>`:'';
     const actions=p.is_self?`<p class="muted small">Así ven tu perfil las demás personas.</p>`:user?`<div class="btn-row community-profile-actions"><button class="btn${fs?' secondary':''}" type="button" data-user-follow>${fs==='accepted'?'Dejar de seguir':fs==='pending'?'Cancelar solicitud':priv?'Solicitar seguir':'Seguir'}</button>${p.stats_visible?'<button class="btn ghost" type="button" data-user-compare>Comparar progreso</button>':''}${mutual?'<button class="btn ghost" type="button" data-user-message>Mensaje</button>':''}<button class="btn ghost" type="button" data-community-block>Bloquear</button></div>${!mutual&&fs==='accepted'?'<p class="muted small">Los mensajes privados se habilitan cuando se siguen mutuamente.</p>':''}`:'<p class="muted small">Iniciá sesión para seguir, comparar o escribir.</p>';
     root.innerHTML=`<header class="cm-hero card">
-        <div class="cm-hero-top"><button type="button" class="cm-avatar-btn" data-hero-avatar aria-label="Ver la foto de perfil">${avatarHtml(p,urlOf,'xl')}</button><div class="cm-hero-id"><strong>${esc(p.display_name||p.username)} ${flagHtml(extra.country)}</strong><span class="muted small">@${esc(p.username)}${priv?' · Privado':''}${p.follows_me&&!p.is_self?' · Te sigue':''}</span>${meta?`<span class="cm-card-level">${esc(meta)}</span>`:''}</div></div>
+        <div class="cm-hero-top"><button type="button" class="cm-avatar-btn" data-hero-avatar aria-label="Ver la foto de perfil">${avatarHtml(p,urlOf,'xl')}</button><div class="cm-hero-id"><strong>${esc(p.display_name||p.username)} ${flagHtml(extra.country)}${p.stats_visible?rankMini(p.overall_rank):''}</strong><span class="muted small">@${esc(p.username)}${priv?' · Privado':''}${p.follows_me&&!p.is_self?' · Te sigue':''}</span>${meta?`<span class="cm-card-level">${esc(meta)}</span>`:''}</div></div>
         <div class="cm-hero-rank">${p.stats_visible?`<div><small class="muted">Rango principal</small>${rankChip(p.overall_rank,44)}</div>`:''}<div class="community-featured" aria-label="Insignias destacadas">${featuredHtml(p.featured_badges,30)}</div></div>
         ${p.bio?`<p class="community-profile-bio">${esc(p.bio)}</p>`:''}${counts}${actions}
       </header>
@@ -1174,7 +1197,7 @@
     if(schemaV41===null){schemaV41=true;updateKindAvailability();}
   }
   function loadCurrentView(){
-    if(currentSubView==='world')return loadDirectory(true);
+    if(currentSubView==='world'){loadSuggested();return loadDirectory(true);}
     if(currentSubView==='ranking')return loadRanking();
     if(currentSubView==='friends'){loadChallenge();return loadFriends(true);}
     if(currentSubView==='alerts')return loadAlerts();
@@ -1234,7 +1257,7 @@
       const active=panel.dataset.communityPanel===name;panel.hidden=!active;panel.classList.toggle('is-active',active);
     });
     renderStatsNotice();
-    if(name==='world'&&previous!=='world'&&client)loadDirectory(true);
+    if(name==='world'&&previous!=='world'&&client){loadDirectory(true);loadSuggested();}
     else if(name==='ranking'&&client)loadRanking();
     else if(name==='friends'&&client){loadFriends(true);loadChallenge();}
     else if(name==='alerts'&&client)loadAlerts();

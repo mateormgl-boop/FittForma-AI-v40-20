@@ -1269,3 +1269,84 @@ body{font-feature-settings:"cv11","ss01"}
   .cm-explain dl div{grid-template-columns:72px 1fr}
 }
 .cm-search input:placeholder-shown ~ #communityClearSearch{display:none}
+
+/* ---------- v55: Músculos legible (paleta oscura fija dentro de la sección), grupos, «Lo hice», Mis músculos ---------- */
+#progressPanelMuscles,.ex-rank{--text:#eef3ff;--text-2:#c3cee2;--text-3:#93a2bf;--surface2-rgb:22 30 48;--ff-border:rgba(120,150,210,.22);--ff-panel:#0b1120;--ff-panel-2:#111a2e;color:#eef3ff}
+#progressPanelMuscles .card p,#progressPanelMuscles .card small,#progressPanelMuscles .card li{color:var(--text-2)}
+#progressPanelMuscles .card strong,#progressPanelMuscles .card b{color:#f4f7ff}
+.mr-hero-next{margin:6px 0 0;font-size:13.5px;color:var(--text-2);max-width:34ch}
+.mr-explain{margin:10px 0 0;padding:10px 12px;border-radius:14px;background:rgba(63,141,255,.08);border:1px solid rgba(63,141,255,.18);font-size:13px;line-height:1.5}
+.mr-stats b small{font-size:12px;font-weight:700;color:var(--text-3)}
+.mr-next h3{margin:2px 0 10px}
+.mr-next-list{display:grid;gap:8px;list-style:none;margin:0 0 8px;padding:0}
+.mr-next-list li{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--ff-border)}
+.mr-next-list li div{display:grid;gap:2px}
+.mr-next-list small{font-size:12px}
+.mr-legend{display:flex;flex-wrap:wrap;gap:6px 10px;margin:8px 0 4px;font-size:11.5px;color:var(--text-2)}
+.mr-legend span{display:inline-flex;align-items:center;gap:4px}
+.mr-legend i{display:inline-block;width:10px;height:10px;border-radius:3px}
+.mr-legend i.is-none{background:#3a4357}
+.mr-zones{display:grid;gap:14px}
+.mr-zone h4{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 6px;font-size:14px;color:#f4f7ff}
+.mr-zone h4 span{font-size:12px;color:var(--text-3);font-weight:700}
+.mr-row small{font-size:11.5px;color:var(--text-3)}
+.mr-ladder-card>summary{display:grid;gap:2px;cursor:pointer;list-style:none}
+.mr-ladder-card>summary::-webkit-details-marker{display:none}
+.mr-ladder-card[open]>summary{margin-bottom:10px}
+/* Entrenar por grupos */
+.focus-picker{margin:14px 0;padding:12px;border-radius:16px;background:var(--ff-panel-2,rgba(0,0,0,.03));border:1px solid var(--ff-border)}
+.focus-head{display:grid;gap:2px;margin-bottom:8px}
+.focus-split{margin:8px 0}
+.focus-split>small{display:block;margin-bottom:4px;font-size:11.5px;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em}
+.focus-custom{margin:10px 0}
+.focus-custom>summary{cursor:pointer;font-weight:700;font-size:14px}
+.focus-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:8px 0}
+.focus-group{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;border:1px solid var(--ff-border);background:var(--ff-panel,transparent);font-size:13.5px}
+.focus-preview{margin-top:10px;padding:12px;border-radius:14px;background:var(--ff-panel,transparent);border:1px solid var(--ff-border)}
+.focus-preview-head small{display:block;font-size:11.5px;color:var(--text-3);font-weight:800}
+.focus-preview-head strong{display:block;font-size:17px}
+.focus-preview ol{margin:10px 0;padding-left:20px;display:grid;gap:4px}
+.focus-preview li{font-size:14px}
+.focus-preview li small{margin-left:6px;color:var(--text-3)}
+/* «Lo hice» en la ficha */
+.ex-quicklog{margin:12px 0}
+.ex-quicklog-open{display:flex;align-items:center;justify-content:center;gap:8px}
+.ex-quicklog-open svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ex-quicklog-form{margin-top:10px;padding:12px;border-radius:16px;border:1px solid var(--ff-border);background:var(--ff-panel-2,transparent)}
+.ex-quicklog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+/* Comunidad: rango junto al nombre, Mis músculos, sugeridas */
+.cm-rank-mini{margin-left:6px;font-size:11.5px;vertical-align:middle}
+.cm-rank-mini svg{vertical-align:middle}
+.cm-own-muscles[hidden]{display:none}
+.cm-own-muscles-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.cm-own-muscles-head h3{margin:0}
+.cm-sugg-wrap{margin-bottom:12px}
+.cm-sugg-wrap[hidden]{display:none}
+.cm-sugg-row{display:flex;gap:10px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.cm-sugg-row::-webkit-scrollbar{display:none}
+.cm-sugg{flex:0 0 112px;display:grid;justify-items:center;gap:3px;padding:12px 8px;border-radius:18px;border:1px solid var(--ff-border);background:var(--ff-panel);color:inherit;font:inherit;text-align:center;cursor:pointer}
+.cm-sugg strong{font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cm-sugg small{font-size:11px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Nutrición: guía según el objetivo y filtro de recetas */
+.ng-card h3{margin:8px 0 4px}
+.ng-goals{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ng-idea{margin:0 0 12px;color:var(--text-2);line-height:1.55}
+.ng-plate-row{display:flex;align-items:center;gap:16px;margin:4px 0 14px}
+.ng-plate{--veg:50;--carb:25;flex:0 0 112px;width:112px;height:112px;border-radius:50%;border:6px solid var(--ff-panel-2);background:conic-gradient(#2f9e62 0 calc(var(--veg) * 1%),#d79a2b 0 calc((var(--veg) + var(--carb)) * 1%),#d4574e 0 100%);box-shadow:var(--ff-shadow-sm)}
+.ng-legend{list-style:none;margin:0;padding:0;display:grid;gap:5px;font-size:13.5px;min-width:0}
+.ng-legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:7px;vertical-align:-1px}
+.ng-legend i.v{background:#2f9e62}.ng-legend i.c{background:#d79a2b}.ng-legend i.p{background:#d4574e}
+.ng-facts{display:grid;gap:8px;margin-bottom:12px}
+.ng-facts>div{padding:10px 12px;border-radius:14px;background:var(--ff-panel-2);border:1px solid var(--ff-border)}
+.ng-facts small{display:block;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3)}
+.ng-facts p{margin:3px 0 0;font-size:14px;line-height:1.5}
+.ng-lists{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.ng-lists h4{margin:0 0 6px;font-size:14px}
+.ng-lists ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:13.5px;color:var(--text-2)}
+.ng-recipes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:6px 0 12px}
+.ng-recipe{display:grid;gap:2px;text-align:left;padding:10px 12px;border-radius:14px;border:1px solid var(--ff-border);background:var(--ff-panel);color:inherit;font:inherit;cursor:pointer}
+.ng-recipe strong{font-size:13.5px}
+.ng-recipe small{font-size:11.5px;color:var(--text-3)}
+.ng-sources a{color:inherit;text-decoration:underline}
+.recipe-filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+@media(max-width:420px){.ng-plate-row{flex-direction:column;align-items:flex-start}.ng-lists,.ng-recipes{grid-template-columns:1fr}}

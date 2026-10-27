@@ -9,6 +9,22 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v55
+
+- `tests/v55.test.mjs`:
+  - Las 11 combinaciones arman sesiones sin repetidos y con ejercicios reales; con poco equipamiento se avisa qué grupo falta.
+  - «Lo hice» no estima minutos ni acepta fechas futuras.
+  - Cada músculo se relaciona con un grupo entrenable.
+  - Las recetas resuelven todos sus ingredientes y los kcal cierran con los macros.
+  - Las guías tienen rangos de proteína con fuente.
+- `tests/e2e/v55.e2e.mjs` (24 pasos, solo la app):
+  - Combinaciones, elegir grupos, empezar y guardar como rutina.
+  - «Lo hice» con validación.
+  - «Entrenar esto hoy» desde Músculos.
+  - La guía usa el objetivo y el peso.
+  - Filtro de recetas.
+  - Sin desborde a 320 px y sin errores de JavaScript.
+
 ### v54
 
 - `supabase/tests/rls_v54_test.sql` (41 comprobaciones):
