@@ -2077,14 +2077,15 @@
       </div>
       <div class="progress-panel" id="progressPanelMuscles" role="tabpanel" aria-labelledby="progressTabMuscles" data-progress-panel="muscles" hidden>
         <div class="card mr-hero" id="mrHero"></div>
-        <div class="card mr-next" id="mrNext"></div>
         <div class="card mr-compare">
           <div class="section-head"><div><div class="eyebrow">Mapa de avances</div><h3>Tu cuerpo, pintado por rango</h3></div>
-            <div class="ff-chips" role="group" aria-label="Lado del cuerpo"><button type="button" class="ff-chip" data-mr-side="front" aria-pressed="true">Frente</button><button type="button" class="ff-chip" data-mr-side="back" aria-pressed="false">Espalda</button></div></div>
+            <div class="ff-chips" role="group" aria-label="Qué mostrar"><button type="button" class="ff-chip" data-mr-view="now" aria-pressed="true">Hoy</button><button type="button" class="ff-chip" data-mr-view="compare" aria-pressed="false">Antes y ahora</button></div></div>
+          <div class="ff-chips mr-side-chips" role="group" aria-label="Lado del cuerpo" hidden><button type="button" class="ff-chip" data-mr-side="front" aria-pressed="true">Frente</button><button type="button" class="ff-chip" data-mr-side="back" aria-pressed="false">Espalda</button></div>
           <div class="mr-maps" id="mrMaps"></div>
           <div class="mr-legend" id="mrLegend" aria-label="Colores de los rangos"></div>
           <p class="muted small" id="mrCompareNote"></p>
         </div>
+        <div class="card mr-next" id="mrNext"></div>
         <div class="card"><div class="section-head"><div><div class="eyebrow">Músculo por músculo</div><h3>Cuánto falta para el próximo rango</h3><p class="muted small">Agrupados por zona del cuerpo. La barra muestra el avance hacia el rango siguiente.</p></div></div><div class="mr-zones" id="mrList"></div></div>
         <div class="card mr-volume-card"><div class="eyebrow">Volumen por semana</div><h3>Kilos levantados</h3><p id="mrVolumeHead" class="mr-vol-head"></p><div class="mr-vol" id="mrVolume" role="img" aria-label="Kilos levantados en las últimas 8 semanas"></div><p class="muted small">Suma de peso × repeticiones de las series hechas. Los ejercicios sin carga suman series pero no kilos.</p></div>
         <div class="card rk-board-card" id="rkBoardCard"><div class="rk-board-top"><div class="rk-laurel" aria-hidden="true"><svg viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="#ffd66b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 38c-6-3-10-9-10-16 0-3 1-6 2-8"/><path d="M31 38c6-3 10-9 10-16 0-3-1-6-2-8"/><path d="M9 20c3 0 5 2 5 5M8 27c3-1 6 1 7 3M12 33c3-1 6 0 7 2M39 20c-3 0-5 2-5 5M40 27c-3-1-6 1-7 3M36 33c-3-1-6 0-7 2"/><path d="M18 14l3 3 3-6 3 6 3-3-1 8H19z" fill="#ffd66b"/></svg></div><div><div class="eyebrow">Ranking</div><h3>Competí con tus amigos</h3><p class="muted small">Compará tu rango general con las personas que seguís. Sale de las estadísticas de tu perfil de Comunidad: solo datos de entrenamiento (nunca tu peso ni tus medidas), visibles para quien puede ver tu perfil. Podés ocultarlas.</p></div></div>
@@ -2092,7 +2093,7 @@
           <ol class="rk-board" id="rkBoard" aria-live="polite"></ol>
           <p class="muted small" id="rkBoardStatus"></p>
           <button type="button" class="btn secondary btn-sm" id="rkFindFriends">Buscar amigos</button></div>
-        <details class="card mr-ladder-card"><summary><span class="eyebrow">Rangos</span><strong>Ver los 9 rangos, de Hierro a Leyenda</strong></summary><div class="mr-ladder" id="mrLadder"></div></details>
+        <details class="card mr-ladder-card"><summary><span class="eyebrow">Rangos</span><strong>Ver los 9 rangos, de Bronce a Leyenda</strong></summary><div class="mr-ladder" id="mrLadder"></div></details>
         <details class="card mr-how"><summary>¿Cómo se calcula?</summary><p class="muted small">Cada serie que marcás como hecha suma 1 al músculo principal del ejercicio y 0,5 a cada músculo secundario (los mismos del mapa de cada ficha). El rango de cada músculo depende de esas series acumuladas. El rango general es el del músculo «del medio»: sube cuando entrenás el cuerpo completo, no solo un grupo. El equilibrio indica qué tan parejo está el trabajo entre músculos. Mide constancia y volumen de entrenamiento, no fuerza ni tamaño muscular.</p></details>
       </div>
     </section>
@@ -2233,7 +2234,7 @@
           <label class="reminder-pref-row"><input id="communityStatsPublic" type="checkbox" checked><span>Mostrar mis estadísticas de entrenamiento en Comunidad</span></label>
           <p class="muted small">Se comparten tu nivel de entrenamiento, tu nivel de XP, tu rango general del Mapa de avances, tus insignias, tu constancia y tu running de los últimos 30 días y tus mejores series de flexiones, dominadas, sentadilla al aire y plancha. Las ve quien puede ver tu perfil (si es privado, solo tus seguidores aceptados) y sirven para los rankings y las comparaciones. Nunca se publican tu peso, tu altura, tus medidas, tus objetivos ni tus fotos de progreso. Si las ocultás, salís de los rankings.</p>
           <label class="reminder-pref-row"><input id="communityShowMuscles" type="checkbox" checked><span>Mostrar mi mapa de músculos en el perfil</span></label>
-          <p class="muted small">El mapa del cuerpo con el rango de cada músculo (de Hierro a Leyenda), calculado con tus series completadas. No muestra medidas ni fotos.</p>
+          <p class="muted small">El mapa del cuerpo con el rango de cada músculo (de Bronce a Leyenda), calculado con tus series completadas. No muestra medidas ni fotos.</p>
           <div class="community-status" id="communityStatsStatus" role="status" aria-live="polite"></div>
         </div>
         <div class="card community-account-card" id="communityProfileEditor">
@@ -4332,7 +4333,7 @@ function findCatalogExercise(name){
     if(name==='muscles')renderMuscleRanks();
   }
   // ---------- v52: Mapa de avances (rango por músculo) ----------
-  const MR=window.FittFormaMuscleRanks;let mrSide='front';
+  const MR=window.FittFormaMuscleRanks;let mrSide='front',mrView='now';
   function musclesOfExercise(name,group){
     const canon=FittFormaTraining.canonicalName(name),g=window.FittFormaExerciseGifs?.[canon]||window.FittFormaExerciseGifs?.[name];
     if(g)return {primary:g.muscles||[],secondary:g.secondary||[]};
@@ -4356,7 +4357,7 @@ function findCatalogExercise(name){
       <details class="rk-ladder-wrap"><summary>Escalera de rangos</summary>${rankLadderMarkup(p.rank,(x,i)=>`+${MR.EX_STEPS[i]} %`)}</details>
       <p class="muted small">El rango mide tu mejora en este ejercicio (${p.kind==='kg'?'1RM estimado':unit==='s'?'mejor tiempo':'mejores repeticiones'}) frente a tu primer registro. No te compara con otras personas.</p>`;
   }
-  // Escalera vertical de rangos (de Leyenda arriba a Hierro abajo) con un haz de luz y la marca «Vos».
+  // Escalera vertical de rangos (de Leyenda arriba a Bronce abajo) con un haz de luz y la marca «Vos».
   function rankLadderMarkup(current,sub){
     return `<ol class="rk-ladder" aria-label="Escalera de rangos">${MR.RANKS.map((r,i)=>({r,i})).reverse().map(({r,i})=>`<li class="rk-step ${i<current?'done':''} ${i===current?'cur':''}" style="--rk:${r.color};--rkg:${r.glow}"><span class="rk-emb">${MR.emblemSvg(i,i===current?60:42)}</span><span class="rk-name">${esc(r.name)}</span><small>${esc(sub(r,i))}</small>${i===current?'<span class="rk-you">Vos</span>':''}</li>`).join('')}</ol>`;
   }
@@ -4384,7 +4385,7 @@ function findCatalogExercise(name){
       const {data,error}=await supabaseClient.rpc('community_leaderboard',{p_category:'rank',p_scope:'friends',p_limit:50});
       if(error){list.innerHTML='';status.textContent=/function|does not exist|schema cache/i.test(error.message||'')?'El ranking todavía no está activado en el servidor (falta aplicar la actualización v53 de la base de datos).':'No se pudo cargar el ranking. Probá de nuevo más tarde.';return;}
       const rows=Array.isArray(data)?data:[];
-      list.innerHTML=rows.map((x,i)=>{const r=MR.RANKS[x.overall_rank];return `<li class="rk-row ${x.is_self?'is-self':''} ${Number(x.pos)===1?'is-first':''}"><button type="button" class="rk-open" data-rk-user="${esc(x.user_id)}" aria-label="Ver el perfil de ${esc(x.display_name||x.username)}"><span class="rk-pos">${Number(x.pos)||i+1}</span><span class="rk-avatar" aria-hidden="true">${esc(String(x.display_name||x.username||'?').trim().charAt(0).toUpperCase())}</span><span class="rk-who"><strong>${x.is_self?'Vos':esc(x.display_name||x.username)}</strong><small>@${esc(x.username)}</small></span><span class="rk-badge">${MR.emblemSvg(x.overall_rank,34)}<b style="color:${r?.glow||'#8b9ab8'}">${r?esc(r.name):'Sin rango'}</b></span></button></li>`;}).join('');
+      list.innerHTML=rows.map((x,i)=>{const r=MR.RANKS[x.overall_rank];return `<li class="rk-row ${x.is_self?'is-self':''} ${Number(x.pos)===1?'is-first':''}"><button type="button" class="rk-open" data-rk-user="${esc(x.user_id)}" aria-label="Ver el perfil de ${esc(x.display_name||x.username)}"><span class="rk-pos">${Number(x.pos)||i+1}</span><span class="rk-avatar" aria-hidden="true">${esc(String(x.display_name||x.username||'?').trim().charAt(0).toUpperCase())}</span><span class="rk-who"><strong>${x.is_self?'Vos':esc(x.display_name||x.username)}</strong><small>@${esc(x.username)}</small></span><span class="rk-badge">${MR.emblemSvg(x.overall_rank,34)}<b style="color:${r?.glow||'#8b9ab8'}">${r?esc(r.name):'Sin entrenar'}</b></span></button></li>`;}).join('');
       status.textContent=!rows.length?(toggle.checked?'Todavía no hay rangos para mostrar. Entrená y seguí a tus amigos en Comunidad.':'Tus estadísticas están ocultas: activalas para aparecer en el ranking.'):rows.length===1&&rows[0].is_self?'Cuando las personas que seguís muestren sus estadísticas, van a aparecer acá.':'';
     }finally{rkBoardLoading=false;}
   }
@@ -4402,7 +4403,7 @@ function findCatalogExercise(name){
     $('mrVolumeHead').innerHTML=`<strong>${fmt(cur.kg)}</strong> <small class="muted">esta semana</small>${pct!==null?` <span class="mr-delta ${pct>=0?'up':'down'}">${pct>=0?'+':''}${pct} %</span>`:''}`;
     box.innerHTML=w.map((x,i)=>`<div class="mr-vol-col ${i===w.length-1?'cur':''}" title="Semana del ${prettyDate(x.start)} · ${fmt(x.kg)} · ${x.sets} series"><span class="mr-vol-bar"><i style="height:${Math.round(x.kg/max*100)}%"></i></span><small>${new Date(x.start+'T12:00:00').toLocaleDateString(uiLocale(),{day:'numeric',month:'short'})}</small></div>`).join('');
   }
-  function rankColorFills(r){return Object.fromEntries(r.muscles.filter(m=>m.rank>=0).map(m=>[m.id,MR.RANKS[m.rank].color]));}
+  function rankColorFills(r){return Object.fromEntries(r.muscles.filter(m=>m.rank>=0).map(m=>{const R=MR.RANKS[m.rank];return [m.id,R.wing?{color:R.color,edge:R.glow}:R.color];}));}
   // v55: Músculos explicado en criollo. Zonas del cuerpo y qué grupo de «Entrenar por grupos» trabaja cada músculo.
   const MR_ZONES=[['Pecho',['pectorales']],['Espalda',['dorsales','espalda_media','trapecio','lumbares']],['Hombros',['deltoides_anterior','deltoides_lateral','deltoides_posterior']],['Brazos',['biceps','triceps','antebrazos']],['Core',['abdominales','oblicuos']],['Piernas y glúteos',['cuadriceps','isquiotibiales','gluteos','gluteo_medio','aductores','gemelos','tibiales']]];
   const MR_GROUP={pectorales:'chest',dorsales:'back',espalda_media:'back',trapecio:'back',lumbares:'core',deltoides_anterior:'shoulders',deltoides_lateral:'shoulders',deltoides_posterior:'rear_delts',biceps:'biceps',triceps:'triceps',antebrazos:'biceps',abdominales:'core',oblicuos:'core',cuadriceps:'legs_quads',isquiotibiales:'legs_post',gluteos:'legs_post',gluteo_medio:'legs_post',aductores:'legs_post',gemelos:'calves',tibiales:'calves'};
@@ -4413,28 +4414,31 @@ function findCatalogExercise(name){
     const names=FittFormaAnatomy.MUSCLES,ov=now.overall,ovR=MR.RANKS[ov],step=MR.nextStep(now.median);
     const behind=now.muscles.filter(m=>m.score<(step.next?.min??Infinity)).length;
     const series=n=>`${String(n).replace('.',',')} ${Number(n)===1?'serie':'series'}`;
-    $('mrHero').innerHTML=`<div class="rk-hero" style="--rk:${ovR?.color||'#5b6680'};--rkg:${ovR?.glow||'#9fb0d0'}"><div class="eyebrow">Tu rango general</div><strong class="rk-big">${ovR?esc(ovR.name):'Sin rango todavía'}</strong><div class="rk-hero-emblem">${MR.emblemSvg(ov,150)}</div>
-        ${step.next?`<div class="rk-bar"><span style="width:${Math.round(step.pct*100)}%"></span></div><p class="mr-hero-next">Para llegar a <b>${esc(step.next.name)}</b>, la mitad de tus músculos tiene que tener al menos ${step.next.min} series. Hoy te faltan unas ${series(step.missing)} en los músculos del medio.</p>`:'<p class="mr-hero-next">Llegaste al rango máximo.</p>'}</div>
-      <p class="mr-explain">Cada serie que completás suma al músculo que trabaja (1 al principal y 0,5 a los que ayudan). Cuantas más series acumula un músculo, más alto su rango. Tu rango general es el del músculo «del medio»: sube cuando entrenás todo el cuerpo, no un solo músculo. Mide constancia y volumen, no tamaño ni fuerza.</p>
-      <div class="mr-stats"><div><b>${now.ranked}<small>/20</small></b><small>músculos con rango</small></div><div><b>${Math.round(now.total)}</b><small>series sumadas</small></div><div><b>${now.balance}%</b><small>parejo entre músculos</small></div></div>`;
+    $('mrHero').innerHTML=`<div class="rk-hero" style="--rk:${ovR?.color||'#5b6680'};--rkg:${ovR?.glow||'#9fb0d0'}"><div class="eyebrow">Tu rango general</div><strong class="rk-big">${ovR?esc(ovR.name):'Sin entrenar'}</strong><div class="rk-hero-emblem">${MR.emblemSvg(ov,150)}</div>
+        ${step.next?`<div class="rk-bar"><span style="width:${Math.round(step.pct*100)}%"></span></div><p class="mr-hero-next">Te ${Number(step.missing)===1?'falta':'faltan'} unas ${series(step.missing)} para ${esc(step.next.name)}. Sumalas en los músculos que menos entrenaste (abajo te decimos cuáles).</p>`:'<p class="mr-hero-next">Llegaste al rango máximo.</p>'}</div>
+      <p class="mr-explain">Cada serie que hacés suma al músculo que trabaja. Más series, más alto el rango de ese músculo. Tu rango general sube cuando entrenás todo el cuerpo.</p>
+      <div class="mr-stats"><div><b>${now.ranked}<small>/20</small></b><small>músculos entrenados</small></div><div><b>${Math.round(now.total)}</b><small>series sumadas</small></div><div><b>${now.balance}%</b><small>parejo entre músculos</small></div></div>`;
     // Qué entrenar para subir: los músculos más atrasados y una sesión armada con esos grupos.
     const weakest=now.weakest||[],groups=[...new Set(weakest.map(m=>MR_GROUP[m.id]).filter(Boolean))];
     $('mrNext').innerHTML=`<div class="eyebrow">Qué entrenar para subir</div><h3>${now.total?'Tus músculos más atrasados':'Empezá por acá'}</h3>
-      ${now.total?`<ul class="mr-next-list">${weakest.map(m=>{const r=MR.RANKS[m.rank],st=MR.nextStep(m.score);return `<li><span class="mr-mini">${MR.emblemSvg(m.rank,34)}</span><div><strong>${esc(names[m.id])}</strong><small>${r?esc(r.name):'Sin rango'} · ${st.next?`${Number(st.missing)===1?'falta':'faltan'} ${series(st.missing)} para ${esc(st.next.name)}`:'rango máximo'}</small></div></li>`;}).join('')}</ul>
+      ${now.total?`<ul class="mr-next-list">${weakest.map(m=>{const r=MR.RANKS[m.rank],st=MR.nextStep(m.score);return `<li><span class="mr-mini">${MR.emblemSvg(m.rank,34)}</span><div><strong>${esc(names[m.id])}</strong><small>${r?esc(r.name):'Sin entrenar'} · ${st.next?`${Number(st.missing)===1?'falta':'faltan'} ${series(st.missing)} para ${esc(st.next.name)}`:'rango máximo'}</small></div></li>`;}).join('')}</ul>
       <p class="muted small">Entrenarlos es lo que más rápido sube tu rango general${behind?` (${behind} de 20 músculos están por debajo del próximo rango)`:''}.</p>`:'<p class="muted small">Completá tu primer entrenamiento marcando las series como hechas y tus músculos empiezan a sumar.</p>'}
       <div class="btn-row">${groups.length?`<button type="button" class="btn" id="mrTrainWeak">Entrenar esto hoy</button>`:''}<button type="button" class="btn ghost" data-goto-view="exercises">Ver ejercicios</button></div>`;
     $('mrTrainWeak')?.addEventListener('click',()=>{const d=FittFormaTraining.buildGroupsDay(groups,focusProfile(),{key:'custom',title:'Músculos atrasados',split:'Para subir tu rango'});if(!d)return;switchView('train');setTimeout(()=>{setFocusDraft(d);$('focusPicker')?.scrollIntoView({behavior:'smooth',block:'start'});},60);});
     const map=(r,label)=>`<figure class="mr-map"><figcaption>${label}</figcaption>${FittFormaAnatomy.muscleFillSvg(rankColorFills(r),{sides:mrSide,label:`${label}: músculos coloreados según su rango`,className:'mr-fig'})}</figure>`;
-    $('mrMaps').innerHTML=map(before,'Hace 30 días')+'<div class="mr-arrow" aria-hidden="true">→</div>'+map(now,'Hoy');
-    $('mrLegend').innerHTML=`<span><i class="is-none"></i>Sin rango</span>`+MR.RANKS.map(r=>`<span><i style="background:${r.color}"></i>${esc(r.name)}</span>`).join('');
+    const mapsBox=$('mrMaps');mapsBox.classList.toggle('is-single',mrView==='now');
+    mapsBox.innerHTML=mrView==='now'?`<figure class="mr-map mr-map-big">${FittFormaAnatomy.muscleFillSvg(rankColorFills(now),{sides:'both',label:'Hoy: tus músculos coloreados según su rango',className:'mr-fig'})}</figure>`:map(before,'Hace 30 días')+'<div class="mr-arrow" aria-hidden="true">→</div>'+map(now,'Hoy');
+    document.querySelector('.mr-side-chips')?.toggleAttribute('hidden',mrView==='now');
+    document.querySelectorAll('[data-mr-view]').forEach(b=>{const on=b.dataset.mrView===mrView;b.setAttribute('aria-pressed',String(on));b.classList.toggle('active',on);});
+    $('mrLegend').innerHTML=`<span><i class="is-none"></i>Sin entrenar</span>`+MR.RANKS.map(r=>`<span><i style="background:${r.color}${r.wing?`;box-shadow:0 0 0 1.5px ${r.glow}`:''}"></i>${esc(r.name)}</span>`).join('');
     const ups=MR.rankUps(before,now);
     const upTop=ups.slice().sort((x,y)=>y.rank-x.rank);$('mrCompareNote').textContent=ups.length?`En los últimos 30 días subieron de rango ${ups.length} ${ups.length===1?'músculo':'músculos'}: ${upTop.slice(0,3).map(u=>`${names[u.id]} (${MR.RANKS[u.rank].name})`).join(', ')}${ups.length>3?' y más':''}.`:now.total?'En los últimos 30 días ningún músculo cambió de rango todavía.':'Los colores aparecen a medida que entrenás.';
     document.querySelectorAll('[data-mr-side]').forEach(b=>{const on=b.dataset.mrSide===mrSide;b.setAttribute('aria-pressed',String(on));b.classList.toggle('active',on);});
     $('mrLadder').innerHTML=rankLadderMarkup(ov,r=>`${r.min} series`);
-    const row=m=>{const r=MR.RANKS[m.rank],st=MR.nextStep(m.score);return `<li class="mr-row"><span class="mr-mini">${MR.emblemSvg(m.rank,36)}</span><div class="mr-row-copy"><div class="mr-row-top"><strong>${esc(names[m.id])}</strong><span style="color:${r?.glow||'#8b9ab8'}">${r?esc(r.name):'Sin rango'}</span></div><div class="mr-bar"><span style="width:${Math.round(st.pct*100)}%;background:${(st.next||r)?.color||'#5b6680'}"></span></div><small>${series(Math.round(m.score*10)/10)}${st.next?` · ${Number(st.missing)===1?'falta':'faltan'} ${series(st.missing)} para ${esc(st.next.name)}`:' · rango máximo'}</small></div></li>`;};
-    $('mrList').innerHTML=MR_ZONES.map(([zone,ids])=>{const ms=now.muscles.filter(m=>ids.includes(m.id));const best=Math.max(-1,...ms.map(m=>m.rank));return `<section class="mr-zone"><h4>${esc(zone)}<span>${best>=0?esc(MR.RANKS[best].name):'Sin rango'}</span></h4><ul class="mr-list">${ms.sort((a,b)=>b.score-a.score).map(row).join('')}</ul></section>`;}).join('');
+    const row=m=>{const r=MR.RANKS[m.rank],st=MR.nextStep(m.score);return `<li class="mr-row"><span class="mr-mini">${MR.emblemSvg(m.rank,36)}</span><div class="mr-row-copy"><div class="mr-row-top"><strong>${esc(names[m.id])}</strong><span style="color:${r?.glow||'#8b9ab8'}">${r?esc(r.name):'Sin entrenar'}</span></div><div class="mr-bar"><span style="width:${Math.round(st.pct*100)}%;background:${(st.next||r)?.color||'#5b6680'}"></span></div><small>${series(Math.round(m.score*10)/10)}${st.next?` · ${Number(st.missing)===1?'falta':'faltan'} ${series(st.missing)} para ${esc(st.next.name)}`:' · rango máximo'}</small></div></li>`;};
+    $('mrList').innerHTML=MR_ZONES.map(([zone,ids])=>{const ms=now.muscles.filter(m=>ids.includes(m.id));const best=Math.max(-1,...ms.map(m=>m.rank));return `<section class="mr-zone"><h4>${esc(zone)}<span>${best>=0?esc(MR.RANKS[best].name):'Sin entrenar'}</span></h4><ul class="mr-list">${ms.sort((a,b)=>b.score-a.score).map(row).join('')}</ul></section>`;}).join('');
   }
-  document.addEventListener('click',e=>{const b=e.target.closest('[data-mr-side]');if(b){mrSide=b.dataset.mrSide;renderMuscleRanks();}});
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-mr-side]');if(b){mrSide=b.dataset.mrSide;renderMuscleRanks();}const v=e.target.closest('[data-mr-view]');if(v){mrView=v.dataset.mrView==='compare'?'compare':'now';renderMuscleRanks();}});
   // Aviso cuando un músculo sube de rango (se compara con lo último que la persona ya vio).
   function checkMuscleRankUps(){
     if(!MR)return;setTimeout(()=>window.FittFormaCommunity?.syncStats?.()?.catch?.(()=>{}),0);const now=muscleRanksNow(),seen=isPlainObj(state.muscleRanksSeen)?state.muscleRanksSeen:null;

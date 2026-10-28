@@ -459,7 +459,6 @@ body{font-feature-settings:"cv11","ss01"}
 :root{--anat-body:#22314d;--anat-muscle:#33456a;--anat-edge:#0b1222;--anat-primary:#ef4444;--anat-secondary:#f59e0b}
 :root[data-theme="light"]{--anat-body:#d3dbe8;--anat-muscle:#b6c2d6;--anat-edge:#f3f6fb;--anat-primary:#dc2626;--anat-secondary:#d97706}
 .anatomy-map{display:block;width:100%;height:auto}
-.anatomy-map .am-body{fill:var(--anat-body)}
 .anatomy-map .am-m{fill:var(--anat-muscle);stroke:var(--anat-edge);stroke-width:.6;transition:fill .25s ease}
 .anatomy-map .am-m.is-primary{fill:var(--anat-primary)}
 .anatomy-map .am-m.is-secondary{fill:var(--anat-secondary);opacity:.85}
@@ -934,7 +933,6 @@ body{font-feature-settings:"cv11","ss01"}
 .mr-map{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:18px;background:#05080f;border:1px solid var(--ff-border)}
 .mr-map figcaption{font-size:13px;font-weight:800;color:var(--text-2)}
 .mr-map .anatomy-map{width:100%;max-width:170px;height:auto}
-.mr-fig .am-body{fill:#c9ced8}
 .mr-fig .am-m{fill:#e7eaf0;stroke:#5b6475;stroke-width:.5}
 .mr-fig .am-m.is-ranked{stroke:#0b1222;stroke-width:.7}
 .mr-fig .am-cap{display:none}
@@ -1462,3 +1460,21 @@ html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 .ff-medal.is-locked .ff-medal-aura,.ff-medal.is-locked .ff-medal-crown{fill:transparent;stroke:var(--ff-border)}
 .badge-celebration[data-rank="legend"]{--glow:#8f5bff}
 .badge-celebration[data-rank="legend"] .badge-celebration-rank{color:#d4a017}
+/* v57: mapa muscular redibujado (volumen, separaciones y brillo) */
+.anatomy-map .am-b1{stop-color:var(--anat-body)}
+.anatomy-map .am-b0{stop-color:color-mix(in srgb,var(--anat-body) 78%,#000)}
+.anatomy-map .am-detail path{fill:none;stroke:var(--anat-edge);stroke-width:.7;stroke-linecap:round;opacity:.55}
+.anatomy-map .am-gloss path,.anatomy-map path.am-gloss{pointer-events:none;stroke:none}
+.anatomy-map .am-m{stroke-linejoin:round}
+.mr-fig .am-b1{stop-color:#3a4660}
+.mr-fig .am-b0{stop-color:#232b3d}
+.mr-fig .am-m:not(.is-ranked){fill:#4a5672!important}
+.mr-fig .am-m{stroke:#141a28;stroke-width:.7}
+.mr-fig .am-m.is-ranked{stroke:#0b1222;stroke-width:.8}
+.mr-fig .am-detail path{stroke:#0e1420;opacity:.6}
+.mr-map{background:radial-gradient(120% 80% at 50% 10%,#16213a,#05080f 70%)!important}
+.mr-maps.is-single{display:block}
+.mr-map-big{padding:14px 8px 10px!important}
+.mr-map-big .anatomy-map{max-width:340px!important;margin:0 auto}
+.mr-side-chips{margin:6px 0 0}
+.mr-side-chips[hidden]{display:none}

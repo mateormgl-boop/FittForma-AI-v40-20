@@ -576,7 +576,7 @@
   const V53_HINT='Esta sección necesita la actualización v53 de la base de datos (supabase/migrations/2026-10-27_v53_athlete_community.sql).';
   let athleteEnabled=null,viewedUser=null,compareUser=null;
   const LOCK_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
-  function rankChip(i,size=26){const R=MRK();if(!R||!Number.isInteger(Number(i))||Number(i)<0||!R.RANKS[Number(i)])return '<span class="cm-rank is-none">Sin rango</span>';const r=R.RANKS[Number(i)];return `<span class="cm-rank" style="--rk:${esc(r.glow||r.color||'#8b9ab8')}">${R.emblemSvg(Number(i),size)}<b>${esc(r.name)}</b></span>`;}
+  function rankChip(i,size=26){const R=MRK();if(!R||!Number.isInteger(Number(i))||Number(i)<0||!R.RANKS[Number(i)])return '<span class="cm-rank is-none">Sin entrenar</span>';const r=R.RANKS[Number(i)];return `<span class="cm-rank" style="--rk:${esc(r.glow||r.color||'#8b9ab8')}">${R.emblemSvg(Number(i),size)}<b>${esc(r.name)}</b></span>`;}
   // v55: rango junto al nombre (emblema chico y nombre del rango).
   function rankMini(i){const R=MRK();const n=Number(i);if(!R||!Number.isInteger(n)||n<0||!R.RANKS[n])return '';const r=R.RANKS[n];return ` <span class="cm-rank cm-rank-mini" style="--rk:${esc(r.glow||r.color)}" title="Rango general: ${esc(r.name)}">${R.emblemSvg(n,18)}<b>${esc(r.name)}</b></span>`;}
   function levelLine(p){if(!p?.stats_visible)return '';return [LEVEL_LABEL[p.training_level]||'',p.xp_level?`Nivel ${Number(p.xp_level)}`:''].filter(Boolean).join(' · ');}
@@ -676,7 +676,7 @@
   const WEEK_TEXT={constancy:'Días distintos con al menos un entrenamiento o una actividad, de lunes a hoy. Se reinicia cada lunes.',running:'Kilómetros corridos registrados en la app de lunes a hoy (manual o con GPS). Se reinicia cada lunes.'};
   function formatMetric(cat,v){
     const n=Number(v);if(v==null||!Number.isFinite(n))return 'Sin datos disponibles';
-    if(cat==='rank'){const r=MRK()?.RANKS?.[n];return r?r.name:'Sin rango';}
+    if(cat==='rank'){const r=MRK()?.RANKS?.[n];return r?r.name:'Sin entrenar';}
     if(cat==='constancy')return `${n} ${n===1?'día':'días'}`;
     if(cat==='badges')return `${n} ${n===1?'insignia':'insignias'}`;
     if(cat==='level')return `Nivel ${n}`;
@@ -1103,7 +1103,7 @@
   function compareValue(row,v){
     if(v==null)return 'Sin datos disponibles';
     if(row.kind==='text')return LEVEL_LABEL[v]||'Sin datos disponibles';
-    if(row.kind==='rank')return MRK()?.RANKS?.[v]?.name||'Sin rango';
+    if(row.kind==='rank')return MRK()?.RANKS?.[v]?.name||'Sin entrenar';
     if(row.key==='best_plank_seconds')return formatMetric('plank',v);
     if(row.key==='run_km_30d')return formatMetric('running',v);
     return `${Number(v).toLocaleString(undefined,{maximumFractionDigits:1})}${row.unit?' '+row.unit:''}`;

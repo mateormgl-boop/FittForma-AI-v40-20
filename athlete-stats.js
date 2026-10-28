@@ -24,7 +24,7 @@
 
   const CATEGORIES = [
     { key: 'rank', label: 'Rango general', unit: '', period: 'Todo tu historial',
-      measures: 'El rango del Mapa de avances: la mediana de series efectivas de tus 20 músculos (de Hierro a Leyenda).',
+      measures: 'El rango del Mapa de avances: la mediana de series efectivas de tus 20 músculos (de Bronce a Leyenda).',
       order: 'Del rango más alto al más bajo; a igual rango, primero quien tiene más músculos con rango.' },
     { key: 'constancy', label: 'Constancia', unit: 'días', period: 'Últimos 30 días',
       measures: 'Días distintos con al menos un entrenamiento o una actividad completada.',

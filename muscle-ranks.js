@@ -1,21 +1,22 @@
 /* FittForma AI v52 — rangos por músculo («Mapa de avances»). Sin dependencias (navegador y Node).
  * Cada serie completada suma a los músculos del ejercicio: 1 al principal y 0,5 a cada secundario.
- * La suma acumulada (series efectivas) define el rango de cada músculo, de Hierro a Leyenda.
+ * La suma acumulada (series efectivas) define el rango de cada músculo, de Bronce a Leyenda.
  * El rango general es el del músculo «mediano»: para subirlo hay que entrenar todo el cuerpo, no solo un grupo.
  * El equilibrio (0–100) mide qué tan parejos están los músculos entre sí.
  */
 (function (root) {
   'use strict';
+  // v57: la escalera empieza en Bronce y termina en Leyenda (negro). Mismos umbrales que antes: nadie pierde avance.
   const RANKS = [
-    { key: 'hierro', name: 'Hierro', min: 1, color: '#9aa3ad', glow: '#c9d1d9' },
-    { key: 'bronce', name: 'Bronce', min: 10, color: '#c98a5a', glow: '#f0b384' },
-    { key: 'plata', name: 'Plata', min: 25, color: '#c7d3e0', glow: '#ffffff' },
-    { key: 'oro', name: 'Oro', min: 50, color: '#f2b631', glow: '#ffe08a' },
-    { key: 'rubi', name: 'Rubí', min: 90, color: '#e8384f', glow: '#ff8a9a' },
-    { key: 'esmeralda', name: 'Esmeralda', min: 150, color: '#2fbf71', glow: '#8ef0b8' },
+    { key: 'bronce', name: 'Bronce', min: 1, color: '#c98a5a', glow: '#f0b384' },
+    { key: 'plata', name: 'Plata', min: 10, color: '#aebdcc', glow: '#ffffff' },
+    { key: 'oro', name: 'Oro', min: 25, color: '#f2b631', glow: '#ffe08a' },
+    { key: 'platino', name: 'Platino', min: 50, color: '#4fc3b8', glow: '#c8fff7' },
+    { key: 'esmeralda', name: 'Esmeralda', min: 90, color: '#2fbf71', glow: '#8ef0b8' },
+    { key: 'rubi', name: 'Rubí', min: 150, color: '#e8384f', glow: '#ff8a9a' },
     { key: 'diamante', name: 'Diamante', min: 240, color: '#5fb8ff', glow: '#c4e6ff' },
     { key: 'campeon', name: 'Campeón', min: 360, color: '#9b5cf6', glow: '#d2b8ff' },
-    { key: 'leyenda', name: 'Leyenda', min: 520, color: '#1f8bff', glow: '#ffd66b' },
+    { key: 'leyenda', name: 'Leyenda', min: 520, color: '#17141f', glow: '#ffd66b', shadow: '#8f5bff', wing: '#d4a017' },
   ];
   // Los 20 músculos del mapa (mismos identificadores que anatomy.js).
   const MUSCLES = ['pectorales', 'deltoides_anterior', 'deltoides_lateral', 'deltoides_posterior', 'biceps', 'triceps', 'antebrazos', 'abdominales', 'oblicuos', 'trapecio',
@@ -101,16 +102,16 @@
       `<polygon points="${Array.from({ length: 10 }, (_, i) => { const a = -Math.PI / 2 + (i * Math.PI) / 5, rr = i % 2 ? 13 : 30; return `${(50 + rr * Math.cos(a)).toFixed(1)},${(54 + rr * Math.sin(a)).toFixed(1)}`; }).join(' ')}"/>`,
       `<circle cx="50" cy="54" r="25"/>`,
     ];
-    const wing = rankIndex >= 3 ? `<g fill="${r.color}" opacity=".9"><path d="M24 50c-10-2-18-8-20-16 6 3 12 4 18 3-5-3-8-7-9-12 6 5 12 7 18 8z"/><path d="M76 50c10-2 18-8 20-16-6 3-12 4-18 3 5-3 8-7 9-12-6 5-12 7-18 8z"/></g>` : '';
+    const wing = rankIndex >= 3 ? `<g fill="${r.wing || r.color}" opacity=".9"><path d="M24 50c-10-2-18-8-20-16 6 3 12 4 18 3-5-3-8-7-9-12 6 5 12 7 18 8z"/><path d="M76 50c10-2 18-8 20-16-6 3-12 4-18 3 5-3 8-7 9-12-6 5-12 7-18 8z"/></g>` : '';
     const crown = rankIndex >= 4 ? `<path d="M38 22l5 6 7-9 7 9 5-6-2 12H40z" fill="#ffd66b" stroke="#a87a10" stroke-width="1"/>` : '';
     const star = `<polygon points="50,44 53,51 60,51 54.5,55.5 56.5,62.5 50,58.5 43.5,62.5 45.5,55.5 40,51 47,51" fill="#fff" opacity=".85"/>`;
-    return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="${title || 'Rango ' + r.name}"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${r.glow}"/><stop offset=".55" stop-color="${r.color}"/><stop offset="1" stop-color="#0b1222"/></linearGradient></defs>${wing}<g fill="url(#${id})" stroke="${r.glow}" stroke-width="2.5" stroke-linejoin="round" style="filter:drop-shadow(0 0 6px ${r.color})">${shapes[rankIndex]}</g>${star}${crown}</svg>`;
+    return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="${title || 'Rango ' + r.name}"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${r.glow}"/><stop offset=".55" stop-color="${r.color}"/><stop offset="1" stop-color="#0b1222"/></linearGradient></defs>${wing}<g fill="url(#${id})" stroke="${r.glow}" stroke-width="2.5" stroke-linejoin="round" style="filter:drop-shadow(0 0 6px ${r.shadow || r.color})">${shapes[rankIndex]}</g>${star}${crown}</svg>`;
   }
 
   // ---------- Rango por ejercicio: cuánto mejoraste desde tu primera vez ----------
   // Medida: 1RM estimado (Epley) si hay carga; si no, repeticiones; en isométricos, segundos.
   // El rango sube con la mejora sobre tu primer registro (no se compara con otras personas: no hay datos para eso).
-  const EX_STEPS = [0, 5, 10, 15, 25, 35, 50, 75, 100]; // % de mejora para cada rango (Hierro … Leyenda)
+  const EX_STEPS = [0, 5, 10, 15, 25, 35, 50, 75, 100]; // % de mejora para cada rango (Bronce … Leyenda)
   const num = v => { const n = Number.parseFloat(String(v ?? '').trim().replace(',', '.')); return Number.isFinite(n) && n > 0 ? n : 0; };
   const e1rm = (w, r) => w * (1 + Math.min(r, 12) / 30);
   function exerciseProgress(sessions, matches, timed = false) {

@@ -12,8 +12,8 @@ const MAP = { Sentadilla: { primary: ['cuadriceps', 'gluteos'], secondary: ['adu
 const of = name => MAP[name] || { primary: [], secondary: [] };
 const sess = (date, name, sets, done = true, status = 'completed') => ({ date, status, exercises: [{ name, entries: Array.from({ length: sets }, () => ({ reps: '10', weight: '20', done })) }] });
 
-test('rangos: umbrales ordenados, 9 rangos de Hierro a Leyenda y todos los músculos del mapa', () => {
-  assert.equal(R.RANKS.length, 9); assert.equal(R.RANKS[0].name, 'Hierro'); assert.equal(R.RANKS[8].name, 'Leyenda');
+test('rangos: umbrales ordenados, 9 rangos de Bronce a Leyenda (v57) y todos los músculos del mapa', () => {
+  assert.equal(R.RANKS.length, 9); assert.equal(R.RANKS[0].name, 'Bronce'); assert.equal(R.RANKS[8].name, 'Leyenda');
   for (let i = 1; i < R.RANKS.length; i++) assert.ok(R.RANKS[i].min > R.RANKS[i - 1].min);
   assert.equal(R.rankFor(0), -1); assert.equal(R.rankFor(1), 0); assert.equal(R.rankFor(9.5), 0); assert.equal(R.rankFor(10), 1); assert.equal(R.rankFor(9999), 8);
   assert.deepEqual([...R.MUSCLES].sort(), [...new Set(A.SHAPES.map(s => s.id))].sort(), 'mismos músculos que el mapa de anatomy.js');
@@ -32,15 +32,15 @@ test('series: principal suma 1, secundario 0,5; solo cuentan series hechas y ses
 test('rango general = músculo mediano; «antes» filtra por fecha y detecta subidas', () => {
   const many = Array.from({ length: 12 }, (_, i) => sess(`2026-09-${String(i + 1).padStart(2, '0')}`, 'Sentadilla', 5));
   const r = R.compute(many, of);
-  assert.equal(r.byId.cuadriceps.rank, 3, '60 series → Oro');
+  assert.equal(r.byId.cuadriceps.rank, 3, '60 series → Platino (mismo umbral que antes)');
   assert.equal(r.overall, -1, 'con pocos músculos entrenados el general no sube');
   assert.ok(r.balance < 30, 'muy desparejo → equilibrio bajo');
   const before = R.compute(many, of, '2026-09-04'), ups = R.rankUps(before, r);
   assert.equal(before.byId.cuadriceps.score, 20);
   assert.ok(ups.some(u => u.id === 'cuadriceps' && u.rank === 3));
   const all = R.compute([{ date: '2026-10-01', status: 'completed', exercises: R.MUSCLES.map(m => ({ name: m, entries: Array.from({ length: 12 }, () => ({ done: true })) })) }], n => ({ primary: [n], secondary: [] }));
-  assert.equal(all.overall, 1, 'todo el cuerpo con 12 series → general Bronce'); assert.equal(all.balance, 100);
-  assert.deepEqual({ ...R.nextStep(12) }.next.name, 'Plata');
+  assert.equal(all.overall, 1, 'todo el cuerpo con 12 series → general Plata (mismo umbral que antes)'); assert.equal(all.balance, 100);
+  assert.deepEqual({ ...R.nextStep(12) }.next.name, 'Oro');
   assert.equal(R.nextStep(9999).next, null);
 });
 
