@@ -368,7 +368,8 @@ const server=http.createServer(async(req,res)=>{try{
     try{
       const data=await readFile(file),ext=path.extname(file);
       applySecurityHeaders(req,res);
-      const cacheControl=['.html','.js','.mjs','.json','.webmanifest'].includes(ext)?'no-cache':'public, max-age=3600';
+      // v59.1: el CSS también se revalida siempre; si quedaba guardado 1 hora, una versión nueva se veía con los estilos viejos.
+      const cacheControl=['.html','.js','.mjs','.json','.webmanifest','.css'].includes(ext)?'no-cache':'public, max-age=3600';
       res.writeHead(200,{'Content-Type':mime[ext]||'application/octet-stream','Cache-Control':cacheControl});
       if(req.method==='HEAD')return res.end();
       return res.end(data);
