@@ -120,3 +120,10 @@ test('Nutrición: cada pestaña cierra bien (las recetas quedan solo en Plan)', 
   const plan = seg.indexOf('data-view-panel="plan"'), hist = seg.indexOf('data-view-panel="historial"'), rec = seg.indexOf('id="recipesCard"');
   assert.ok(plan < rec && rec < hist, 'las recetas están dentro de la pestaña Plan');
 });
+
+test('las figuras del centro de las insignias son siluetas rellenas', () => {
+  for (const [k, g] of Object.entries(E.GLYPHS)) assert.match(g, /class="gf"/, `${k} tiene que tener partes rellenas`);
+  for (const k of ['pullup', 'pushup', 'squat', 'run', 'ohp', 'dips', 'lunge']) assert.match(E.GLYPHS[k], /class="lb"/, `${k}: extremidades gruesas`);
+  assert.match(E.GLYPHS.biceps, /class="lbx"/, 'el bíceps es un brazo flexionado musculoso');
+  assert.match(css, /\.ff-medal \.ff-medal-glyph \.lb\{fill:none;stroke-width:5\.2!important\}/);
+});

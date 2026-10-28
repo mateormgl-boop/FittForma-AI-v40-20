@@ -1655,3 +1655,14 @@ html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 .brc-tier .ff-medal.is-locked .ff-medal-glyph .gf{fill:#3e5285}
 .badge-system li span{white-space:nowrap;overflow-wrap:normal}
 @media (max-width:380px){.badge-system{padding:12px 10px}.badge-system li span{font-size:.5rem}.badge-system li small{display:none}.brc-tier small{font-size:.54rem}}
+
+/* v58: figuras rellenas del centro de las insignias */
+.ff-medal .ff-medal-glyph .lb{fill:none;stroke-width:5.2!important}
+.ff-medal .ff-medal-glyph .lbx{fill:none;stroke-width:8.6!important}
+.ff-medal .ff-medal-glyph .eq{fill:none;stroke-width:2.6!important}
+.ff-medal .ff-medal-glyph .eq.tk{stroke-width:3.6!important}
+.ff-medal .ff-medal-glyph{stroke-width:2.6!important}
+.ff-medal .ff-medal-glyph .cut{fill:none;stroke:rgba(0,0,0,.42)!important;stroke-width:1.8!important}
+.ff-medal .ff-medal-glyph .cut2{fill:rgba(0,0,0,.3);stroke:none!important}
+.ff-medal.is-locked .ff-medal-glyph .cut,.ff-medal.is-locked .ff-medal-glyph .cut2{display:none}
+.brc-icon svg .lb{fill:none;stroke-width:5}.brc-icon svg .lbx{fill:none;stroke-width:8}.brc-icon svg .eq{fill:none;stroke-width:2.4}.brc-icon svg .cut{fill:none;stroke:#132a6b;stroke-width:1.8}.brc-icon svg .cut2{fill:#132a6b}.brc-icon svg .gf{fill:currentColor;stroke:none}

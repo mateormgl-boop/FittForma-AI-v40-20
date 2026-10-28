@@ -34,6 +34,7 @@
   - Los alimentos y las comidas sugeridas se muestran traducidos.
 - **Insignias rediseñadas como la imagen de referencia:**
   - Medalla hexagonal de metal con bisel, cara con brillo y figura grande del ejercicio.
+  - Las 36 figuras del centro se redibujaron como siluetas rellenas y con volumen, por ejemplo el brazo flexionado de bíceps, la persona colgada en dominadas o los abdominales marcados.
   - Bronce cobre, Plata acero, Oro, Diamante azul brillante con destellos y Legendario negro con corona.
   - Galería «Sistema de insignias»: leyenda de rangos y una tarjeta por ejercicio con su fila de rangos encendidos.
   - No cambia ningún nivel ni umbral.

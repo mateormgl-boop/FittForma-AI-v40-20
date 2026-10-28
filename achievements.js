@@ -233,43 +233,45 @@
   /* v49: emblema hexagonal con relieve. El marco cambia por rango (no solo el color) y el símbolo por actividad.
    * Bronce: hexágono liso · Plata: hexágono biselado · Oro: hexágono con puntas y laureles · Diamante: gema
    * hexagonal facetada con destellos. El nivel I–III se ve con 1–3 marcas debajo. Sin emojis. */
+  // v58: figuras rellenas y con volumen, como el «Sistema de insignias» de referencia (40×40, centro 20,19.5).
+  // Clases: gf = relleno; lb = extremidad gruesa; lbx = brazo musculoso; eq = equipamiento; cut/cut2 = detalle en el color de la cara.
   const GLYPHS = {
-    pushup: '<path d="M7 26h26M11 26l5-7h9l4 7M16 19l3-5"/><circle class="gf" cx="21" cy="12" r="2.2"/>',
-    dumbbell: '<path d="M12 15v10M8.5 17v6M28 15v10M31.5 17v6M12 20h16"/>',
-    legs: '<path d="M17 9v9l-3 9M23 9v9l3 9M14 27h-3M26 27h3"/>',
-    core: '<rect x="14" y="10" width="12" height="18" rx="4"/><path d="M20 10v18M14 16h12M14 22h12"/>',
-    timer: '<circle cx="20" cy="21" r="8"/><path d="M20 21v-4M18 10h4M20 10v3"/>',
-    heart: '<path d="M20 28s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 28 17c0 6-8 11-8 11z"/>',
-    run: '<circle class="gf" cx="23" cy="10.5" r="2.2"/><path d="M14 28l4-6 3 2 1-6 4 4h3M18 22l1-6 4 1"/>',
-    route: '<circle cx="13" cy="26" r="2"/><circle cx="27" cy="13" r="2"/><path d="M15 26h7a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h7"/>',
-    calendar: '<rect x="12" y="12" width="16" height="15" rx="2.5"/><path d="M12 17h16M16 10v4M24 10v4M16 22l3 2 5-4"/>',
-    star: '<path d="M20 11l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
-    bench: '<path d="M8 13h24M11 10v6M29 10v6M9 11.5v3M31 11.5v3"/><path d="M11 25h18M14 25v5M26 25v5M14 21h9"/><circle class="gf" cx="27" cy="21" r="2"/>',
-    pullup: '<path d="M8 9h24M14 9l3 6M26 9l-3 6M17 15h6M18 15v8l-2 7M22 15v8l2 7"/><circle class="gf" cx="20" cy="12.6" r="2"/>',
-    dips: '<path d="M9 18h7M24 18h7M12 18v12M28 18v12M16 18l1-4h6l1 4M20 14v8l-3 4M20 22l3 4"/><circle class="gf" cx="20" cy="10.5" r="2"/>',
-    squat: '<circle class="gf" cx="17" cy="9.5" r="2.2"/><path d="M17 12.5v7l7 2-1 8M17 19.5l-4 4 4 6M13 15h10"/>',
-    squatbar: '<path d="M8 12h24M11 9v6M29 9v6"/><circle class="gf" cx="18" cy="9.2" r="2"/><path d="M17 12v7l6 2-1 8M17 19l-4 4 4 6"/>',
-    deadlift: '<path d="M8 29h24M11 26v6M29 26v6M21 29l-2-8M19 21l-3-5 6-4M19 21l5 2M16 16l-2 2"/><circle class="gf" cx="24.5" cy="11" r="2"/>',
-    ohp: '<path d="M8 8h24M11 5v6M29 5v6M15 8l2 7M25 8l-2 7M17 15h6v6l-2 8M23 21l1 8"/><circle class="gf" cx="20" cy="12.8" r="2"/>',
-    lunge: '<circle class="gf" cx="20" cy="9" r="2.2"/><path d="M20 12v8l-6 3v6M20 20l6 4 1 5M16 15h8"/>',
-    calf: '<path d="M16 8v14l-1 6h8M24 8v14"/><path d="M12 31h16"/>',
-    abs: '<rect x="13" y="9" width="14" height="22" rx="5"/><path d="M20 9v22M13 16h14M13 23h14"/>',
-    plank: '<circle class="gf" cx="10" cy="16" r="2.2"/><path d="M12.5 18l17 4.5M12.5 18v8M10 26h5M29.5 22.5l2.5 3.5"/>',
-    sideplank: '<circle class="gf" cx="13" cy="10" r="2.2"/><path d="M14 13l13 15M14 13v13M11 26h6M14 13l-5-3"/>',
-    wallsit: '<path d="M10 7v24"/><circle class="gf" cx="14" cy="9.5" r="2.2"/><path d="M12 13v8h9v9M14 15l5 2"/>',
-    balance: '<circle class="gf" cx="20" cy="8.5" r="2.2"/><path d="M20 11.5v9l-1 9M20 20.5l6 3M12 14h16"/>',
-    burpee: '<circle class="gf" cx="20" cy="7.5" r="2.2"/><path d="M20 10.5v8M14 8l6 4 6-4M20 18.5l-4 6M20 18.5l4 6M10 31h20"/>',
-    jack: '<circle class="gf" cx="20" cy="8" r="2.2"/><path d="M20 11v9M20 13l-7-5M20 13l7-5M20 20l-6 9M20 20l6 9"/>',
-    climber: '<circle class="gf" cx="9" cy="15" r="2.2"/><path d="M11 17l18 3M11 17v8M20 18.5l-3 7M27 20l2 6"/>',
-    walk: '<circle class="gf" cx="20" cy="8.5" r="2.2"/><path d="M20 11.5v9l-3 9M20 20.5l3 9M20 14l-4 4M20 14l4 3"/>',
-    bike: '<circle cx="12" cy="25" r="5"/><circle cx="28" cy="25" r="5"/><path d="M12 25l5-9h7l4 9M17 16l3 9h-8M22 12h4"/>',
-    flame: '<path d="M20 31c-5 0-8-3-8-7 0-5 5-7 5-12 3 2 4 4 4 7 1-1 2-3 2-4 3 2 5 5 5 9 0 4-3 7-8 7z"/>',
-    checkbell: '<path d="M12 15v10M8.5 17v6M28 15v10M31.5 17v6M12 20h16"/><path d="M15 29l3 2 7-5"/>',
-    biceps: '<path d="M11 29c1-6 2-12 6-15 3-2 6 0 5 3l-3 2c4-1 8 0 9 4 1 5-3 7-8 7z"/>',
-    triceps: '<path d="M14 31V19l5-8 5 3M14 19l6 2M20 21l-2 10"/><path d="M22 9l5 3"/>',
-    shoulders: '<path d="M8 19c3-5 7-6 12-6s9 1 12 6M12 19v10h16V19"/><circle class="gf" cx="20" cy="9" r="2.6"/>',
-    glutes: '<path d="M11 13c0 9 4 15 9 15s9-6 9-15M20 15v13"/>',
-    mobility: '<circle class="gf" cx="14" cy="9" r="2.2"/><path d="M14 12l3 8 9 4M17 20l-5 9M14 14l10-6"/>'
+    pushup: '<path class="eq" d="M4 33.5H36"/><circle class="gf" cx="31.5" cy="15.8" r="3.4"/><path class="gf" d="M27.8 17.2 29.6 22.4 13.4 26.6 12 21.6Z"/><path class="lb" d="M26.8 20.5 27.3 31.2M13.2 24.4 5.5 31.5"/>',
+    dumbbell: '<path class="lb" d="M11 20H29"/><rect class="gf" x="4.6" y="11" width="5.2" height="18" rx="1.6"/><rect class="gf" x="30.2" y="11" width="5.2" height="18" rx="1.6"/><rect class="gf" x="9.4" y="13.6" width="3.6" height="12.8" rx="1.2"/><rect class="gf" x="27" y="13.6" width="3.6" height="12.8" rx="1.2"/>',
+    legs: '<path class="gf" d="M12.6 3.6H19.4L19.2 15.2C19.2 18 17.6 19.4 17.8 22.4L17.4 31.6H12.4L12.6 23.6C11.4 20.4 10.8 17.6 11.2 14.2Z"/><path class="gf" d="M27.4 3.6H20.6L20.8 15.2C20.8 18 22.4 19.4 22.2 22.4L22.6 31.6H27.6L27.4 23.6C28.6 20.4 29.2 17.6 28.8 14.2Z"/><path class="gf" d="M10.6 31.4H17.8V35.4H8.6Q8.6 32.6 10.6 31.4Z"/><path class="gf" d="M29.4 31.4H22.2V35.4H31.4Q31.4 32.6 29.4 31.4Z"/>',
+    core: '<rect class="gf" x="12.4" y="9" width="6.6" height="6.6" rx="2.2"/><rect class="gf" x="21" y="9" width="6.6" height="6.6" rx="2.2"/><rect class="gf" x="12.4" y="17" width="6.6" height="6.6" rx="2.2"/><rect class="gf" x="21" y="17" width="6.6" height="6.6" rx="2.2"/><rect class="gf" x="12.4" y="25" width="6.6" height="6.6" rx="2.2"/><rect class="gf" x="21" y="25" width="6.6" height="6.6" rx="2.2"/><path class="eq" d="M9 6.5Q20 3 31 6.5"/>',
+    timer: '<circle class="eq tk" cx="20" cy="21.6" r="11.2"/><path class="gf" d="M17 4.4H23V8.4H17Z"/><path class="lb" d="M20 21.6V14.6M20 21.6 25 25"/><path class="eq" d="M29.4 10.4 31.6 8.2"/>',
+    heart: '<path class="gf" d="M20 33S6 24.6 6 14.6A7.4 7.4 0 0 1 20 10.6 7.4 7.4 0 0 1 34 14.6C34 24.6 20 33 20 33Z"/><path class="cut" d="M9.6 19.6H15L17.4 15 21.6 24 24 19.6H30.4"/>',
+    run: '<circle class="gf" cx="25" cy="6.4" r="3.4"/><path class="gf" d="M20.4 9.6 27.6 9.8 24.8 20 18 19.4Z"/><path class="lb" d="M22.4 11.6 15.8 15.6 12.8 12.4M25.6 11.8 30.4 17 34 15.2M19.4 19.8 13.4 25.6 8.4 24M22.4 20 27.6 26.4 25 33.6"/>',
+    route: '<path class="gf" d="M28 3.6A6.2 6.2 0 0 1 34.2 9.8C34.2 14.4 28 21 28 21S21.8 14.4 21.8 9.8A6.2 6.2 0 0 1 28 3.6Z"/><circle class="cut" cx="28" cy="9.8" r="2.2"/><path class="eq" d="M28 24.6H14.6A4.4 4.4 0 0 0 14.6 33.4H33"/><circle class="gf" cx="9" cy="29" r="3"/>',
+    calendar: '<path class="gf" d="M8 9.6H32A2.6 2.6 0 0 1 34.6 12.2V31.6A2.6 2.6 0 0 1 32 34.2H8A2.6 2.6 0 0 1 5.4 31.6V12.2A2.6 2.6 0 0 1 8 9.6Z"/><path class="lb" d="M13 5.6V11M27 5.6V11"/><path class="cut" d="M12.4 23 18 28 28 17.4"/>',
+    star: '<path class="gf" d="M20 4.4 24.6 13.8 35 15.3 27.5 22.6 29.3 33 20 28.1 10.7 33 12.5 22.6 5 15.3 15.4 13.8Z"/>',
+    bench: '<path class="eq" d="M7 28.5H29M10 28.5V34M26 28.5V34M5 12.5H35"/><rect class="gf" x="6.5" y="7.5" width="3" height="10" rx="1"/><rect class="gf" x="30.5" y="7.5" width="3" height="10" rx="1"/><circle class="gf" cx="31.5" cy="24.2" r="3.1"/><path class="gf" d="M8 22.4H27.6V27H8Z"/><path class="lb" d="M23 23 22.5 13.5M15.5 23 15.8 13.5"/><path class="lb" d="M9 25 4.5 31"/>',
+    pullup: '<path class="eq" d="M5 5.5H35"/><path class="lb" d="M12.5 6 15.5 14M27.5 6 24.5 14"/><circle class="gf" cx="20" cy="11.2" r="3.4"/><path class="gf" d="M14.25 14.4Q20 12.8 25.75 14.4L23.55 23.9Q20 25.099999999999998 16.45 23.9Z"/><path class="lb" d="M18 24.5 17.5 33.5M22 24.5 22.5 33.5"/>',
+    dips: '<path class="eq" d="M5 18H14M26 18H35M8.5 18V34M31.5 18V34"/><circle class="gf" cx="20" cy="8.6" r="3.4"/><path class="gf" d="M14.5 12Q20 10.4 25.5 12L23.3 21.4Q20 22.599999999999998 16.7 21.4Z"/><path class="lb" d="M15.4 13 12.4 18M24.6 13 27.6 18M18 21.6 16.6 28.4 20.4 31.6M22 21.6 23.4 28.4 27 30.6"/>',
+    squat: '<circle class="gf" cx="14.5" cy="8.2" r="3.4"/><path class="gf" d="M11.8 11.6 18.4 10.8 21.4 20.4 14.6 22Z"/><path class="lb" d="M18 13.6 29 15M19.6 20.8 28 23.2M28 23.2 26.2 32.6"/><path class="eq" d="M23.4 34H30.4"/>',
+    squatbar: '<path class="eq" d="M5 12.2H31"/><rect class="gf" x="5" y="7.199999999999999" width="3" height="10" rx="1"/><rect class="gf" x="28" y="7.199999999999999" width="3" height="10" rx="1"/><circle class="gf" cx="16.2" cy="8.6" r="3.4"/><path class="gf" d="M12.8 12.6 19.6 12 22 21 15.2 22.4Z"/><path class="lb" d="M14.6 14.6 12 12.6M20.2 21.4 28.4 23.6M28.4 23.6 26.6 32.6"/><path class="eq" d="M23.8 34H30.8"/>',
+    deadlift: '<circle class="gf" cx="25.5" cy="7.6" r="3.4"/><path class="gf" d="M22.2 10.4 28.2 11.8 21.2 20.6 15.6 18.4Z"/><path class="lb" d="M24.4 13.6 21.6 27M17.2 19.6 19.8 26.4 17.6 33.6"/><path class="eq" d="M6 28H34"/><circle class="gf" cx="8.5" cy="28" r="5"/><circle class="gf" cx="31.5" cy="28" r="5"/>',
+    ohp: '<path class="eq" d="M4 4H36"/><rect class="gf" x="4.5" y="0" width="3" height="8" rx="1"/><rect class="gf" x="32.5" y="0" width="3" height="8" rx="1"/><circle class="gf" cx="20" cy="12.4" r="3.4"/><path class="gf" d="M14.25 15.8Q20 14.200000000000001 25.75 15.8L23.55 25.3Q20 26.5 16.45 25.3Z"/><path class="lb" d="M15 16.5 11.6 10.2 12.4 4.4M25 16.5 28.4 10.2 27.6 4.4M18 26 17.4 34M22 26 22.6 34"/>',
+    lunge: '<circle class="gf" cx="20" cy="6.8" r="3.4"/><path class="gf" d="M14.5 10.2Q20 8.6 25.5 10.2L23.3 19.6Q20 20.8 16.7 19.6Z"/><path class="lb" d="M15.6 11.4 13.8 19M24.4 11.4 26.2 19M18.4 20 11.6 25.2 11.6 33.6M21.6 20 27.6 27 32 32.4"/>',
+    calf: '<path class="lb" d="M15.5 4 15.5 17M24.5 4 24.5 17"/><ellipse class="gf" cx="15.2" cy="21" rx="3.6" ry="6"/><ellipse class="gf" cx="24.8" cy="21" rx="3.6" ry="6"/><path class="lb" d="M15.6 25 16.6 30.6M24.4 25 23.4 30.6"/><path class="eq" d="M9 34H31"/><path class="gf" d="M14 30.4 20 31.8 19.4 33.2 13.8 33Z"/><path class="gf" d="M26 30.4 20.6 31.8 21 33.2 26.4 33Z"/>',
+    abs: '<rect class="gf" x="12.4" y="8" width="6.6" height="6.4" rx="2.2"/><rect class="gf" x="21" y="8" width="6.6" height="6.4" rx="2.2"/><rect class="gf" x="12.4" y="15.4" width="6.6" height="6.4" rx="2.2"/><rect class="gf" x="21" y="15.4" width="6.6" height="6.4" rx="2.2"/><rect class="gf" x="12.4" y="22.8" width="6.6" height="6.4" rx="2.2"/><rect class="gf" x="21" y="22.8" width="6.6" height="6.4" rx="2.2"/><path class="gf" d="M14 30.4 20 35.2 26 30.4Z"/>',
+    plank: '<path class="eq" d="M4 33.5H36"/><circle class="gf" cx="32.2" cy="16.6" r="3.4"/><path class="gf" d="M28.6 18 29.4 23 9.6 26.6 8.8 21.8Z"/><path class="lb" d="M27.6 21.6 27.6 28.4 33 28.4M9.6 24 5 31.4"/>',
+    sideplank: '<path class="eq" d="M4 34H36"/><circle class="gf" cx="9.6" cy="8.6" r="3.4"/><path class="lb" d="M11.6 12.4 31.6 30.6"/><path class="gf" d="M10.6 11.2 15.6 12.8 26 24.4 22.8 27Z"/><path class="lb" d="M11.4 13.4 11.4 24.4 15.6 24.4M14.4 11 8 5.6"/>',
+    wallsit: '<path class="eq" d="M7 3V35"/><circle class="gf" cx="13.4" cy="8.6" r="3.4"/><path class="gf" d="M10 12H17L17 21.6H10Z"/><path class="lb" d="M13 21.4 24.4 21.4M24.4 21.4 24.4 32.6M16 14 21.4 17.6"/><path class="eq" d="M21.6 34H28"/>',
+    balance: '<circle class="gf" cx="20" cy="6.8" r="3.4"/><path class="gf" d="M14.5 10.2Q20 8.6 25.5 10.2L23.3 19.6Q20 20.8 16.7 19.6Z"/><path class="lb" d="M15.4 11.4 8 12.6M24.6 11.4 32 12.6M18.6 20.2 18.6 33.6M21.6 20.2 28 23.6 27 30"/>',
+    burpee: '<circle class="gf" cx="20" cy="7.4" r="3.4"/><path class="gf" d="M14.5 10.8Q20 9.200000000000001 25.5 10.8L23.3 20.200000000000003Q20 21.400000000000002 16.7 20.200000000000003Z"/><path class="lb" d="M15.4 11.8 10.6 3.6M24.6 11.8 29.4 3.6M18.4 20.6 15 29.6M21.6 20.6 25 29.6"/><path class="eq" d="M8 34.4H32"/>',
+    jack: '<circle class="gf" cx="20" cy="7" r="3.4"/><path class="gf" d="M14.5 10.4Q20 8.8 25.5 10.4L23.3 19.8Q20 21 16.7 19.8Z"/><path class="lb" d="M15.4 11.4 8.4 5M24.6 11.4 31.6 5M18.4 20.4 11.4 32.6M21.6 20.4 28.6 32.6"/>',
+    climber: '<path class="eq" d="M4 33.6H36"/><circle class="gf" cx="32.4" cy="13.6" r="3.4"/><path class="gf" d="M28.8 15.2 29.6 20.4 12.6 24.8 11.6 19.8Z"/><path class="lb" d="M28 19 28 31M12.4 22.6 5 30M18.6 21.6 24 25.6 21.6 31"/>',
+    walk: '<circle class="gf" cx="20" cy="6.4" r="3.4"/><path class="gf" d="M14.8 9.8Q20 8.200000000000001 25.2 9.8L23 19.6Q20 20.8 17 19.6Z"/><path class="lb" d="M16 11.4 13.4 19.6M24 11.4 27 18.4M18.6 20.2 15.2 33.6M21.4 20.2 25.4 33.6"/>',
+    bike: '<circle class="eq" cx="10" cy="27" r="6"/><circle class="eq" cx="30" cy="27" r="6"/><path class="eq" d="M10 27 16.6 17H26.6L30 27M16.6 17 20.4 27H10"/><circle class="gf" cx="24.6" cy="6.4" r="3.1"/><path class="lb" d="M23.2 9.6 18.4 16.6M23.4 10.2 29 14.2M18.6 16.6 21 22.6"/>',
+    flame: '<path class="gf" d="M20 35.4C12.6 35.4 8.4 30.4 8.4 24.6 8.4 17 15.6 13.2 15.6 4.6 20.6 7.4 23 11.6 23 16.4 24.8 14.8 26 12.4 26.2 10 30 13 31.6 18.6 31.6 23.6 31.6 30.4 27 35.4 20 35.4Z"/><path class="cut2" d="M20 33C17 33 15.2 30.8 15.2 28.2 15.2 24.8 18.2 23 18.6 19.6 21.6 21.6 24.8 24.4 24.8 28.2 24.8 31 23 33 20 33Z"/>',
+    checkbell: '<path class="gf" d="M15.6 6.4H24.4A3.4 3.4 0 0 1 27.6 10.6L26.6 13.6A11.2 11.2 0 1 1 13.4 13.6L12.4 10.6A3.4 3.4 0 0 1 15.6 6.4Z"/><path class="cut" d="M15.6 9.4H24.4L23.4 12.4H16.6Z"/><path class="cut" d="M14.6 23.8 18.6 27.6 26 19.6"/>',
+    biceps: '<path class="lbx" d="M6.4 28.4 23.6 28.4"/><path class="lbx" d="M25.2 27.2 27.4 10.8"/><ellipse class="gf" cx="15.6" cy="22.4" rx="8" ry="6.2" transform="rotate(-12 15.6 22.4)"/><circle class="gf" cx="27.6" cy="8.4" r="5"/><path class="cut" d="M9.6 25.2Q15 18.8 21.8 22.6M25 6.6 30 7"/>',
+    triceps: '<path class="lbx" d="M17 4.6 16.6 21.4"/><path class="lbx" d="M17.6 22.4 27.6 31"/><ellipse class="gf" cx="13.8" cy="13.4" rx="4.8" ry="8.2"/><circle class="gf" cx="29.4" cy="32.6" r="4.2"/><path class="cut" d="M12.2 7.6Q10.6 13.4 13.6 19.4"/>',
+    shoulders: '<circle class="gf" cx="20" cy="7" r="3.4"/><path class="gf" d="M7.4 18.4C8.6 13.6 12.4 11.6 16.4 11.4H23.6C27.6 11.6 31.4 13.6 32.6 18.4L33.4 24.4 28.4 25.4 27.6 21 26.6 33.6H13.4L12.4 21 11.6 25.4 6.6 24.4Z"/><path class="cut" d="M20 14.6V26M14.4 17.2Q17 19.4 20 18.4Q23 19.4 25.6 17.2"/>',
+    glutes: '<path class="gf" d="M8 8.4H32V13.6C33.6 17.4 33.4 22.2 31.4 25.6 29.2 29.4 24.6 31.2 20.6 29.4L20 28.8 19.4 29.4C15.4 31.2 10.8 29.4 8.6 25.6 6.6 22.2 6.4 17.4 8 13.6Z"/><path class="cut" d="M20 14.4V28.4M8.6 13.4H31.4"/>',
+    mobility: '<circle class="gf" cx="13.4" cy="7.4" r="3.4"/><path class="gf" d="M10.6 11 16.2 10.8 18.8 20.2 13.4 21.2Z"/><path class="lb" d="M15.8 12.4 26.4 4.6M17.4 20.4 28.6 24.6 32.4 32.4M15.6 21 9.6 29 9.6 33.4"/><path class="eq" d="M5 34.6H35"/>'
   };
   // Símbolo propio por desafío (la categoría solo queda como respaldo).
   const SYMBOL_BY_ID = {
@@ -332,7 +334,7 @@
       + `<path class="ff-medal-drop" d="${pathOf(rim.map(([x, y]) => [x, y + 1.6]))}"/>${RANK_SHAPES[key]}`
       + `<path class="ff-medal-bevel" d="${pathOf(hexPts(18.4))}" fill="url(#ffBevel${id})"/><path class="ff-medal-inner" d="${pathOf(hexPts(16.3))}"/>`
       + `<path class="ff-medal-ring" d="${pathOf(hexPts(16.3))}"/><ellipse class="ff-medal-glow" cx="24" cy="15.5" rx="10.5" ry="5.5"/>`
-      + `<path class="ff-medal-shine" d="${shine}"/><g class="ff-medal-glyph" transform="translate(24 23.4) scale(.74) translate(-20 -19.5)">${g}</g>${RANK_DECOR[key] || ''}${banner}</svg>`;
+      + `<path class="ff-medal-shine" d="${shine}"/><g class="ff-medal-glyph" transform="translate(24 23.4) scale(.78) translate(-20 -19.5)">${g}</g>${RANK_DECOR[key] || ''}${banner}</svg>`;
   }
 
   root.FittFormaBadgeEngine = Object.freeze({
