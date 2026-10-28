@@ -739,7 +739,37 @@
     return { source: 'history', weekday: wd, day: { kind: 'focus', key: best.k }, reason: best.d >= 99 ? `En las últimas 2 semanas no registraste ${lbl}.` : `Hace ${best.d} ${best.d === 1 ? 'día' : 'días'} que no entrenás ${lbl}.` };
   }
 
-  const api = { WEEKDAYS, weekdayOf, PROGRAMS, programWeek, groupsOfExercise, groupHistory, recommendPrograms, recommendToday, SPLIT_PLANS, nextFocusInSplit, suggestProgression, norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
+  // v60: calculadora de discos. Reparte (total − barra) / 2 por lado con los discos disponibles, de mayor a menor.
+  // Si no se puede armar exacto, devuelve lo más cercano por debajo y cuánto falta (nunca inventa un disco).
+  const PLATES_KG = [25, 20, 15, 10, 5, 2.5, 1.25];
+  function platesPerSide(total, bar = 20, plates = PLATES_KG) {
+    const t = Number(total), b = Number(bar);
+    if (!(t > 0) || !(b >= 0)) return { ok: false, reason: 'datos' };
+    if (t < b) return { ok: false, reason: 'menos-que-barra', bar: b };
+    const list = [...new Set((plates || []).map(Number).filter(x => x > 0))].sort((a, c) => c - a);
+    let left = Math.round((t - b) / 2 * 100) / 100; const side = [];
+    for (const p of list) while (left + 1e-9 >= p) { side.push(p); left = Math.round((left - p) * 100) / 100; }
+    const loaded = Math.round((b + 2 * side.reduce((a, x) => a + x, 0)) * 100) / 100;
+    return { ok: true, exact: left === 0, side, bar: b, loaded, missing: Math.round((t - loaded) * 100) / 100 };
+  }
+  // v60: superseries. Un ejercicio con superset:true se hace seguido del siguiente. Devuelve el grupo (índices) de ei.
+  function supersetGroup(exercises, ei) {
+    const ex = exercises || []; let start = ei;
+    while (start > 0 && ex[start - 1]?.superset) start--;
+    let end = start; while (end < ex.length - 1 && ex[end]?.superset) end++;
+    const out = []; for (let i = start; i <= end; i++) out.push(i);
+    return out.length > 1 && out.includes(ei) ? out : [ei];
+  }
+  // Después de marcar una serie de ei: si no es el último de la superserie, se pasa al siguiente sin descanso;
+  // el descanso va después del último ejercicio de la ronda.
+  function supersetNext(exercises, ei) {
+    const g = supersetGroup(exercises, ei), pos = g.indexOf(ei);
+    if (g.length < 2 || pos === g.length - 1) return { rest: true };
+    const next = g[pos + 1], set = (exercises[next]?.entries || []).findIndex(x => !x.done);
+    return set >= 0 ? { rest: false, next, set } : { rest: true };
+  }
+
+  const api = { PLATES_KG, platesPerSide, supersetGroup, supersetNext, WEEKDAYS, weekdayOf, PROGRAMS, programWeek, groupsOfExercise, groupHistory, recommendPrograms, recommendToday, SPLIT_PLANS, nextFocusInSplit, suggestProgression, norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaTraining = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);

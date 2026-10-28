@@ -220,7 +220,11 @@ const achId = sql(`select id from community_posts where post_kind='achievement' 
 sql(`insert into community_moderators(user_id) values('aaaaaaaa-0000-0000-0000-000000000001'); insert into community_reports(reporter_id,post_id,reason) values('bbbbbbbb-0000-0000-0000-000000000002','b0000000-0000-0000-0000-0000000000b1','Prueba descartar'),('bbbbbbbb-0000-0000-0000-000000000002','${achId}','Prueba eliminar')`);
 await page.click('#communityTabWorld'); await page.waitForTimeout(500); await page.click('#communityTabProfile'); await page.waitForTimeout(1200);
 step('Moderador ve las denuncias abiertas', await page.isVisible('#communityModerationCard') && /Prueba descartar/.test(await page.textContent('#communityReportsList')));
-await page.click('#communityReportsList [data-report-dismiss]'); await page.waitForTimeout(1200);
+// v60: las dos denuncias se crean en el mismo instante y el orden de la lista puede variar: se toca la de «Prueba descartar»
+// (antes se tocaba la primera y a veces se descartaba la otra) y se espera a que la base lo registre.
+const dismissId = sql(`select id from community_reports where reason='Prueba descartar'`);
+await page.click(`#communityReportsList [data-report-dismiss="${dismissId}"]`);
+for (let i = 0; i < 40 && sql(`select status from community_reports where id='${dismissId}'`) !== 'dismissed'; i++) await page.waitForTimeout(150);
 step('Descartar denuncia guarda estado y quién resolvió', sql(`select status, resolved_by is not null from community_reports where reason='Prueba descartar'`) === 'dismissed|t');
 await page.click(`#communityReportsList [data-report-remove="${achId}"]`); await page.waitForTimeout(1200);
 step('Moderador elimina la publicación denunciada', sql(`select count(*) from community_posts where id='${achId}'`) === '0');

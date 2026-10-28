@@ -1754,3 +1754,33 @@ html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 @media (max-width:899px){.train-launch .focus-picker{margin:12px -6px;padding:14px 2px 4px;background:none;border:0;border-top:1px solid var(--ff-border);border-radius:0}
 .home-tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important}.home-tiles .home-tile{padding:10px 4px!important;border-radius:16px!important}.home-tiles .home-tile b{font-size:11.5px;line-height:1.2}.home-tiles .home-tile svg{width:34px!important;height:34px!important;padding:8px}}
 @media (max-width:560px){.community-connection-row{flex-direction:column;align-items:stretch}.community-connection-row .btn{align-self:flex-end}}
+/* v60: avisos de Mi semana */
+.wp-remind{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px;padding:10px 12px;border-radius:14px;border:1px dashed var(--ff-border)}
+.wp-remind-ico{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:50%;background:rgba(91,108,255,.14);color:#7d8bff}
+.wp-remind-ico svg{width:18px;height:18px}
+.wp-remind-text{display:flex;flex-direction:column;gap:1px;flex:1 1 160px;min-width:0}
+.wp-remind-text b{font-size:.9rem}.wp-remind-text small{font-size:.76rem;opacity:.75}
+.wp-remind-btns{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+/* v60: sesión — aviso de descanso, discos y superseries */
+.rest-alert-prefs{display:flex;gap:14px;margin-top:8px;font-size:.84rem}
+.rest-alert-prefs label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.workout-exercise.is-superset{border-left:3px solid #7d4dff}
+.ss-badge{display:inline-block;margin-bottom:4px;padding:2px 9px;border-radius:999px;background:rgba(125,77,255,.16);color:#9b7dff;font-size:.7rem;font-weight:800;letter-spacing:.02em;text-transform:uppercase}
+.plate-dialog{width:min(440px,calc(100% - 24px));padding:0;border:0;border-radius:20px;background:var(--ff-surface,var(--ff-panel));color:inherit;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.plate-dialog::backdrop{background:rgba(5,8,18,.6)}
+.plate-body{display:flex;flex-direction:column;gap:12px;padding:16px}
+.plate-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.plate-head>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.plate-head strong{font-size:1.1rem}
+.plate-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.plate-fields .field{margin:0}
+.pc-visual{display:flex;align-items:center;gap:3px;min-height:110px;padding:8px 10px;border-radius:14px;background:var(--ff-panel-2);overflow-x:auto}
+.pc-bar{flex:none;width:46px;height:12px;border-radius:3px;background:linear-gradient(180deg,#c9ced8,#7e8594)}
+.pc-plate{flex:none;display:grid;place-items:center;width:22px;height:var(--ph);border-radius:5px;background:var(--pc);color:#10131c;font-size:.62rem;font-weight:900;writing-mode:vertical-rl;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.pc-text{display:flex;flex-direction:column;gap:3px;margin:0}
+.pc-text strong{font-size:1.05rem}
+/* v60: preguntas frecuentes */
+.faq-item{border-top:1px solid var(--ff-border);padding:10px 0}
+.faq-item:first-of-type{border-top:0}
+.faq-item summary{cursor:pointer;font-weight:700;font-size:.94rem;list-style-position:inside}
+.faq-item p{margin:6px 0 0;line-height:1.5}

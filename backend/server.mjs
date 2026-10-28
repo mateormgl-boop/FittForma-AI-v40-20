@@ -19,7 +19,7 @@ const root=rootCandidates.find(candidate=>existsSync(path.join(candidate,'index.
 const rawPort=String(process.env.PORT||'8787');
 const port=Number(rawPort);
 if(!Number.isInteger(port)||port<0||port>65535)throw new Error(`PORT debe ser un entero entre 0 y 65535; se recibió ${JSON.stringify(rawPort)}.`);
-const appVersion='0.59.0';
+const appVersion='0.60.0';
 const apiKey=String(process.env.GEMINI_API_KEY||'').trim(), model=String(process.env.GEMINI_MODEL||'gemini-3.8-flash').trim()||'gemini-3.8-flash';
 const trustRenderClientIp=String(process.env.TRUST_RENDER_CLIENT_IP||'').toLowerCase()==='true';
 // If the primary model temporarily returns 503, try a lighter official model automatically.
@@ -97,15 +97,19 @@ function sanitizeHistory(items){
   }
   return alternating.slice(-8);
 }
-const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.webp':'image/webp','.gif':'image/gif','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.ico':'image/x-icon','.woff2':'font/woff2'};
+const mime={'.html':'text/html; charset=utf-8','.txt':'text/plain; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.webp':'image/webp','.gif':'image/gif','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.ico':'image/x-icon','.woff2':'font/woff2'};
 const monetization=createMonetization();
 const adsCsp=adsCspAdditions(monetization.settings.ads);
 const limits=new Map();
 const MAX_TRACKED_CLIENTS=5000;
+// v60: dirección pública opcional (solo https y sin ruta) para la vista previa al compartir.
+const SITE_URL=(()=>{try{const u=new URL(String(process.env.PUBLIC_SITE_URL||''));return u.protocol==='https:'&&!u.username&&!u.password?u.origin:'';}catch{return '';}})();
 const PUBLIC_ROOT_FILES=new Set([
   '/index.html','/i18n.js','/i18n-extra.js','/i18n-v48.js','/i18n-v50.js','/i18n-v51.js','/i18n-v52.js','/i18n-v53.js','/anatomy.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js','/training-core.js','/body-goals.js','/muscle-ranks.js','/athlete-stats.js','/monetization-core.js','/exercise-guides.js','/exercise-media.js','/exercise-gifs.js','/activity-core.js','/native-gps.js','/food-db.js','/food-core.js','/nutrition-guides.js',
   '/manifest.json','/icon.svg','/icon-180.png','/icon-192.png','/icon-512.png',
-  '/supabase-config.js','/achievements.js','/sw.js'
+  '/supabase-config.js','/achievements.js','/sw.js',
+  // v60: página 404 propia, robots.txt, política de privacidad e imagen para compartir.
+  '/404.html','/robots.txt','/privacidad.html','/legal-config.js','/og-image.png'
 ]);
 const CSP=[
   "default-src 'self'",
@@ -267,6 +271,13 @@ function overDailyBudget(req){
   dailyBudget.clients.set(key,used+1);dailyBudget.total++;return false;
 }
 // Los navegadores envían Origin (o al menos Sec-Fetch-Site) en un POST; sin ninguno de los dos se rechaza.
+// v60: a una persona (navegador que pide HTML) se le muestra la página 404 propia; a la app y a las APIs, JSON.
+async function notFound(req,res){
+  if(String(req.headers.accept||'').includes('text/html')){
+    try{const data=await readFile(path.resolve(root,'404.html'));applySecurityHeaders(req,res);res.writeHead(404,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache'});return res.end(req.method==='HEAD'?undefined:data);}catch{}
+  }
+  return send(req,res,404,{error:'No encontrado.'});
+}
 function sameOriginPost(req){
   if(req.headers.origin){try{return new URL(req.headers.origin).host===String(req.headers.host||'');}catch{return false;}}
   return String(req.headers['sec-fetch-site']||'')==='same-origin';
@@ -362,18 +373,20 @@ const server=http.createServer(async(req,res)=>{try{
     const rawSegments=decodedPath.split('/');
     if(rawSegments.some(part=>part==='.'||part==='..'||(part.startsWith('.')&&part!=='')))return send(req,res,404,{error:'No encontrado.'});
     const requested=decodedPath==='/'?'/index.html':decodedPath;
-    if(!isPublicAssetPath(requested))return send(req,res,404,{error:'No encontrado.'});
+    if(!isPublicAssetPath(requested))return notFound(req,res);
     const file=path.resolve(root,'.'+requested);
     if(!file.startsWith(root+path.sep))return send(req,res,404,{error:'No encontrado.'});
     try{
-      const data=await readFile(file),ext=path.extname(file);
+      let data=await readFile(file);const ext=path.extname(file);
+      // v60: con PUBLIC_SITE_URL (https://…) la imagen para compartir y og:url quedan con dirección absoluta, como piden las redes.
+      if(requested==='/index.html'&&SITE_URL)data=Buffer.from(data.toString('utf8').replace('<meta property="og:image" content="/og-image.png">',`<meta property="og:image" content="${SITE_URL}/og-image.png">\n  <meta property="og:url" content="${SITE_URL}/">`));
       applySecurityHeaders(req,res);
       // v59.1: el CSS también se revalida siempre; si quedaba guardado 1 hora, una versión nueva se veía con los estilos viejos.
       const cacheControl=['.html','.js','.mjs','.json','.webmanifest','.css'].includes(ext)?'no-cache':'public, max-age=3600';
       res.writeHead(200,{'Content-Type':mime[ext]||'application/octet-stream','Cache-Control':cacheControl});
       if(req.method==='HEAD')return res.end();
       return res.end(data);
-    }catch{return send(req,res,404,{error:'No encontrado. Revisá que el archivo exista en el repositorio conectado a este servicio.'});}
+    }catch{if(String(req.headers.accept||'').includes('text/html'))return notFound(req,res);return send(req,res,404,{error:'No encontrado. Revisá que el archivo exista en el repositorio conectado a este servicio.'});}
   }
   return send(req,res,404,{error:'No encontrado.'});
 }catch(err){if(err?.name==='TimeoutError'||err?.name==='AbortError')return send(req,res,504,{error:'La IA tardó demasiado en responder. Probá de nuevo.'});return send(req,res,500,{error:'Error interno.'});}});
