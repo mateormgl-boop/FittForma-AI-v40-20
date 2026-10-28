@@ -149,7 +149,102 @@
     return RECIPES.map(r => { const v = computeRecipe(r, db); return v ? { ...r, ...v, portions: 1, computed: true, ingredients: r.items.map(([, g, label]) => `${g} g de ${label.charAt(0).toLowerCase()}${label.slice(1)}`) } : null; }).filter(Boolean);
   }
 
-  const api = { SOURCES, GUIDES, RECIPES, guideFor, proteinRange, computeRecipe, recipesWithValues };
+  // ---------- v58: qué comer hoy según el objetivo y «Completá tu día» ----------
+  // Cada opción usa alimentos de la base (USDA o recetas marcadas como estimación). Roles: p = proteína (se ajusta
+  // para llegar a la proteína), c = carbohidrato (se ajusta para llegar a las calorías), v = verdura y f = grasa (fijos).
+  const ALL = ['lose', 'maintain', 'muscle', 'strength', 'endurance'];
+  const MENU_OPTIONS = {
+    Desayuno: [
+      { id: 'avena-yogur', name: 'Avena con yogur griego y banana', goals: ALL, items: [['sr01256', 170, 'p'], ['sr08120', 40, 'c', 100], ['sr09040', 100, 'c', 150]] },
+      { id: 'huevos-tostadas', name: 'Huevos revueltos con pan integral y tomate', goals: ALL, items: [['sr01132', 120, 'p', 200], ['sr18075', 60, 'c'], ['sr11529', 100, 'v']] },
+      { id: 'tostadas-ricota', name: 'Tostadas integrales con ricota y fruta', goals: ['lose', 'maintain', 'endurance'], items: [['sr01037', 100, 'p'], ['sr18075', 60, 'c', 120], ['sr09003', 150, 'v']] },
+      { id: 'leche-granola', name: 'Leche con granola, maní y banana', goals: ['muscle', 'strength', 'endurance'], items: [['sr01079', 300, 'p', 450], ['sr08037', 50, 'c'], ['sr09040', 100, 'c'], ['sr16390', 15, 'f']] }
+    ],
+    Almuerzo: [
+      { id: 'pollo-arroz', name: 'Pollo con arroz integral y brócoli', goals: ALL, items: [['sr05064', 150, 'p'], ['sr20037', 180, 'c', 400], ['sr11091', 150, 'v'], ['sr04053', 8, 'f']] },
+      { id: 'carne-papa', name: 'Carne magra con papa al horno y ensalada', goals: ALL, items: [['sr23563', 150, 'p'], ['sr11674', 200, 'c'], ['sr11253', 60, 'v'], ['sr11529', 100, 'v'], ['sr04053', 8, 'f']] },
+      { id: 'atun-garbanzos', name: 'Ensalada de atún, garbanzos y verduras', goals: ['lose', 'maintain', 'endurance'], items: [['sr15121', 120, 'p'], ['sr16057', 150, 'c'], ['sr11253', 60, 'v'], ['sr11529', 120, 'v'], ['sr04053', 8, 'f']] },
+      { id: 'fideos-carne', name: 'Fideos integrales con carne picada magra', goals: ['muscle', 'strength', 'endurance', 'maintain'], items: [['sr23563', 130, 'p'], ['sr20125', 220, 'c', 400], ['sr11529', 120, 'v'], ['sr04053', 8, 'f']] }
+    ],
+    Merienda: [
+      { id: 'yogur-fruta', name: 'Yogur griego con frutillas, granola y nueces', goals: ALL, items: [['sr01256', 170, 'p'], ['sr08037', 25, 'c', 70], ['sr09316', 120, 'v'], ['sr12155', 10, 'f']] },
+      { id: 'tostada-jamon', name: 'Tostada integral con jamón cocido y queso', goals: ['maintain', 'muscle', 'strength'], items: [['sr07029', 50, 'p'], ['sr01026', 25, 'p'], ['sr18075', 60, 'c']] },
+      { id: 'leche-banana', name: 'Licuado de leche descremada y banana', goals: ['lose', 'maintain', 'endurance'], items: [['sr01085', 300, 'p', 450], ['sr09040', 120, 'c', 180]] },
+      { id: 'pan-mani', name: 'Pan integral con mantequilla de maní y banana', goals: ['muscle', 'strength', 'endurance'], items: [['sr16398', 20, 'p'], ['sr18075', 70, 'c'], ['sr09040', 100, 'c']] }
+    ],
+    Cena: [
+      { id: 'pescado-calabaza', name: 'Pescado al horno con calabaza y ensalada', goals: ['lose', 'maintain', 'endurance'], items: [['sr15034', 180, 'p'], ['sr11423', 250, 'c', 350], ['sr11253', 60, 'v'], ['sr04053', 8, 'f']] },
+      { id: 'salmon-arroz', name: 'Salmón al horno con arroz y ensalada', goals: ['muscle', 'strength', 'maintain', 'endurance'], items: [['sr15237', 150, 'p'], ['sr20045', 200, 'c', 400], ['sr11253', 60, 'v'], ['sr11529', 100, 'v']] },
+      { id: 'omelette-verduras', name: 'Omelette de huevo y claras con verduras y pan', goals: ['lose', 'maintain', 'muscle', 'strength'], items: [['sr01123', 100, 'p', 150], ['sr01124', 100, 'p', 200], ['sr18075', 50, 'c'], ['sr11529', 100, 'v'], ['sr11124', 60, 'v']] },
+      { id: 'pollo-boniato', name: 'Muslo de pollo con boniato y brócoli', goals: ['maintain', 'muscle', 'strength', 'endurance'], items: [['sr05098', 160, 'p'], ['sr11508', 220, 'c', 400], ['sr11091', 120, 'v'], ['sr04053', 8, 'f']] },
+      { id: 'lentejas-arroz', name: 'Lentejas con arroz y verduras', goals: ['lose', 'maintain', 'endurance'], items: [['sr16070', 220, 'p'], ['sr20045', 120, 'c'], ['sr11124', 80, 'v'], ['sr04053', 8, 'f']] }
+    ]
+  };
+  const MEAL_SHARE = { Desayuno: 0.25, Almuerzo: 0.35, Merienda: 0.15, Cena: 0.25 };
+  const SNACKS = [
+    { id: 'yogur-griego', name: 'Yogur griego descremado', items: [['sr01256', 170, 'p']] },
+    { id: 'atun-galletas', name: 'Atún al natural con galletas de agua', items: [['sr15121', 120, 'p'], ['sr18228', 25, 'c']] },
+    { id: 'huevos-duros', name: 'Huevos duros', items: [['sr01129', 100, 'p']] },
+    { id: 'pollo-frio', name: 'Pechuga de pollo a la plancha', items: [['sr05064', 120, 'p']] },
+    { id: 'ricota-fruta', name: 'Ricota con frutillas', items: [['sr01037', 120, 'p'], ['sr09316', 150, 'c']] },
+    { id: 'leche-descremada', name: 'Vaso de leche descremada', items: [['sr01085', 300, 'p']] },
+    { id: 'pan-mani', name: 'Pan integral con mantequilla de maní', items: [['sr16398', 25, 'p'], ['sr18075', 60, 'c']] },
+    { id: 'banana-nueces', name: 'Banana con nueces', items: [['sr09040', 120, 'c'], ['sr12155', 20, 'f']] },
+    { id: 'jamon-queso', name: 'Jamón cocido y queso', items: [['sr07029', 60, 'p'], ['sr01026', 30, 'p']] }
+  ];
+  const r1 = x => Math.round(x * 10) / 10;
+  const roundG = g => g >= 100 ? Math.round(g / 10) * 10 : Math.max(5, Math.round(g / 5) * 5);
+  function itemsWithValues(items, byId) {
+    const out = []; for (const [id, g, role, max] of items) { const f = byId.get(id); if (!f) return null; const k = g / 100; out.push({ foodId: id, name: f.name, variant: f.variant || '', grams: g, role, max: Number(max) || 300, kcal: (Number(f.kcal) || 0) * k, protein: (Number(f.p) || 0) * k, carbs: (Number(f.c) || 0) * k, fat: (Number(f.f) || 0) * k }); }
+    return out;
+  }
+  const totalsOf = items => { const t = items.reduce((a, x) => ({ kcal: a.kcal + x.kcal, protein: a.protein + x.protein, carbs: a.carbs + x.carbs, fat: a.fat + x.fat }), { kcal: 0, protein: 0, carbs: 0, fat: 0 }); return { kcal: Math.round(t.kcal), protein: r1(t.protein), carbs: r1(t.carbs), fat: r1(t.fat) }; };
+  // Ajusta las cantidades: primero la proteína (con los alimentos «p»), después las calorías (con los «c»). Topes para
+  // que las porciones sigan siendo razonables; si no alcanza, se informa la diferencia en vez de forzar porciones absurdas.
+  function scaleOption(option, target, byId) {
+    const base = itemsWithValues(option.items, byId); if (!base) return null;
+    const sum = (arr, k) => arr.reduce((a, x) => a + x[k], 0);
+    const pItems = base.filter(x => x.role === 'p'), cItems = base.filter(x => x.role === 'c'), fixed = base.filter(x => x.role !== 'p' && x.role !== 'c');
+    const pf = Math.max(0.6, Math.min(2.2, (target.protein - sum(fixed, 'protein') - sum(cItems, 'protein')) / Math.max(1, sum(pItems, 'protein'))));
+    const kcalAfterP = sum(fixed, 'kcal') + sum(pItems, 'kcal') * pf;
+    const cf = cItems.length ? Math.max(0.4, Math.min(2.5, (target.kcal - kcalAfterP) / Math.max(1, sum(cItems, 'kcal')))) : 1;
+    const valued = (x, g) => { const f = byId.get(x.foodId), m = g / 100; return { ...x, grams: g, kcal: (Number(f.kcal) || 0) * m, protein: (Number(f.p) || 0) * m, carbs: (Number(f.c) || 0) * m, fat: (Number(f.f) || 0) * m }; };
+    let scaled = base.map(x => { const k = x.role === 'p' ? pf : x.role === 'c' ? cf : 1; return valued(x, Math.min(x.role === 'c' || x.role === 'p' ? x.max : 1e9, roundG(x.grams * k))); });
+    // Si con los topes faltan calorías, se suma de a poco a la grasa buena (aceite o frutos secos), hasta el doble.
+    const short = (target.kcal || 0) - sum(scaled, 'kcal');
+    if (short > 80) { const fats = scaled.filter(x => x.role === 'f'), fk = sum(fats, 'kcal'); if (fk > 0) { const ff = Math.min(2, 1 + short / fk); scaled = scaled.map(x => x.role === 'f' ? valued(x, roundG(x.grams * ff)) : x); } }
+    return { id: option.id, name: option.name, items: scaled.map(({ max, ...x }) => ({ ...x, kcal: Math.round(x.kcal), protein: r1(x.protein), carbs: r1(x.carbs), fat: r1(x.fat) })), totals: totalsOf(scaled) };
+  }
+  function optionsFor(type, goal) { const list = MENU_OPTIONS[type] || []; const own = list.filter(o => o.goals.includes(goal)); return own.length ? own : list; }
+  // picks = { Desayuno: n, … } elige la opción n (rota). kcal y protein son los objetivos del día.
+  function dailyMenu(db, { goal = 'maintain', kcal = 2000, protein = 120 } = {}, picks = {}) {
+    const byId = new Map((Array.isArray(db) ? db : []).map(f => [f.id, f])), g = GUIDES[goal] ? goal : 'maintain';
+    const K = Math.max(1200, Math.min(4500, Number(kcal) || 2000)), P = Math.max(50, Math.min(300, Number(protein) || 120));
+    const meals = Object.keys(MEAL_SHARE).map(type => {
+      const opts = optionsFor(type, g), i = ((Number(picks[type]) || 0) % opts.length + opts.length) % opts.length;
+      const m = scaleOption(opts[i], { kcal: K * MEAL_SHARE[type], protein: P * MEAL_SHARE[type] }, byId);
+      return m ? { type, pick: i, options: opts.length, ...m } : null;
+    }).filter(Boolean);
+    return { goal: g, target: { kcal: K, protein: P }, meals, totals: totalsOf(meals.map(m => m.totals)) };
+  }
+  // Lo que falta hoy → hasta 3 opciones concretas que entran en las calorías que quedan. Si ya llegaste, no sugiere comer más.
+  function completeDay(db, { goal = 'maintain', kcalLeft = 0, proteinLeft = 0 } = {}) {
+    const byId = new Map((Array.isArray(db) ? db : []).map(f => [f.id, f])), kl = Number(kcalLeft) || 0, pl = Number(proteinLeft) || 0;
+    if (kl < 80 && pl < 10) return { status: 'done', options: [] };
+    if (kl < 80) return { status: 'kcal-reached', options: [] };
+    const wantProtein = pl >= 10;
+    const scored = SNACKS.map(sn => {
+      const base = itemsWithValues(sn.items, byId); if (!base) return null; const t = totalsOf(base);
+      const k = Math.min(1.6, Math.max(0.5, Math.min(kl * 0.9 / Math.max(1, t.kcal), wantProtein ? Math.max(1, pl) / Math.max(1, t.protein) : 1.2)));
+      const opt = scaleOption({ ...sn, items: sn.items.map(([id, gg, role]) => [id, roundG(gg * k), 'x']) }, { kcal: 0, protein: 0 }, byId);
+      if (!opt || opt.totals.kcal > kl + 20) return null;
+      const density = opt.totals.protein * 4 / Math.max(1, opt.totals.kcal);
+      return { ...opt, score: wantProtein ? density * 10 + Math.min(opt.totals.protein, pl) / 10 : (goal === 'muscle' || goal === 'strength' ? opt.totals.kcal / 100 : 1 - opt.totals.kcal / 1000) };
+    }).filter(Boolean).sort((a, b) => b.score - a.score);
+    return { status: wantProtein ? 'protein' : 'kcal', options: scored.slice(0, 3).map(({ score, ...o }) => o) };
+  }
+
+  const api = { SOURCES, GUIDES, RECIPES, guideFor, proteinRange, computeRecipe, recipesWithValues, MENU_OPTIONS, SNACKS, dailyMenu, completeDay };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaNutritionGuides = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);
