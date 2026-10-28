@@ -2465,12 +2465,16 @@
   <section class="exercise-modal-panel" role="dialog" aria-modal="true" aria-labelledby="exerciseModalTitle" aria-describedby="exerciseModalDescription" tabindex="-1">
     <div class="modal-top exercise-sheet-top"><div><div class="eyebrow">Ficha del ejercicio</div><h2 id="exerciseModalTitle">Ejercicio</h2><p id="exerciseModalDescription" class="muted small"></p></div><span class="exercise-group-pill" id="exerciseModalGroup"></span><button class="modal-close" type="button" aria-label="Cerrar guía" data-close-exercise-modal>×</button></div>
     <div id="exerciseModalImages" class="exercise-modal-images"></div>
-    <div class="exercise-sheet-hero"><div class="exercise-sheet-map" id="exerciseModalMap"></div><dl class="exercise-sheet-muscles" id="exerciseModalMuscles"></dl></div>
-    <div class="exercise-sheet-chips" id="exerciseModalChips"></div>
-    <section class="ex-rank" id="exerciseModalRank" aria-label="Tu rango en este ejercicio" hidden></section>
+    <div class="ex-tabs" role="tablist" aria-label="Secciones de la ficha"><button type="button" role="tab" class="ex-tab" id="exTabHowBtn" data-ex-tab="how" aria-controls="exTabHow" aria-selected="true">Cómo se hace</button><button type="button" role="tab" class="ex-tab" id="exTabMineBtn" data-ex-tab="mine" aria-controls="exTabMine" aria-selected="false">Mi progreso<span class="ex-tab-count" id="exTabMineCount"></span></button></div>
+    <div class="ex-tab-panel" id="exTabMine" role="tabpanel" aria-labelledby="exTabMineBtn" hidden>
     <section class="ex-quicklog" id="exerciseQuickLog" aria-label="Registrar este ejercicio"></section>
+    <section class="ex-rank" id="exerciseModalRank" aria-label="Tu rango en este ejercicio" hidden></section>
     <section class="ex-history card" id="exerciseModalHistory" aria-label="Tu historial con este ejercicio" hidden></section>
     <section class="ex-addroutine" id="exerciseModalAddRoutine" aria-label="Agregar a una rutina"></section>
+    </div>
+    <div class="ex-tab-panel" id="exTabHow" role="tabpanel" aria-labelledby="exTabHowBtn">
+    <div class="exercise-sheet-hero"><div class="exercise-sheet-map" id="exerciseModalMap"></div><dl class="exercise-sheet-muscles" id="exerciseModalMuscles"></dl></div>
+    <div class="exercise-sheet-chips" id="exerciseModalChips"></div>
     <div class="exercise-sheet-start" id="exerciseModalStart" hidden></div>
     <section class="exercise-progression" aria-label="Ejecución paso a paso"><h3>Ejecución paso a paso</h3><div id="exerciseModalProgression" class="exercise-progression-grid"></div></section>
     <div class="exercise-sheet-columns"><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">⇄</span>Respiración</h3><p id="exerciseModalBreathing" class="muted small"></p></div><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">!</span>Errores comunes</h3><ul id="exerciseModalErrors"></ul></div><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">✓</span>Recomendaciones</h3><ul id="exerciseModalTips"></ul></div></div>
@@ -2479,6 +2483,7 @@
     <div class="exercise-detail-block exercise-alternatives-block"><h3>Variantes y alternativas</h3><div id="exerciseModalAlternatives"><p class="muted small">Las alternativas dependen de la modalidad y de tu equipo.</p></div></div>
     <div id="exerciseModalVideoLink" class="btn-row"></div>
     <p class="notice">Usá un rango de movimiento cómodo y una carga que puedas controlar. Detenete si sentís dolor agudo, mareo o una molestia inusual. Estas fichas son orientativas y no sustituyen una supervisión profesional.</p>
+    </div>
     <div class="btn-row"><button class="btn secondary" type="button" data-close-exercise-modal>Cerrar guía</button></div>
   </section>
 </div>
@@ -3173,6 +3178,10 @@ function findCatalogExercise(name){
       renderRoutines?.();renderAddToRoutine(name,group,kind);$('exAddRoutineStatus').textContent=`Agregado a «${r.name}».`;toast(`${name}: agregado a «${r.name}».`);
     };
   }
+  function showExerciseTab(tab){
+    for(const [t,panel,btn] of [['how','exTabHow','exTabHowBtn'],['mine','exTabMine','exTabMineBtn']]){const on=t===tab;$(panel).hidden=!on;$(btn).setAttribute('aria-selected',String(on));$(btn).classList.toggle('active',on);}
+  }
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-ex-tab]');if(b){showExerciseTab(b.dataset.exTab);b.closest('.exercise-modal-panel')?.querySelector('.ex-tabs')?.scrollIntoView({block:'nearest'});}});
   function openExerciseDetails(name,group,kind,equipmentMode=''){
     const modal=$('exerciseModal');if(!modal)return;
     $('exerciseModalTitle').textContent=name;
@@ -3181,6 +3190,7 @@ function findCatalogExercise(name){
     {const box=$('exerciseModalRank');if(box){const html=kind==='cardio'?'':exerciseRankMarkup(name,false);box.innerHTML=html;box.hidden=!html;}}
     renderQuickLog(name,group,kind);
     renderExerciseHistory(name,kind);renderAddToRoutine(name,group,kind);
+    {const n=kind==='cardio'?0:exerciseHistoryData(name).rows.length;$('exTabMineCount').textContent=n?` · ${n}`:'';showExerciseTab('how');}
     const inPlan=(state.plan?.days||[]).flatMap(d=>d.exercises).find(e=>normalizeExerciseName(e.name)===normalizeExerciseName(FittFormaTraining.canonicalName(name)));
     const prescription=inPlan||findExercisePrescription(FittFormaTraining.canonicalName(name)),guide=exerciseGuide(name);
     const muscles=exerciseMuscleTexts(name,group);
@@ -4352,8 +4362,8 @@ function findCatalogExercise(name){
     const best=p.kind==='kg'?`${fmt(p.best.weight)} kg × ${p.best.reps}`:`${fmt(p.best.reps)} ${unit}`;
     if(compact)return `<p class="ex-rank-line">${MR.emblemSvg(p.rank,22)}<b style="color:${r.glow}">${esc(r.name)}</b>${nx?`<span>Siguiente rango: ${esc(target)}</span>`:'<span>Rango máximo</span>'}</p>`;
     const first=p.kind==='kg'?`${fmt(p.first.weight)} kg × ${p.first.reps}`:`${fmt(p.first.reps)} ${unit}`;
-    return `<div class="ex-rank-head rk-hero" style="--rk:${r.color};--rkg:${r.glow}"><div class="eyebrow">Tu rango en este ejercicio</div><strong class="rk-big">${esc(r.name)}</strong><div class="rk-hero-emblem">${MR.emblemSvg(p.rank,150)}</div><div class="rk-bar"><span style="width:${nx?Math.round(Math.max(0,Math.min(1,(p.pct-MR.EX_STEPS[p.rank])/(MR.EX_STEPS[nx.rank]-MR.EX_STEPS[p.rank])))*100):100}%"></span></div><small class="muted">${p.pct>0?`+${fmt(p.pct)} % desde tu primera vez`:'Tu punto de partida'} · ${p.sessions} ${p.sessions===1?'sesión':'sesiones'}</small></div>
-      <dl class="ex-rank-dl"><div><dt>Primera vez</dt><dd>${esc(first)}</dd></div><div><dt>Mejor serie</dt><dd>${esc(best)}</dd></div><div><dt>Serie para el siguiente rango</dt><dd>${nx?`${esc(target)} <em style="color:${MR.RANKS[nx.rank].glow}">→ ${esc(MR.RANKS[nx.rank].name)}</em>`:'Rango máximo'}</dd></div></dl>
+    return `<div class="ex-rank-head rk-hero" style="--rk:${r.color};--rkg:${r.glow}"><div class="eyebrow">Tu rango en este ejercicio</div><strong class="rk-big">${esc(r.name)}</strong><div class="rk-hero-emblem">${MR.emblemSvg(p.rank,96)}</div><div class="rk-bar"><span style="width:${nx?Math.round(Math.max(0,Math.min(1,(p.pct-MR.EX_STEPS[p.rank])/(MR.EX_STEPS[nx.rank]-MR.EX_STEPS[p.rank])))*100):100}%"></span></div><small class="muted">${p.pct>0?`+${fmt(p.pct)} % desde tu primera vez`:'Tu punto de partida'} · ${p.sessions} ${p.sessions===1?'sesión':'sesiones'}</small></div>
+      <dl class="ex-rank-dl"><div><dt>Primera vez</dt><dd>${esc(first)}</dd></div><div><dt>Serie para el siguiente rango</dt><dd>${nx?`${esc(target)} <em style="color:${MR.RANKS[nx.rank].glow}">→ ${esc(MR.RANKS[nx.rank].name)}</em>`:'Rango máximo'}</dd></div></dl>
       <details class="rk-ladder-wrap"><summary>Escalera de rangos</summary>${rankLadderMarkup(p.rank,(x,i)=>`+${MR.EX_STEPS[i]} %`)}</details>
       <p class="muted small">El rango mide tu mejora en este ejercicio (${p.kind==='kg'?'1RM estimado':unit==='s'?'mejor tiempo':'mejores repeticiones'}) frente a tu primer registro. No te compara con otras personas.</p>`;
   }

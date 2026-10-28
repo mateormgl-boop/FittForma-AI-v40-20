@@ -1478,3 +1478,10 @@ html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 .mr-map-big .anatomy-map{max-width:340px!important;margin:0 auto}
 .mr-side-chips{margin:6px 0 0}
 .mr-side-chips[hidden]{display:none}
+/* v57: ficha del ejercicio en dos pestañas */
+.ex-tabs{position:sticky;top:-1px;z-index:3;display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:12px 0;padding:4px;border-radius:14px;background:var(--ff-panel-2);border:1px solid var(--ff-border)}
+.ex-tab{border:0;border-radius:11px;background:transparent;color:var(--text-2);font:inherit;font-size:14px;font-weight:800;padding:10px 6px;min-height:42px;cursor:pointer}
+.ex-tab.active{background:var(--mod,var(--blue));color:#fff}
+.ex-tab-count{font-weight:700;opacity:.85}
+.ex-tab-panel[hidden]{display:none}
+#exTabMine .rk-hero-emblem{margin:4px auto}
