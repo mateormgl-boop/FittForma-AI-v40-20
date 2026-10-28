@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Política de privacidad · FittForma AI</title>
+<meta name="description" content="Qué datos usa FittForma AI, dónde se guardan, con quién se comparten y cómo borrarlos.">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<style>
+  :root{--bg:#f4f6fb;--card:#fff;--text:#121726;--muted:#5b6478;--line:#dde2ee;--accent:#5b6cff;--warn:#fff4d6;--warn-text:#6b4e00}
+  @media (prefers-color-scheme:dark){:root{--bg:#070b16;--card:#111a2e;--text:#eef1f8;--muted:#9aa3b8;--line:#22304d;--warn:#3a2f10;--warn-text:#ffd88a}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line)}
+  header a{display:inline-flex;align-items:center;gap:8px;color:var(--text);font-weight:800;text-decoration:none}
+  header img{width:30px;height:30px}
+  header .back{color:var(--accent);font-weight:700;font-size:.95rem}
+  main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+  h1{font-size:1.7rem;line-height:1.2;margin:8px 0 4px}
+  h2{font-size:1.15rem;margin:28px 0 8px}
+  p,li{color:var(--text)}
+  .muted{color:var(--muted);font-size:.92rem}
+  ul{padding-left:20px}
+  li{margin:4px 0}
+  .card{padding:14px 16px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+  .warn{padding:12px 14px;border-radius:14px;background:var(--warn);color:var(--warn-text);font-size:.92rem}
+  a{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;font-size:.92rem}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:700}
+  .table-wrap{overflow-x:auto}
+</style>
+<script src="/legal-config.js"></script>
+</head>
+<body>
+<header><a href="/"><img src="/assets/brand/logo-mark.svg" alt="" width="30" height="30">FittForma AI</a><a class="back" href="/#profile">Volver a la app</a></header>
+<main>
+  <h1>Política de privacidad</h1>
+  <p class="muted">Última actualización: <span id="legalUpdated">28 de octubre de 2026</span></p>
+
+  <div class="card" id="legalOwner">
+    <p><strong>Responsable:</strong> <span id="ownerName">—</span><br><strong>Contacto:</strong> <span id="contactEmail">—</span></p>
+  </div>
+
+  <h2>En pocas palabras</h2>
+  <ul>
+    <li>Lo que registrás (entrenamientos, comidas, agua, peso, medidas y carreras) se guarda <strong>en tu dispositivo</strong>.</li>
+    <li>Solo se guarda en la nube si <strong>iniciás sesión</strong> y usás la copia en la nube o Comunidad.</li>
+    <li>Tu peso, altura, medidas y fotos de progreso <strong>nunca se publican solos</strong>: solo los ve la comunidad si vos los publicás.</li>
+    <li>No vendemos tus datos. La app no usa herramientas de analítica ni seguimiento publicitario propio.</li>
+    <li>Las calorías, recomendaciones y respuestas de FittAI son estimaciones orientativas, no consejos médicos.</li>
+  </ul>
+
+  <h2>Qué datos usa la app y para qué</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Dato</th><th>Para qué</th><th>Dónde se guarda</th></tr></thead>
+    <tbody>
+      <tr><td>Perfil (nombre, objetivo, nivel, equipamiento, peso, altura, edad, sexo si lo cargás)</td><td>Armar tu plan, calcular calorías y metas</td><td>Tu dispositivo; en la nube solo si usás la copia en la nube</td></tr>
+      <tr><td>Entrenamientos, series, cargas, récords e insignias</td><td>Tu historial, progreso, insignias y recomendaciones</td><td>Tu dispositivo; en la nube solo con copia o Comunidad</td></tr>
+      <tr><td>Comidas, agua y hábitos</td><td>Seguimiento de nutrición e hidratación</td><td>Tu dispositivo; en la nube solo con copia</td></tr>
+      <tr><td>Ubicación (GPS) durante una carrera o caminata</td><td>Distancia, ritmo, recorrido y calorías estimadas. Solo mientras grabás una actividad</td><td>Tu dispositivo; en la nube solo con copia</td></tr>
+      <tr><td>Cámara</td><td>Escanear códigos de barras de alimentos y sacar fotos que decidas subir. El escaneo se procesa en el dispositivo</td><td>No se guarda la imagen del escaneo</td></tr>
+      <tr><td>Cuenta (correo electrónico)</td><td>Iniciar sesión para la copia en la nube y Comunidad</td><td>Supabase (servicio de base de datos)</td></tr>
+      <tr><td>Comunidad: perfil público, publicaciones, fotos, mensajes, seguidores y estadísticas de entrenamiento</td><td>Funciones sociales. Podés hacer tu perfil privado y ocultar tus estadísticas</td><td>Supabase</td></tr>
+      <tr><td>Mensajes a FittAI y, si lo permitís, un resumen de tu perfil e historial reciente</td><td>Responder tus preguntas</td><td>Se envían a nuestro servidor y a Google (Gemini) para generar la respuesta</td></tr>
+      <tr><td>Búsquedas de alimentos y códigos de barras</td><td>Encontrar valores nutricionales</td><td>Se consultan en Open Food Facts (base pública)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Con quién se comparten</h2>
+  <ul>
+    <li><strong>Supabase</strong>: aloja las cuentas, la copia en la nube y Comunidad.</li>
+    <li><strong>Google (Gemini API)</strong>: recibe los mensajes que le escribís a FittAI y el contexto que autorices.</li>
+    <li><strong>Open Food Facts</strong>: recibe el texto o el código de barras que buscás.</li>
+    <li><strong>Render</strong>: aloja el servidor de la app; como cualquier servidor web, registra datos técnicos de las conexiones (por ejemplo, la dirección IP) para funcionar y prevenir abusos.</li>
+    <li><strong>CDN de bibliotecas</strong> (jsDelivr, unpkg): la app descarga de ahí algunas bibliotecas, lo que implica una conexión desde tu dispositivo.</li>
+    <li><strong>Pagos y anuncios</strong>: hoy están desactivados. Si se activan (Google Play para la suscripción o anuncios de Google), esta política se actualizará antes.</li>
+  </ul>
+
+  <h2>Qué es público en Comunidad</h2>
+  <p>Si usás Comunidad, otras personas pueden ver tu nombre visible, usuario, foto de perfil (si subís una), país (si lo elegís), tus publicaciones y, si las dejás públicas, tus estadísticas de entrenamiento (nivel, insignias, entrenamientos). Podés poner tu perfil en privado y ocultar las estadísticas. <strong>Nunca se muestran tu peso, altura, medidas ni fotos de progreso</strong>, salvo que vos los publiques en «Mi físico».</p>
+
+  <h2>Cuánto tiempo se guardan</h2>
+  <p>Los datos del dispositivo quedan hasta que los borres (desde la configuración del navegador o desinstalando la app). Los datos en la nube quedan mientras tengas la cuenta; al eliminarla se borran tu perfil, publicaciones, mensajes, copia en la nube y archivos.</p>
+
+  <h2>Tus derechos y cómo borrar tus datos</h2>
+  <ul>
+    <li><strong>Ver y exportar</strong>: desde la app podés exportar tus datos.</li>
+    <li><strong>Corregir</strong>: podés editar tu perfil y tus registros en cualquier momento.</li>
+    <li><strong>Eliminar la cuenta en la nube</strong>: Perfil → Cuenta y sincronización → «Eliminar mi cuenta en la nube».</li>
+    <li><strong>Borrar los datos del dispositivo</strong>: desde la configuración del navegador (datos del sitio) o desinstalando la app.</li>
+    <li>Para cualquier otra solicitud, escribinos al contacto de arriba.</li>
+  </ul>
+
+  <h2>Seguridad</h2>
+  <p>Las conexiones usan HTTPS. En la nube, cada persona solo puede leer y modificar sus propios datos privados (reglas de seguridad a nivel de fila). Ningún sistema es 100 % seguro: no guardes en la app información que no quieras arriesgar.</p>
+
+  <h2>Menores de edad</h2>
+  <p>La app no está pensada para menores de 13 años. Si sos menor de edad, usala con autorización de una persona adulta responsable.</p>
+
+  <h2>Salud</h2>
+  <p>FittForma AI no es un dispositivo médico. Las estimaciones (calorías, cargas, recomendaciones de FittAI) son orientativas. Ante dudas de salud, consultá a un profesional.</p>
+
+  <h2>Cambios</h2>
+  <p>Si esta política cambia, se actualiza la fecha de arriba y, si el cambio es importante, se avisa dentro de la app.</p>
+</main>
+<script>
+  (function(){
+    var c=window.FittFormaLegalConfig||{};
+    var owner=document.getElementById('ownerName'),mail=document.getElementById('contactEmail');
+    if(c.ownerName)owner.textContent=c.ownerName+(c.country?' ('+c.country+')':'');
+    else owner.textContent='todavía no publicado por quien administra la app';
+    if(c.contactEmail&&/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.contactEmail)){mail.textContent='';var a=document.createElement('a');a.href='mailto:'+c.contactEmail;a.textContent=c.contactEmail;mail.appendChild(a);}
+    else mail.textContent='todavía no publicado. Mientras tanto podés borrar tus datos desde la app como se explica abajo.';
+    if(!c.ownerName||!c.contactEmail){var w=document.createElement('p');w.className='warn';w.textContent='Aviso: quien administra FittForma AI todavía no completó su nombre y correo de contacto en esta política.';document.getElementById('legalOwner').appendChild(w);}
+  })();
+</script>
+</body>
+</html>

@@ -12,6 +12,18 @@
   <meta name="format-detection" content="telephone=no">
   <link rel="apple-touch-icon" href="icon-180.png">
   <meta name="description" content="FittForma AI: entrenamiento, nutrición, carrera con GPS y seguimiento de progreso en un solo lugar.">
+  <!-- v60: vista previa al compartir el enlace (WhatsApp, redes) y datos estructurados de la aplicación (sin reseñas ni puntajes). -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="FittForma AI">
+  <meta property="og:title" content="FittForma AI — Tu objetivo. Tu plan. Tu progreso.">
+  <meta property="og:description" content="Entrenamiento por días, nutrición según tu objetivo, carrera con GPS e insignias. Gratis en el celular.">
+  <meta property="og:image" content="/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="FittForma AI: la semana de entrenamiento con los músculos de cada día">
+  <meta property="og:locale" content="es_UY">
+  <meta name="twitter:card" content="summary_large_image">
+  <script>(function(){var d=document.createElement('script');d.type='application/ld+json';d.textContent=JSON.stringify({"@context":"https://schema.org","@type":"WebApplication","name":"FittForma AI","applicationCategory":"HealthApplication","operatingSystem":"Web, Android","description":"Entrenamiento, nutrición, carrera con GPS y seguimiento de progreso en un solo lugar.","inLanguage":["es","en","pt","fr","it","de"],"isAccessibleForFree":true});document.head.appendChild(d);})();</script>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <title>FittForma AI — Tu objetivo. Tu plan. Tu progreso.</title>
@@ -2421,11 +2433,14 @@
       </div>
       </details>
       <details class="ff-group">
-        <summary><span><strong>Privacidad y funcionamiento</strong><small>Qué se guarda y dónde</small></span></summary>
+        <summary><span><strong>Ayuda y privacidad</strong><small>Preguntas frecuentes, qué se guarda y dónde</small></span></summary>
+        <div class="card faq-card" id="faqCard"><h3>Preguntas frecuentes</h3><details class="faq-item"><summary>¿Mis datos se guardan en la nube?</summary><p class="muted small">Por defecto, todo queda en este dispositivo. Si iniciás sesión en «Cuenta y sincronización» y activás la copia en la nube, se guarda además una copia en tu cuenta para pasarla a otro celular.</p></details><details class="faq-item"><summary>¿Qué ve la gente de mí en Comunidad?</summary><p class="muted small">Tu nombre visible, usuario, foto (si subís una), tus publicaciones y, si las dejás públicas, tus estadísticas de entrenamiento. Nunca tu peso, altura, medidas ni fotos de progreso, salvo que las publiques vos en «Mi físico». Podés poner tu perfil en privado.</p></details><details class="faq-item"><summary>¿Cómo se calculan las calorías?</summary><p class="muted small">Son estimaciones con valores MET del Compendio de Actividades Físicas y tu peso: en fuerza, por el tiempo de tus series y descansos; al correr o caminar, con las ecuaciones de la ACSM. Sin peso cargado no se calcula nada.</p></details><details class="faq-item"><summary>¿Por qué no me llegó un recordatorio con la app cerrada?</summary><p class="muted small">Una app web no puede garantizar avisos con la app cerrada. Para eso usá «Agregar al calendario» en Mi semana: el calendario del celular te avisa siempre.</p></details><details class="faq-item"><summary>¿Funciona sin internet?</summary><p class="muted small">Sí para registrar entrenamientos, comidas y agua. FittAI, Comunidad, la búsqueda de alimentos y la copia en la nube necesitan conexión.</p></details><details class="faq-item"><summary>¿FittAI reemplaza a un profesional?</summary><p class="muted small">No. FittAI y las recomendaciones son orientativas. Ante dolor, lesiones o dudas de salud, consultá a un profesional.</p></details><details class="faq-item"><summary>¿Cómo borro mis datos?</summary><p class="muted small">Tu cuenta en la nube: «Cuenta y sincronización» → «Eliminar mi cuenta en la nube». Los datos del dispositivo: desde la configuración del navegador (datos del sitio) o desinstalando la app. Antes podés exportarlos.</p></details></div>
+
         <div class="card">
         <h3>Privacidad y funcionamiento</h3>
         <p class="muted small">Por defecto, tus preferencias y sesiones se guardan localmente. Si configurás Supabase, podés crear una cuenta y sincronizar manualmente; sin esa configuración, cambiar de dispositivo no transfiere tus datos. Exportalos para guardar una copia.</p>
         <p class="muted small">No ingreses información sensible. La IA y la sincronización son opcionales y requieren configurar servicios externos; pueden aplicarse costos según el proveedor.</p>
+        <p class="small" style="margin:10px 0 0"><a href="/privacidad.html" target="_blank" rel="noopener" id="privacyPolicyLink">Leer la política de privacidad completa</a></p>
 
       </div>
       </details>
@@ -6316,6 +6331,15 @@ function findCatalogExercise(name){
     if(kind==='meal'){switchView('nutrition');showViewTab('nutrition','registrar');setTimeout(()=>$('mealName')?.focus(),60);return;}
     if(kind==='water'){$('addWater')?.click();renderHome();toast(`Agua registrada: ${waterMl()} de ${hydro().goalMl} ml hoy. Podés corregirlo en Nutrición › Hoy.`);return;}
   }
+  // v60: cada sección con su título en la pestaña del navegador y su dirección (#entrenar…), para compartir o volver.
+  const VIEW_TITLES={plan:'Inicio',train:'Entrenar',exercises:'Ejercicios',routines:'Rutinas',running:'Correr',coach:'FittAI',nutrition:'Nutrición',progress:'Progreso',community:'Comunidad',profile:'Perfil'};
+  const HOME_TITLE='FittForma AI — Tu objetivo. Tu plan. Tu progreso.';
+  function setViewTitle(name){
+    const label=VIEW_TITLES[name];if(!label)return;const tr=t=>window.FittFormaI18n?.translate?.(t)||t;
+    document.title=name==='plan'?tr(HOME_TITLE):`${tr(label)} · FittForma AI`;
+    try{const url=name==='plan'?location.pathname+location.search:'#'+name;if((name==='plan'?'':'#'+name)!==location.hash)history.replaceState(history.state,'',url);}catch{}
+  }
+  {const openHash=()=>{let h='';try{h=decodeURIComponent(location.hash.slice(1));}catch{}if(h&&VIEW_TITLES[h]&&h!=='plan'&&$('view-'+h))setTimeout(()=>switchView(h),0);};if(document.readyState==='complete')openHash();else window.addEventListener('load',openHash,{once:true});window.addEventListener('hashchange',openHash);}
   function switchView(name){
     // v48: un intersticial solo se evalúa al cambiar de sección (nunca en medio de una actividad) y,
     // después de guardar un entrenamiento o una carrera, recién cuando la persona sale del resumen.
@@ -6325,7 +6349,7 @@ function findCatalogExercise(name){
     const navName=hasTab?name:(trainViews.includes(name)?'train':name);
     const mobileName=trainViews.includes(name)?'train':name;
     document.querySelectorAll('.tab').forEach(b=>{const active=b.dataset.view===navName;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
-    document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));
+    document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));setViewTitle(name);
     if(name==='plan')renderHome();
     if(name==='train')renderTrain();
     if(name==='running'){renderRunningPlan();renderRunningHistory();updateRunPacePreview();initGpsMap();if(gpsMapInstance)setTimeout(()=>gpsMapInstance.invalidateSize(),140);}

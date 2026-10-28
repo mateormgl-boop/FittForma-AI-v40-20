@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Página no encontrada · FittForma AI</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<style>
+  :root{--bg:#f4f6fb;--card:#fff;--text:#121726;--muted:#5b6478;--line:#dde2ee;--accent:#5b6cff;--accent2:#7d4dff}
+  @media (prefers-color-scheme:dark){:root{--bg:#070b16;--card:#111a2e;--text:#eef1f8;--muted:#9aa3b8;--line:#22304d}}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:radial-gradient(circle at 20% 0%,rgba(91,108,255,.18),transparent 55%),var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  main{width:100%;max-width:420px;padding:28px 24px;border-radius:24px;background:var(--card);border:1px solid var(--line);text-align:center;box-shadow:0 20px 50px -30px rgba(0,0,0,.5)}
+  .logo{display:inline-flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;color:var(--text);text-decoration:none}
+  .logo img{width:36px;height:36px}
+  .code{margin:22px 0 4px;font-size:64px;line-height:1;font-weight:900;letter-spacing:-2px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  h1{margin:0 0 8px;font-size:1.35rem}
+  p{margin:0 0 22px;color:var(--muted)}
+  .btn{display:block;padding:14px 18px;border-radius:999px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800;text-decoration:none}
+  .btn:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+  .links{display:flex;justify-content:center;gap:18px;margin-top:16px;font-size:.92rem}
+  .links a{color:var(--accent);font-weight:700;text-decoration:none}
+</style>
+</head>
+<body>
+<main>
+  <a class="logo" href="/"><img src="/assets/brand/logo-mark.svg" alt="" width="36" height="36">FittForma AI</a>
+  <div class="code" aria-hidden="true">404</div>
+  <h1 data-t="title">Esta página no existe</h1>
+  <p data-t="text">Puede que el enlace esté mal escrito o que la página se haya movido. Tus datos y tu progreso siguen intactos.</p>
+  <a class="btn" href="/" data-t="home">Volver al inicio</a>
+  <div class="links"><a href="/#train" data-t="train">Entrenar</a><a href="/#nutrition" data-t="nutrition">Nutrición</a><a href="/privacidad.html" data-t="privacy">Privacidad</a></div>
+</main>
+<script>
+  // Mismo idioma que eligió la persona en la app (o el del navegador).
+  (function(){
+    var T={
+      en:{title:'This page doesn’t exist',text:'The link may be mistyped or the page may have moved. Your data and progress are safe.',home:'Back to home',train:'Train',nutrition:'Nutrition',privacy:'Privacy',doc:'Page not found · FittForma AI'},
+      pt:{title:'Esta página não existe',text:'O link pode estar errado ou a página foi movida. Seus dados e seu progresso continuam intactos.',home:'Voltar ao início',train:'Treinar',nutrition:'Nutrição',privacy:'Privacidade',doc:'Página não encontrada · FittForma AI'},
+      fr:{title:'Cette page n’existe pas',text:'Le lien est peut-être mal écrit ou la page a été déplacée. Tes données et ta progression sont intactes.',home:'Retour à l’accueil',train:'S’entraîner',nutrition:'Nutrition',privacy:'Confidentialité',doc:'Page introuvable · FittForma AI'},
+      it:{title:'Questa pagina non esiste',text:'Il link potrebbe essere errato o la pagina è stata spostata. I tuoi dati e i tuoi progressi sono al sicuro.',home:'Torna alla home',train:'Allenati',nutrition:'Nutrizione',privacy:'Privacy',doc:'Pagina non trovata · FittForma AI'},
+      de:{title:'Diese Seite gibt es nicht',text:'Der Link ist vielleicht falsch oder die Seite wurde verschoben. Deine Daten und dein Fortschritt sind sicher.',home:'Zur Startseite',train:'Training',nutrition:'Ernährung',privacy:'Datenschutz',doc:'Seite nicht gefunden · FittForma AI'}
+    };
+    var lang='es';try{lang=localStorage.getItem('fittforma-language-v1')||(navigator.language||'es').slice(0,2);}catch(e){}
+    var t=T[lang];if(!t)return;document.documentElement.lang=lang;document.title=t.doc;
+    var els=document.querySelectorAll('[data-t]');for(var i=0;i<els.length;i++){var k=els[i].getAttribute('data-t');if(t[k])els[i].textContent=t[k];}
+  })();
+</script>
+</body>
+</html>

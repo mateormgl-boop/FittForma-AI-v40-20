@@ -1779,3 +1779,8 @@ html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 .pc-plate{flex:none;display:grid;place-items:center;width:22px;height:var(--ph);border-radius:5px;background:var(--pc);color:#10131c;font-size:.62rem;font-weight:900;writing-mode:vertical-rl;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
 .pc-text{display:flex;flex-direction:column;gap:3px;margin:0}
 .pc-text strong{font-size:1.05rem}
+/* v60: preguntas frecuentes */
+.faq-item{border-top:1px solid var(--ff-border);padding:10px 0}
+.faq-item:first-of-type{border-top:0}
+.faq-item summary{cursor:pointer;font-weight:700;font-size:.94rem;list-style-position:inside}
+.faq-item p{margin:6px 0 0;line-height:1.5}
