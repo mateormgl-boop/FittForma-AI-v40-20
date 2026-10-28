@@ -1,7 +1,14 @@
-# Despliegue de FittForma AI v58.0
+# Despliegue de FittForma AI v59.0
 
-Esta guía es la lista de pasos para publicar v58.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v59.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
+
+## Qué cambia en v59.0
+
+- **No hay migraciones nuevas.** Las calorías de cada sesión se guardan en la propia sesión (`calories`), que ya viaja en la copia en la nube.
+- **Archivos que se actualizan:** `activity-core.js` (`estimateExerciseCalories`), `index.html`, `design.css` e `i18n-v53.js`.
+- El service worker cambia a `fittforma-ai-static-v59-0`.
+- Si todavía no se aplicó, sigue pendiente la migración de v57 `2026-10-30_v57_legend_badges.sql`.
 
 ## Qué cambia en v58.0
 

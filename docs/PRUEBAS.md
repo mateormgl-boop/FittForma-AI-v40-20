@@ -9,6 +9,23 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v59
+
+- `tests/v59.test.mjs` (7 pruebas):
+  - Calorías por ejercicio: MET 3,5 × peso × (trabajo + descanso) solo con las series hechas; cardio en minutos con MET 5.
+  - Sin peso o sin series no devuelve calorías.
+  - La sesión avisa al completar cada ejercicio, muestra el total en vivo y usa el mayor entre la duración y las series.
+  - El anillo de espera del entrenamiento diario tiene tamaño y relleno definidos (sin círculo negro).
+  - Mi semana: 7 días en una fila y hoja (`dialog`) con dibujos de músculos.
+  - Encabezados finos, sin tarjetas anidadas en Entrenar, combinaciones que no se cortan.
+  - Textos nuevos traducidos.
+- `tests/e2e/v59.e2e.mjs` (26 pasos, solo la app):
+  - Completar un ejercicio avisa ≈ kcal; total en vivo; resumen con calorías, detalle por ejercicio y «Récord nuevo»; la sesión guardada lleva las calorías.
+  - Sin peso: se pide cargarlo y «Cargar peso» lleva al campo de Perfil.
+  - Tarjeta diaria en espera con anillo de 88 px sin relleno negro.
+  - Mi semana: una sola fila, dibujo por día, la hoja se abre, guarda y se cierra (también con Escape), y se traduce.
+  - 320 px sin desborde en las 6 secciones y sin errores de JavaScript.
+
 ### v58
 
 - `tests/v58.test.mjs` (9 pruebas):
