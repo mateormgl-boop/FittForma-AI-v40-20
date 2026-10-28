@@ -1,5 +1,31 @@
 # FittForma AI — Registro de cambios
 
+## v60.0 — Avisos según tu semana, sesión más cómoda y lista de lanzamiento web (28 de octubre de 2026)
+
+- **Avisos según Mi semana:**
+  - El recordatorio dice lo que toca hoy («Hoy toca: Piernas») y no avisa los días de descanso.
+  - «Agregar al calendario» descarga un archivo .ics con un evento semanal por cada día de entrenamiento. Lo avisa el calendario del celular, aunque la app esté cerrada.
+- **Sesión de entrenamiento:**
+  - Al terminar el descanso vibra y suena un pitido corto. Se pueden apagar, y la preferencia queda en el dispositivo.
+  - «Discos» en ejercicios con barra: cuántos discos poner por lado, con barra de 20, 15 o 10 kg. Si el peso no se puede armar exacto, muestra lo más cercano y cuánto falta.
+  - «Superserie con el siguiente»: se pasa al otro ejercicio sin descanso y se descansa al cerrar la ronda.
+- **Lista de lanzamiento web (lo que aplica a una app):**
+  - Página 404 propia, en el idioma de la persona.
+  - robots.txt.
+  - Título de la pestaña por sección y enlaces directos (`/#nutrition`, `/#train`…).
+  - Vista previa al compartir: título, descripción e imagen de 1200×630 hecha con una captura real de la app.
+  - Datos estructurados de aplicación web, sin reseñas ni puntajes.
+  - Preguntas frecuentes en Perfil → Ayuda y privacidad.
+  - Política de privacidad (`privacidad.html`) escrita según lo que hace el código.
+  - Etiqueta accesible en las miniaturas de «Mi físico».
+- **v59.1 (incluida):** los estilos se actualizan junto con la app (antes quedaban guardados 1 hora y la v59 se veía con los estilos viejos), y los íconos tienen tamaño propio.
+- **Pruebas:** la prueba de Comunidad «Descartar denuncia» ya no falla según el orden de la lista.
+- **No incluido, a propósito:**
+  - Analítica: hace falta tu ID y un aviso de consentimiento.
+  - Reseñas, casos de éxito y fotos: no hay reales y no se inventan.
+  - Mapa: no hay un local físico.
+- Sin migraciones nuevas.
+
 ## v59.0 — Calorías por ejercicio, Mi semana compacta y revisión visual (28 de octubre de 2026)
 
 - **Calorías estimadas mientras entrenás:**

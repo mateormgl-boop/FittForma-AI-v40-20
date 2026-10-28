@@ -9,6 +9,29 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v60
+
+- `tests/v60.test.mjs` (9 pruebas):
+  - Calculadora de discos: exacto, barra de 15 kg, lo más cercano y cuánto falta, menos que la barra.
+  - Superseries: grupo, siguiente ejercicio sin descanso y descanso al cerrar la ronda.
+  - Aviso al terminar el descanso: vibración, audio habilitado con el toque e interruptores.
+  - Calendario de Mi semana: un evento semanal por día de entrenamiento, sin descansos, líneas de 75 octetos como máximo y errores claros.
+  - Recordatorios con lo que toca y sin aviso en días de descanso.
+  - 404 propia para HTML y JSON para la app; robots.txt; archivos públicos permitidos.
+  - Títulos por sección, enlaces con #, vista previa al compartir y datos estructurados sin reseñas ni puntajes.
+  - Política de privacidad: menciona Supabase, Gemini, Open Food Facts y Render, y no tiene responsable ni correo inventados.
+  - Preguntas frecuentes y textos nuevos traducidos.
+- `tests/e2e/v60.e2e.mjs` (24 pasos, solo la app):
+  - Notificación «Hoy toca: Piernas», ninguna en día de descanso y calendario .ics descargado.
+  - Superserie: sin descanso a mitad de la ronda y descanso al cerrarla.
+  - Discos: 102,5 kg = 25 + 15 + 1,25 por lado; 61 kg avisa que falta 1 kg.
+  - Vibración al terminar un descanso real de 30 s, y se puede apagar.
+  - 404 en HTML y JSON; robots.txt; imagen para compartir.
+  - `#nutrition` abre Nutrición, con título de pestaña por sección.
+  - Preguntas frecuentes; política sin datos inventados; «Volver al inicio»; 320 px sin desborde.
+- `tests/v59.test.mjs` suma la regresión de v59.1: CSS sin caché de 1 hora y con versión en la dirección.
+- `tests/e2e/community.e2e.mjs`: «Descartar denuncia» toca la denuncia correcta por su id y espera a la base. La comprobación es la misma.
+
 ### v59
 
 - `tests/v59.test.mjs` (7 pruebas):

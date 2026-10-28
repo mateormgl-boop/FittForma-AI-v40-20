@@ -1,7 +1,21 @@
-# Despliegue de FittForma AI v59.0
+# Despliegue de FittForma AI v60.0
 
-Esta guía es la lista de pasos para publicar v59.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v60.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
+
+## Qué cambia en v60.0
+
+- **No hay migraciones nuevas.**
+- **Archivos nuevos:** `404.html`, `robots.txt`, `privacidad.html`, `legal-config.js` y `og-image.png`. El servidor los publica en la lista de archivos permitidos.
+- **Antes de publicar, completá `legal-config.js`** con el nombre (persona o empresa) responsable y un correo de contacto real.
+  - Mientras estén vacíos, la política de privacidad muestra un aviso en lugar de inventarlos.
+  - Conviene que un profesional revise la política según tu país.
+- **Opcional:** variable `PUBLIC_SITE_URL` en Render (por ejemplo `https://tu-app.onrender.com`, solo https).
+  - Con ella, la imagen para compartir y `og:url` van con la dirección completa, como piden Facebook y otras redes.
+  - Sin ella, la imagen usa una dirección relativa (WhatsApp suele mostrarla igual).
+- **404:** a un navegador se le muestra la página propia; a la app y a las APIs, JSON como antes.
+- **Estilos:** `design.css` se sirve con `no-cache` y se pide como `design.css?v=60.0` (v59.1).
+- El service worker cambia a `fittforma-ai-static-v60-0`.
 
 ## Qué cambia en v59.0
 
