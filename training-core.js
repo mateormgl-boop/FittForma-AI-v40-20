@@ -715,7 +715,7 @@
     return Object.entries(PROGRAMS).map(([id, prog]) => {
       const n = Object.keys(prog.days).length, reasons = []; let score = 0;
       if (!prog.equipment.includes(p.equipment)) score -= 50; else score += 1;
-      if (prog.goals.includes(p.goal)) { score += 3; reasons.push(`Sirve para ${goalLabel}.`); }
+      if (prog.goals.includes(p.goal)) { score += prog.goals.length <= 2 ? 4 : 3; reasons.push(`Sirve para ${goalLabel}.`); }
       if (prog.levels.includes(p.level)) { score += 2; reasons.push({ beginner: 'Va con tu nivel principiante.', intermediate: 'Va con tu nivel intermedio.', advanced: 'Va con tu nivel avanzado.' }[p.level] || 'Va con tu nivel.'); }
       const diff = Math.abs(n - wantDays); score -= diff * 2; if (!diff) reasons.push(`Son ${n} días, los que dijiste que podés entrenar.`);
       const focus = [...new Set(Object.values(prog.days))], groups = new Set(focus.flatMap(k => FOCUS[k].groups));

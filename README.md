@@ -4,6 +4,15 @@ Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HT
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
 
+## Novedades v58.0
+
+- Mi semana: elegís qué entrenar cada día (por ejemplo, pecho y tríceps el lunes y espalda y bíceps el martes). «Hoy toca» sigue tu semana.
+- 11 rutinas listas y una recomendada para vos, según tu objetivo, nivel, equipamiento, días disponibles y lo que entrenaste. Siempre dice por qué.
+- Inicio personalizable (mostrar, ocultar y ordenar tarjetas) y «Lo que hiciste en el gym», con tus mejores series y «Repetir».
+- Nutrición: menú de ejemplo según tu objetivo, con cantidades, y «Completá tu día» con lo que te falta.
+- Insignias rediseñadas como medallas de metal y galería «Sistema de insignias».
+- Sin migraciones nuevas.
+
 ## Novedades v57.0
 
 - Nutrición: escribís lo que comiste con cantidades (por ejemplo, «100 g de hamburguesa, 2 croquetas de papa y 200 g de pan»). Ves los gramos de cada alimento y los podés cambiar. Hay 25 alimentos nuevos.
