@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v61.0
+# Despliegue de FittForma AI v62.0
 
-Esta guía es la lista de pasos para publicar v61.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v62.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -12,11 +12,21 @@ Si Comunidad dice «Comunidad se está actualizando…» o «Could not find the 
 3. Recargá la app.
 
 Detalles del archivo:
-- Tiene las 13 migraciones (v41 a v57), en orden.
+- Tiene las 14 migraciones (v41 a v62), en orden.
 - Cada una va en su propia transacción y se puede ejecutar más de una vez: no borra datos ni desactiva RLS.
 - Al final recarga la caché de la API de Supabase.
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
+
+## Qué cambia en v62.0
+
+- **Hay una migración nueva:** `supabase/migrations/2026-10-31_v62_body_share.sql`.
+  - Si ya aplicaste `APLICAR_MIGRACIONES.sql` antes, alcanza con pegar en el SQL Editor solo este archivo (y `notify pgrst, 'reload schema';`).
+  - Es aditiva y re-ejecutable: crea la tabla `community_body` (RLS activo, solo la dueña la lee y la escribe) y la función `community_body_info`.
+  - Fija el `search_path` de `community_valid_muscle_ranks`, `community_stats_fresh` y `touch_user_app_data_updated_at` sin cambiar lo que hacen.
+  - Sin la migración, la app sigue funcionando: la tarjeta «Datos físicos» se oculta.
+- **Archivos que se actualizan:** `community.js`, `index.html`, `design.css`, `i18n-v53.js` y `privacidad.html`.
+- El service worker cambia a `fittforma-ai-static-v62-0`.
 
 ## Qué cambia en v61.0
 

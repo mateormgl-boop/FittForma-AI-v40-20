@@ -65,7 +65,34 @@
     return p=>signedCache.get(p)?.url||'';
   }
   function avatarHtml(profile,urlOf,size=''){const name=profile?.display_name||profile?.username||'Usuario',url=profile?.avatar_path&&urlOf?urlOf(profile.avatar_path):'';return `<span class="community-avatar${size?' community-avatar-'+size:''}${url?' has-photo':''}">${url?`<img src="${esc(url)}" alt="" loading="lazy" onerror="this.parentElement.classList.remove('has-photo');this.remove()">`:''}<span aria-hidden="true">${esc(initials(name))}</span></span>`;}
-  function featuredHtml(list,size=18){const E=window.FittFormaBadgeEngine;if(!E||!Array.isArray(list))return '';return list.slice(0,3).map(b=>{const level=Math.min(15,Math.max(1,Number(b?.level)||1)),rank=E.rankForLevel(level-1);return `<span class="community-mini-badge" title="${esc(b?.exerciseName||'')} · ${esc(rank.label)}">${E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:b?.exerciseId,name:b?.exerciseName,category:b?.category,measure:b?.measure}),category:b?.category,size,title:`${b?.exerciseName||''} · ${rank.label}`})}</span>`;}).join('');}
+  // v62: las insignias se pueden tocar: ficha con qué es, nivel, marca, fecha y cómo se registró.
+  // Si es tuya, «Ver en mis insignias» lleva a tu galería. Se guarda cada insignia mostrada para abrir su ficha.
+  const badgeRegistry=new Map();let badgeSeq=0;
+  function badgeKey(b){const k='b'+(++badgeSeq);badgeRegistry.set(k,b||{});if(badgeRegistry.size>400){const first=badgeRegistry.keys().next().value;badgeRegistry.delete(first);}return k;}
+  const MEASURE_UNIT={reps:['repetición','repeticiones'],seconds:['segundo','segundos'],minutes:['minuto','minutos'],km:['km','km'],days:['día','días'],sessions:['entrenamiento','entrenamientos'],streak:['día seguido','días seguidos'],bw:['× tu peso corporal','× peso corporal']};
+  function showBadgeInfo(b,own){
+    const E=BE(),dlg=$('communityBadgeInfo');if(!E||!dlg||!b)return;
+    const level=Math.min(15,Math.max(1,Number(b.level)||1)),rank=E.rankForLevel(level-1);
+    const core=(E.CORE_EXERCISES||[]).find(x=>x.id===b.exerciseId),need=core?.thresholds?.[level-1],u=MEASURE_UNIT[b.measure]||MEASURE_UNIT.reps;
+    const mark=need!=null?(b.measure==='bw'?`${String(need).replace('.',',')} ${u[1]}`:`${Number(need).toLocaleString()} ${Number(need)===1?u[0]:u[1]}`):'';
+    const ev={gps_device:'Con GPS del dispositivo',session:'Registrada en un entrenamiento',declared:'Autorregistrada'}[b.evidence]||'Autorregistrada';
+    const cat=b.category?E.categoryLabel(b.category):'';
+    dlg.innerHTML=`<div class="cm-bi-body"><button type="button" class="wp-sheet-close cm-bi-close" data-bi-close aria-label="Cerrar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div class="cm-bi-medal">${E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:b.exerciseId,name:b.exerciseName,category:b.category,measure:b.measure}),category:b.category,size:112,title:`${b.exerciseName||''} · ${rank.label}`})}</div>
+      <h3 id="communityBadgeInfoTitle">${esc(b.exerciseName||'Insignia')}</h3>
+      <p class="cm-bi-rank"><strong>${esc(rank.label)}</strong> · <span>nivel ${level} de 15</span></p>
+      <dl class="cm-bi-facts">${cat?`<div><dt>Categoría</dt><dd>${esc(cat)}</dd></div>`:''}${mark?`<div><dt>Marca de este nivel</dt><dd>${esc(mark)}</dd></div>`:''}${b.earnedAt?`<div><dt>Lograda</dt><dd>${esc(dateLabel(b.earnedAt))}</dd></div>`:''}<div><dt>Cómo se registró</dt><dd>${esc(ev)}</dd></div></dl>
+      <p class="muted small">Las insignias se ganan en la app con los registros de cada persona; ninguna está verificada por terceros.</p>
+      <div class="btn-row">${own?'<button type="button" class="btn" data-bi-mine>Ver en mis insignias</button>':''}<button type="button" class="btn ${own?'ghost':''}" data-bi-close>Cerrar</button></div></div>`;
+    dlg.querySelectorAll('[data-bi-close]').forEach(x=>x.onclick=()=>dlg.close());
+    dlg.querySelector('[data-bi-mine]')?.addEventListener('click',()=>{dlg.close();window.FittFormaGo?.('badge:'+String(b.exerciseId||''));});
+    dlg.onclick=e=>{if(e.target===dlg)dlg.close();};
+    try{dlg.showModal();}catch{dlg.setAttribute('open','');}
+  }
+  // Captura: una insignia dentro de una tarjeta que abre un perfil abre su ficha, no el perfil.
+  document.addEventListener('click',e=>{const el=e.target.closest?.('[data-badge-key]');if(!el)return;e.preventDefault();e.stopPropagation();showBadgeInfo(badgeRegistry.get(el.dataset.badgeKey),Boolean(el.closest('#communityOwnProfile'))||Boolean(user&&el.closest(`[data-owner="${user.id}"]`)));},true);
+  document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const el=e.target.closest?.('[data-badge-key]');if(!el||el!==e.target)return;e.preventDefault();e.stopPropagation();el.click();},true);
+  function featuredHtml(list,size=18){const E=window.FittFormaBadgeEngine;if(!E||!Array.isArray(list))return '';return list.slice(0,3).map(b=>{const level=Math.min(15,Math.max(1,Number(b?.level)||1)),rank=E.rankForLevel(level-1);return `<span class="community-mini-badge" title="${esc(b?.exerciseName||'')} · ${esc(rank.label)}" role="button" tabindex="0" data-badge-key="${badgeKey(b)}">${E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:b?.exerciseId,name:b?.exerciseName,category:b?.category,measure:b?.measure}),category:b?.category,size,title:`${b?.exerciseName||''} · ${rank.label}`})}</span>`;}).join('');}
   // #hashtags clicables (se buscan en Explorar). El texto se escapa antes.
   // v53: los #hashtags se resaltan pero no abren una búsqueda de publicaciones (no hay feed general).
   function richText(text){return esc(text).replace(/(^|[\s(])#([\p{L}\p{N}_]{2,30})/gu,(m,pre,tag)=>`${pre}<span class="community-hashtag">#${tag}</span>`);}
@@ -549,7 +576,7 @@
     root.querySelectorAll('[data-community-chat]').forEach(b=>b.addEventListener('click',()=>openChat(b.dataset.communityChat)));
   }
   async function openChat(target){
-    if(!target)return;const select=$('communityChatContact');if(select&&select.value!==target)select.value=target;
+    if(!target)return;const who=$('communityChatWho');if(who)who.dataset.uid=target;const select=$('communityChatContact');if(select&&select.value!==target)select.value=target;
     const p=mutualContacts.get(target);
     $('communityChatListView').hidden=true;$('communityChatView').hidden=false;
     $('communityChatName').textContent=p?.display_name||p?.username||'Conversación';
@@ -761,7 +788,7 @@
         }
         if(ownStats?.stats_public===false)return ownStats;
         // v61: públicas desde el inicio. Se publican al iniciar sesión, sin esperar el aviso (que sigue siendo informativo
-        // y ofrece «Ocultar mis estadísticas»). Nunca incluyen peso, altura, medidas ni objetivos.
+        // y ofrece «Ocultar mis estadísticas»). Nunca incluyen peso, altura, medidas ni objetivos (esos van aparte, ver syncBody).
         const row=window.FittFormaAthleteStatsNow?.();if(!row)return ownStats;
         const sig=JSON.stringify(row);if(!force&&ownStats&&sig===statsSig)return ownStats;
         const version=statsVersion;
@@ -798,6 +825,69 @@
     return true;
   }
 
+  // ---------- v62: datos físicos, PRIVADOS por defecto ----------
+  // Cada dato se sube solo si la persona activó su interruptor; los demás van en null. Sin fila = nada compartido.
+  const BODY_FIELDS=[['weight_kg','communityBodyWeight','tu peso actual'],['height_cm','communityBodyHeight','tu altura'],['target_weight_kg','communityBodyTarget','tu peso objetivo'],['goal','communityBodyGoal','tu objetivo de entrenamiento']];
+  const GOAL_LABEL={fitness:'Ponerme en forma',muscle:'Ganar masa muscular',strength:'Ganar fuerza',endurance:'Mejorar resistencia',habit:'Crear el hábito'};
+  let bodyEnabled=null,ownBody=null,ownBodyLoaded=false,bodyBusy=null;
+  const bodyMissing=e=>isMissingFunction(e)||['42P01','PGRST205'].includes(String(e?.code))||(/community_body/.test(String(e?.message||''))&&/does not exist|could not find/i.test(String(e?.message||'')));
+  const bodyNorm=o=>JSON.stringify(BODY_FIELDS.map(([k])=>o?.[k]==null?null:k==='goal'?String(o[k]):Number(o[k])));
+  function bodyValue(k,v){if(v==null)return '';if(k==='goal')return GOAL_LABEL[v]||String(v);return `${String(Number(v)).replace('.',',')} ${k==='height_cm'?'cm':'kg'}`;}
+  function bodyPayload(chosen){const now=window.FittFormaBodyNow?.()||{};return Object.fromEntries(BODY_FIELDS.map(([k])=>[k,chosen[k]?(now[k]??null):null]));}
+  function reflectBody(){
+    const now=window.FittFormaBodyNow?.()||{};
+    BODY_FIELDS.forEach(([k,id])=>{const el=$(id);if(el)el.checked=ownBody?.[k]!=null;const v=$(id+'Val');if(v)v.textContent=now[k]==null?'Sin cargar en Perfil':bodyValue(k,now[k]);});
+  }
+  async function loadOwnBody(){
+    if(!authReady()||bodyEnabled===false){reflectBody();return;}
+    const r=await client.from('community_body').select('weight_kg,height_cm,target_weight_kg,goal').eq('user_id',user.id).maybeSingle();
+    if(r.error){if(bodyMissing(r.error)){bodyEnabled=false;const c=$('communityBodyCard');if(c)c.hidden=true;}return;}
+    bodyEnabled=true;ownBody=r.data||null;ownBodyLoaded=true;reflectBody();
+  }
+  async function writeBody(payload){
+    const {data,error}=await client.from('community_body').upsert({user_id:user.id,...payload}).select('weight_kg,height_cm,target_weight_kg,goal').maybeSingle();
+    if(!error)ownBody=data;return error;
+  }
+  async function setBodyField(key,on){
+    const f=BODY_FIELDS.find(x=>x[0]===key);if(!f)return;const el=$(f[1]);
+    if(!authReady()){if(el)el.checked=false;toast(authHint());return;}
+    if(bodyEnabled===false){if(el)el.checked=false;setStatus('communityBodyStatus',V54_HINT);return;}
+    if(bodyBusy)await bodyBusy.catch(()=>{});
+    if(!ownBodyLoaded)await loadOwnBody();
+    const now=window.FittFormaBodyNow?.()||{};
+    if(on&&now[key]==null){if(el)el.checked=false;setStatus('communityBodyStatus',`Primero cargá ${f[2]} en Perfil → Datos físicos.`);return;}
+    const chosen=Object.fromEntries(BODY_FIELDS.map(([k])=>[k,ownBody?.[k]!=null]));chosen[key]=!!on;
+    const error=await writeBody(bodyPayload(chosen));
+    if(error){if(el)el.checked=!on;setStatus('communityBodyStatus',bodyMissing(error)?V54_HINT:friendlySupabaseError(error,'guardar la preferencia'));return;}
+    reflectBody();
+    const msg=on?`Ahora se muestra ${f[2]} en tu perfil de Comunidad.`:`Dejaste de mostrar ${f[2]}: volvió a ser privado.`;
+    setStatus('communityBodyStatus',msg);toast(msg);
+  }
+  // Mantiene al día SOLO lo que la persona eligió mostrar (por ejemplo, si cambia su peso en Perfil).
+  function syncBody(){
+    if(!authReady()||bodyEnabled===false)return Promise.resolve();
+    if(bodyBusy)return bodyBusy;
+    bodyBusy=(async()=>{try{
+      if(!ownBodyLoaded)await loadOwnBody();
+      if(!ownBody)return; // nunca eligió mostrar nada: no se crea ninguna fila
+      const payload=bodyPayload(Object.fromEntries(BODY_FIELDS.map(([k])=>[k,ownBody[k]!=null])));
+      if(bodyNorm(payload)!==bodyNorm(ownBody)){await writeBody(payload);reflectBody();}
+    }catch(error){console.warn('Datos físicos de Comunidad:',error?.message||error);}})();
+    const current=bodyBusy;current.finally(()=>{if(bodyBusy===current)bodyBusy=null;});
+    return current;
+  }
+  function bodySection(b){
+    if(!b)return '';const tiles=[['weight_kg','Peso actual'],['height_cm','Altura'],['target_weight_kg','Peso objetivo'],['goal','Objetivo']].filter(([k])=>b[k]!=null);
+    if(!tiles.length)return '';
+    return `<section class="cm-section cm-body-section"><h4>Datos físicos</h4><div class="cm-stats">${tiles.map(([k,l])=>statTile(l,bodyValue(k,b[k]))).join('')}</div><p class="muted small cm-footnote">Los eligió mostrar esta persona. No es una evaluación de salud.</p></section>`;
+  }
+  async function bodyInfo(uid){
+    if(bodyEnabled===false)return null;
+    const r=await client.rpc('community_body_info',{p_user:uid});
+    if(r.error){if(bodyMissing(r.error))bodyEnabled=false;return null;}
+    bodyEnabled=true;return r.data?.[0]||null;
+  }
+
   // ---------- Perfil completo (el mismo componente desde Todos, Ranking y Amigos) ----------
   function statTile(label,value,sub=''){return `<div class="cm-stat"><small>${esc(label)}</small><b${value==null?' class="is-empty"':''}>${esc(value==null?'Sin datos disponibles':value)}</b>${sub?`<span>${esc(sub)}</span>`:''}</div>`;}
   function statsSection(p){
@@ -831,20 +921,20 @@
     const items=list.map(b=>{const level=Math.min(15,Math.max(1,Number(b?.level)||1)),rank=E?E.rankForLevel(level-1):{label:'',key:'',numeral:''};
       const medal=E?E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:b.exerciseId,name:b.exerciseName,category:b.category,measure:b.measure}),category:b.category,size:46,title:`${b.exerciseName} · ${rank.label}`}):'';
       const cat=E&&b.category?E.categoryLabel(b.category):'';const date=b.earnedAt?dateLabel(b.earnedAt):'';
-      return `<li class="cm-badge">${medal}<div><strong>${esc(b.exerciseName||'Insignia')}</strong><small>${esc([cat,rank.label?`${rank.label} · nivel ${level}`:`Nivel ${level}`].filter(Boolean).join(' · '))}</small><small class="muted">${esc([date,b.evidence?ev[b.evidence]||ev.declared:''].filter(Boolean).join(' · '))}</small></div></li>`;}).join('');
+      return `<li class="cm-badge" role="button" tabindex="0" data-badge-key="${badgeKey(b)}">${medal}<div><strong>${esc(b.exerciseName||'Insignia')}</strong><small>${esc([cat,rank.label?`${rank.label} · nivel ${level}`:`Nivel ${level}`].filter(Boolean).join(' · '))}</small><small class="muted">${esc([date,b.evidence?ev[b.evidence]||ev.declared:''].filter(Boolean).join(' · '))}</small></div></li>`;}).join('');
     return `<section class="cm-section"><h4>Insignias y logros <small class="muted">${list.length}${p.stats_visible&&Number(p.badges_count)>list.length?` de ${Number(p.badges_count)}`:''}</small></h4><ul class="cm-badges">${items}</ul><p class="muted small cm-footnote">Las insignias se ganan en la app. Ninguna está verificada por terceros: se indica si tiene GPS del dispositivo, si salió de un entrenamiento registrado o si fue autorregistrada.</p></section>`;
   }
   async function openUser(uid,opts={}){
     if(!client||!uid)return;
     if(user&&uid===user.id&&!opts.asOthers){showCommunitySubView('profile');return;}
     if(athleteEnabled===false)return openUserLegacy(uid,opts);
-    viewedUser=uid;showCommunitySubView('user');const root=$('communityUserProfile');root.innerHTML='<div class="cm-skeleton cm-skeleton-hero" aria-hidden="true"><i></i><i></i></div><p class="sr-only">Cargando perfil…</p>';
+    viewedUser=uid;showCommunitySubView('user');const root=$('communityUserProfile');root.dataset.owner=uid;root.innerHTML='<div class="cm-skeleton cm-skeleton-hero" aria-hidden="true"><i></i><i></i></div><p class="sr-only">Cargando perfil…</p>';
     if(user&&uid===user.id)await syncStats();
     const r=await client.rpc('community_athlete_profile',{p_user:uid});
     if(r.error){if(isMissingFunction(r.error)){athleteEnabled=false;return openUserLegacy(uid,opts);}root.innerHTML=`<div class="empty"><strong>No se pudo abrir el perfil</strong><p>${esc(friendlySupabaseError(r.error,'abrir el perfil'))}</p></div>`;return;}
     athleteEnabled=true;const p=r.data?.[0];if(viewedUser!==uid)return;
     if(!p){root.innerHTML='<div class="empty"><strong>Perfil no disponible</strong><p>Puede haber sido eliminado o haber un bloqueo entre las cuentas.</p></div>';return;}
-    const [urlOf,extra]=await Promise.all([signedMany([p.avatar_path]),profileExtrasHtml(uid,p)]),fs=p.follow_status||'',mutual=fs==='accepted'&&p.follows_me,priv=p.visibility==='private',meta=levelLine(p);if(viewedUser!==uid)return;
+    const [urlOf,extra,body]=await Promise.all([signedMany([p.avatar_path]),profileExtrasHtml(uid,p),p.can_view?bodyInfo(uid):null]),fs=p.follow_status||'',mutual=fs==='accepted'&&p.follows_me,priv=p.visibility==='private',meta=levelLine(p);if(viewedUser!==uid)return;
     const counts=p.can_view?`<div class="community-profile-stats cm-counts">${statsHtml(p.posts,p.followers,p.following)}</div>`:'';
     const actions=p.is_self?`<p class="muted small">Así ven tu perfil las demás personas.</p>`:user?`<div class="btn-row community-profile-actions"><button class="btn${fs?' secondary':''}" type="button" data-user-follow>${fs==='accepted'?'Dejar de seguir':fs==='pending'?'Cancelar solicitud':priv?'Solicitar seguir':'Seguir'}</button>${p.stats_visible?'<button class="btn ghost" type="button" data-user-compare>Comparar progreso</button>':''}${mutual?'<button class="btn ghost" type="button" data-user-message>Mensaje</button>':''}<button class="btn ghost" type="button" data-community-block>Bloquear</button></div>${!mutual&&fs==='accepted'?'<p class="muted small">Los mensajes privados se habilitan cuando se siguen mutuamente.</p>':''}`:'<p class="muted small">Iniciá sesión para seguir, comparar o escribir.</p>';
     root.innerHTML=`<header class="cm-hero card">
@@ -853,7 +943,7 @@
         ${p.bio?`<p class="community-profile-bio">${esc(p.bio)}</p>`:''}${counts}${actions}
       </header>
       ${p.can_view?'':`<div class="notice community-private-notice"><strong>Este perfil es privado.</strong><p class="small">${fs==='pending'?'Tu solicitud está pendiente: cuando la acepte vas a ver sus estadísticas, insignias y publicaciones.':'Seguilo y, cuando acepte tu solicitud, vas a ver sus estadísticas, insignias y publicaciones.'}</p></div>`}
-      ${p.can_view?extra.html+statsSection(p)+badgesSection(p):''}
+      ${p.can_view?extra.html+bodySection(body)+statsSection(p)+badgesSection(p):''}
       ${p.can_view?'<section class="cm-section"><h4>Publicaciones</h4><div class="community-grid" id="communityUserGrid"><p class="muted small">Cargando…</p></div></section>':''}`;
     root.querySelector('[data-user-follow]')?.addEventListener('click',e=>toggleFollow(uid,e.currentTarget));
     root.querySelector('[data-user-compare]')?.addEventListener('click',()=>openCompare(uid));
@@ -1177,7 +1267,7 @@
   // Perfil sin la migración v53 (datos de v50): sin estadísticas.
   async function openUserLegacy(uid,opts={}){
     if(!client||!uid)return;if(user&&uid===user.id&&!opts.asOthers){showCommunitySubView('profile');return;}
-    viewedUser=uid;showCommunitySubView('user');const root=$('communityUserProfile');root.innerHTML='<p class="muted small">Cargando perfil…</p>';
+    viewedUser=uid;showCommunitySubView('user');const root=$('communityUserProfile');root.dataset.owner=uid;root.innerHTML='<p class="muted small">Cargando perfil…</p>';
     const {data:p,error}=await client.from('community_profiles').select(profileCols()).eq('user_id',uid).maybeSingle();
     if(error||!p){
       // v50: perfil privado (o sin acceso al contenido): datos básicos y aviso claro, sin exponer publicaciones.
@@ -1239,7 +1329,7 @@
     if(currentSubView==='ranking')return loadRanking();
     if(currentSubView==='friends'){loadChallenge();return loadFriends(true);}
     if(currentSubView==='alerts')return loadAlerts();
-    if(currentSubView==='profile'){if(authReady()){loadOwnExtras();loadOwnPhysique();}return renderOwnGrid();}
+    if(currentSubView==='profile'){if(authReady()){loadOwnExtras();loadOwnPhysique();loadOwnBody();}return renderOwnGrid();}
     if(currentSubView==='user'&&viewedUser)return openUser(viewedUser,{asOthers:viewedUser===user?.id});
     if(currentSubView==='compare'&&compareUser)return openCompare(compareUser);
   }
@@ -1276,7 +1366,7 @@
       return {ok:true,stage:'database',message:coreMessage+(authReady()?' También se comprobaron chat, bloqueos y sincronización de la cuenta.':' Iniciá sesión para comprobar además chat, bloqueos y sincronización de la cuenta.')};
     }catch(error){return {ok:false,stage:'network',message:friendlySupabaseError(error,'comprobar la conexión con Supabase')};}
   }
-  function setSession(supabase,userSession){client=supabase||client;const wasId=user?.id;user=userSession||null;if(user&&user.id!==wasId){ownStats=null;ownStatsLoaded=false;statsSig='';setTimeout(()=>{syncStats().catch?.(()=>{});},1500);}if(!user){ownProfile=null;stopChatPoll();['communityChatMessages','communityReportsList'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});if($('communityChatText'))$('communityChatText').value='';if($('communityModerationCard'))$('communityModerationCard').hidden=true;if($('communityDisplayName'))$('communityDisplayName').value='';if($('communityUsername'))$('communityUsername').value='';if($('communityBio'))$('communityBio').value='';if($('communityVisibility'))$('communityVisibility').value='private';if($('communityOwnName'))$('communityOwnName').textContent='Tu perfil';if($('communityOwnAvatar'))$('communityOwnAvatar').innerHTML='<span aria-hidden="true">FF</span>';if($('communityOwnHandle'))$('communityOwnHandle').textContent='';if($('communityOwnBio'))$('communityOwnBio').textContent='';if($('communityOwnFeatured'))$('communityOwnFeatured').innerHTML='';if($('communityOwnStats'))$('communityOwnStats').innerHTML=statsHtml(0,0,0);if($('communityConversations'))$('communityConversations').innerHTML='';if($('communityFollowRequests'))$('communityFollowRequests').textContent='Iniciá sesión para administrar solicitudes.';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communityBlockedList'))$('communityBlockedList').textContent='Iniciá sesión para administrar los bloqueos.';}setControls();updateKindAvailability();ownStats=null;ownStatsLoaded=false;statsSig='';friendPositions=new Map();ownPhysique={pair:null,single:null};if($('communityAlertsBadge'))$('communityAlertsBadge').hidden=true;if($('communityChallenge'))$('communityChallenge').hidden=true;if($('communityOwnFlag'))$('communityOwnFlag').innerHTML='';if($('communityPhysiqueEdit'))$('communityPhysiqueEdit').innerHTML='';reflectStatsToggles();renderStatsNotice();if(client)Promise.resolve().then(()=>refresh());else loadCurrentView();}
+  function setSession(supabase,userSession){client=supabase||client;const wasId=user?.id;user=userSession||null;if(user&&user.id!==wasId){ownStats=null;ownStatsLoaded=false;statsSig='';setTimeout(()=>{syncStats().catch?.(()=>{});syncBody();},1500);ownBody=null;ownBodyLoaded=false;}if(!user){ownProfile=null;stopChatPoll();['communityChatMessages','communityReportsList'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});if($('communityChatText'))$('communityChatText').value='';if($('communityModerationCard'))$('communityModerationCard').hidden=true;if($('communityDisplayName'))$('communityDisplayName').value='';if($('communityUsername'))$('communityUsername').value='';if($('communityBio'))$('communityBio').value='';if($('communityVisibility'))$('communityVisibility').value='private';if($('communityOwnName'))$('communityOwnName').textContent='Tu perfil';if($('communityOwnAvatar'))$('communityOwnAvatar').innerHTML='<span aria-hidden="true">FF</span>';if($('communityOwnHandle'))$('communityOwnHandle').textContent='';if($('communityOwnBio'))$('communityOwnBio').textContent='';if($('communityOwnFeatured'))$('communityOwnFeatured').innerHTML='';if($('communityOwnStats'))$('communityOwnStats').innerHTML=statsHtml(0,0,0);if($('communityConversations'))$('communityConversations').innerHTML='';if($('communityFollowRequests'))$('communityFollowRequests').textContent='Iniciá sesión para administrar solicitudes.';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communityBlockedList'))$('communityBlockedList').textContent='Iniciá sesión para administrar los bloqueos.';}setControls();updateKindAvailability();ownStats=null;ownStatsLoaded=false;statsSig='';friendPositions=new Map();ownPhysique={pair:null,single:null};if($('communityAlertsBadge'))$('communityAlertsBadge').hidden=true;if($('communityChallenge'))$('communityChallenge').hidden=true;if($('communityOwnFlag'))$('communityOwnFlag').innerHTML='';if($('communityPhysiqueEdit'))$('communityPhysiqueEdit').innerHTML='';reflectStatsToggles();renderStatsNotice();if(client)Promise.resolve().then(()=>refresh());else loadCurrentView();}
   const communityViews=['world','ranking','friends','publish','messages','profile','user','compare','alerts'];
   const MAIN_TABS=['world','ranking','friends'];
   function showCommunitySubView(name,focusTab=false){
@@ -1300,7 +1390,7 @@
     else if(name==='friends'&&client){loadFriends(true);loadChallenge();}
     else if(name==='alerts'&&client)loadAlerts();
     else if(name==='messages'&&client){loadChatContacts();}
-    else if(name==='profile'){renderOwnGrid();fillCountryOptions();if(authReady()){loadFollowRequests();loadBlockedUsers();loadModeration();refreshOwnCounts();syncFeaturedBadges();syncStats();loadOwnExtras();loadOwnPhysique();}}
+    else if(name==='profile'){renderOwnGrid();fillCountryOptions();if(authReady()){loadFollowRequests();loadBlockedUsers();loadModeration();refreshOwnCounts();syncFeaturedBadges();syncStats();loadOwnExtras();loadOwnPhysique();loadOwnBody().then(syncBody);}}
     else if(name==='publish'){fillAchievementOptions();fillSessionOptions();renderPostPreview();}
     if(name!==previous)document.getElementById('view-community')?.scrollIntoView?.({block:'start'});
   }
@@ -1333,7 +1423,9 @@
     $('communityPhotoViewer')?.addEventListener('click',e=>{if(e.target.closest('[data-close-viewer]')||e.target===e.currentTarget)closeViewer();});
     ['communityPhysiqueBefore','communityPhysiqueAfter','communityPhysiqueSingle'].forEach(id=>$(id)?.addEventListener('change',e=>physiqueFileChosen(e.target)));
     $('communityShowMuscles')?.addEventListener('change',e=>setShowMuscles(e.target.checked));
+    BODY_FIELDS.forEach(([k,id])=>$(id)?.addEventListener('change',e=>setBodyField(k,e.target.checked)));
     $('communityEditProfileToggle')?.addEventListener('click',e=>{const box=$('communityProfileEditor');const open=!box.classList.contains('is-open');box.classList.toggle('is-open',open);e.currentTarget.setAttribute('aria-expanded',String(open));if(open)box.scrollIntoView({behavior:'smooth',block:'start'});});
+    $('communityChatWho')?.addEventListener('click',e=>{const uid=e.currentTarget.dataset.uid;if(uid)openUser(uid);});
     $('communityAvatarInput')?.addEventListener('change',e=>changeAvatar(e.target.files?.[0]));$('communityAvatarRemove')?.addEventListener('click',removeAvatar);$('communityPeopleMore')?.addEventListener('click',()=>loadDirectory(false));
     $('communityChatBack')?.addEventListener('click',closeChat);
     $('communityPostDialog')?.addEventListener('click',e=>{if(e.target.closest('[data-close-post-dialog]')||e.target===e.currentTarget)$('communityPostDialog').close();});
@@ -1347,5 +1439,5 @@
     const today=localDateKey();if($('communityEndDate'))$('communityEndDate').value=today;if($('communityStartDate'))$('communityStartDate').value=today;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
-  window.FittFormaCommunity={init,setSession,refresh,loadChatContacts,loadMessages,loadBlockedUsers,testConnection,syncStats,setStatsPublic,show:name=>showCommunitySubView(name),openProfile:uid=>openUser(uid),setAvatar:changeAvatar};
+  window.FittFormaCommunity={init,setSession,refresh,loadChatContacts,loadMessages,loadBlockedUsers,testConnection,syncStats,setStatsPublic,show:name=>showCommunitySubView(name),openProfile:uid=>openUser(uid),syncBody:()=>syncBody(),setAvatar:changeAvatar};
 })();

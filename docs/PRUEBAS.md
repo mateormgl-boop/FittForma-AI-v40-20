@@ -9,6 +9,14 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v62
+
+- `tests/v62.test.mjs`: navegación por `data-go`, chat → perfil, ficha de insignias, datos físicos privados por defecto, migración y traducciones.
+- `supabase/tests/rls_v62_test.sql` (26 comprobaciones): nada visible sin elegir; solo la dueña escribe; rangos y objetivos válidos; la tabla no se lee directo; perfil privado solo para seguidores aceptados; bloqueos; apagar quita el dato; sin sesión solo perfiles públicos.
+- E2E:
+  - `v62` (15 pasos, solo la app): cada número de Inicio, Perfil y Progreso lleva a su sección, también con teclado; sin desbordes a 320 px.
+  - `athletes` suma 15 pasos: ficha de insignia ajena y propia («Ver en mis insignias»), chat → perfil, y datos físicos (apagados por defecto, no se publican al cargarlos en Perfil, se publica solo lo activado, se actualiza solo y se quita al apagar).
+
 ### v61
 
 - `tests/v61.test.mjs` (5 pruebas):
