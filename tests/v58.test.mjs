@@ -113,3 +113,10 @@ test('insignias metálicas: contorno propio por rango, borde con bisel, Diamante
 test('textos nuevos traducidos', () => {
   for (const t of ['Mi semana', 'Rutinas listas', 'Recomendada para vos', 'Personalizar inicio', 'Lo que hiciste en el gym', 'Completá tu día', 'Menú de ejemplo según tu objetivo', 'Sistema de insignias', 'Pares clásicos 4 días']) assert.ok(i18n.includes(`["${t}", "`), t);
 });
+
+test('Nutrición: cada pestaña cierra bien (las recetas quedan solo en Plan)', () => {
+  const a = html.indexOf('<section class="view" id="view-nutrition">'), b = html.indexOf('</section>', a), seg = html.slice(a, b);
+  assert.equal((seg.match(/<div\b/g) || []).length, (seg.match(/<\/div>/g) || []).length, 'mismas aperturas y cierres de <div>');
+  const plan = seg.indexOf('data-view-panel="plan"'), hist = seg.indexOf('data-view-panel="historial"'), rec = seg.indexOf('id="recipesCard"');
+  assert.ok(plan < rec && rec < hist, 'las recetas están dentro de la pestaña Plan');
+});

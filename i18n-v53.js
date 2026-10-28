@@ -988,7 +988,7 @@ window.FittFormaI18nDynamic = [
 [/^Hoy toca: (.+)$/, (m, i, t) => `${['Today', 'Hoje', 'Aujourd’hui', 'Oggi', 'Heute'][i]}: ${t(m[1])}`],
   [/^Te recomendamos: (.+)$/, (m, i, t) => `${['We recommend', 'Recomendamos', 'On te recommande', 'Ti consigliamo', 'Empfehlung'][i]}: ${t(m[1])}`],
   [/^y (\d+) más$/, (m, i) => [`and ${m[1]} more`, `e mais ${m[1]}`, `et ${m[1]} de plus`, `e altri ${m[1]}`, `und ${m[1]} weitere`][i]],
-  [/^(Subir|Bajar) (.+)$/, (m, i, t) => `${(m[1] === 'Subir' ? ['Move up', 'Subir', 'Monter', 'Sposta su', 'Nach oben'] : ['Move down', 'Descer', 'Descendre', 'Sposta giù', 'Nach unten'])[i]}: ${t(m[2])}`],
+  [/^(Subir|Bajar) (Entrenamiento de hoy|Lo que hiciste en el gym|Progreso semanal|Resumen de hoy|Accesos rápidos|Próxima insignia|Peso y objetivo|Hábitos de hoy|Actividad reciente|Frase del día|Tu constancia)$/, (m, i, t) => `${(m[1] === 'Subir' ? ['Move up', 'Subir', 'Monter', 'Sposta su', 'Nach oben'] : ['Move down', 'Descer', 'Descendre', 'Sposta giù', 'Nach unten'])[i]}: ${t(m[2])}`],
   [/^Repetís «(.+)»\. Tus marcas anteriores aparecen como referencia\.$/, (m, i, t) => [`Repeating “${t(m[1])}”. Your previous marks show as a reference.`, `Repetindo “${t(m[1])}”. Suas marcas anteriores aparecem como referência.`, `Tu refais « ${t(m[1])} ». Tes marques précédentes s’affichent comme référence.`, `Ripeti “${t(m[1])}”. I tuoi risultati precedenti compaiono come riferimento.`, `Du wiederholst „${t(m[1])}“. Deine bisherigen Werte erscheinen als Referenz.`][i]],
 [/^(\d+) de (\d+)$/, (m) => `${m[1]} / ${m[2]}`],
   [/^de (\d[\d.,]*) ml$/, (m, i) => `${['of', 'de', 'sur', 'di', 'von'][i]} ${m[1]} ml`],
