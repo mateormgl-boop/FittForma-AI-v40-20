@@ -1485,3 +1485,12 @@ html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 .ex-tab-count{font-weight:700;opacity:.85}
 .ex-tab-panel[hidden]{display:none}
 #exTabMine .rk-hero-emblem{margin:4px auto}
+
+/* v57: copia automática en la nube */
+.cloud-auto{margin-top:12px;padding:12px;border:1px solid var(--line, rgba(127,127,127,.25));border-radius:14px}
+.cloud-auto-toggle{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.cloud-auto-toggle input{margin-top:3px;width:18px;height:18px;flex:none}
+.cloud-auto-toggle span{display:flex;flex-direction:column;gap:2px}
+.cloud-auto-toggle small{opacity:.75}
+.cloud-auto p{margin:8px 0 0}
+.cloud-auto p[data-state="newer"],.cloud-auto p[data-state="empty"],.cloud-auto p[data-state="error"]{color:var(--warn, #c77700)}

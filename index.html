@@ -2392,8 +2392,9 @@
           <div class="field"><label for="cloudPassword">Contraseña</label><input id="cloudPassword" type="password" minlength="8" maxlength="128" autocomplete="current-password" placeholder="Mínimo 8 caracteres" required></div>
           <div class="btn-row"><button class="btn" id="cloudLogin" type="submit">Iniciar sesión</button><button class="btn secondary" id="cloudRegister" type="button">Crear cuenta</button><button class="btn ghost" id="cloudLogout" type="button" hidden>Cerrar sesión</button></div>
         </form>
+        <div class="cloud-auto" id="cloudAutoRow" hidden><label class="cloud-auto-toggle"><input type="checkbox" id="cloudAutoToggle" checked> <span><b>Copia automática en la nube</b><small>Sube tus cambios sola mientras tenés la sesión iniciada.</small></span></label><p class="muted small" id="cloudAutoStatus" role="status"></p></div>
         <div class="btn-row" style="margin-top:12px"><button class="btn secondary" id="cloudDownload" type="button" disabled>Cargar datos de la nube</button><button class="btn secondary" id="cloudUpload" type="button" disabled>Guardar datos en la nube</button></div><button class="btn danger full" id="deleteCloudAccount" type="button" hidden style="margin-top:12px">Eliminar mi cuenta en la nube</button><p class="muted small">Eliminar la cuenta borra definitivamente tu copia en la nube, tu perfil y contenido de Comunidad, mensajes y fotos subidas. Los datos de este dispositivo no se tocan salvo que lo elijas.</p>
-        <p class="muted small">La sincronización es manual para evitar sobrescribir datos sin querer. Al cargar desde la nube, se reemplaza la copia local de este navegador. Usá solo una contraseña que no reutilices en otros servicios.</p>
+        <p class="muted small">La copia automática nunca pisa una copia más nueva hecha desde otro dispositivo: en ese caso se pausa y te pide elegir. Al cargar desde la nube, se reemplaza la copia local de este navegador. Usá solo una contraseña que no reutilices en otros servicios.</p>
       </div>
       </details>
       <details class="ff-group">
@@ -2575,6 +2576,7 @@
   let gpsWatchId = null, gpsStartedAt = 0, gpsElapsedTimer = null, gpsLastPoint = null, gpsMeters = 0, gpsType = 'Correr', gpsPaused = false, gpsPausedMs = 0, gpsPauseAt = 0, gpsPoints = [], gpsStoppedElapsedMs = 0;
   let gpsSplits=[],gpsNextSplitKm=1,gpsSessionDate='',gpsLastDraftSavedAt=0,gpsMapInstance=null,gpsMapLayers=[],gpsCurrentMarker=null,gpsStartMarker=null,gpsAccuracyCircle=null,gpsWakeLock=null,gpsRetryNeeded=false;
   let supabaseClient = null, supabaseAuthSubscription = null, cloudUser = null, menuDraft = null, barcodeStream = null, barcodeScanActive = false;
+  const CLOUD_AUTO_KEY='fittforma-cloud-auto-v1',CLOUD_MARK_KEY='fittforma-cloud-mark-v1';let cloudAutoTimer=null,cloudAutoDue=0,cloudAutoBusy=false,cloudAutoDirty=false;
   let gpsMapTilesFailed=false;
 
   // v48: biblioteca única con metadatos para planificar (training-core.js).
@@ -2669,7 +2671,7 @@
     }
     return structuredClone(defaults);
   }
-  function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));return true;}catch(e){toast('No se pudo guardar. Exportá tus datos para no perderlos.');return false;}}
+  function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));scheduleCloudBackup();return true;}catch(e){toast('No se pudo guardar. Exportá tus datos para no perderlos.');return false;}}
   function toast(msg){const el=$('toast');el.textContent=msg;el.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.style.display='none',2600);}
   // v48: el estado de Plus lo consulta ads.js en el servidor (/api/entitlements).
   // v48: lo que necesita la publicidad para no interrumpir: actividades en curso y token de la cuenta.
@@ -5412,7 +5414,7 @@ function findCatalogExercise(name){
     if(!gpsStartedAt)return;if(gpsNative&&gpsWatchId!==null){persistGpsDraft(true);return;}persistGpsDraft(true);clearGpsWatch();gpsLastPoint=null;if(gpsElapsedTimer)clearInterval(gpsElapsedTimer);gpsElapsedTimer=null;releaseGpsWakeLock();if(!gpsPaused){gpsPaused=true;gpsPauseAt=Date.now();}$('gpsPause').textContent='Reanudar';$('gpsStart').disabled=true;$('gpsStart').textContent='GPS pausado';$('gpsStatus').textContent='Sesión pausada para conservar el recorrido. Volvé a la app y reanudá cuando esté visible.';persistGpsDraft(true);
   }
   function setCloudStatus(message){const el=$('cloudStatus');if(el)el.textContent=message;}
-  function updateCloudControls(){if(cloudUser&&cloudUser.id!==updateCloudControls.lastUser){updateCloudControls.lastUser=cloudUser.id;setTimeout(reconcileDailyFromCloud,0);}if(!cloudUser)updateCloudControls.lastUser=null;const ready=!!supabaseClient,logged=!!cloudUser;if($('deleteCloudAccount'))$('deleteCloudAccount').hidden=!logged;$('cloudLogin').disabled=!ready||logged;$('cloudRegister').disabled=!ready||logged;$('cloudLogout').hidden=!logged;$('cloudDownload').disabled=!ready||!logged;$('cloudUpload').disabled=!ready||!logged;if(!ready)setCloudStatus('Sin configurar. La app sigue en modo local; configurá SUPABASE_URL y SUPABASE_ANON_KEY en Render o completá supabase-config.js con la clave pública.');else if(logged)setCloudStatus('Sesión iniciada: '+cloudUser.email+'. Elegí manualmente si querés cargar o guardar datos.');else setCloudStatus('Configuración lista. Iniciá sesión o creá una cuenta para sincronizar.');}
+  function updateCloudControls(){if(cloudUser&&cloudUser.id!==updateCloudControls.lastUser){updateCloudControls.lastUser=cloudUser.id;setTimeout(reconcileDailyFromCloud,0);if(cloudAutoOn())scheduleCloudBackup(2500);else setCloudAutoStatus('off');}if($('cloudAutoRow'))$('cloudAutoRow').hidden=!cloudUser;if(!cloudUser)updateCloudControls.lastUser=null;const ready=!!supabaseClient,logged=!!cloudUser;if($('deleteCloudAccount'))$('deleteCloudAccount').hidden=!logged;$('cloudLogin').disabled=!ready||logged;$('cloudRegister').disabled=!ready||logged;$('cloudLogout').hidden=!logged;$('cloudDownload').disabled=!ready||!logged;$('cloudUpload').disabled=!ready||!logged;if(!ready)setCloudStatus('Sin configurar. La app sigue en modo local; configurá SUPABASE_URL y SUPABASE_ANON_KEY en Render o completá supabase-config.js con la clave pública.');else if(logged)setCloudStatus('Sesión iniciada: '+cloudUser.email+'. Tus cambios se copian solos en la nube; también podés cargar o guardar a mano.');else setCloudStatus('Configuración lista. Iniciá sesión o creá una cuenta para sincronizar.');}
   function normalizeCloudState(data){
     if(!data||typeof data!=='object'||!data.profile||!Array.isArray(data.sessions))throw new Error('Los datos de la nube no tienen un formato reconocido.');
     return sanitizeState({...structuredClone(defaults),...data,profile:{...defaults.profile,...(data.profile||{})},nutritionGoals:{...defaults.nutritionGoals,...(data.nutritionGoals||{})},reminders:{...defaults.reminders,...(data.reminders||{}),days:Array.isArray(data.reminders?.days)?data.reminders.days.filter(d=>[0,1,2,3,4,5,6].includes(Number(d))).map(Number):defaults.reminders.days.slice()},water:data.water&&typeof data.water==='object'?data.water:structuredClone(defaults.water),waterLogs:data.waterLogs&&typeof data.waterLogs==='object'&&!Array.isArray(data.waterLogs)?data.waterLogs:{},habitLogs:data.habitLogs&&typeof data.habitLogs==='object'&&!Array.isArray(data.habitLogs)?data.habitLogs:{},sessions:Array.isArray(data.sessions)?data.sessions:[],meals:Array.isArray(data.meals)?data.meals:[],weights:Array.isArray(data.weights)?data.weights:[],activities:Array.isArray(data.activities)?data.activities:[],chat:Array.isArray(data.chat)?data.chat:[],planHistory:Array.isArray(data.planHistory)?data.planHistory.slice(-8):[],badgeRecords:Array.isArray(data.badgeRecords)?data.badgeRecords.slice(-500):[],badgeUnlocks:data.badgeUnlocks&&typeof data.badgeUnlocks==='object'&&!Array.isArray(data.badgeUnlocks)?data.badgeUnlocks:{}});
@@ -5437,7 +5439,7 @@ function findCatalogExercise(name){
   }
   async function cloudSave(){
     if(!supabaseClient||!cloudUser)return;
-    try{const {error}=await supabaseClient.from('user_app_data').upsert({user_id:cloudUser.id,data:state,updated_at:new Date().toISOString()},{onConflict:'user_id'});if(error){setCloudStatus('No se pudieron guardar los datos: '+error.message);return;}setCloudStatus('Datos guardados en la nube el '+new Date().toLocaleString('es-UY')+'.');toast('Sincronización completada.');}
+    try{const {data:saved,error}=await supabaseClient.from('user_app_data').upsert({user_id:cloudUser.id,data:state,updated_at:new Date().toISOString()},{onConflict:'user_id'}).select('updated_at').maybeSingle();if(error){setCloudStatus('No se pudieron guardar los datos: '+error.message);return;}setCloudMark(saved?.updated_at);cloudAutoDirty=false;clearTimeout(cloudAutoTimer);cloudAutoTimer=null;setCloudAutoStatus('ok');setCloudStatus('Datos guardados en la nube el '+new Date().toLocaleString('es-UY')+'.');toast('Sincronización completada.');}
     catch{setCloudStatus('No se pudieron guardar los datos por un problema de conexión. Tus datos locales siguen disponibles; intentá sincronizar de nuevo.');}
   }
   async function cloudLoad(){
@@ -5448,9 +5450,52 @@ function findCatalogExercise(name){
       if(error){setCloudStatus('No se pudieron cargar los datos: '+error.message);return;}
       if(!data){setCloudStatus('Todavía no hay una copia en la nube para esta cuenta. Usá “Guardar datos en la nube” primero.');return;}
       const previousState=state;
-      try{const loadedState=normalizeCloudState(data.data);state=loadedState;if(!save()){state=previousState;setCloudStatus('No se pudo guardar la copia descargada en este dispositivo. Los datos locales anteriores se conservaron. Liberá espacio e intentá de nuevo.');return;}syncForm();renderFoodOptions();renderAll();renderTrain();setCloudStatus('Datos cargados desde la nube ('+new Date(data.updated_at).toLocaleString('es-UY')+').');toast('Datos cargados.');}
+      try{const loadedState=normalizeCloudState(data.data);state=loadedState;if(!save()){state=previousState;setCloudStatus('No se pudo guardar la copia descargada en este dispositivo. Los datos locales anteriores se conservaron. Liberá espacio e intentá de nuevo.');return;}setCloudMark(data.updated_at);cloudAutoDirty=false;clearTimeout(cloudAutoTimer);cloudAutoTimer=null;setCloudAutoStatus('ok');syncForm();renderFoodOptions();renderAll();renderTrain();setCloudStatus('Datos cargados desde la nube ('+new Date(data.updated_at).toLocaleString('es-UY')+').');toast('Datos cargados.');}
       catch(e){state=previousState;save();setCloudStatus(e.message||'No se pudieron leer los datos. Los datos locales se conservaron.');}
     }catch{setCloudStatus('No se pudieron cargar los datos por un problema de conexión. Los datos locales se conservaron; intentá de nuevo.');}
+  }
+  // ---------- v57: copia automática en la nube ----------
+  // Con la sesión iniciada, cada cambio se sube solo (unos segundos después, o al salir de la app).
+  // Nunca pisa una copia más nueva hecha desde otro dispositivo (la nube cambió desde la última vez que este dispositivo la vio)
+  // ni sube un estado vacío encima de una copia existente: en esos casos se pausa y pide elegir con los botones manuales.
+  function cloudAutoOn(){try{return localStorage.getItem(CLOUD_AUTO_KEY)!=='0';}catch{return true;}}
+  function cloudMark(){try{return JSON.parse(localStorage.getItem(CLOUD_MARK_KEY)||'null');}catch{return null;}}
+  function setCloudMark(at){try{if(cloudUser&&at)localStorage.setItem(CLOUD_MARK_KEY,JSON.stringify({user:cloudUser.id,at}));}catch{}}
+  function stateHasData(s){return ['sessions','meals','weights','activities','badgeRecords'].some(k=>Array.isArray(s?.[k])&&s[k].length>0);}
+  function setCloudAutoStatus(kind,extra=''){
+    const el=$('cloudAutoStatus');if(!el)return;
+    const at=new Date().toLocaleTimeString('es-UY',{hour:'2-digit',minute:'2-digit'});
+    const msg={ok:`Copia automática al día (${at}).`,off:'Copia automática apagada. Usá los botones para guardar o cargar.',pending:'Hay cambios sin subir; se suben en unos segundos.',offline:'Sin conexión: la copia se sube cuando vuelvas a tener internet.',error:'No se pudo subir la copia automática. Se reintenta con el próximo cambio.',newer:`Hay una copia en la nube${extra?' del '+extra:''} que este dispositivo no tiene (por ejemplo, de otro teléfono). Para no pisarla, la copia automática está en pausa: elegí «Cargar datos de la nube» o «Guardar datos en la nube».`,empty:'Este dispositivo no tiene datos y en la nube sí: la copia automática no los reemplaza. Usá «Cargar datos de la nube» para recuperarlos.'}[kind]||'';
+    el.textContent=msg;el.dataset.state=kind;
+  }
+  function scheduleCloudBackup(delay=20000){
+    if(!supabaseClient||!cloudUser||!cloudAutoOn())return;
+    // Se respeta el plazo más cercano: guardar seguido no posterga la copia indefinidamente.
+    const due=Date.now()+delay;cloudAutoDirty=true;if(cloudAutoTimer&&cloudAutoDue<=due)return;
+    clearTimeout(cloudAutoTimer);cloudAutoDue=due;cloudAutoTimer=setTimeout(runCloudBackup,delay);
+    if($('cloudAutoStatus')?.dataset.state!=='newer'&&$('cloudAutoStatus')?.dataset.state!=='empty')setCloudAutoStatus('pending');
+  }
+  async function runCloudBackup(){
+    clearTimeout(cloudAutoTimer);cloudAutoTimer=null;
+    if(!cloudAutoDirty||cloudAutoBusy||!supabaseClient||!cloudUser||!cloudAutoOn())return;
+    if(navigator.onLine===false){setCloudAutoStatus('offline');return;}
+    cloudAutoBusy=true;const uid=cloudUser.id;
+    try{
+      const {data:remote,error:readError}=await supabaseClient.from('user_app_data').select('updated_at').eq('user_id',uid).maybeSingle();
+      if(readError){setCloudAutoStatus('error');return;}
+      const mark=cloudMark();
+      if(remote&&!(mark&&mark.user===uid&&mark.at===remote.updated_at)){setCloudAutoStatus('newer',new Date(remote.updated_at).toLocaleString('es-UY'));return;}
+      if(!stateHasData(state)){if(remote)setCloudAutoStatus('empty');cloudAutoDirty=false;return;}
+      const {data:saved,error}=await supabaseClient.from('user_app_data').upsert({user_id:uid,data:state,updated_at:new Date().toISOString()},{onConflict:'user_id'}).select('updated_at').maybeSingle();
+      if(error){setCloudAutoStatus('error');return;}
+      if(cloudUser?.id===uid)setCloudMark(saved?.updated_at);cloudAutoDirty=false;setCloudAutoStatus('ok');
+    }catch{setCloudAutoStatus(navigator.onLine===false?'offline':'error');}
+    finally{cloudAutoBusy=false;}
+  }
+  function initCloudAuto(){
+    const t=$('cloudAutoToggle');if(t){t.checked=cloudAutoOn();t.addEventListener('change',()=>{try{localStorage.setItem(CLOUD_AUTO_KEY,t.checked?'1':'0');}catch{}if(t.checked){setCloudAutoStatus('pending');scheduleCloudBackup(1000);}else{clearTimeout(cloudAutoTimer);cloudAutoTimer=null;setCloudAutoStatus('off');}});}
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&cloudAutoDirty)runCloudBackup();});
+    window.addEventListener('online',()=>{if(cloudAutoDirty)runCloudBackup();});
   }
   function usableSupabaseConfig(cfg){
     if(!cfg||typeof cfg.url!== 'string'||typeof cfg.anonKey!=='string')return false;
@@ -6274,7 +6319,7 @@ function findCatalogExercise(name){
   $('activityDate').value=dateKey();
   document.querySelectorAll('[data-exp-period]').forEach(b=>b.addEventListener('click',()=>{expenditurePeriod=b.dataset.expPeriod;renderExpenditure();}));
   $('activityForm').addEventListener('submit',e=>{e.preventDefault();const distance=Number($('activityDistance').value),minutes=Number($('activityMinutes').value),type=$('manualActivityType').value,date=$('activityDate').value;if(!date||date>dateKey()||!Number.isFinite(distance)||distance<0.01||distance>500||!Number.isFinite(minutes)||minutes<1||minutes>1440){toast('Revisá la fecha, distancia y duración de la actividad.');return;}const speed=distance/(minutes/60);if(speed>(type==='Bicicleta'?100:20)){toast('La velocidad parece inusual. Revisá los datos ingresados.');return;}state.activities.push({id:Date.now(),type,date,distance:Number(distance.toFixed(3)),minutes:Number(minutes.toFixed(2)),durationSeconds:Math.round(minutes*60),speedKmh:Number(speed.toFixed(2)),source:'manual'});{const a=state.activities[state.activities.length-1];a.calories=caloriesRecord(activityCalories(a));}const badgeDelta=syncBadgeUnlocks();save();$('activityForm').reset();$('activityDate').value=dateKey();renderActivities();renderStats();renderProgress();renderPlanner();notifyBadgeChanges(badgeDelta,'Actividad registrada.');});
-  window.FittFormaRetrySupabase=initCloud;checkCoachConnection();$('cloudAuthForm').addEventListener('submit',cloudLogin);$('cloudRegister').addEventListener('click',cloudRegister);$('cloudLogout').addEventListener('click',cloudLogout);$('cloudUpload').addEventListener('click',cloudSave);$('cloudDownload').addEventListener('click',cloudLoad);initCloud();
+  window.FittFormaRetrySupabase=initCloud;checkCoachConnection();$('cloudAuthForm').addEventListener('submit',cloudLogin);$('cloudRegister').addEventListener('click',cloudRegister);$('cloudLogout').addEventListener('click',cloudLogout);$('cloudUpload').addEventListener('click',cloudSave);$('cloudDownload').addEventListener('click',cloudLoad);initCloudAuto();initCloud();
   $('undoPlan').addEventListener('click',undoPlan);
   $('foodSearch').addEventListener('input',()=>{if(foodCat==='envasados')foodCat='';renderFoodOptions();});$('foodAmount').addEventListener('input',updateFoodEstimate);$('foodUnit').addEventListener('change',updateFoodEstimate);$('useFood').addEventListener('click',useFood);$('foodAddMeal').addEventListener('click',addFoodToMeals);$('foodMealType').addEventListener('change',()=>{selectFood.touched=true;});$('foodOnline').addEventListener('click',searchFoodOnline);
   $('foodFinder').addEventListener('click',e=>{const c=e.target.closest('[data-food-cat]');if(c){foodCat=foodCat===c.dataset.foodCat?'':c.dataset.foodCat;renderFoodOptions();return;}const b=e.target.closest('[data-food-id]');if(b){const f=foodById(b.dataset.foodId);if(f)selectFood(f);return;}if(e.target.closest('#foodFav')&&foodSelected){state.foodFavorites=Array.isArray(state.foodFavorites)?state.foodFavorites:[];const i=state.foodFavorites.indexOf(foodSelected.id);if(i>=0)state.foodFavorites.splice(i,1);else{state.foodFavorites.push(foodSelected.id);if(foodSelected.cat==='envasados'){state.customFoods=Array.isArray(state.customFoods)?state.customFoods:[];if(!state.customFoods.some(x=>x.id===foodSelected.id))state.customFoods.push(foodSelected);}}state.foodFavorites=state.foodFavorites.slice(-60);save();renderFoodOptions();toast(i>=0?'Quitado de favoritos.':'Guardado en favoritos.');}});$('generateMenu').addEventListener('click',generateMenu);
