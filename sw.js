@@ -16,7 +16,8 @@ async function networkFirst(request) {
     if (response && response.ok && response.type === 'basic') cache.put(request, response.clone());
     return response;
   } catch (error) {
-    const cached = await cache.match(request, { ignoreSearch: request.mode === 'navigate' });
+    // v59.1: el CSS se pide con ?v=…; sin red se usa la copia guardada aunque cambie ese número.
+    const cached = await cache.match(request, { ignoreSearch: request.mode === 'navigate' || /\.css$/i.test(new URL(request.url).pathname) });
     if (cached) return cached;
     if (request.mode === 'navigate') {
       const home = await cache.match('./index.html');
