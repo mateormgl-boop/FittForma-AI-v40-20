@@ -112,8 +112,8 @@ step('3. Sin sesión: perfiles públicos con nivel y rango', /Bruno Fit/.test(pe
 step('3. Las estadísticas ocultas no aparecen', !/Leyenda/.test(people));
 
 await page.click('#communityTabProfile');
-await page.fill('#communityEmail', 'alice@example.test'); await page.fill('#communityPassword', 'clave-segura-123');
-await page.click('#communityEmailLogin'); await page.waitForTimeout(1800);
+await page.click('#communityAuthBanner [data-auth-open="login"]'); await page.fill('#authEmail', 'alice@example.test'); await page.fill('#authPassword', 'clave-segura-123');
+await page.click('#authSubmit'); await page.waitForTimeout(1800);
 // v61: públicas desde el inicio (pedido de la persona dueña): se publican al iniciar sesión, sin esperar el aviso.
 for (let i = 0; i < 20 && sql(`select count(*) from community_athlete_stats where user_id='${A}'`) === '0'; i++) await page.waitForTimeout(250);
 step('Al iniciar sesión se publican las estadísticas sin esperar el aviso', sql(`select count(*) from community_athlete_stats where user_id='${A}'`) === '1');

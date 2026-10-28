@@ -91,9 +91,9 @@ const openBrunoPost = async () => { await page.click('#communityTabWorld'); awai
 const POST_B = '#communityPostDialog [data-community-post="b0000000-0000-0000-0000-0000000000b1"]';
 
 await page.click('#communityTabProfile');
-await page.fill('#communityEmail', 'alice@example.test'); await page.fill('#communityPassword', 'clave-segura-123');
-await page.click('#communityEmailLogin'); await page.waitForTimeout(1500);
-step('Inicio de sesión', /Sesión iniciada|Sesión online/.test(await page.textContent('#communityEmailStatus') + await page.textContent('#communityProfileStatus')));
+await page.click('#communityAuthBanner [data-auth-open="login"]'); await page.fill('#authEmail', 'alice@example.test'); await page.fill('#authPassword', 'clave-segura-123');
+await page.click('#authSubmit'); await page.waitForTimeout(1500);
+step('Inicio de sesión (con el aviso «¡Listo! Ya iniciaste sesión»)', /Ya iniciaste sesión/.test(await page.textContent('#authDone')) && await page.isHidden('#communityAuthBanner'));
 step('Indicador de 1 mensaje sin leer', await page.isVisible('#communityUnreadBadge') && (await page.textContent('#communityUnreadBadge')).trim() === '1');
 
 // Publicación de texto con foto, vista previa y consentimiento

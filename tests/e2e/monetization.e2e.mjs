@@ -116,8 +116,8 @@ async function newPage({ clock = false, blockEntitlements = false } = {}) {
   page.ent = () => page.evaluate(async () => { const h = await window.FittFormaAuthHeader?.() || {}; return (await fetch('/api/entitlements', { headers: h })).json(); });
   page.login = async email => {
     await page.go('community'); await page.click('#communityTabProfile');
-    await page.fill('#communityEmail', email); await page.fill('#communityPassword', 'clave-segura-123');
-    await page.click('#communityEmailLogin'); await page.waitForTimeout(1500);
+    await page.click('#communityAuthBanner [data-auth-open="login"]'); await page.fill('#authEmail', email); await page.fill('#authPassword', 'clave-segura-123');
+    await page.click('#authSubmit'); await page.waitForTimeout(1500);
     await page.evaluate(() => window.FittFormaAds.refresh(true)); await page.waitForTimeout(300);
   };
   await page.goto(APP + '/'); await page.waitForTimeout(800);

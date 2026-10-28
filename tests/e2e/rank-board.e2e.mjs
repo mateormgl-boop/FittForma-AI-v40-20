@@ -94,8 +94,8 @@ sql(`insert into community_follows(follower_id,following_id,status) values('${A}
 await page.goto(APP + '/'); await page.waitForTimeout(800);
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(600);
 await page.click('#communityTabProfile');
-await page.fill('#communityEmail', 'alice@example.test'); await page.fill('#communityPassword', 'clave-segura-123');
-await page.click('#communityEmailLogin'); await page.waitForTimeout(1500);
+await page.click('#communityAuthBanner [data-auth-open="login"]'); await page.fill('#authEmail', 'alice@example.test'); await page.fill('#authPassword', 'clave-segura-123');
+await page.click('#authSubmit'); await page.waitForTimeout(1500);
 const openMuscles = async () => { await page.evaluate(() => document.querySelector('[data-view="progress"]').click()); await page.waitForTimeout(300); await page.evaluate(() => document.querySelector('[data-progress-tab="muscles"]').click()); await page.waitForTimeout(1800); };
 await openMuscles();
 let names = await page.$$eval('#rkBoard .rk-who strong', l => l.map(x => x.textContent));

@@ -1,5 +1,29 @@
 # FittForma AI — Registro de cambios
 
+## v63.0 — Crear cuenta e iniciar sesión, fácil (28 de octubre de 2026)
+
+- **Al abrir la app por primera vez:** «Crear cuenta», «Iniciar sesión» o «Seguir sin cuenta».
+- **Una sola pantalla de cuenta para toda la app.** Se abre desde:
+  - la bienvenida;
+  - Inicio, con la tarjeta «Guardá tu progreso», que se puede cerrar;
+  - el menú «Más»;
+  - Perfil;
+  - Comunidad, con «Entrá a Comunidad» arriba de todo.
+- Ya no hay formularios escondidos: el de Comunidad estaba debajo del editor de perfil.
+- **Más fácil en el celular:**
+  - teclado de correo y autocompletar;
+  - 👁 para ver la contraseña;
+  - recuerda tu correo en este dispositivo;
+  - Enter para entrar.
+- **Errores en palabras simples:** contraseña incorrecta, cuenta sin confirmar, correo ya registrado, demasiados intentos y sin conexión.
+  - Si el correo ya tiene cuenta, pasa sola a «Iniciar sesión».
+- **«¿Olvidaste tu contraseña?»:** llega un enlace y, al tocarlo, la app pide la contraseña nueva.
+- **«Reenviar el correo de confirmación»** si Supabase todavía pide confirmar el correo.
+- **Al entrar, un aviso claro:** «¡Listo! Ya iniciaste sesión».
+- **«Continuar con Google»** aparece solo si el proyecto de Supabase tiene Google activado.
+- Perfil ya no muestra instrucciones técnicas («configurá SUPABASE_URL…») a quien usa la app.
+- Sin migraciones nuevas.
+
 ## v62.0 — Más interacción en toda la app y datos físicos privados con opción de mostrarlos (28 de octubre de 2026)
 
 - **Todo lo que muestra un número lleva a su sección** (con el dedo o con Enter):

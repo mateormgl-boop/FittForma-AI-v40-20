@@ -9,6 +9,21 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v63
+
+- `tests/v63.test.mjs` (6 pruebas): una sola pantalla de cuenta abierta desde toda la app; sin formularios escondidos ni textos técnicos; errores claros, recuperar contraseña, reenviar y Google solo si está activado; aviso al entrar; ayudas del celular; traducciones.
+- E2E `v63` (40 pasos):
+  - bienvenida con las tres opciones;
+  - crear cuenta con sesión al instante y luego «Contanos un poco»;
+  - validaciones antes de enviar; ojo de la contraseña;
+  - Perfil, Comunidad y «Más» según haya sesión o no;
+  - correo recordado, contraseña incorrecta, recuperar contraseña y Enter;
+  - correo ya registrado; cuenta que pide confirmación con reenviar;
+  - Google oculto o visible según el proyecto;
+  - tarjeta de Inicio que se puede cerrar;
+  - pantalla en inglés y a 320 px; sin errores de JavaScript.
+- Las pruebas E2E que iniciaban sesión con los formularios viejos (`athletes`, `community`, `rank-board`, `monetization`, `cloud-backup`) ahora entran por la pantalla nueva.
+
 ### v62
 
 - `tests/v62.test.mjs`: navegación por `data-go`, chat → perfil, ficha de insignias, datos físicos privados por defecto, migración y traducciones.

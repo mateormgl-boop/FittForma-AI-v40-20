@@ -68,7 +68,7 @@ await page.goto(APP + '/'); await page.waitForTimeout(1200);
 await page.click('.mobile-nav-item[data-mobile-view="profile"]'); await page.waitForTimeout(400);
 await page.evaluate(() => { const d = document.getElementById('cloudAccountCard')?.closest('details'); if (d) d.open = true; });
 step('Sin sesión no se muestra la copia automática', !(await page.isVisible('#cloudAutoRow')));
-await page.fill('#cloudEmail', EMAIL); await page.fill('#cloudPassword', 'clave-segura-123'); await page.click('#cloudLogin');
+await page.click('#cloudLogin'); await page.fill('#authEmail', EMAIL); await page.fill('#authPassword', 'clave-segura-123'); await page.click('#authSubmit');
 await page.waitForTimeout(4500);
 step('Al iniciar sesión se ofrece la copia automática, prendida', await page.isVisible('#cloudAutoRow') && await page.isChecked('#cloudAutoToggle'));
 step('Primera copia: se sube sola (no había copia en la nube)', cloudSessions() === '1', cloudSessions());
