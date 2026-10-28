@@ -86,6 +86,20 @@
     return { kcal: round(met * kg * min / 60), netKcal: round((met - 1) * kg * min / 60), method: 'compendio-2011-fuerza', detail: 'MET 3,5 (entrenamiento con pesas, esfuerzo moderado, Compendio 2011 código 02054)', approximate: true, notes: ['La duración incluye descansos entre series.'], inputs: { weightKg: kg, minutes: round(min, 1), met } };
   }
 
+  // v59: estimación por ejercicio al completarlo. Tiempo ≈ series × (trabajo + descanso): unos 3 s por repetición o los
+  // segundos sostenidos, más el descanso indicado (90 s si no hay). Fuerza: MET 3,5 (Compendio 2011, 02054). Cardio cargado
+  // en minutos: MET 5,0 (actividad aeróbica general de intensidad moderada). Siempre aproximado; sin peso no se calcula.
+  function estimateExerciseCalories({ entries = [], kind = 'strength', measure = 'reps', rest = 90, weightKg } = {}) {
+    const kg = validWeight(weightKg); if (!kg) return { kcal: null, reason: 'peso' };
+    const done = (entries || []).filter(x => x && x.done);
+    if (!done.length) return { kcal: null, reason: 'datos' };
+    if (kind === 'cardio') { const min = done.reduce((a, x) => a + (Number(x.reps) || 0), 0); if (!(min > 0)) return { kcal: null, reason: 'datos' }; return { kcal: round(5 * kg * min / 60), minutes: round(min, 1), met: 5, approximate: true }; }
+    const restS = Math.max(0, Math.min(600, Number(rest) || 90));
+    const workS = done.reduce((a, x) => a + Math.max(10, Math.min(600, measure === 'seconds' ? (Number(x.reps) || 30) : (Number(x.reps) || 10) * 3)), 0);
+    const min = (workS + restS * done.length) / 60;
+    return { kcal: round(3.5 * kg * min / 60), minutes: round(min, 1), met: 3.5, approximate: true };
+  }
+
   // ---------- Estadísticas en vivo del GPS ----------
   function createGpsStats() { return { movingMs: 0, maxSpeed: 0, currentSpeed: 0, window: [], elevationGain: 0, lastAlt: null }; }
   /**
@@ -167,6 +181,6 @@
     return { period, from, to, rows, total: round(total) };
   }
 
-  const api = { TYPES, MAX_SPEED, MOVING_SPEED, kindOf, cyclingMet, estimateActivityCalories, estimateStrengthCalories, createGpsStats, addGpsSegment, resetGpsWindow, signalQuality, paceText, compareWithPrevious, periodRange, summarizeExpenditure };
+  const api = { TYPES, MAX_SPEED, MOVING_SPEED, kindOf, cyclingMet, estimateActivityCalories, estimateStrengthCalories, estimateExerciseCalories, createGpsStats, addGpsSegment, resetGpsWindow, signalQuality, paceText, compareWithPrevious, periodRange, summarizeExpenditure };
   root.FittFormaActivity = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);
