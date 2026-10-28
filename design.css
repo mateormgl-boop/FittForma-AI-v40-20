@@ -1431,3 +1431,21 @@ body{font-feature-settings:"cv11","ss01"}
 .body-edit>summary{cursor:pointer;padding:12px 0;font-weight:800;list-style-position:inside}
 .body-edit[open]>summary{border-bottom:1px solid var(--ff-border);margin-bottom:10px}
 .settings-title{margin:22px 4px 8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3)}
+/* v57: lector de comidas con gramos editables */
+.meal-parse{margin:8px 0 4px;padding:10px;border-radius:14px;border:1px solid var(--ff-border);background:var(--ff-panel-2)}
+.meal-parse[hidden]{display:none}
+.meal-parse-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13.5px}
+.meal-parse-head span{font-weight:800}
+.meal-parse ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.meal-parse li{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:6px;align-items:center;padding-bottom:8px;border-bottom:1px solid var(--ff-border)}
+.meal-parse li:last-child{border-bottom:0;padding-bottom:0}
+.mp-food{display:grid;gap:2px;min-width:0}
+.mp-food select{width:100%;min-height:38px;font-size:13.5px;padding:6px 26px 6px 8px;text-overflow:ellipsis}
+.mp-food small{font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mp-grams{display:flex;align-items:center;gap:3px}
+.mp-grams input{width:68px;min-height:38px;padding:6px;text-align:right;font-size:14px}
+.mp-kcal{font-size:12.5px;font-weight:700;white-space:nowrap;min-width:52px;text-align:right}
+.mp-remove{width:34px;height:34px;border-radius:50%;border:1px solid var(--ff-border);background:transparent;color:var(--text-2);font-size:18px;line-height:1;cursor:pointer}
+.mp-unknown{margin:8px 0 0;font-size:12.5px;color:#b45309}
+html[data-theme="dark"] .mp-unknown{color:#fbbf24}
+@media(max-width:380px){.meal-parse li{grid-template-columns:minmax(0,1fr) auto auto}.mp-food{grid-column:1/-1}}
