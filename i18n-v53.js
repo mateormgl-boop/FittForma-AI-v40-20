@@ -175,7 +175,9 @@
   ["Músculos atrasados", "Lagging muscles", "Músculos atrasados", "Muscles en retard", "Muscoli indietro", "Nachzügler-Muskeln"],
   ["Para subir tu rango", "To rank up", "Para subir de nível", "Pour monter de rang", "Per salire di grado", "Zum Aufsteigen"],
   ["Guardar en el historial", "Save to history", "Salvar no histórico", "Enregistrer dans l'historique", "Salva nello storico", "Im Verlauf speichern"],
-  ["Lo hice: registrarlo", "I did it: log it", "Eu fiz: registrar", "Je l'ai fait : l'enregistrer", "L'ho fatto: registralo", "Erledigt: eintragen"]
+  ["Lo hice: registrarlo", "I did it: log it", "Eu fiz: registrar", "Je l'ai fait : l'enregistrer", "L'ho fatto: registralo", "Erledigt: eintragen"],
+  ["Hidratación: sumar un vaso de agua", "Hydration: add a glass of water", "Hidratação: adicionar um copo de água", "Hydratation : ajouter un verre d’eau", "Idratazione: aggiungi un bicchiere d’acqua", "Flüssigkeit: ein Glas Wasser hinzufügen"],
+  ["Tocá para sumar un vaso", "Tap to add a glass", "Toque para adicionar um copo", "Touche pour ajouter un verre", "Tocca per aggiungere un bicchiere", "Tippe, um ein Glas hinzuzufügen"]
 );
 window.FittFormaI18nDynamic = [
   [/^Quedan (\d+) (día|días)$/, (m, i) => [`${m[1]} ${m[1] === '1' ? 'day' : 'days'} left`, `Faltam ${m[1]} ${m[1] === '1' ? 'dia' : 'dias'}`, `Plus que ${m[1]} ${m[1] === '1' ? 'jour' : 'jours'}`, `${m[1] === '1' ? 'Manca' : 'Mancano'} ${m[1]} ${m[1] === '1' ? 'giorno' : 'giorni'}`, `Noch ${m[1]} ${m[1] === '1' ? 'Tag' : 'Tage'}`][i]],
@@ -189,5 +191,6 @@ window.FittFormaI18nDynamic = [
   [/^#(\d+) en rango$/, (m, i) => `#${m[1]} ${['in rank', 'no nível', 'au rang', 'nel grado', 'im Rang'][i]}`],
   [/^(\d+) de 30 días$/, (m, i) => `${m[1]} / 30 ${['days', 'dias', 'jours', 'giorni', 'Tage'][i]}`],
   [/^(\d+) de 20$/, (m) => `${m[1]} / 20`],
-  [/^(\d+) (día|días)$/, (m, i) => `${m[1]} ${[['day', 'days'], ['dia', 'dias'], ['jour', 'jours'], ['giorno', 'giorni'], ['Tag', 'Tage']][i][m[1] === '1' ? 0 : 1]}`]
+  [/^(\d+) (día|días)$/, (m, i) => `${m[1]} ${[['day', 'days'], ['dia', 'dias'], ['jour', 'jours'], ['giorno', 'giorni'], ['Tag', 'Tage']][i][m[1] === '1' ? 0 : 1]}`],
+[/^(\d+) de (\d+) ml · tocá para sumar un vaso$/, (m, i) => [`${m[1]} of ${m[2]} ml · tap to add a glass`, `${m[1]} de ${m[2]} ml · toque para adicionar um copo`, `${m[1]} sur ${m[2]} ml · touche pour ajouter un verre`, `${m[1]} di ${m[2]} ml · tocca per aggiungere un bicchiere`, `${m[1]} von ${m[2]} ml · tippe für ein Glas`][i]]
 ].concat(window.FittFormaI18nDynamic || []);

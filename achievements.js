@@ -82,7 +82,7 @@
     { id: 'load-press-banca', name: 'Press de banca · carga', group: 'Pecho', category: 'strength', measure: 'bw', symbol: 'bench', match: '^press de banca( con barra)?$|^press de banca plano', thresholds: [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.15, 1.3, 1.5, 1.75] },
     { id: 'load-sentadilla', name: 'Sentadilla con barra · carga', group: 'Piernas', category: 'strength', measure: 'bw', symbol: 'squatbar', match: '^sentadilla (con barra|trasera)', thresholds: [0.4, 0.5, 0.65, 0.8, 0.95, 1.1, 1.25, 1.4, 1.6, 1.8, 2.0, 2.4] },
     { id: 'load-peso-muerto', name: 'Peso muerto · carga', group: 'Espalda', category: 'strength', measure: 'bw', symbol: 'deadlift', match: '^peso muerto( con barra| convencional)?$', thresholds: [0.5, 0.65, 0.8, 1.0, 1.15, 1.3, 1.5, 1.7, 1.9, 2.1, 2.4, 2.8] },
-    { id: 'load-press-militar', name: 'Press militar · carga', group: 'Hombros', category: 'strength', measure: 'bw', symbol: 'ohp', match: '^press militar( con barra| de pie)?$', thresholds: [0.2, 0.25, 0.3, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.15] }
+    { id: 'load-press-militar', name: 'Press militar · carga', group: 'Hombros', category: 'strength', measure: 'bw', symbol: 'ohp', match: '^press militar( con barra| de pie| con barra de pie)?$', thresholds: [0.2, 0.25, 0.3, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.15] }
   ];
   function loadChallengeFor(name) { const n = normalizeName(name); return LOAD_CHALLENGES.find(c => new RegExp(c.match).test(n)) || null; }
 

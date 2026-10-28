@@ -408,3 +408,77 @@ X('Shadow boxing de bajo impacto', { pose: alt(stand({ footN: 18, footF: -18, to
 X('Paso lateral de bajo impacto', { view: 'front', pose: phi => { const s = Math.sin(phi); return front({ hx: 10 * s, hy: 96, legL: [6 + Math.max(0, -s) * 16, 2], legR: [6 + Math.max(0, s) * 16, 2], arms: [20 + 30 * Math.abs(s), 40] }); }, m: ['gluteo_medio', 'cuadriceps'], s: ['gemelos'] });
 X('Baile o cardio de bajo impacto', { view: 'front', pose: phi => { const s = Math.sin(phi); return front({ hx: 12 * s, hy: 95, legL: [6 + Math.max(0, -s) * 18, 0], legR: [6 + Math.max(0, s) * 18, 0], armL: [60 + 70 * Math.max(0, -s), 120], armR: [60 + 70 * Math.max(0, s), 120] }); }, m: ['cuadriceps', 'deltoides_lateral'], s: ['gemelos', 'abdominales'] });
 X('Jumping jacks de bajo impacto', { view: 'front', pose: alt(front({ legs: [4, 2], arms: [10, 8] }), front({ legL: [4, 2], legR: [24, 18], arms: [160, 168] }), front({ legL: [24, 18], legR: [4, 2], arms: [160, 168] })), m: ['deltoides_lateral', 'gluteo_medio'], s: ['gemelos', 'cuadriceps'] });
+
+// ======================= v56: ejercicios nuevos =======================
+const plateBack = J => ({ front: E.plate(pt(J.sh.x - 8, J.sh.y - 2), 22) });
+X('Sentadilla trasera con barra', { pose: squat({ top: { armN: { a: [-40, 175] } }, bot: { armN: { a: [-70, 120] } } }), env: plateBack, m: ['cuadriceps', 'gluteos'], s: ['aductores', 'lumbares', 'isquiotibiales'] });
+X('Sentadilla búlgara con mancuernas', (() => {
+  const back = pt(CX - 56, FLOOR - 44);
+  const mk = (hy, hx) => stand({ footN: 30, hy, hx, legF: { t: back, bend: 1 }, feet: { f: 150 } });
+  return { pose: rep(mk(96, 2), mk(62, -2)), env: J => ({ back: E.bench(CX - 100, CX - 44, FLOOR - 46) + E.dumbbell(J.limbs.f.hand), front: E.dumbbell(J.limbs.n.hand) }), m: ['cuadriceps', 'gluteos'], s: ['isquiotibiales', 'aductores', 'gluteo_medio'], scale: 1.35 };
+})());
+const fwdLunge = load => ({ pose: rep(stand({}), stand({ footN: 46, footF: -30, hy: 56, hx: 8, feet: { f: 40 }, legF: { t: pt(CX - 30, FLOOR - 9), bend: 1 } })), env: load ? db : undefined, m: ['cuadriceps', 'gluteos'], s: ['isquiotibiales', 'aductores'] });
+X('Zancadas hacia adelante con mancuernas', fwdLunge(true));
+X('Zancadas caminando sin peso', fwdLunge(false));
+X('Peso muerto sumo con barra', { pose: rep(stand({ footN: 22, footF: -20, armN: { a: [2, 2] } }), stand({ footN: 22, footF: -20, hx: -14, hy: 62, torso: 142, head: 20, armN: { a: [2, 2] } })), env: J => ({ front: E.plate(J.limbs.n.hand, 23) }), m: ['gluteos', 'aductores', 'cuadriceps'], s: ['isquiotibiales', 'lumbares', 'trapecio'] });
+X('Press inclinado con barra', (() => {
+  const hip = pt(CX + 24, FLOOR - 62), ang = -126, sh = pt(hip.x + Math.sin(ang * Math.PI / 180) * 64, hip.y + Math.cos(ang * Math.PI / 180) * 64);
+  const mk = (d, k) => ({ hip, torso: ang, head: 20, arms: { n: { t: pt(sh.x + 10 + k, sh.y - d), bend: 1 }, f: { t: pt(sh.x + 6 + k, sh.y - d + 1), bend: 1 } }, legs: { n: { t: pt(hip.x + 58, FLOOR - 6), bend: -1 }, f: { t: pt(hip.x + 52, FLOOR - 6), bend: -1 } } });
+  return { pose: rep(mk(66, 8), mk(12, 0)), env: J => ({ back: E.inclineBench(pt(CX + 30, FLOOR - 52), 36, 96), front: E.plate(J.limbs.n.hand, 22) }), m: ['pectorales', 'deltoides_anterior'], s: ['triceps'], scale: 1.3 };
+})());
+X('Fondos en paralelas', (() => {
+  const barY = FLOOR - 150, hand = pt(CX + 4, barY);
+  const mk = (hipY, t) => ({ hip: pt(CX - 6, hipY), torso: t, head: 4, arms: { n: { t: hand, bend: 1 }, f: { t: pt(hand.x - 3, hand.y), bend: 1 } }, legs: { n: { a: [14, -50] }, f: { a: [8, -58] } } });
+  return { trailPoint: 'cabeza', pose: rep(mk(barY + 50, 172), mk(barY + 86, 160)), shadow: false, scale: 1.25, env: () => ({ back: E.bar(CX - 30, CX + 40, barY) }), m: ['pectorales', 'triceps'], s: ['deltoides_anterior'] };
+})());
+X('Aperturas en máquina', {
+  view: 'front', pose: rep(front({ hy: 60, legs: [8, 0, 0.35, 1], arms: [90, 90, 1, 1] }), front({ hy: 60, legs: [8, 0, 0.35, 1], arms: [88, 88, 0.22, 0.22] })),
+  env: J => ({ back: E.box(CX - 34, FLOOR - 52, 68) + E.pad(CX - 34, FLOOR - 190, 68, 120), front: E.handle(J.world.l.hand) + E.handle(J.world.r.hand) }), m: ['pectorales'], s: ['deltoides_anterior'], scale: 1.4,
+});
+X('Remo en barra T', { pose: rep(stand({ hx: -18, hy: 84, torso: 124, head: 24, armN: { a: [2, 2] } }), stand({ hx: -18, hy: 84, torso: 124, head: 24, armN: { a: [-140, 8] } })), env: J => ({ back: `<line x1="${CX - 120}" y1="${FLOOR}" x2="${J.limbs.n.hand.x}" y2="${J.limbs.n.hand.y}" stroke="#7d858e" stroke-width="5"/>`, front: E.plate(pt(J.limbs.n.hand.x + 14, J.limbs.n.hand.y + 2), 18) + E.handle(J.limbs.n.hand) }), m: ['dorsales', 'espalda_media'], s: ['biceps', 'deltoides_posterior', 'lumbares'] });
+X('Remo invertido en barra', (() => {
+  const barY = FLOOR - 100, foot = pt(CX + 96, FLOOR - 6);
+  const mk = (hipY, hipX, handX) => ({ hip: pt(hipX, hipY), torso: angTo(pt(hipX, hipY), pt(hipX - 70, hipY - 22)), head: 0, arms: { n: { t: pt(handX, barY), bend: 1 }, f: { t: pt(handX - 3, barY), bend: 1 } }, legs: { n: { t: foot, bend: -1 }, f: { t: pt(foot.x - 4, foot.y), bend: -1 } } });
+  return { trailPoint: 'cabeza', pose: rep(mk(FLOOR - 40, CX + 14, CX - 40), mk(FLOOR - 62, CX + 14, CX - 40)), env: () => ({ back: E.bar(CX - 90, CX + 10, barY) }), m: ['dorsales', 'espalda_media'], s: ['biceps', 'deltoides_posterior', 'abdominales'], scale: 1.3 };
+})());
+X('Press militar con barra de pie', { pose: rep(stand({ armN: { a: [-150, 178] } }), stand({ armN: { a: [178, 178] } })), env: J => ({ front: E.plate(J.limbs.n.hand, 22) }), m: ['deltoides_anterior', 'deltoides_lateral'], s: ['triceps', 'trapecio', 'abdominales'], scale: 1.35 });
+X('Elevaciones laterales con banda', { view: 'front', pose: rep(front({ arms: [10, 8] }), front({ arms: [84, 80] })), env: J => ({ front: E.band(pt(CX - 8, FLOOR - 2), J.world.l.hand) + E.band(pt(CX + 8, FLOOR - 2), J.world.r.hand) }), m: ['deltoides_lateral'], s: ['trapecio'] });
+X('Curl con barra', { pose: rep(stand({ armN: { a: [3, 6] } }), stand({ armN: { a: [-4, 150] } })), env: J => ({ front: E.plate(J.limbs.n.hand, 20) }), m: ['biceps'], s: ['antebrazos'] });
+X('Curl inclinado con mancuernas', (() => {
+  const hip = pt(CX + 24, FLOOR - 62), ang = -126;
+  const mk = fore => ({ hip, torso: ang, head: 20, arms: { n: { a: [-6, fore] }, f: { a: [-10, fore - 4] } }, legs: { n: { t: pt(hip.x + 58, FLOOR - 6), bend: -1 }, f: { t: pt(hip.x + 52, FLOOR - 6), bend: -1 } } });
+  return { pose: rep(mk(-2), mk(140)), env: J => ({ back: E.inclineBench(pt(CX + 30, FLOOR - 52), 36, 96), front: E.dumbbell(J.limbs.n.hand) }), m: ['biceps'], s: ['antebrazos'], scale: 1.3 };
+})());
+X('Press de banca agarre cerrado', benchPress({ extra: { m: ['triceps', 'pectorales'], s: ['deltoides_anterior'], env: J => ({ back: E.bench(CX - 80, CX + 40, FLOOR - 46), front: E.plate(J.limbs.n.hand, 22) }) } }));
+X('Rueda abdominal', (() => {
+  const knee = pt(CX - 46, FLOOR - 7);
+  const mk = (ang, reach) => { const la = (ang - 180) * Math.PI / 180, hip = pt(knee.x - Math.sin(la) * 46, knee.y - Math.cos(la) * 46), sh = pt(hip.x + Math.sin(ang * Math.PI / 180) * 64, hip.y + Math.cos(ang * Math.PI / 180) * 64); return { ...plankPose({ ang, hand: pt(sh.x + reach, FLOOR - 12), knees: true }), hip }; };
+  return { pose: rep(mk(140, 8), mk(104, 46)), env: J => ({ back: E.mat(CX - 120, CX + 130), front: E.plate(pt(J.limbs.n.hand.x, FLOOR - 11), 11) }), m: ['abdominales'], s: ['dorsales', 'deltoides_anterior', 'oblicuos'], scale: 1.3 };
+})());
+X('Elevación de piernas colgado', (() => {
+  const barY = 68, hand = pt(CX + 6, barY + 2);
+  const mk = (th, sh) => ({ hip: pt(CX - 4, 196), torso: 182, head: 0, arms: { n: { t: hand, bend: -1 }, f: { t: pt(hand.x - 4, hand.y), bend: -1 } }, legs: { n: { a: [th, sh] }, f: { a: [th - 4, sh - 4] } } });
+  return { pose: rep(mk(4, 2), mk(96, 90)), shadow: false, scale: 1.2, env: () => ({ back: E.bar(CX - 70, CX + 80, barY) }), m: ['abdominales'], s: ['oblicuos', 'antebrazos'] };
+})());
+X('Leñador en polea', { pose: rep(stand({ footN: 14, footF: -14, torso: 176, armN: { a: [150, 150] } }), stand({ footN: 14, footF: -14, hx: -6, hy: 86, torso: 160, head: 10, armN: { a: [40, 40] } })), env: J => ({ back: E.column(CX - 110, 50) + E.pulley(pt(CX - 102, 80)) + E.cable(pt(CX - 102, 80), J.limbs.n.hand), front: E.handle(J.limbs.n.hand) }), m: ['oblicuos', 'abdominales'], s: ['deltoides_anterior', 'gluteos'] });
+X('Elevación de talones en prensa', (() => {
+  const hip = pt(CX - 36, FLOOR - 58), ang = -128, foot = pt(CX + 52, FLOOR - 146);
+  const mk = fa => ({ hip, torso: ang, head: 30, arms: { n: { a: [-20, 20] }, f: { a: [-24, 16] } }, legs: { n: { t: foot, bend: -1 }, f: { t: pt(foot.x - 4, foot.y + 2), bend: -1 } }, feet: { n: fa, f: fa } });
+  return { pose: rep(mk(150), mk(110)), env: J => ({ back: E.padC(mid(J.hip, J.sh, 13, 128), 74, 12, 38) + E.box(CX - 70, FLOOR - 46, 60), front: E.padC(pt(J.limbs.n.ankle.x + 14, J.limbs.n.ankle.y - 10), 64, 9, -45) }), m: ['gemelos'], s: [], scale: 1.3 };
+})());
+X('Swing con pesa rusa a una mano', { pose: rep(stand({ hx: -26, hy: 84, torso: 112, head: 30, footN: 16, footF: -14, armN: { a: [-24, -24] } }), stand({ footN: 16, footF: -14, armN: { a: [88, 90] } })), env: J => ({ front: E.kettlebell(pt(J.limbs.n.hand.x, J.limbs.n.hand.y + 8)) }), m: ['gluteos', 'isquiotibiales'], s: ['lumbares', 'abdominales', 'antebrazos'] });
+X('Saltar la cuerda', { view: 'front', cyclic: true, pose: phi => front({ hy: 98 + 8 * Math.abs(Math.sin(phi)), legs: [4, 2], arms: [24, 50] }), env: (J, phi) => { const y = FLOOR - 60 - 140 * Math.cos(phi); return { back: Math.cos(phi) > 0 ? `<path class="band" fill="none" d="M${J.world.l.hand.x},${J.world.l.hand.y} Q${CX},${y} ${J.world.r.hand.x},${J.world.r.hand.y}"/>` : '', front: Math.cos(phi) <= 0 ? `<path class="band" fill="none" d="M${J.world.l.hand.x},${J.world.l.hand.y} Q${CX},${Math.min(FLOOR + 6, y)} ${J.world.r.hand.x},${J.world.r.hand.y}"/>` : '' }; }, m: ['gemelos', 'cuadriceps'], s: ['deltoides_anterior', 'antebrazos'] });
+X('Escaladores', kneeDrive(105, pt(CX + 40, FLOOR - 4)));
+X('Remo renegado con pesas rusas', (() => {
+  const ang = 104, h = plankHip(ang, CX - 110), base = { ...plankPose({ ang, hand: pt(CX + 40, FLOOR - 14) }), hip: h };
+  const row = { t: pt(CX + 18, FLOOR - 52), bend: 1 };
+  return { pose: alt(base, { ...base, arms: { n: row, f: base.arms.f } }, { ...base, arms: { n: base.arms.n, f: { ...row, t: pt(row.t.x - 3, row.t.y) } } }), env: J => ({ back: E.mat(CX - 140, CX + 100) + E.kettlebell(pt(J.limbs.f.hand.x, J.limbs.f.hand.y + 6)), front: E.kettlebell(pt(J.limbs.n.hand.x, J.limbs.n.hand.y + 6)) }), m: ['dorsales', 'abdominales'], s: ['espalda_media', 'oblicuos', 'triceps'], scale: 1.25 };
+})());
+X('Sentadilla sumo con mancuerna', { pose: rep(stand({ footN: 22, footF: -20, armN: { a: [2, 4] } }), stand({ footN: 22, footF: -20, hx: -16, hy: 56, torso: 164, head: 10, armN: { a: [2, 4] } })), env: J => ({ front: E.dumbbell(pt(J.limbs.n.hand.x, J.limbs.n.hand.y + 6), 90) }), m: ['cuadriceps', 'aductores', 'gluteos'], s: ['abdominales'] });
+X('Encogimientos con barra', { view: 'front', pose: rep(front({ back: true, arms: [6, 4] }), front({ back: true, arms: [6, 4], shrug: 10 })), env: J => ({ front: E.barbellFront(J.world.l.hand, J.world.r.hand) }), m: ['trapecio'], s: ['antebrazos'] });
+X('Peso muerto rumano con barra', { pose: hinge(), env: J => ({ front: E.plate(J.limbs.n.hand, 22) }), m: ['isquiotibiales', 'gluteos'], s: ['lumbares', 'antebrazos'] });
+X('Sentadilla con salto', { pose: seq(stand({}), stand({ hx: -26, hy: 56, torso: 150, head: 24, armN: { a: [-30, -20] } }), stand({ hy: 114, armN: { a: [150, 160] }, feet: { n: 60, f: 60 }, legN: { a: [2, 0] }, legF: { a: [-2, -4] } })), m: ['cuadriceps', 'gluteos'], s: ['gemelos', 'isquiotibiales'] });
+X('Curl martillo con cuerda en polea', { pose: rep(stand({ hx: -8, armN: { a: [6, 14] } }), stand({ hx: -8, armN: { a: [-2, 145] } })), env: J => ({ back: E.column(CX + 92, 70) + E.pulley(pt(CX + 84, FLOOR - 16)) + E.cable(pt(CX + 84, FLOOR - 16), J.limbs.n.hand), front: E.handle(J.limbs.n.hand) }), m: ['biceps', 'antebrazos'] });
+X('Pullover con mancuerna en banco', { pose: rep(supine({ y: FLOOR - 46, armN: { a: [178, 178] } }), supine({ y: FLOOR - 46, armN: { a: [-102, -100] } })), env: J => ({ back: E.bench(CX - 80, CX + 40, FLOOR - 46), front: E.dumbbell(J.limbs.n.hand, 90) }), m: ['dorsales', 'pectorales'], s: ['triceps', 'abdominales'], scale: 1.3 });
+X('Aducción de cadera con banda', { view: 'front', pose: rep(front({ legL: [4, 2], legR: [26, 20], armL: [30, 20], armR: [10, 8] }), front({ legL: [4, 2], legR: [2, 0], armL: [30, 20], armR: [10, 8] })), env: J => ({ back: `<rect class="met" x="${CX + 128}" y="${FLOOR - 40}" width="8" height="40"/>`, front: E.band(pt(CX + 130, FLOOR - 16), J.world.r.ankle) }), m: ['aductores'], s: [] });
+X('Subida a escalón con elevación de rodilla', { ...stepUp(false), pose: rep(stand({ hx: -10, hy: 92, footN: 30, footF: -24, legN: { t: pt(CX + 30, FLOOR - 46), bend: 1 } }), stand({ hx: 24, hy: 134, footN: 30, armN: { a: [-20, 40] }, legN: { t: pt(CX + 30, FLOOR - 46), bend: 1 }, legF: { a: [92, 0] }, feet: { f: 80 } })), m: ['cuadriceps', 'gluteos'], s: ['abdominales', 'gemelos'] });

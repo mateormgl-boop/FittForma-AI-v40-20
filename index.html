@@ -1754,7 +1754,7 @@
     <div class="home-tiles" aria-label="Accesos rápidos">
       <button class="home-tile t-blue" type="button" data-home-quick="train"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg><b>Entrenar</b><span>Sesión, rutinas y libre</span></button>
       <button class="home-tile t-green" type="button" data-home-quick="meal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M17 21V3c-2 1-3 4-3 8h3"/></svg><b>Registrar comida</b><span>Foto, código o manual</span></button>
-      <button class="home-tile t-cyan" type="button" data-home-quick="water" aria-label="Sumar un vaso de agua"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg><b>+1 vaso de agua</b><span><span id="homeQuickWater">Hidratación de hoy</span></span></button>
+      <button class="home-tile t-cyan" type="button" data-home-quick="water" aria-label="Hidratación: sumar un vaso de agua"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg><b>Hidratación</b><span><span id="homeQuickWater">Tocá para sumar un vaso</span></span></button>
       <button class="home-tile t-teal" type="button" data-shortcut-view="running"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><b>Correr con GPS</b><span>O registrar a mano</span></button>
       <button class="home-tile t-violet" type="button" data-show-badges><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 19.5 7v10L12 21.5 4.5 17V7z"/><path d="M12 8v5l3 2"/></svg><b>Insignias</b><span>Tus desafíos</span></button>
       <button class="home-tile t-amber" type="button" data-shortcut-view="coach" aria-label="Consultar a la IA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><b>FittAI</b><span>Preguntá o pedí un plan</span></button>
@@ -2494,7 +2494,7 @@
     <div class="ff-sheet-grid">
       <button type="button" data-quick-add="train" class="qa-blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg>Entrenamiento</button>
       <button type="button" data-quick-add="meal" class="qa-green"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M17 21V3c-2 1-3 4-3 8h3"/></svg>Comida</button>
-      <button type="button" data-quick-add="water" class="qa-cyan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>+1 vaso de agua</button>
+      <button type="button" data-quick-add="water" class="qa-cyan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>Hidratación</button>
       <button type="button" data-quick-add="run" class="qa-teal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Carrera</button>
       <button type="button" data-quick-add="body" class="qa-violet"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M7 15l4-4 3 2 5-6"/></svg>Peso y medidas</button>
       <button type="button" data-quick-add="routine" class="qa-amber"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Nueva rutina</button>
@@ -5430,7 +5430,7 @@ function findCatalogExercise(name){
     set('homeKcalVal',fmt(cal));set('homeKcalLbl','de '+fmt(goals.calories||0)+' kcal');arc('homeKcalArc',goals.calories?cal/goals.calories:0);
     set('homeProtVal',fmt(pro)+' g');set('homeProtLbl','de '+fmt(goals.protein||0)+' g de proteína');arc('homeProtArc',goals.protein?pro/goals.protein:0);
     const wml=waterMl(todayKey),wgoal=hydro().goalMl;
-    set('homeQuickWater',wml?`${wml} de ${wgoal} ml hoy`:'Todavía sin registrar hoy');
+    set('homeQuickWater',wml?`${wml} de ${wgoal} ml · tocá para sumar un vaso`:'Tocá para sumar un vaso');
     set('homeWaterVal',wml>=1000?(wml/1000).toFixed(1).replace('.',',')+' L':String(wml)+' ml');set('homeWaterLbl','de '+wgoal+' ml');arc('homeWaterArc',wgoal?wml/wgoal:0);
     // Hábitos de hoy (mismos registros que Progreso)
     const habitBox=$('homeHabits');
