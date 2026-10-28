@@ -301,23 +301,38 @@
   function chamfer(pts, t) { const out = []; pts.forEach((p, i) => { const prev = pts[(i + 5) % 6], next = pts[(i + 1) % 6]; out.push([p[0] + (prev[0] - p[0]) * t, p[1] + (prev[1] - p[1]) * t], [p[0] + (next[0] - p[0]) * t, p[1] + (next[1] - p[1]) * t]); }); return out; }
   function spiked(r) { const out = []; for (let i = 0; i < 12; i++) { const a = Math.PI / 180 * (30 * i - 90), rr = i % 2 ? r * 0.93 : r * 1.06; out.push([24 + rr * Math.cos(a), 23 + rr * Math.sin(a)]); } return out; }
   const OUTER = hexPts(20), FACE = hexPts(14.6);
-  const RANK_SHAPES = {
-    bronze: `<path class="ff-medal-shape" d="${pathOf(OUTER)}"/>`,
-    silver: `<path class="ff-medal-shape" d="${pathOf(chamfer(OUTER, 0.16))}"/><path class="ff-medal-facet" d="${pathOf(hexPts(17.4))}"/>`,
-    gold: `<path class="ff-medal-laurel" d="M7 36c-4-5-5-12-2-19M41 36c4-5 5-12 2-19M5.5 30l-3 1M5 24l-3-.5M6 18.5 3.5 17M42.5 30l3 1M43 24l3-.5M42 18.5l2.5-1.5"/><path class="ff-medal-shape" d="${pathOf(spiked(20.5))}"/><path class="ff-medal-facet" d="${pathOf(hexPts(17.6))}"/>`,
-    legend: `<path class="ff-medal-aura" d="M24 1.5 28 7l6.5-2.5L33 11l7 2-5.5 4.5L41 22l-6.5 1L37 30l-7-1.5L28 35l-4-4.5-4 4.5-2-6.5-7 1.5 2.5-7L7 22l6-4.5L7.5 13l7-2-1.5-6.5L19.5 7z"/><path class="ff-medal-shape" d="${pathOf(chamfer(hexPts(19.6, 24, 23.8, 1.04), 0.1))}"/><path class="ff-medal-facet" d="${pathOf(hexPts(17.2, 24, 23.8, 1.04))}"/><path class="ff-medal-crown" d="M15.5 7.6 17.6 1.6l3.4 3.5L24 0.6l3 4.5 3.4-3.5 2.1 6z"/>`,
-    diamond: `<path class="ff-medal-spark" d="M5 6v4M3 8h4M43 5v4M41 7h4M44 33v3M42.5 34.5h3"/><path class="ff-medal-shape" d="${pathOf(hexPts(20.5, 24, 23, 1.06))}"/><path class="ff-medal-facet" d="${pathOf(hexPts(20.5, 24, 23, 1.06)).replace(/[MZ]/g, '').split('L').map(p => `M24 23L${p}`).join('')}"/>`
+  // v58: emblema metálico como el «Sistema de insignias» de referencia: hexágono con borde de metal grueso y bisel,
+  // cara con brillo, figura grande del ejercicio y color por rango (bronce cobre, plata acero, oro, diamante azul y
+  // legendario negro con corona). Cada rango conserva un contorno propio para reconocerlo también sin color.
+  const RANK_RIM = {
+    bronze: hexPts(21.5),
+    silver: chamfer(hexPts(21.5), 0.1),
+    gold: hexPts(21.8, 24, 23, 1.02),
+    diamond: hexPts(22.2, 24, 23, 1.04),
+    legend: chamfer(hexPts(22, 24, 23.4, 1.04), 0.08)
   };
+  const RANK_SHAPES = Object.fromEntries(Object.entries(RANK_RIM).map(([k, pts]) => [k, `<path class="ff-medal-shape" d="${pathOf(pts)}"/>`]));
+  const RANK_DECOR = {
+    diamond: '<path class="ff-medal-spark" d="M4.5 8v4M2.5 10h4M43.5 6v4M41.5 8h4M44 36v3M42.5 37.5h3"/>',
+    legend: '<path class="ff-medal-crown" d="M15.5 4.6 18.8 7.4 21.4 2.6 24 6.6 26.6 2.6 29.2 7.4 32.5 4.6 31.2 11H16.8z"/><circle class="ff-medal-gem" cx="24" cy="8.4" r="1.3"/>'
+  };
+  const RIM_ID = { bronze: 'Bronze', silver: 'Silver', gold: 'Gold', diamond: 'Diamond', legend: 'Legend' };
   function medalSvg({ rankKey = 'bronze', numeral = '', glyph = 'star', locked = false, size = 48, title = '', category = '' } = {}) {
     const key = ['bronze', 'silver', 'gold', 'diamond', 'legend'].includes(rankKey) ? rankKey : 'bronze';
     const g = GLYPHS[glyph] || GLYPHS.star;
     const cat = category || (CATEGORIES.find(c => c.glyph === glyph) || {}).key || 'custom';
     const hue = CATEGORY_HUES[cat] || CATEGORY_HUES.custom;
     const level = ['I', 'II', 'III'].indexOf(numeral) + 1;
-    const pips = level > 0 ? Array.from({ length: level }, (_, i) => `<circle class="ff-medal-pip" cx="${24 + (i - (level - 1) / 2) * 5}" cy="50" r="1.7"/>`).join('') : '';
+    const pips = level > 0 ? Array.from({ length: level }, (_, i) => `<circle class="ff-medal-pip" cx="${24 + (i - (level - 1) / 2) * 5}" cy="51" r="1.8"/>`).join('') : '';
     const label = title ? `<title>${String(title).replace(/[<>&"]/g, '')}</title>` : '';
-    const banner = numeral && !locked ? `<path class="ff-medal-banner" d="M15 44.5h18l-2 4 2 4H15l2-4z"/><text class="ff-medal-num" x="24" y="50.2" text-anchor="middle">${numeral}</text>${pips}` : '';
-    return `<svg class="ff-medal ff-medal--${key} ff-medal-cat--${cat}${locked ? ' is-locked' : ''}" style="--medal-hue:${hue}" width="${size}" height="${Math.round(size * 56 / 48)}" viewBox="0 0 48 56" role="${title ? 'img' : 'presentation'}"${title ? '' : ' aria-hidden="true"'}>${label}${RANK_SHAPES[key]}<path class="ff-medal-inner" d="${pathOf(FACE)}"/><path class="ff-medal-ring" d="${pathOf(hexPts(12.6))}"/><path class="ff-medal-shine" d="M12.5 15.5 24 8.8l11.5 6.7"/><g class="ff-medal-glyph" transform="translate(24 23) scale(.62) translate(-20 -19.5)">${g}</g>${banner}</svg>`;
+    const banner = numeral && !locked ? `<path class="ff-medal-banner" d="M15 45.5h18l-2 4 2 4H15l2-4z"/><text class="ff-medal-num" x="24" y="51.2" text-anchor="middle">${numeral}</text>${pips}` : '';
+    const rim = RANK_RIM[key], top = hexPts(19.6, 24, 23, rim === RANK_RIM.bronze ? 1 : 1.02), id = RIM_ID[key];
+    const shine = `M${top[4][0].toFixed(1)} ${top[4][1].toFixed(1)}L${top[5][0].toFixed(1)} ${top[5][1].toFixed(1)}L${top[0][0].toFixed(1)} ${top[0][1].toFixed(1)}`;
+    return `<svg class="ff-medal ff-medal--${key} ff-medal-cat--${cat}${locked ? ' is-locked' : ''}" style="--medal-hue:${hue}" width="${size}" height="${Math.round(size * 56 / 48)}" viewBox="0 0 48 56" role="${title ? 'img' : 'presentation'}"${title ? '' : ' aria-hidden="true"'}>${label}`
+      + `<path class="ff-medal-drop" d="${pathOf(rim.map(([x, y]) => [x, y + 1.6]))}"/>${RANK_SHAPES[key]}`
+      + `<path class="ff-medal-bevel" d="${pathOf(hexPts(18.4))}" fill="url(#ffBevel${id})"/><path class="ff-medal-inner" d="${pathOf(hexPts(16.3))}"/>`
+      + `<path class="ff-medal-ring" d="${pathOf(hexPts(16.3))}"/><ellipse class="ff-medal-glow" cx="24" cy="15.5" rx="10.5" ry="5.5"/>`
+      + `<path class="ff-medal-shine" d="${shine}"/><g class="ff-medal-glyph" transform="translate(24 23.4) scale(.74) translate(-20 -19.5)">${g}</g>${RANK_DECOR[key] || ''}${banner}</svg>`;
   }
 
   root.FittFormaBadgeEngine = Object.freeze({

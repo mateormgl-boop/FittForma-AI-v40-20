@@ -932,7 +932,10 @@
   ["Bajar grasa", "Lose fat", "Perder gordura", "Perdre du gras", "Perdere grasso", "Fett abbauen"],
   ["Ponerte en forma y mantener", "Get fit and maintain", "Entrar em forma e manter", "Se mettre en forme et maintenir", "Metterti in forma e mantenerti", "Fit werden und halten"],
   ["Ganar músculo", "Build muscle", "Ganhar músculo", "Prendre du muscle", "Guadagnare muscolo", "Muskeln aufbauen"],
-  ["Calorías", "Calories", "Calorias", "Calories", "Calorie", "Kalorien"]
+  ["Calorías", "Calories", "Calorias", "Calories", "Calorie", "Kalorien"],
+  ["Sistema de insignias", "Badge system", "Sistema de insígnias", "Système de badges", "Sistema di badge", "Abzeichen-System"],
+  ["Entrená · Mejorá · Superá tus límites", "Train · Improve · Beat your limits", "Treine · Melhore · Supere seus limites", "Entraîne-toi · Progresse · Dépasse tes limites", "Allenati · Migliora · Supera i tuoi limiti", "Trainieren · Verbessern · Grenzen überwinden"],
+  ["Niveles I–III", "Levels I–III", "Níveis I–III", "Niveaux I–III", "Livelli I–III", "Stufen I–III"]
 );
 window.FittFormaI18nDynamic = [
   [/^Quedan (\d+) (día|días)$/, (m, i) => [`${m[1]} ${m[1] === '1' ? 'day' : 'days'} left`, `Faltam ${m[1]} ${m[1] === '1' ? 'dia' : 'dias'}`, `Plus que ${m[1]} ${m[1] === '1' ? 'jour' : 'jours'}`, `${m[1] === '1' ? 'Manca' : 'Mancano'} ${m[1]} ${m[1] === '1' ? 'giorno' : 'giorni'}`, `Noch ${m[1]} ${m[1] === '1' ? 'Tag' : 'Tage'}`][i]],
