@@ -3,6 +3,21 @@
 Esta guía es la lista de pasos para publicar v60.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
+## Base de datos: aplicar todas las migraciones de una vez
+
+Si Comunidad dice «Comunidad se está actualizando…» o «Could not find the function … in the schema cache», a la base de Supabase le faltan migraciones.
+
+1. Abrí tu proyecto en Supabase → **SQL Editor** → **New query**.
+2. Pegá el contenido completo de `supabase/APLICAR_MIGRACIONES.sql` y tocá **Run**.
+3. Recargá la app.
+
+Detalles del archivo:
+- Tiene las 13 migraciones (v41 a v57), en orden.
+- Cada una va en su propia transacción y se puede ejecutar más de una vez: no borra datos ni desactiva RLS.
+- Al final recarga la caché de la API de Supabase.
+- Se regenera con `node tools/build-migrations-bundle.mjs`.
+- `tests/migrations-bundle.test.mjs` comprueba que esté al día.
+
 ## Qué cambia en v60.0
 
 - **No hay migraciones nuevas.**
