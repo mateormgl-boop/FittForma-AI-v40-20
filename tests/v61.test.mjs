@@ -16,7 +16,7 @@ test('estadísticas: se publican al iniciar sesión y nunca si la persona las oc
   assert.doesNotMatch(community, /if\(!ownStats&&!noticeState\(\)\)return null;/);
   assert.match(community, /if\(ownStats\?\.stats_public===false\)return ownStats;/);
   assert.match(community, /if\(user&&user\.id!==wasId\)\{ownStats=null;ownStatsLoaded=false;statsSig='';setTimeout\(\(\)=>\{syncStats\(\)/);
-  assert.match(html, /Nunca se publican tu peso, tu altura, tus medidas, tus objetivos ni tus fotos de progreso/);
+  assert.match(html, /Tu peso, tu altura y tus objetivos son privados: solo se muestran los que actives en «Datos físicos». Nunca se publican tus medidas ni tus fotos de progreso/);
 });
 
 test('foto de perfil única: Perfil ↔ Comunidad, siempre con una acción de la persona', () => {

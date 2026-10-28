@@ -67,6 +67,6 @@ test('v43: eliminación de cuenta con confirmación escrita y migración aditiva
 test('v43: mensajes dinámicos traducidos y versión 43.0', () => {
   assert.match(i18n, /function translateDynamic\(source\)/);
   assert.match(i18n, /translateDynamic\(source\) \|\| source/);
-  assert.match(sw, /fittforma-ai-static-v61-0/);
-  assert.match(html, /const APP_VERSION='0\.61\.0'/);
+  assert.match(sw, /fittforma-ai-static-v62-0/);
+  assert.match(html, /const APP_VERSION='0\.62\.0'/);
 });
