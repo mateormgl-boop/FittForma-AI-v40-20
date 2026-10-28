@@ -116,7 +116,10 @@ test('privacidad: estadísticas solo por funciones del servidor, públicas por d
   assert.match(sql, /stats_public boolean not null default true/);
   assert.match(sql, /revoke all on public\.community_athlete_stats from anon/);
   assert.doesNotMatch(sqlCode, /drop table|disable row level security|delete from|drop function|drop policy if exists (?!athlete_stats_)/i, 'migración aditiva');
-  assert.match(community, /if\(!ownStats&&!noticeState\(\)\)return null;/, 'no publica antes de mostrar el aviso');
+  // v61 (pedido de la persona dueña): públicas desde el inicio. Se publican al iniciar sesión, sin esperar el aviso,
+  // y nunca si la persona las ocultó.
+  assert.match(community, /if\(ownStats\?\.stats_public===false\)return ownStats;/, 'si las ocultó, no se publican');
+  assert.match(community, /if\(user&&user\.id!==wasId\)\{ownStats=null;ownStatsLoaded=false;statsSig='';setTimeout\(\(\)=>\{syncStats\(\)/, 'se publican al iniciar sesión');
   assert.match(html, /Nunca se publican tu peso, tu altura, tus medidas, tus objetivos ni tus fotos de progreso/);
 });
 
@@ -132,7 +135,7 @@ test('v53: archivos publicados, traducciones y versión', () => {
   for (const f of ['athlete-stats.js', 'i18n-v53.js']) { assert.match(sw, new RegExp(`"\\./${f.replace('.', '\\.')}"`)); assert.match(server, new RegExp(`'/${f.replace('.', '\\.')}'`)); assert.match(html, new RegExp(`src="\\./${f.replace('.', '\\.')}"`)); }
   for (const s of ['Todos', 'Ranking', 'Amigos', 'Todavía no tenés amigos en tu comunidad', 'Sin datos disponibles', 'Tu progreso']) assert.ok(i18n.includes(`["${s}"`), s);
   for (const row of i18n.matchAll(/^\s*\[("[^\n]*")\],?$/gm)) assert.equal(JSON.parse(`[${row[1]}]`).length, 6, row[1].slice(0, 40));
-  assert.match(sw, /fittforma-ai-static-v60-0/);
+  assert.match(sw, /fittforma-ai-static-v61-0/);
 });
 
 test('v53.1: rango por músculo validado (sin datos corporales) y misma regla en SQL', () => {

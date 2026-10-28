@@ -100,7 +100,8 @@ const openMuscles = async () => { await page.evaluate(() => document.querySelect
 await openMuscles();
 let names = await page.$$eval('#rkBoard .rk-who strong', l => l.map(x => x.textContent));
 step('Ve a quien sigue y muestra sus estadísticas', names.includes('Bruno Fit'), names.join(','));
-step('Sin ver el aviso de Comunidad no se publicó nada de Alicia', sql(`select count(*) from community_athlete_stats where user_id='${A}'`) === '0' && !names.includes('Vos'));
+// v61: públicas desde el inicio (pedido de la persona dueña): al iniciar sesión ya se publicaron, sin pasar por Comunidad.
+step('Sin pasar por Comunidad, las estadísticas de Alicia ya se publicaron (públicas por defecto)', sql(`select stats_public from community_athlete_stats where user_id='${A}'`) === 't');
 step('La casilla arranca activada (públicas por defecto)', await page.isChecked('#rkShareToggle'));
 await page.uncheck('#rkShareToggle'); await page.waitForTimeout(1500);
 step('Al desactivar, la preferencia queda oculta en la base', sql(`select stats_public from community_athlete_stats where user_id='${A}'`) === 'f');

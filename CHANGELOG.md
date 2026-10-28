@@ -1,5 +1,22 @@
 # FittForma AI — Registro de cambios
 
+## v61.0 — Comunidad: estadísticas públicas desde el inicio, una sola foto de perfil, versus por músculo y Legendario (28 de octubre de 2026)
+
+- **Estadísticas públicas desde el inicio:**
+  - Nivel, insignias, constancia, running y músculos se publican al iniciar sesión, sin tener que entrar antes a Comunidad.
+  - Cada persona las puede ocultar con «Ocultar mis estadísticas».
+  - Peso, altura, medidas y objetivos nunca se publican.
+- **Una sola foto de perfil:**
+  - Al elegir la foto en Perfil, la casilla «También en Comunidad» (marcada) la sube también a Comunidad.
+  - Si alguien tiene foto en Perfil pero no en Comunidad, Comunidad le ofrece «Usar mi foto» de un toque, o «Elegir otra».
+  - La foto nunca se sube sola: siempre la confirma la persona.
+- **Versus músculo por músculo:**
+  - La comparación muestra el mapa de músculos de las dos personas, uno al lado del otro.
+  - Muestra el rango de cada músculo y cuántos músculos van a favor de cada una.
+- **Legendario en Comunidad:** las insignias se compartían con un tope viejo de 12 niveles, que las cortaba en Diamante. Ahora llegan hasta Legendario (15).
+- **Pruebas:** dos pasos E2E que exigían «no publicar antes del aviso» se actualizaron a la nueva regla, que pidió la persona dueña.
+- Sin migraciones nuevas.
+
 ## v60.0 — Avisos según tu semana, sesión más cómoda y lista de lanzamiento web (28 de octubre de 2026)
 
 - **Avisos según Mi semana:**
