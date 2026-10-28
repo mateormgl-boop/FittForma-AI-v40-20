@@ -809,7 +809,23 @@
   ["bíceps", "biceps", "bíceps", "biceps", "bicipiti", "Bizeps"],
   ["tríceps", "triceps", "tríceps", "triceps", "tricipiti", "Trizeps"],
   ["gemelos", "calves", "panturrilhas", "mollets", "polpacci", "Waden"],
-  ["core", "core", "core", "gainage", "core", "Rumpf"]
+  ["core", "core", "core", "gainage", "core", "Rumpf"],
+  ["Lo que hiciste en el gym", "What you did at the gym", "O que você fez na academia", "Ce que tu as fait à la salle", "Cosa hai fatto in palestra", "Was du im Studio gemacht hast"],
+  ["Registrar uno", "Log one", "Registrar um", "En enregistrer un", "Registrane uno", "Eintragen"],
+  ["Repetir", "Repeat", "Repetir", "Refaire", "Ripeti", "Wiederholen"],
+  ["Personalizar inicio", "Customize home", "Personalizar início", "Personnaliser l’accueil", "Personalizza la home", "Startseite anpassen"],
+  ["Elegí qué tarjetas ver y en qué orden. Se guarda en este dispositivo y en tu copia en la nube.", "Choose which cards to show and in what order. Saved on this device and in your cloud backup.", "Escolha quais cartões ver e em que ordem. Fica salvo neste dispositivo e na sua cópia na nuvem.", "Choisis quelles cartes afficher et dans quel ordre. Enregistré sur cet appareil et dans ta sauvegarde cloud.", "Scegli quali schede vedere e in che ordine. Si salva su questo dispositivo e nel tuo backup nel cloud.", "Wähle, welche Karten du in welcher Reihenfolge siehst. Wird auf diesem Gerät und in deiner Cloud-Sicherung gespeichert."],
+  ["Restablecer", "Reset", "Restaurar", "Réinitialiser", "Ripristina", "Zurücksetzen"],
+  ["Inicio restablecido.", "Home reset.", "Início restaurado.", "Accueil réinitialisé.", "Home ripristinata.", "Startseite zurückgesetzt."],
+  ["Peso y objetivo", "Weight and goal", "Peso e objetivo", "Poids et objectif", "Peso e obiettivo", "Gewicht und Ziel"],
+  ["Accesos rápidos", "Shortcuts", "Atalhos", "Raccourcis", "Scorciatoie", "Schnellzugriffe"],
+  ["Frase del día", "Quote of the day", "Frase do dia", "Citation du jour", "Frase del giorno", "Spruch des Tages"],
+  ["Progreso semanal", "Weekly progress", "Progresso semanal", "Progrès de la semaine", "Progressi settimanali", "Wochenfortschritt"],
+  ["Entrenamiento de hoy", "Today’s workout", "Treino de hoje", "Entraînement du jour", "Allenamento di oggi", "Heutiges Training"],
+  ["Hoy: descanso", "Today: rest", "Hoje: descanso", "Aujourd’hui : repos", "Oggi: riposo", "Heute: Ruhetag"],
+  ["Ver mi semana", "See my week", "Ver minha semana", "Voir ma semaine", "Vedi la mia settimana", "Meine Woche ansehen"],
+  ["Recuperar también es entrenar", "Recovery is part of training", "Recuperar também é treinar", "Récupérer fait aussi partie de l’entraînement", "Recuperare è parte dell’allenamento", "Erholung gehört zum Training"],
+  ["Cuando registres un entrenamiento de fuerza vas a ver acá tus ejercicios y tus mejores series. Si ya entrenaste, tocá «Registrar uno».", "When you log a strength workout you’ll see your exercises and best sets here. If you already trained, tap “Log one”.", "Quando você registrar um treino de força, verá aqui seus exercícios e suas melhores séries. Se já treinou, toque em “Registrar um”.", "Quand tu enregistreras une séance de force, tu verras ici tes exercices et tes meilleures séries. Si tu t’es déjà entraîné, touche « En enregistrer un ».", "Quando registri un allenamento di forza vedrai qui i tuoi esercizi e le tue serie migliori. Se ti sei già allenato, tocca “Registrane uno”.", "Wenn du ein Krafttraining einträgst, siehst du hier deine Übungen und besten Sätze. Wenn du schon trainiert hast, tippe auf „Eintragen“."]
 );
 window.FittFormaI18nDynamic = [
   [/^Quedan (\d+) (día|días)$/, (m, i) => [`${m[1]} ${m[1] === '1' ? 'day' : 'days'} left`, `Faltam ${m[1]} ${m[1] === '1' ? 'dia' : 'dias'}`, `Plus que ${m[1]} ${m[1] === '1' ? 'jour' : 'jours'}`, `${m[1] === '1' ? 'Manca' : 'Mancano'} ${m[1]} ${m[1] === '1' ? 'giorno' : 'giorni'}`, `Noch ${m[1]} ${m[1] === '1' ? 'Tag' : 'Tage'}`][i]],
@@ -858,5 +874,12 @@ window.FittFormaI18nDynamic = [
   [/^Son (\d+) días, los que dijiste que podés entrenar\.$/, (m, i) => [`${m[1]} days, the ones you said you can train.`, `São ${m[1]} dias, os que você disse que pode treinar.`, `${m[1]} jours, ceux que tu as dit pouvoir t’entraîner.`, `Sono ${m[1]} giorni, quelli che hai detto di poterti allenare.`, `${m[1]} Tage, so viele, wie du trainieren kannst.`][i]],
   [/^Se parece a lo que venís haciendo \((.+)\)\.$/, (m, i, t) => { const x = m[1].split(', ').map(t).join(', '); return [`Similar to what you’ve been doing (${x}).`, `Parece com o que você vem fazendo (${x}).`, `Ressemble à ce que tu fais déjà (${x}).`, `Somiglia a quello che stai facendo (${x}).`, `Ähnlich wie das, was du bisher machst (${x}).`][i]; }],
   [/^Incluye (.+), que no entrenaste en las últimas 3 semanas\.$/, (m, i, t) => { const x = m[1].split(/, | y /).map(t).join(', '); return [`Includes ${x}, which you haven’t trained in the last 3 weeks.`, `Inclui ${x}, que você não treinou nas últimas 3 semanas.`, `Inclut ${x}, que tu n’as pas entraîné ces 3 dernières semaines.`, `Include ${x}, che non hai allenato nelle ultime 3 settimane.`, `Enthält ${x}, die du in den letzten 3 Wochen nicht trainiert hast.`][i]; }],
-  [/^Tu semana ahora sigue «(.+)»\. Podés cambiar cualquier día\.$/, (m, i, t) => [`Your week now follows “${t(m[1])}”. You can change any day.`, `Sua semana agora segue “${t(m[1])}”. Você pode mudar qualquer dia.`, `Ta semaine suit maintenant « ${t(m[1])} ». Tu peux changer n’importe quel jour.`, `La tua settimana ora segue “${t(m[1])}”. Puoi cambiare qualsiasi giorno.`, `Deine Woche folgt jetzt „${t(m[1])}“. Du kannst jeden Tag ändern.`][i]]
+  [/^Tu semana ahora sigue «(.+)»\. Podés cambiar cualquier día\.$/, (m, i, t) => [`Your week now follows “${t(m[1])}”. You can change any day.`, `Sua semana agora segue “${t(m[1])}”. Você pode mudar qualquer dia.`, `Ta semaine suit maintenant « ${t(m[1])} ». Tu peux changer n’importe quel jour.`, `La tua settimana ora segue “${t(m[1])}”. Puoi cambiare qualsiasi giorno.`, `Deine Woche folgt jetzt „${t(m[1])}“. Du kannst jeden Tag ändern.`][i]],
+[/^Hoy toca: (.+)$/, (m, i, t) => `${['Today', 'Hoje', 'Aujourd’hui', 'Oggi', 'Heute'][i]}: ${t(m[1])}`],
+  [/^Te recomendamos: (.+)$/, (m, i, t) => `${['We recommend', 'Recomendamos', 'On te recommande', 'Ti consigliamo', 'Empfehlung'][i]}: ${t(m[1])}`],
+  [/^y (\d+) más$/, (m, i) => [`and ${m[1]} more`, `e mais ${m[1]}`, `et ${m[1]} de plus`, `e altri ${m[1]}`, `und ${m[1]} weitere`][i]],
+  [/^(Subir|Bajar) (.+)$/, (m, i, t) => `${(m[1] === 'Subir' ? ['Move up', 'Subir', 'Monter', 'Sposta su', 'Nach oben'] : ['Move down', 'Descer', 'Descendre', 'Sposta giù', 'Nach unten'])[i]}: ${t(m[2])}`],
+  [/^Repetís «(.+)»\. Tus marcas anteriores aparecen como referencia\.$/, (m, i, t) => [`Repeating “${t(m[1])}”. Your previous marks show as a reference.`, `Repetindo “${t(m[1])}”. Suas marcas anteriores aparecem como referência.`, `Tu refais « ${t(m[1])} ». Tes marques précédentes s’affichent comme référence.`, `Ripeti “${t(m[1])}”. I tuoi risultati precedenti compaiono come riferimento.`, `Du wiederholst „${t(m[1])}“. Deine bisherigen Werte erscheinen als Referenz.`][i]],
+[/^(\d+) de (\d+)$/, (m) => `${m[1]} / ${m[2]}`],
+  [/^de (\d[\d.,]*) ml$/, (m, i) => `${['of', 'de', 'sur', 'di', 'von'][i]} ${m[1]} ml`]
 ].concat(window.FittFormaI18nDynamic || []);

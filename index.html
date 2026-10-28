@@ -1395,13 +1395,14 @@
       .app>main{grid-area:main;min-width:0}
       .app>.footer{grid-area:foot}
       .home-dash{max-width:none;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:var(--ff-s4);align-items:start}
-      .home-dash>*{grid-column:1}
-      .home-dash>.home-top,.home-dash>.home-goal,.home-dash>.home-week{grid-column:1/-1}
-      .home-dash>.home-hero{grid-column:1}
-      .home-dash>.home-badges{grid-column:2;grid-row:4;flex-wrap:wrap}
-      .home-dash>.home-badges .home-link{width:100%}
-      .home-dash>.home-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
-      .home-dash>.home-habits{grid-column:2;grid-row:5 / span 3}
+      .home-dash{grid-auto-flow:row dense}
+      .home-dash>*,.home-dash>.home-block>*{grid-column:1}
+      .home-dash>.home-top,.home-dash .home-goal,.home-dash .home-week,.home-dash>.home-customize-row{grid-column:1/-1}
+      .home-dash .home-hero{grid-column:1}
+      .home-dash .home-badges{grid-column:2;flex-wrap:wrap}
+      .home-dash .home-badges .home-link{width:100%}
+      .home-dash .home-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .home-dash .home-habits,.home-dash .home-gym{grid-column:2}
       .home-dash>.ad-slot{grid-column:1/-1}
     }
     @media(min-width:1200px){
@@ -1727,6 +1728,7 @@
       <div class="home-top-actions"><button class="home-bell" id="notifBell" type="button" aria-label="Notificaciones" aria-expanded="false" aria-controls="notifPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0"/></svg><span class="notif-count" id="notifCount" hidden></span></button><button class="home-avatar" type="button" data-shortcut-view="profile" aria-label="Abrir mi perfil" data-avatar><span id="homeInitial">F</span></button></div>
     </div>
     <div class="notif-panel" id="notifPanel" role="region" aria-label="Notificaciones" hidden><div class="notif-head"><strong>Notificaciones</strong><button type="button" class="link-btn" id="notifReadAll">Marcar todo como leído</button></div><ul class="notif-list"></ul></div>
+    <div class="home-block" data-home-block="week">
     <div class="home-week" id="homeWeek" aria-label="Tu semana"></div>
     <section class="home-card home-goal" aria-label="Progreso semanal">
       <div class="home-ring" aria-hidden="true"><svg viewBox="0 0 100 100"><defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5cff"/><stop offset="1" stop-color="#1aa7ff"/></linearGradient></defs><circle class="bg" cx="50" cy="50" r="40"/><circle id="homeWeekArc" class="fg" cx="50" cy="50" r="40" stroke="url(#ringGrad)" stroke-dasharray="251.2" stroke-dashoffset="251.2"/></svg><b id="homeWeekPct">0%</b></div>
@@ -1738,19 +1740,26 @@
       </div>
       <div class="home-week-stats" id="homeWeekStats"></div>
     </section>
-    <button type="button" class="home-card home-body-goal" id="homeBodyGoal" aria-label="Objetivo y actualidad: abrir en Perfil"></button>
+    </div>
+    <div class="home-block" data-home-block="body"><button type="button" class="home-card home-body-goal" id="homeBodyGoal" aria-label="Objetivo y actualidad: abrir en Perfil"></button></div>
+    <div class="home-block" data-home-block="today">
     <section class="home-hero" aria-labelledby="homeTodayTitle">
       <small>Entrenamiento de hoy</small>
       <h2 id="homeTodayTitle">Armá tu primera rutina</h2>
       <div class="home-meta" id="homeTodayMeta"></div>
       <button class="home-cta" id="homeStartBtn" type="button" data-home-action="view:routines">Crear mi rutina</button>
     </section>
+    </div>
+    <div class="home-block" data-home-block="gym"><section class="home-card home-gym" aria-labelledby="homeGymTitle"><div class="home-card-head"><h3 id="homeGymTitle">Lo que hiciste en el gym</h3><button class="link-btn" type="button" data-home-gym-log>Registrar uno</button></div><div id="homeGym"></div></section></div>
+    <div class="home-block" data-home-block="badges">
     <section class="home-card home-badges" aria-labelledby="homeBadgeTitle">
       <div class="home-badge-medal" id="homeBadgeMedal" aria-hidden="true"></div>
       <div class="home-badge-copy"><small class="home-kicker">Próxima insignia</small><strong id="homeBadgeTitle">Tu primera insignia te espera</strong><p id="homeBadgeText">Registrá tu mejor serie para empezar.</p><div class="home-badge-bar" id="homeBadgeBar" role="progressbar" aria-label="Avance hacia el próximo nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden><i></i></div></div>
       <button class="home-link" id="homeBadgeBtn" type="button" data-show-badges>Ver desafíos</button>
     </section>
+    </div>
     <p class="home-empty" id="homeEmpty" hidden>Cuando registres entrenamientos, comidas o agua, acá vas a ver tu avance real.</p>
+    <div class="home-block" data-home-block="tiles">
     <div class="home-tiles" aria-label="Accesos rápidos">
       <button class="home-tile t-blue" type="button" data-home-quick="train"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg><b>Entrenar</b><span>Sesión, rutinas y libre</span></button>
       <button class="home-tile t-green" type="button" data-home-quick="meal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M17 21V3c-2 1-3 4-3 8h3"/></svg><b>Registrar comida</b><span>Foto, código o manual</span></button>
@@ -1760,25 +1769,36 @@
       <button class="home-tile t-amber" type="button" data-shortcut-view="coach" aria-label="Consultar a la IA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><b>FittAI</b><span>Preguntá o pedí un plan</span></button>
       <button class="home-tile t-violet" type="button" data-home-muscles aria-label="Ver mis músculos (Mapa de avances)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 14c-2-1-3-3-2.5-5.5C5.2 6 7.5 5 9 6.5l1 1.5M17 14c2-1 3-3 2.5-5.5C18.8 6 16.5 5 15 6.5L14 8"/><path d="M9 6.5c0-2 1.3-3.5 3-3.5s3 1.5 3 3.5M8 20c0-3 1.8-5 4-5s4 2 4 5M10 11h4"/></svg><b>Músculos</b><span>Tu rango por músculo</span></button>
     </div>
-    <section class="home-quote" aria-label="Frase del día"><p>“Disciplina hoy,<br>resultados mañana.”</p></section>
+    </div>
+    <div class="home-block" data-home-block="quote"><section class="home-quote" aria-label="Frase del día"><p>“Disciplina hoy,<br>resultados mañana.”</p></section></div>
+    <div class="home-block" data-home-block="summary">
     <h2 class="home-h">Resumen de hoy</h2>
     <section class="home-card home-summary">
       <div class="home-sum"><div class="home-ring sm" aria-hidden="true"><svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="40"/><circle id="homeKcalArc" class="fg" cx="50" cy="50" r="40" stroke="#1aa7ff" stroke-dasharray="251.2" stroke-dashoffset="251.2"/></svg><b id="homeKcalVal">0</b></div><p id="homeKcalLbl">&nbsp;</p></div><div class="home-sum"><div class="home-ring sm" aria-hidden="true"><svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="40"/><circle id="homeProtArc" class="fg" cx="50" cy="50" r="40" stroke="#f2a33a" stroke-dasharray="251.2" stroke-dashoffset="251.2"/></svg><b id="homeProtVal">0</b></div><p id="homeProtLbl">&nbsp;</p></div><div class="home-sum"><div class="home-ring sm" aria-hidden="true"><svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="40"/><circle id="homeWaterArc" class="fg" cx="50" cy="50" r="40" stroke="#18c28f" stroke-dasharray="251.2" stroke-dashoffset="251.2"/></svg><b id="homeWaterVal">0</b></div><p id="homeWaterLbl">&nbsp;</p></div>
     </section>
+    </div>
+    <div class="home-block" data-home-block="habits">
     <section class="home-card home-habits" aria-labelledby="homeHabitsTitle">
       <div class="home-card-head"><h3 id="homeHabitsTitle">Hábitos de hoy</h3><span id="homeHabitsCount">0 de 5</span></div>
       <div id="homeHabits" class="home-habit-list"></div>
     </section>
+    </div>
+    <div class="home-block" data-home-block="recent">
     <section class="home-card home-recent" aria-labelledby="homeRecentTitle">
       <div class="home-card-head"><h3 id="homeRecentTitle">Actividad reciente</h3><button class="link-btn" id="homeRecentAll" type="button">Ver todo</button></div>
       <ul class="home-recent-list" id="homeRecent"></ul>
     </section>
+    </div>
+    <div class="home-block" data-home-block="stats">
     <h2 class="home-h">Tu constancia</h2>
   <section class="stats">
     <div class="stat"><strong id="statSessions">0</strong><small>Actividades registradas</small></div>
     <div class="stat"><strong id="statMinutes">0</strong><small>Minutos entrenados</small></div>
     <div class="stat"><strong id="statStreak">0</strong><small>Días activos seguidos</small></div>
   </section>
+    </div>
+    <div class="home-customize-row"><button type="button" class="btn ghost btn-sm" id="homeCustomize">Personalizar inicio</button></div>
+    <dialog class="home-layout-dialog" id="homeLayoutDialog" aria-labelledby="homeLayoutTitle"><form method="dialog" class="home-layout-form"><h3 id="homeLayoutTitle">Personalizar inicio</h3><p class="muted small">Elegí qué tarjetas ver y en qué orden. Se guarda en este dispositivo y en tu copia en la nube.</p><ol class="home-layout-list" id="homeLayoutList"></ol><div class="btn-row"><button type="button" class="btn ghost btn-sm" id="homeLayoutReset">Restablecer</button><button type="submit" class="btn" value="ok">Listo</button></div></form></dialog>
   <aside class="ad-slot" id="adSlotHome" aria-label="Publicidad"><span class="ad-slot-label">Publicidad</span><div class="ad-slot-content" id="adContentHome"></div></aside>
   </div>
 </section>
@@ -5710,6 +5730,55 @@ function findCatalogExercise(name){
   }
 
   // v40.21: panel de Inicio. Solo muestra datos guardados en este dispositivo; sin datos, ceros y un aviso de ayuda.
+  // ---------- v58: Inicio personalizable, «Hoy toca» y lo que hiciste en el gym ----------
+  const HOME_BLOCKS=[['today','Entrenamiento de hoy'],['gym','Lo que hiciste en el gym'],['week','Progreso semanal'],['summary','Resumen de hoy'],['tiles','Accesos rápidos'],['badges','Próxima insignia'],['body','Peso y objetivo'],['habits','Hábitos de hoy'],['recent','Actividad reciente'],['quote','Frase del día'],['stats','Tu constancia']];
+  const HOME_DEFAULT_ORDER=['week','today','gym','summary','tiles','badges','body','habits','recent','quote','stats'];
+  function homeLayout(){
+    const l=isPlainObj(state.homeLayout)?state.homeLayout:{},known=HOME_BLOCKS.map(b=>b[0]);
+    const order=[...new Set((Array.isArray(l.order)?l.order:[]).filter(k=>known.includes(k)))];for(const k of HOME_DEFAULT_ORDER)if(!order.includes(k))order.push(k);
+    return {order,hidden:(Array.isArray(l.hidden)?l.hidden:[]).filter(k=>known.includes(k))};
+  }
+  function applyHomeLayout(){
+    const dash=document.querySelector('#view-plan .home-dash');if(!dash)return;const {order,hidden}=homeLayout(),anchor=dash.querySelector('.home-customize-row');
+    for(const k of order){const el=dash.querySelector(`.home-block[data-home-block="${k}"]`);if(!el)continue;el.hidden=hidden.includes(k);if(anchor)dash.insertBefore(el,anchor);}
+  }
+  function renderHomeLayoutEditor(){
+    const list=$('homeLayoutList');if(!list)return;const {order,hidden}=homeLayout(),name=Object.fromEntries(HOME_BLOCKS);
+    list.innerHTML=order.map((k,i)=>`<li class="${hidden.includes(k)?'is-hidden':''}"><label><input type="checkbox" data-layout-show="${k}"${hidden.includes(k)?'':' checked'}><span>${esc(name[k])}</span></label><span class="home-layout-move"><button type="button" class="icon-btn" data-layout-move="${k}:-1" aria-label="Subir ${esc(name[k])}"${i?'':' disabled'}>↑</button><button type="button" class="icon-btn" data-layout-move="${k}:1" aria-label="Bajar ${esc(name[k])}"${i===order.length-1?' disabled':''}>↓</button></span></li>`).join('');
+  }
+  function saveHomeLayout(order,hidden){state.homeLayout={order,hidden};save();applyHomeLayout();renderHomeLayoutEditor();}
+  function initHomeLayout(){
+    const dlg=$('homeLayoutDialog');if(!dlg)return;
+    $('homeCustomize')?.addEventListener('click',()=>{renderHomeLayoutEditor();dlg.showModal?dlg.showModal():dlg.setAttribute('open','');});
+    $('homeLayoutReset')?.addEventListener('click',()=>{saveHomeLayout(HOME_DEFAULT_ORDER.slice(),[]);toast('Inicio restablecido.');});
+    $('homeLayoutList')?.addEventListener('change',e=>{const k=e.target.dataset.layoutShow;if(!k)return;const {order,hidden}=homeLayout();const h=new Set(hidden);if(e.target.checked)h.delete(k);else h.add(k);saveHomeLayout(order,[...h]);});
+    $('homeLayoutList')?.addEventListener('click',e=>{const b=e.target.closest('[data-layout-move]');if(!b)return;const [k,dir]=b.dataset.layoutMove.split(':'),{order,hidden}=homeLayout(),i=order.indexOf(k),j=i+Number(dir);if(j<0||j>=order.length)return;[order[i],order[j]]=[order[j],order[i]];saveHomeLayout(order,hidden);$('homeLayoutList').querySelector(`[data-layout-move="${k}:${dir}"]`)?.focus();});
+    document.addEventListener('click',e=>{if(e.target.closest('[data-home-gym-log]')){switchView('train');setTimeout(()=>{openManualLog();$('manualLogHost')?.scrollIntoView({behavior:'smooth',block:'start'});},60);}const r=e.target.closest('[data-home-repeat]');if(r)repeatSession(r.dataset.homeRepeat);});
+    applyHomeLayout();
+  }
+  // «Hoy toca» en Inicio cuando no hay un plan generado: sale de Mi semana o, si no la armaste, de lo que entrenaste.
+  function homeWeekToday(){
+    const T=FittFormaTraining;if(!T.recommendToday)return null;const rec=todayRecommendation(),day=rec.day,lbl=weekDayLabel(day);
+    if(rec.source==='week'&&day.kind==='rest')return {title:'Hoy: descanso',meta:['Mi semana','Recuperar también es entrenar'],cta:'Ver mi semana',action:'view:train'};
+    if(rec.source==='week')return {title:'Hoy toca: '+lbl,meta:['Mi semana',T.WEEKDAYS[rec.weekday-1]],cta:'Ver la sesión',action:'week:today'};
+    if(rec.source==='history')return {title:'Te recomendamos: '+lbl,meta:[rec.reason].filter(Boolean),cta:'Ver la sesión',action:'week:today'};
+    return null;
+  }
+  function gymSessions(){return (state.sessions||[]).filter(x=>x&&x.status!=='cancelled'&&Array.isArray(x.exercises)&&x.exercises.some(e=>(e.kind||'strength')==='strength'&&(e.entries||[]).some(y=>y&&y.done))).sort((a,b)=>String(b.date).localeCompare(String(a.date))||(Number(b.id)||0)-(Number(a.id)||0));}
+  function bestSetText(ex){
+    const sets=(ex.entries||[]).filter(y=>y&&y.done).map(y=>({w:Number(String(y.weight||'').replace(',','.'))||0,r:Number(y.reps)||0})).filter(y=>y.r>0);if(!sets.length)return '';
+    const b=sets.sort((a,c)=>c.w-a.w||c.r-a.r)[0];return b.w>0?`${String(b.w).replace('.',',')} kg × ${b.r}`:`${b.r} reps`;
+  }
+  function renderHomeGym(){
+    const host=$('homeGym');if(!host)return;const list=gymSessions().slice(0,3);
+    if(!list.length){host.innerHTML='<p class="muted small">Cuando registres un entrenamiento de fuerza vas a ver acá tus ejercicios y tus mejores series. Si ya entrenaste, tocá «Registrar uno».</p>';return;}
+    host.innerHTML=list.map(x=>{const ex=x.exercises.filter(e=>(e.entries||[]).some(y=>y&&y.done));return `<article class="home-gym-item"><div class="home-gym-head"><div><strong>${esc(x.title||'Entrenamiento')}</strong><small>${esc(prettyDate(x.date))}${Number(x.minutes)>0?' · '+esc(String(x.minutes))+' min':''} · ${ex.length} ${ex.length===1?'ejercicio':'ejercicios'}</small></div><button type="button" class="btn secondary btn-sm" data-home-repeat="${esc(String(x.id))}">Repetir</button></div><ul>${ex.slice(0,4).map(e=>`<li><span>${esc(e.name)}</span><b>${esc(bestSetText(e))}</b></li>`).join('')}${ex.length>4?`<li class="muted small">y ${ex.length-4} más</li>`:''}</ul></article>`;}).join('');
+  }
+  function repeatSession(id){
+    const x=(state.sessions||[]).find(s=>String(s.id)===String(id));if(!x)return;
+    const ex=x.exercises.filter(e=>(e.entries||[]).some(y=>y&&y.done)).map(e=>{const done=(e.entries||[]).filter(y=>y&&y.done),lib=FittFormaTraining.libraryEntry(e.name);return {name:e.name,group:e.group||lib?.group||'',kind:e.kind||'strength',sets:Math.max(1,done.length),reps:String(e.targetReps||done[0]?.reps||'10'),rest:Number(e.rest)||90};});
+    if(ex.length&&beginSession({type:'custom',title:x.title||'Entrenamiento'},ex))toast(`Repetís «${x.title||'Entrenamiento'}». Tus marcas anteriores aparecen como referencia.`);
+  }
   function renderHome(){
     renderHomeBodyGoal();
     const set=(id,value)=>{const el=$(id);if(el)el.textContent=value;};
@@ -5762,10 +5831,11 @@ function findCatalogExercise(name){
     else if(todays.length&&outdoor(todays[0])){title=todays[0].title||todays[0].type;meta=[todays[0].type,'Planificado para hoy'];cta='Ir a '+(todays[0].type==='Correr'?'correr':todays[0].type==='Caminar'?'caminar':'pedalear');action='view:running';}
     else if(todays.length&&nextDay){title=todays[0].title||nextDay.title;meta=[todays[0].type,nextDay.title+' · '+nextDay.exercises.length+' ejercicios'];cta='Empezar entrenamiento';action='start:'+nextIndex;}
     else if(todays.length){title=todays[0].title||todays[0].type;meta=[todays[0].type,'Planificado para hoy'];cta='Crear mi rutina';action='view:routines';}
+    else if(!nextDay&&!restDay&&homeWeekToday()){const w=homeWeekToday();title=w.title;meta=w.meta;cta=w.cta;action=w.action;}
     else if(restDay){title='Hoy toca descansar';meta=['Descanso planificado'];cta=nextDay?'Entrenar igual':'Ver rutinas';action=nextDay?'start:'+nextIndex:'view:routines';}
     else if(nextDay){title='Siguiente: '+nextDay.title;meta=[nextDay.exercises.length+' ejercicios',(profile.duration||'')+' min',equipment].filter(Boolean);cta='Empezar entrenamiento';action='start:'+nextIndex;}
     else{title='Armá tu primera rutina';meta=['Elegí tu objetivo, nivel y equipamiento'];cta='Crear mi rutina';action='view:routines';}
-    set('homeTodayTitle',title);
+    set('homeTodayTitle',title);renderHomeGym();applyHomeLayout();
     const metaBox=$('homeTodayMeta');if(metaBox){metaBox.innerHTML='';meta.forEach(text=>{const span=document.createElement('span');span.textContent=text;metaBox.appendChild(span);});}
     const start=$('homeStartBtn');if(start){start.textContent=cta;start.dataset.homeAction=action;}
     // Resumen de hoy
@@ -6139,7 +6209,7 @@ function findCatalogExercise(name){
   document.querySelectorAll('[data-shortcut-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.shortcutView)));
   $('homeBodyGoal')?.addEventListener('click',()=>{switchView('profile');setTimeout(()=>$('bodyProfileCard')?.scrollIntoView({behavior:'smooth',block:'start'}),60);});
   document.querySelectorAll('[data-subview]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.subview)));
-  $('homeStartBtn').addEventListener('click',()=>{const parts=String($('homeStartBtn').dataset.homeAction||'view:train').split(':');if(parts[0]==='start'){const index=Number(parts[1]);if(Number.isInteger(index)&&state.plan&&state.plan.days&&state.plan.days[index])startWorkout(index);else switchView('routines');}else switchView(parts[1]||'train');});
+  $('homeStartBtn').addEventListener('click',()=>{const parts=String($('homeStartBtn').dataset.homeAction||'view:train').split(':');if(parts[0]==='week'){switchView('train');setTimeout(()=>startWeekDay(todayRecommendation().day),60);return;}if(parts[0]==='start'){const index=Number(parts[1]);if(Number.isInteger(index)&&state.plan&&state.plan.days&&state.plan.days[index])startWorkout(index);else switchView('routines');}else switchView(parts[1]||'train');});
   $('homeHabits').addEventListener('click',event=>{const button=event.target.closest('[data-home-habit]');if(!button)return;const habitKey=button.dataset.homeHabit;if(!dailyHabitDefinitions.some(item=>item.key===habitKey))return;if(!state.habitLogs||typeof state.habitLogs!=='object'||Array.isArray(state.habitLogs))state.habitLogs={};const day=dateKey(),log=state.habitLogs[day]&&typeof state.habitLogs[day]==='object'?state.habitLogs[day]:{};log[habitKey]=!log[habitKey];state.habitLogs[day]=log;save();renderHabitTracker();renderHome();});
   document.querySelectorAll('[data-run-plan]').forEach(b=>b.addEventListener('click',()=>{if(!runningPlans[b.dataset.runPlan])return;state.runningPlan=b.dataset.runPlan;save();renderRunningPlan();}));
   $('plannedActivityForm').addEventListener('submit',e=>{e.preventDefault();const date=$('scheduleDate').value,type=$('scheduleType').value,title=$('scheduleTitle').value.trim();if(!date){toast('Elegí una fecha para planificar.');return;}if(date<dateKey()){toast('Elegí hoy o una fecha futura.');return;}state.plannedActivities=state.plannedActivities||[];state.plannedActivities.push({id:Date.now(),date,type,title:title||type});state.plannedActivities.sort((a,b)=>a.date.localeCompare(b.date));save();$('scheduleTitle').value='';renderPlanner();toast('Actividad agregada al calendario.');});
@@ -6485,7 +6555,7 @@ function findCatalogExercise(name){
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncServerTime().then(()=>{if(!activeSession)renderTrain();});});
   $('badgeCelebrationClose')?.addEventListener('click',()=>$('badgeCelebration').close());
   $('badgeCelebrationView')?.addEventListener('click',()=>{$('badgeCelebration').close();switchView('progress');showProgressTab('badges');});
-  {const p=state.profile||{},d=$('bodyEditDetails');if(d&&Number(p.currentWeightKg)>0&&Number(p.heightCm)>0&&Number(p.age)>0)d.open=false;}initBadgeCenter();initProgressTabs();if(MR&&!isPlainObj(state.muscleRanksSeen)){const r=muscleRanksNow();state.muscleRanksSeen=Object.fromEntries(r.muscles.map(m=>[m.id,m.rank]));}document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});$('coachMessages')?.addEventListener('click',e=>{const b=e.target.closest('[data-ai-go]');if(b)fittaiGo(b.dataset.aiGo);});initViewTabs();initRoutines();initBodyTracking();initNotifications();initTheme();$('homeRecentAll')?.addEventListener('click',()=>{switchView('progress');showProgressTab('history');});initAvatar();initQuickAdd();initWelcome();initMealPlanning();$('deleteCloudAccount')?.addEventListener('click',deleteCloudAccount);initSessionHistoryEditing();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
+  {const p=state.profile||{},d=$('bodyEditDetails');if(d&&Number(p.currentWeightKg)>0&&Number(p.heightCm)>0&&Number(p.age)>0)d.open=false;}initBadgeCenter();initProgressTabs();if(MR&&!isPlainObj(state.muscleRanksSeen)){const r=muscleRanksNow();state.muscleRanksSeen=Object.fromEntries(r.muscles.map(m=>[m.id,m.rank]));}document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});$('coachMessages')?.addEventListener('click',e=>{const b=e.target.closest('[data-ai-go]');if(b)fittaiGo(b.dataset.aiGo);});initViewTabs();initRoutines();initBodyTracking();initNotifications();initTheme();$('homeRecentAll')?.addEventListener('click',()=>{switchView('progress');showProgressTab('history');});initAvatar();initQuickAdd();initWelcome();initMealPlanning();initHomeLayout();$('deleteCloudAccount')?.addEventListener('click',deleteCloudAccount);initSessionHistoryEditing();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
   setTimeout(()=>checkWorkoutReminders(),1200);setInterval(()=>{if(document.visibilityState==='visible')checkWorkoutReminders();},30000);window.addEventListener('focus',()=>{renderReminderSettings();checkWorkoutReminders();});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){renderReminderSettings();checkWorkoutReminders();}});
   document.addEventListener('visibilitychange',()=>{if(!activeSession)return;if(document.visibilityState==='hidden'&&!activeSession.pausedAt){activeSession.elapsedMs=activeSessionElapsedMs(activeSession);activeSession.segmentStartedAt=Date.now();activeSession.pausedAt=Date.now();activeSession.pauseReason='background';persistActiveSessionDraft();}else if(document.visibilityState==='visible'&&activeSession.pausedAt&&activeSession.pauseReason==='background'){activeSession.pausedAt=0;activeSession.pauseReason='';activeSession.segmentStartedAt=Date.now();persistActiveSessionDraft();updateWorkoutClock();}});
   window.addEventListener('pagehide',()=>{if(activeSession)persistActiveSessionDraft();});

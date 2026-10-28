@@ -1533,3 +1533,29 @@ html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 .wp-program-days small{font-weight:800;opacity:.65}
 .wp-program-days span{font-weight:700}
 .wp-reasons{margin:0 0 10px;padding-left:18px;font-size:.84rem;display:flex;flex-direction:column;gap:3px}
+
+/* v58: Inicio personalizable y «Lo que hiciste en el gym» */
+.home-block{display:contents}
+.home-block[hidden]{display:none!important}
+.home-gym-item{padding:10px 0;border-top:1px solid var(--ff-border)}
+.home-gym-item:first-child{border-top:0;padding-top:2px}
+.home-gym-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.home-gym-head>div{display:flex;flex-direction:column;min-width:0}
+.home-gym-head small{opacity:.7;font-size:.78rem}
+.home-gym-item ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.home-gym-item li{display:flex;justify-content:space-between;gap:10px;font-size:.86rem}
+.home-gym-item li span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.home-gym-item li b{flex:none;font-variant-numeric:tabular-nums}
+.home-customize-row{display:flex;justify-content:center;margin:6px 0 4px}
+.home-layout-dialog{max-width:420px;width:calc(100% - 32px);border:0;border-radius:20px;padding:0;background:var(--ff-panel);color:var(--text)}
+.home-layout-dialog::backdrop{background:rgba(4,8,20,.55)}
+.home-layout-form{padding:18px;display:flex;flex-direction:column;gap:10px}
+.home-layout-form h3{margin:0}
+.home-layout-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow:auto}
+.home-layout-list li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:12px;background:var(--ff-panel-2);border:1px solid var(--ff-border)}
+.home-layout-list li.is-hidden span{opacity:.5}
+.home-layout-list label{display:flex;align-items:center;gap:10px;min-width:0;cursor:pointer;font-weight:600}
+.home-layout-list input{width:18px;height:18px;flex:none}
+.home-layout-move{display:flex;gap:4px;flex:none}
+.home-layout-move .icon-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--ff-border);background:var(--ff-panel);color:var(--text);font-weight:800;cursor:pointer}
+.home-layout-move .icon-btn:disabled{opacity:.3;cursor:default}
