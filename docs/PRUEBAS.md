@@ -12,7 +12,7 @@ migración. No se conecta a Supabase, Gemini ni Render.
 ### v63
 
 - `tests/v63.test.mjs` (6 pruebas): una sola pantalla de cuenta abierta desde toda la app; sin formularios escondidos ni textos técnicos; errores claros, recuperar contraseña, reenviar y Google solo si está activado; aviso al entrar; ayudas del celular; traducciones.
-- E2E `v63` (40 pasos):
+- E2E `v63` (36 pasos):
   - bienvenida con las tres opciones;
   - crear cuenta con sesión al instante y luego «Contanos un poco»;
   - validaciones antes de enviar; ojo de la contraseña;
