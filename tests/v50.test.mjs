@@ -9,7 +9,7 @@ const gifs = load('exercise-gifs.js').window.FittFormaExerciseGifs;
 const trainingCtx = load('training-core.js');
 const T = trainingCtx.FittFormaTraining || trainingCtx.window.FittFormaTraining;
 
-test('cada ejercicio de la biblioteca tiene su propia animación GIF', () => {
+test('cada ejercicio de la biblioteca tiene su propia animación (WebP animado desde v57)', () => {
   const names = new Set(Object.values(T.LIBRARY).flat().map(e => e.name));
   for (const n of names) assert.ok(gifs[n], `falta animación: ${n}`);
   const files = Object.values(gifs).map(g => g.file);
@@ -17,8 +17,10 @@ test('cada ejercicio de la biblioteca tiene su propia animación GIF', () => {
   for (const f of files) {
     const path = 'assets/exercises/' + f;
     assert.ok(existsSync(path), path);
-    const head = readFileSync(path).subarray(0, 6).toString('latin1');
-    assert.equal(head, 'GIF89a', `${path} es un GIF`);
+    // v57: las animaciones pasaron de GIF a WebP animado (mismo contenido, unas 4 veces menos peso).
+    const buf = readFileSync(path), head = buf.subarray(0, 4).toString('latin1') + buf.subarray(8, 12).toString('latin1');
+    assert.equal(head, 'RIFFWEBP', `${path} es un WebP`);
+    assert.ok(buf.subarray(12, 64).toString('latin1').includes('ANIM'), `${path} está animado`);
   }
 });
 

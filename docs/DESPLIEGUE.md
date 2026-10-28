@@ -7,7 +7,7 @@ hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 - **No hay migraciones nuevas.**
 - **Archivos nuevos:**
-  - 31 animaciones en `assets/exercises/gif/`.
+  - 31 animaciones en `assets/exercises/gif/` (desde v57, todas en `assets/exercises/anim/` como WebP animado).
   - 62 fotos en `assets/exercises/lib/`.
 - **Archivos que se actualizan:** `exercise-gifs.js`, `exercise-media.js`, `exercise-guides.js` y `training-core.js`.
 - El service worker cambia a `fittforma-ai-static-v56-0`, así que los teléfonos descargan la versión nueva al abrir la app.
