@@ -1,5 +1,46 @@
 # FittForma AI — Registro de cambios
 
+## v58.0 — Mi semana, rutinas listas, Inicio personalizable, qué comer según tu objetivo e insignias nuevas (28 de octubre de 2026)
+
+- **Mi semana (Entrenar):**
+  - De lunes a domingo elegís qué trabajar cada día: una combinación (pecho y tríceps, espalda y bíceps, piernas, hombros y core, torso, glúteos…), grupos elegidos a mano, una de tus rutinas o descanso.
+  - «Hoy toca» sigue tu semana y «Ver la sesión» la arma con tu equipamiento, nivel y objetivo.
+  - Si no armaste la semana, recomienda qué entrenar hoy según lo que hace más tiempo que no entrenás (por ejemplo, «Hace 5 días que no entrenás piernas»).
+- **Rutinas listas (11):**
+  - Cuerpo completo 2 y 3 días.
+  - En casa.
+  - Músculos opuestos.
+  - Empuje · Tracción · Piernas de 3 y 6 días.
+  - Fuerza básica.
+  - Torso · Tren inferior.
+  - Pares clásicos de 4 y 5 días.
+  - Glúteos y piernas.
+
+  Con «Usar esta» se completa tu semana, y después podés cambiar cualquier día.
+- **Recomendada para vos:**
+  - Sale de tu objetivo, nivel, equipamiento y días por semana, y de lo que entrenaste las últimas semanas: las combinaciones que ya usás y los grupos que quedaron sin entrenar.
+  - Siempre dice por qué la recomienda.
+- **Inicio personalizable:**
+  - Con «Personalizar inicio» elegís qué tarjetas ver y en qué orden; se guarda también en tu copia en la nube.
+  - Tarjeta nueva «Lo que hiciste en el gym»: tus últimos entrenamientos de fuerza con cada ejercicio y su mejor serie, «Repetir» para volver a hacer la misma sesión y «Registrar uno».
+  - «Entrenamiento de hoy» muestra lo que toca según Mi semana.
+- **Nutrición:**
+  - «Menú de ejemplo según tu objetivo» (pestaña Plan):
+    - desayuno, almuerzo, merienda y cena armados con la base de alimentos;
+    - las cantidades se ajustan a tus calorías y proteína, con topes para que las porciones sean razonables;
+    - varias opciones por comida («Otra opción») y «Agregar a hoy».
+    - Si con porciones razonables no llega a tus calorías, lo dice en vez de forzar.
+  - «Completá tu día» (pestaña Hoy): cuánto te falta y 3 opciones concretas que entran en lo que te queda; prioriza proteína si falta. Si ya llegaste a tus calorías, no sugiere comer más.
+  - Los alimentos y las comidas sugeridas se muestran traducidos.
+- **Insignias rediseñadas como la imagen de referencia:**
+  - Medalla hexagonal de metal con bisel, cara con brillo y figura grande del ejercicio.
+  - Las 36 figuras del centro se redibujaron como siluetas rellenas y con volumen, por ejemplo el brazo flexionado de bíceps, la persona colgada en dominadas o los abdominales marcados.
+  - Bronce cobre, Plata acero, Oro, Diamante azul brillante con destellos y Legendario negro con corona.
+  - Galería «Sistema de insignias»: leyenda de rangos y una tarjeta por ejercicio con su fila de rangos encendidos.
+  - No cambia ningún nivel ni umbral.
+  - Corregido: la ficha de una insignia decía «/12»; ahora cuenta sobre los 15 niveles.
+- **Sin migraciones nuevas.** Pruebas en `tests/v58.test.mjs` y `tests/e2e/v58.e2e.mjs`.
+
 ## v57.0 — Nutrición con cantidades, insignias Legendario, Músculos desde Bronce y ficha más clara (28 de octubre de 2026)
 
 - **Nutrición: escribís lo que comiste con la cantidad y la app lo lee.**

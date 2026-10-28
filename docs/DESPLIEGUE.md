@@ -1,7 +1,14 @@
-# Despliegue de FittForma AI v57.0
+# Despliegue de FittForma AI v58.0
 
-Esta guía es la lista de pasos para publicar v57.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v58.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
+
+## Qué cambia en v58.0
+
+- **No hay migraciones nuevas.** Mi semana, el diseño de Inicio y las sugerencias de comida se guardan en los datos de la persona (`weekPlan` y `homeLayout`), que ya viajan en la copia en la nube.
+- **Archivos que se actualizan:** `training-core.js` (semana, rutinas listas y recomendaciones), `nutrition-guides.js` (menú según el objetivo y «Completá tu día»), `achievements.js` (dibujo de las insignias), `index.html`, `design.css` e `i18n-v53.js`.
+- El service worker cambia a `fittforma-ai-static-v58-0`.
+- Si todavía no se aplicó, sigue pendiente la migración de v57 `2026-10-30_v57_legend_badges.sql`, para publicar logros Legendario en Comunidad.
 
 ## Qué cambia en v57.0
 

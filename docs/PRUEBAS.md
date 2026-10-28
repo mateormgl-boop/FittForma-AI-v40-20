@@ -9,6 +9,25 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v58
+
+- `tests/v58.test.mjs` (9 pruebas):
+  - Semana de lunes a domingo; cada rutina lista arma una semana válida con ejercicios.
+  - «Qué toca hoy» primero sigue tu semana y, si no la armaste, lo que hace más que no entrenás.
+  - Las series sin completar no cuentan.
+  - La rutina recomendada respeta objetivo, nivel, equipamiento y días, y explica por qué.
+  - Inicio: todas las tarjetas son bloques ordenables.
+  - Menú según el objetivo: 5 objetivos × 3 opciones dentro de ±16 % de las calorías y con la proteína, y porciones de 5 a 450 g.
+  - «Completá tu día» no sugiere comer más si ya llegaste.
+  - Insignias: contorno propio por rango, degradados metálicos, destellos en Diamante y corona en Legendario.
+  - Textos traducidos.
+- `tests/e2e/v58.e2e.mjs` (30 pasos, solo la app):
+  - Recomendación sin semana; rutina recomendada con motivos; «Usar esta»; cambiar un día; grupos a mano; «Ver la sesión».
+  - Inicio con «Hoy toca»; «Lo que hiciste en el gym» con «60 kg × 8»; «Repetir»; personalizar y recargar.
+  - «Completá tu día» y agregar; menú con «Otra opción» y «Agregar a hoy».
+  - Galería «Sistema de insignias» y ficha con 15/15.
+  - Inglés, 320 px y sin errores de JavaScript.
+
 ### v57
 
 - `tests/v57.test.mjs`:

@@ -1395,14 +1395,16 @@
       .app>main{grid-area:main;min-width:0}
       .app>.footer{grid-area:foot}
       .home-dash{max-width:none;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:var(--ff-s4);align-items:start}
-      .home-dash>*{grid-column:1}
-      .home-dash>.home-top,.home-dash>.home-goal,.home-dash>.home-week{grid-column:1/-1}
-      .home-dash>.home-hero{grid-column:1}
-      .home-dash>.home-badges{grid-column:2;grid-row:4;flex-wrap:wrap}
-      .home-dash>.home-badges .home-link{width:100%}
-      .home-dash>.home-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
-      .home-dash>.home-habits{grid-column:2;grid-row:5 / span 3}
-      .home-dash>.ad-slot{grid-column:1/-1}
+      /* v58: dos columnas que se acomodan solas (sin huecos) y respetan el orden elegido en «Personalizar inicio». */
+      .home-dash{display:block;columns:2;column-gap:var(--ff-s4)}
+      .home-dash>*{break-inside:avoid;margin:0 0 var(--ff-s4)}
+      .home-dash>.home-block{display:block}
+      .home-dash>.home-block>*{margin-bottom:var(--ff-s4)}
+      .home-dash>.home-block>*:last-child{margin-bottom:0}
+      .home-dash>.home-top,.home-dash>.notif-panel,.home-dash>.home-block[data-home-block="week"],.home-dash>.home-customize-row,.home-dash>.ad-slot,.home-dash>.home-empty{column-span:all}
+      .home-dash .home-badges{flex-wrap:wrap}
+      .home-dash .home-badges .home-link{width:100%}
+      .home-dash .home-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
     }
     @media(min-width:1200px){
       #view-progress .progress-panel[data-progress-panel="summary"]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 var(--ff-s4);align-items:start}
@@ -1692,7 +1694,7 @@
   <link rel="stylesheet" href="./design.css">
 </head>
 <body>
-<svg class="ff-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><linearGradient id="ffFaceBronze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c46f33"/><stop offset="1" stop-color="#6e3412"/></linearGradient><linearGradient id="ffFaceSilver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aa6b8"/><stop offset="1" stop-color="#4f5a6c"/></linearGradient><linearGradient id="ffFaceGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e7a514"/><stop offset="1" stop-color="#8a5a00"/></linearGradient><linearGradient id="ffMedalLegend" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a4a58"/><stop offset=".35" stop-color="#16161d"/><stop offset=".7" stop-color="#050507"/><stop offset="1" stop-color="#2b2433"/></linearGradient><linearGradient id="ffFaceLegend" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26222e"/><stop offset="1" stop-color="#08080b"/></linearGradient><linearGradient id="ffLegendEdge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#d4a017"/><stop offset="1" stop-color="#8f5bff"/></linearGradient><linearGradient id="ffFaceDiamond" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3fa2f5"/><stop offset="1" stop-color="#2b33c9"/></linearGradient><linearGradient id="ffMedalBronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0b27a"/><stop offset=".55" stop-color="#b8692f"/><stop offset="1" stop-color="#7a3f17"/></linearGradient><linearGradient id="ffMedalSilver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f7fb"/><stop offset=".5" stop-color="#b9c3d1"/><stop offset="1" stop-color="#7d8898"/></linearGradient><linearGradient id="ffMedalGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a8"/><stop offset=".5" stop-color="#f2b822"/><stop offset="1" stop-color="#b07805"/></linearGradient><linearGradient id="ffMedalDiamond" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e4fbff"/><stop offset=".45" stop-color="#7fd8f7"/><stop offset="1" stop-color="#5b5cf0"/></linearGradient>
+<svg class="ff-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs><linearGradient id="ffRimBronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd7b0"/><stop offset=".28" stop-color="#d98a4a"/><stop offset=".55" stop-color="#8c4318"/><stop offset=".78" stop-color="#e9a066"/><stop offset="1" stop-color="#5a260a"/></linearGradient><linearGradient id="ffRimSilver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".28" stop-color="#c7cfda"/><stop offset=".55" stop-color="#6f7a8a"/><stop offset=".78" stop-color="#dfe5ec"/><stop offset="1" stop-color="#454e5c"/></linearGradient><linearGradient id="ffRimGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff5bf"/><stop offset=".28" stop-color="#f7c53a"/><stop offset=".55" stop-color="#a56c00"/><stop offset=".78" stop-color="#ffd860"/><stop offset="1" stop-color="#6a4400"/></linearGradient><linearGradient id="ffRimDiamond" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eafdff"/><stop offset=".28" stop-color="#6dd3ff"/><stop offset=".55" stop-color="#1d5be0"/><stop offset=".78" stop-color="#9fe8ff"/><stop offset="1" stop-color="#16258f"/></linearGradient><linearGradient id="ffRimLegend" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5d5768"/><stop offset=".3" stop-color="#1c1923"/><stop offset=".55" stop-color="#050507"/><stop offset=".78" stop-color="#3a3347"/><stop offset="1" stop-color="#000"/></linearGradient><linearGradient id="ffBevelBronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f2008"/><stop offset="1" stop-color="#d07d40"/></linearGradient><linearGradient id="ffBevelSilver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3d4552"/><stop offset="1" stop-color="#d3dae3"/></linearGradient><linearGradient id="ffBevelGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5e3b00"/><stop offset="1" stop-color="#f3c23c"/></linearGradient><linearGradient id="ffBevelDiamond" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0f1a6e"/><stop offset="1" stop-color="#5ccaff"/></linearGradient><linearGradient id="ffBevelLegend" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#000"/><stop offset=".6" stop-color="#2c2636"/><stop offset="1" stop-color="#d4a017"/></linearGradient><radialGradient id="ffFace2Bronze" cx=".5" cy=".38" r=".72"><stop offset="0" stop-color="#e8955a"/><stop offset=".55" stop-color="#9a4a1c"/><stop offset="1" stop-color="#4a1d06"/></radialGradient><radialGradient id="ffFace2Silver" cx=".5" cy=".38" r=".72"><stop offset="0" stop-color="#b9c3cf"/><stop offset=".55" stop-color="#5f6a79"/><stop offset="1" stop-color="#262c35"/></radialGradient><radialGradient id="ffFace2Gold" cx=".5" cy=".38" r=".72"><stop offset="0" stop-color="#ffd659"/><stop offset=".55" stop-color="#c48500"/><stop offset="1" stop-color="#583800"/></radialGradient><radialGradient id="ffFace2Diamond" cx=".5" cy=".38" r=".72"><stop offset="0" stop-color="#7fe6ff"/><stop offset=".5" stop-color="#2b6ff2"/><stop offset="1" stop-color="#0e1670"/></radialGradient><radialGradient id="ffFace2Legend" cx=".5" cy=".38" r=".72"><stop offset="0" stop-color="#3f3750"/><stop offset=".55" stop-color="#15121b"/><stop offset="1" stop-color="#000"/></radialGradient><radialGradient id="ffMedalGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><linearGradient id="ffCrownGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#f2b822"/><stop offset="1" stop-color="#9a6400"/></linearGradient><linearGradient id="ffFaceBronze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c46f33"/><stop offset="1" stop-color="#6e3412"/></linearGradient><linearGradient id="ffFaceSilver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aa6b8"/><stop offset="1" stop-color="#4f5a6c"/></linearGradient><linearGradient id="ffFaceGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e7a514"/><stop offset="1" stop-color="#8a5a00"/></linearGradient><linearGradient id="ffMedalLegend" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a4a58"/><stop offset=".35" stop-color="#16161d"/><stop offset=".7" stop-color="#050507"/><stop offset="1" stop-color="#2b2433"/></linearGradient><linearGradient id="ffFaceLegend" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26222e"/><stop offset="1" stop-color="#08080b"/></linearGradient><linearGradient id="ffLegendEdge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#d4a017"/><stop offset="1" stop-color="#8f5bff"/></linearGradient><linearGradient id="ffFaceDiamond" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3fa2f5"/><stop offset="1" stop-color="#2b33c9"/></linearGradient><linearGradient id="ffMedalBronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0b27a"/><stop offset=".55" stop-color="#b8692f"/><stop offset="1" stop-color="#7a3f17"/></linearGradient><linearGradient id="ffMedalSilver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f7fb"/><stop offset=".5" stop-color="#b9c3d1"/><stop offset="1" stop-color="#7d8898"/></linearGradient><linearGradient id="ffMedalGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a8"/><stop offset=".5" stop-color="#f2b822"/><stop offset="1" stop-color="#b07805"/></linearGradient><linearGradient id="ffMedalDiamond" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e4fbff"/><stop offset=".45" stop-color="#7fd8f7"/><stop offset="1" stop-color="#5b5cf0"/></linearGradient>
   <linearGradient id="ffGradNutri" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22c993"/><stop offset="1" stop-color="#0a7a50"/></linearGradient>
   <linearGradient id="ffGradBrand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#19b8ff"/><stop offset="1" stop-color="#6a4cf2"/></linearGradient>
 </defs></svg>
@@ -1727,6 +1729,7 @@
       <div class="home-top-actions"><button class="home-bell" id="notifBell" type="button" aria-label="Notificaciones" aria-expanded="false" aria-controls="notifPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0"/></svg><span class="notif-count" id="notifCount" hidden></span></button><button class="home-avatar" type="button" data-shortcut-view="profile" aria-label="Abrir mi perfil" data-avatar><span id="homeInitial">F</span></button></div>
     </div>
     <div class="notif-panel" id="notifPanel" role="region" aria-label="Notificaciones" hidden><div class="notif-head"><strong>Notificaciones</strong><button type="button" class="link-btn" id="notifReadAll">Marcar todo como leído</button></div><ul class="notif-list"></ul></div>
+    <div class="home-block" data-home-block="week">
     <div class="home-week" id="homeWeek" aria-label="Tu semana"></div>
     <section class="home-card home-goal" aria-label="Progreso semanal">
       <div class="home-ring" aria-hidden="true"><svg viewBox="0 0 100 100"><defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5cff"/><stop offset="1" stop-color="#1aa7ff"/></linearGradient></defs><circle class="bg" cx="50" cy="50" r="40"/><circle id="homeWeekArc" class="fg" cx="50" cy="50" r="40" stroke="url(#ringGrad)" stroke-dasharray="251.2" stroke-dashoffset="251.2"/></svg><b id="homeWeekPct">0%</b></div>
@@ -1738,19 +1741,26 @@
       </div>
       <div class="home-week-stats" id="homeWeekStats"></div>
     </section>
-    <button type="button" class="home-card home-body-goal" id="homeBodyGoal" aria-label="Objetivo y actualidad: abrir en Perfil"></button>
+    </div>
+    <div class="home-block" data-home-block="body"><button type="button" class="home-card home-body-goal" id="homeBodyGoal" aria-label="Objetivo y actualidad: abrir en Perfil"></button></div>
+    <div class="home-block" data-home-block="today">
     <section class="home-hero" aria-labelledby="homeTodayTitle">
       <small>Entrenamiento de hoy</small>
       <h2 id="homeTodayTitle">Armá tu primera rutina</h2>
       <div class="home-meta" id="homeTodayMeta"></div>
       <button class="home-cta" id="homeStartBtn" type="button" data-home-action="view:routines">Crear mi rutina</button>
     </section>
+    </div>
+    <div class="home-block" data-home-block="gym"><section class="home-card home-gym" aria-labelledby="homeGymTitle"><div class="home-card-head"><h3 id="homeGymTitle">Lo que hiciste en el gym</h3><button class="link-btn" type="button" data-home-gym-log>Registrar uno</button></div><div id="homeGym"></div></section></div>
+    <div class="home-block" data-home-block="badges">
     <section class="home-card home-badges" aria-labelledby="homeBadgeTitle">
       <div class="home-badge-medal" id="homeBadgeMedal" aria-hidden="true"></div>
       <div class="home-badge-copy"><small class="home-kicker">Próxima insignia</small><strong id="homeBadgeTitle">Tu primera insignia te espera</strong><p id="homeBadgeText">Registrá tu mejor serie para empezar.</p><div class="home-badge-bar" id="homeBadgeBar" role="progressbar" aria-label="Avance hacia el próximo nivel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden><i></i></div></div>
       <button class="home-link" id="homeBadgeBtn" type="button" data-show-badges>Ver desafíos</button>
     </section>
+    </div>
     <p class="home-empty" id="homeEmpty" hidden>Cuando registres entrenamientos, comidas o agua, acá vas a ver tu avance real.</p>
+    <div class="home-block" data-home-block="tiles">
     <div class="home-tiles" aria-label="Accesos rápidos">
       <button class="home-tile t-blue" type="button" data-home-quick="train"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8v8M3.5 10v4M18 8v8M20.5 10v4M6 12h12"/></svg><b>Entrenar</b><span>Sesión, rutinas y libre</span></button>
       <button class="home-tile t-green" type="button" data-home-quick="meal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M17 21V3c-2 1-3 4-3 8h3"/></svg><b>Registrar comida</b><span>Foto, código o manual</span></button>
@@ -1760,25 +1770,36 @@
       <button class="home-tile t-amber" type="button" data-shortcut-view="coach" aria-label="Consultar a la IA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><b>FittAI</b><span>Preguntá o pedí un plan</span></button>
       <button class="home-tile t-violet" type="button" data-home-muscles aria-label="Ver mis músculos (Mapa de avances)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 14c-2-1-3-3-2.5-5.5C5.2 6 7.5 5 9 6.5l1 1.5M17 14c2-1 3-3 2.5-5.5C18.8 6 16.5 5 15 6.5L14 8"/><path d="M9 6.5c0-2 1.3-3.5 3-3.5s3 1.5 3 3.5M8 20c0-3 1.8-5 4-5s4 2 4 5M10 11h4"/></svg><b>Músculos</b><span>Tu rango por músculo</span></button>
     </div>
-    <section class="home-quote" aria-label="Frase del día"><p>“Disciplina hoy,<br>resultados mañana.”</p></section>
+    </div>
+    <div class="home-block" data-home-block="quote"><section class="home-quote" aria-label="Frase del día"><p>“Disciplina hoy,<br>resultados mañana.”</p></section></div>
+    <div class="home-block" data-home-block="summary">
     <h2 class="home-h">Resumen de hoy</h2>
     <section class="home-card home-summary">
       <div class="home-sum"><div class="home-ring sm" aria-hidden="true"><svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="40"/><circle id="homeKcalArc" class="fg" cx="50" cy="50" r="40" stroke="#1aa7ff" stroke-dasharray="251.2" stroke-dashoffset="251.2"/></svg><b id="homeKcalVal">0</b></div><p id="homeKcalLbl">&nbsp;</p></div><div class="home-sum"><div class="home-ring sm" aria-hidden="true"><svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="40"/><circle id="homeProtArc" class="fg" cx="50" cy="50" r="40" stroke="#f2a33a" stroke-dasharray="251.2" stroke-dashoffset="251.2"/></svg><b id="homeProtVal">0</b></div><p id="homeProtLbl">&nbsp;</p></div><div class="home-sum"><div class="home-ring sm" aria-hidden="true"><svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="40"/><circle id="homeWaterArc" class="fg" cx="50" cy="50" r="40" stroke="#18c28f" stroke-dasharray="251.2" stroke-dashoffset="251.2"/></svg><b id="homeWaterVal">0</b></div><p id="homeWaterLbl">&nbsp;</p></div>
     </section>
+    </div>
+    <div class="home-block" data-home-block="habits">
     <section class="home-card home-habits" aria-labelledby="homeHabitsTitle">
       <div class="home-card-head"><h3 id="homeHabitsTitle">Hábitos de hoy</h3><span id="homeHabitsCount">0 de 5</span></div>
       <div id="homeHabits" class="home-habit-list"></div>
     </section>
+    </div>
+    <div class="home-block" data-home-block="recent">
     <section class="home-card home-recent" aria-labelledby="homeRecentTitle">
       <div class="home-card-head"><h3 id="homeRecentTitle">Actividad reciente</h3><button class="link-btn" id="homeRecentAll" type="button">Ver todo</button></div>
       <ul class="home-recent-list" id="homeRecent"></ul>
     </section>
+    </div>
+    <div class="home-block" data-home-block="stats">
     <h2 class="home-h">Tu constancia</h2>
   <section class="stats">
     <div class="stat"><strong id="statSessions">0</strong><small>Actividades registradas</small></div>
     <div class="stat"><strong id="statMinutes">0</strong><small>Minutos entrenados</small></div>
     <div class="stat"><strong id="statStreak">0</strong><small>Días activos seguidos</small></div>
   </section>
+    </div>
+    <div class="home-customize-row"><button type="button" class="btn ghost btn-sm" id="homeCustomize">Personalizar inicio</button></div>
+    <dialog class="home-layout-dialog" id="homeLayoutDialog" aria-labelledby="homeLayoutTitle"><form method="dialog" class="home-layout-form"><h3 id="homeLayoutTitle">Personalizar inicio</h3><p class="muted small">Elegí qué tarjetas ver y en qué orden. Se guarda en este dispositivo y en tu copia en la nube.</p><ol class="home-layout-list" id="homeLayoutList"></ol><div class="btn-row"><button type="button" class="btn ghost btn-sm" id="homeLayoutReset">Restablecer</button><button type="submit" class="btn" value="ok">Listo</button></div></form></dialog>
   <aside class="ad-slot" id="adSlotHome" aria-label="Publicidad"><span class="ad-slot-label">Publicidad</span><div class="ad-slot-content" id="adContentHome"></div></aside>
   </div>
 </section>
@@ -1957,6 +1978,7 @@
       </nav>
       <div class="view-panel" role="tabpanel" data-view-panel="hoy">
       <div class="card nutrition-summary-card"><div class="section-head"><div><h3>Resumen de hoy</h3><p>Basado en lo que registraste.</p></div><span class="tag" id="nutritionDate"></span></div><div class="nutri-hero"><div class="nutri-ring" aria-hidden="true"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"></circle><circle class="fg" id="nutriRingArc" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle></svg><div><b id="nutriRingValue">0</b><small>kcal</small></div></div><div class="nutri-hero-copy"><strong id="nutriRingTitle">Tu día de comidas</strong><p id="nutriRingText">Registrá tu primera comida.</p></div><div class="macro-progress"><div><div class="macro-progress-label"><span>Proteínas</span><strong id="proteinCaption">0 / 120 g</strong></div><div class="progressbar"><span id="proteinBar" style="width:0%"></span></div></div><div><div class="macro-progress-label"><span>Carbohidratos</span><strong id="carbCaption">0 / 280 g</strong></div><div class="progressbar"><span id="carbBar" style="width:0%"></span></div></div><div><div class="macro-progress-label"><span>Grasas</span><strong id="fatCaption">0 / 80 g</strong></div><div class="progressbar"><span id="fatBar" style="width:0%"></span></div></div></div></div><div class="stats"><div class="stat"><strong id="todayCalories">0</strong><small>kcal registradas</small></div><div class="stat"><strong id="todayProtein">0 g</strong><small>Proteínas</small></div><div class="stat"><strong id="todayCarbs">0 g</strong><small>Carbohidratos</small></div><div class="stat"><strong id="todayFat">0 g</strong><small>Grasas</small></div><div class="stat"><strong id="mealsCount">0</strong><small>Comidas</small></div></div><div class="progressbar nutri-hide"><span id="calorieBar" style="width:0%"></span></div><p class="muted small" id="calorieCaption">Registrá tu primera comida.</p><div id="mealList"></div></div>
+      <div class="card complete-day-card" id="completeDayCard"></div>
       <div class="card hydration-card" id="hydrationCard">
         <div class="section-head"><div><h3>Hidratación</h3><p class="muted small">Registrá lo que tomás. El objetivo es orientativo y lo podés ajustar.</p></div><span class="tag" id="hydroDate"></span></div>
         <div class="hydro-main">
@@ -2012,7 +2034,7 @@
       <div class="view-panel" role="tabpanel" data-view-panel="plan" hidden>
       <div class="card ng-card" id="nutritionGuideCard"></div>
       <div class="card"><div class="eyebrow">Objetivos diarios orientativos</div><div class="grid2"><div class="field"><label for="calorieGoal">Calorías (kcal)</label><input id="calorieGoal" type="number" min="800" max="6000" step="50" value="2400"></div><div class="field"><label for="proteinGoal">Proteínas (g)</label><input id="proteinGoal" type="number" min="20" max="400" step="5" value="120"></div><div class="field"><label for="carbGoal">Carbohidratos (g)</label><input id="carbGoal" type="number" min="0" max="800" step="5" value="280"></div><div class="field"><label for="fatGoal">Grasas (g)</label><input id="fatGoal" type="number" min="0" max="300" step="5" value="80"></div></div><button class="btn secondary full" id="estimateNutritionGoals" type="button">Calcular objetivos con mi perfil</button><button type="button" class="btn full" id="saveNutritionGoals">Guardar objetivos</button><p id="nutritionGoalHint" class="muted small" aria-live="polite">Podés calcular una referencia con edad, altura, peso actual, objetivo de peso y actividad en Perfil. Revisá la propuesta antes de guardarla.</p><p class="muted small">Son estimaciones generales para adultos, no una prescripción médica o dietética. Para menores de 18 años, embarazo, enfermedades o necesidades específicas, consultá con un profesional.</p></div>
-      <div class="card"><h3>Menú diario orientativo</h3><p class="muted small">Arma una propuesta con alimentos de la base local teniendo en cuenta tus objetivos de calorías y proteínas. No es una dieta clínica ni contempla alergias o condiciones médicas. Revisá ingredientes y porciones antes de agregarla.</p><button class="btn secondary full" id="generateMenu" type="button">Generar menú para hoy</button><div id="menuProposal"></div></div>
+      <div class="card goal-menu-card" id="goalMenuCard"><div class="section-head"><div><div class="eyebrow">Qué comer hoy</div><h3>Menú de ejemplo según tu objetivo</h3><p class="muted small">Armado con la base de alimentos y tus objetivos de calorías y proteína. Cambiá cualquier comida o agregala a hoy con un toque. Es orientativo: no es una dieta clínica ni contempla alergias o enfermedades.</p></div></div><div id="goalMenu"></div><div class="btn-row"><button class="btn secondary" id="generateMenu" type="button">Otro menú completo</button><button class="btn ghost" id="goalMenuAddAll" type="button">Agregar todo a hoy</button></div><div id="menuProposal" hidden></div></div>
       <div class="card" id="mealPlanCard"><div class="section-head"><div><div class="eyebrow">Plan semanal</div><h3>Tus comidas de la semana</h3><p class="muted small">Planificá por día. Nada se registra hasta que vos lo confirmes.</p></div></div><div class="ff-chips" id="mealPlanDays" role="group" aria-label="Día de la semana"></div><div class="field"><label for="mealPlanFavorite" class="sr-only">Agregar una comida favorita</label><select id="mealPlanFavorite"></select></div><div id="mealPlanList"></div></div>
       <div class="card" id="recipesCard"><div class="section-head"><div><div class="eyebrow">Recetas</div><h3>Ideas con valores estimados</h3><p class="muted small">Cargalas en el registro o agregalas al plan del día elegido.</p></div></div><div id="recipeFilters"></div><div id="recipeList" class="recipe-list"></div></div>
       </div>
@@ -2424,14 +2446,14 @@
         <summary><span><strong>Versión de la app</strong><small>Actualizaciones</small></span></summary>
         <div class="card" id="appVersionCard">
         <h3>Versión de la app</h3>
-        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">57.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
+        <p class="muted small">Estás usando la versión <strong id="appVersionLabel">58.0</strong>. Si algo se ve desactualizado, buscá una actualización.</p>
         <button class="btn full" id="checkUpdateButton" type="button">Buscar actualización</button>
         <p id="updateMessage" class="muted small" role="status" aria-live="polite" style="margin:10px 0 0"></p>
       </div>
       </details>
     </section>
   </main>
-  <div class="footer">FITTFORMA AI · Versión 57.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
+  <div class="footer">FITTFORMA AI · Versión 58.0 · comunidad fitness online · Estimaciones orientativas; no sustituye asesoramiento profesional.</div>
 </div>
 
 <nav class="mobile-app-nav" id="mobileAppNav" aria-label="Navegación principal">
@@ -2458,7 +2480,7 @@
   <button class="mobile-more-link" type="button" data-mobile-view="coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg><span>FittAI<small class="more-desc">Tu asistente de entrenamiento y nutrición</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link" type="button" data-mobile-view="running"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Correr con GPS<small class="more-desc">Distancia, ritmo y mapa</small></span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
   <button class="mobile-more-link install-menu-link" id="installBtn" type="button" aria-label="Instalar FittForma en el celular"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg><span>Instalar aplicación</span><span class="more-arrow" aria-hidden="true"><svg class="ff-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
-  <p class="mobile-menu-footnote">FITTFORMA AI · V57.0</p>
+  <p class="mobile-menu-footnote">FITTFORMA AI · V58.0</p>
 </div>
 
 <div class="exercise-modal" id="exerciseModal" hidden>
@@ -2629,6 +2651,7 @@
     out.profile=isPlainObj(st.profile)?{...st.profile}:{...defaults.profile};
     for(const k of Object.keys(defaults.profile))if(out.profile[k]!==undefined&&typeof out.profile[k]!=='string'&&typeof out.profile[k]!=='number')out.profile[k]=defaults.profile[k];
     if(out.profile.avatar!==undefined&&!validAvatar(out.profile.avatar))delete out.profile.avatar;
+    out.weekPlan=sanitizeWeekPlan(st.weekPlan);
     out.sessions=objList(st.sessions,5000).map(x=>({...x,exercises:objList(x.exercises,40).map(e=>({...e,entries:objList(e.entries,40)}))}));
     for(const [k,max] of [['meals',10000],['weights',3000],['activities',5000],['plannedActivities',500],['mealFavorites',200],['customFoods',300],['badgeRecords',500],['bodyMeasures',1000],['notifications',200]])out[k]=objList(st[k],max);
     out.foodFavorites=Array.isArray(st.foodFavorites)?st.foodFavorites.filter(x=>typeof x==='string').slice(-60):[];
@@ -3560,7 +3583,7 @@ function findCatalogExercise(name){
     const T=FittFormaTraining;if(!T.FOCUS)return '';
     const bySplit={};for(const [k,f] of Object.entries(T.FOCUS))(bySplit[f.split]=bySplit[f.split]||[]).push([k,f]);
     const splitKey=T.SPLIT_PLANS?.[state.profile?.splitPlan]?state.profile.splitPlan:'',nx=splitKey?T.nextFocusInSplit(splitKey,state.sessions):null;
-    const splitBox=T.SPLIT_PLANS?`<div class="focus-plan"><div class="field"><label for="focusSplitPlan">Mi división semanal</label><select id="focusSplitPlan"><option value="">Sin división (elijo cada día)</option>${Object.entries(T.SPLIT_PLANS).map(([k,p])=>`<option value="${k}"${k===splitKey?' selected':''}>${esc(p.title)} · ${esc(p.days)}</option>`).join('')}</select></div>${nx?`<div class="focus-today"><div><small>Hoy toca</small><strong>${esc(T.FOCUS[nx.key].title)}</strong><span class="muted small">${nx.last?`La última fue ${esc(T.FOCUS[nx.last].title)} (${esc(prettyDate(nx.lastDate))}).`:'Empezás por la primera de la división.'}</span></div><button type="button" class="btn" data-focus="${nx.key}">Ver la sesión</button></div>`:''}</div>`:'';
+    const splitBox=T.SPLIT_PLANS&&!Object.keys(state.weekPlan?.days||{}).length?`<div class="focus-plan"><div class="field"><label for="focusSplitPlan">Mi división semanal</label><select id="focusSplitPlan"><option value="">Sin división (elijo cada día)</option>${Object.entries(T.SPLIT_PLANS).map(([k,p])=>`<option value="${k}"${k===splitKey?' selected':''}>${esc(p.title)} · ${esc(p.days)}</option>`).join('')}</select></div>${nx?`<div class="focus-today"><div><small>Hoy toca</small><strong>${esc(T.FOCUS[nx.key].title)}</strong><span class="muted small">${nx.last?`La última fue ${esc(T.FOCUS[nx.last].title)} (${esc(prettyDate(nx.lastDate))}).`:'Empezás por la primera de la división.'}</span></div><button type="button" class="btn" data-focus="${nx.key}">Ver la sesión</button></div>`:''}</div>`:'';
     return `<div class="focus-picker" id="focusPicker"><div class="focus-head"><strong>Entrenar por grupos musculares</strong><small class="muted">Combinaciones que se suelen entrenar juntas, o elegí vos los grupos. Se arma con tu equipamiento y tu nivel.</small></div>${splitBox}
       ${Object.entries(bySplit).map(([split,items])=>`<div class="focus-split"><small>${esc(split)}</small><div class="ff-chips">${items.map(([k,f])=>`<button type="button" class="ff-chip${focusDraft?.key===k?' active':''}" data-focus="${k}" aria-pressed="${focusDraft?.key===k}">${esc(f.title)}</button>`).join('')}</div></div>`).join('')}
       <details class="focus-custom"${focusDraft?.key==='custom'?' open':''}><summary>Elegí vos los grupos</summary><div class="focus-groups">${Object.entries(T.MUSCLE_GROUPS).map(([k,g])=>`<label class="focus-group"><input type="checkbox" data-focus-group="${k}"${focusDraft?.key==='custom'&&focusDraft.groups.includes(k)?' checked':''}><span>${esc(g.label)}</span></label>`).join('')}</div><button type="button" class="btn secondary btn-sm" id="focusBuildCustom">Armar sesión con estos grupos</button></details>
@@ -3590,9 +3613,90 @@ function findCatalogExercise(name){
     if($('focusBuildCustom'))$('focusBuildCustom').onclick=()=>{const groups=[...root.querySelectorAll('[data-focus-group]:checked')].map(x=>x.dataset.focusGroup);if(!groups.length){toast('Elegí al menos un grupo muscular.');return;}setFocusDraft(FittFormaTraining.buildGroupsDay(groups,focusProfile()));};
     bindFocusPreview();
   }
+  // ---------- v58: Mi semana (qué entrenar cada día), rutinas listas y recomendada ----------
+  let weekEditDay=0,weekGroupsOpen=false;
+  function sanitizeWeekPlan(w){
+    const T=window.FittFormaTraining;if(!T?.FOCUS||!isPlainObj(w)||!isPlainObj(w.days))return null;const days={};
+    for(let d=1;d<=7;d++){const x=w.days[d];if(!isPlainObj(x))continue;
+      if(x.kind==='rest')days[d]={kind:'rest'};else if(x.kind==='focus'&&T.FOCUS[x.key])days[d]={kind:'focus',key:x.key};
+      else if(x.kind==='groups'&&Array.isArray(x.groups)){const g=[...new Set(x.groups.filter(k=>T.MUSCLE_GROUPS[k]))].slice(0,10);if(g.length)days[d]={kind:'groups',groups:g};}
+      else if(x.kind==='routine'&&typeof x.id==='string'&&x.id)days[d]={kind:'routine',id:x.id.slice(0,60)};}
+    return {days,programId:T.PROGRAMS?.[w.programId]?w.programId:'',updatedAt:String(w.updatedAt||'').slice(0,30)};
+  }
+  const weekDays=()=>state.weekPlan?.days||{};
+  function weekDayLabel(day){
+    const T=FittFormaTraining;if(!day)return 'Libre';
+    if(day.kind==='rest')return 'Descanso';if(day.kind==='focus')return T.FOCUS[day.key]?.title||'Libre';
+    if(day.kind==='groups')return day.groups.map(g=>T.MUSCLE_GROUPS[g]?.label).filter(Boolean).map((l,i)=>i?l.toLowerCase():l).join(' y ');
+    if(day.kind==='routine')return (state.routines||[]).find(r=>String(r.id)===day.id)?.name||'Rutina borrada';return 'Libre';
+  }
+  function weekDoneDays(){
+    const today=dateKey(),wd=FittFormaTraining.weekdayOf(today),monday=dateKey(new Date(new Date(today+'T12:00:00').getTime()-(wd-1)*864e5)),done=new Set();
+    for(const x of state.sessions||[])if(x&&x.status!=='cancelled'&&x.date>=monday&&x.date<=today)done.add(FittFormaTraining.weekdayOf(x.date));return done;
+  }
+  function todayRecommendation(){return FittFormaTraining.recommendToday(state.profile||{},state.sessions||[],weekDays(),dateKey());}
+  function weekPlanMarkup(){
+    const T=FittFormaTraining;if(!T.WEEKDAYS)return '';
+    const days=weekDays(),today=T.weekdayOf(dateKey()),done=weekDoneDays(),rec=todayRecommendation(),hasPlan=Object.keys(days).length>0;
+    const chips=T.WEEKDAYS.map((n,i)=>{const d=i+1,day=days[d],editing=weekEditDay===d;return `<button type="button" class="wp-day${d===today?' is-today':''}${day?.kind==='rest'?' is-rest':''}${!day?' is-empty':''}${done.has(d)?' is-done':''}${editing?' is-editing':''}" data-wp-day="${d}" aria-expanded="${editing}"><span class="wp-day-name">${esc(n)}${d===today?' <em>Hoy</em>':''}</span><span class="wp-day-what">${esc(day?weekDayLabel(day):'Sin asignar')}</span>${done.has(d)?'<i aria-label="entrenaste">✓</i>':''}<span class="wp-day-edit" aria-hidden="true">${editing?'▴':'›'}</span></button>${editing?`<div id="wpEditor">${weekEditorMarkup()}</div>`:''}`;}).join('');
+    const todayDay=rec.day,todayTitle=weekDayLabel(todayDay);
+    const todayBox=rec.source==='week'?(todayDay.kind==='rest'?`<p class="wp-today-text"><small>Hoy (${esc(T.WEEKDAYS[today-1].toLowerCase())})</small><strong>Descanso</strong><span class="muted small">Si igual querés entrenar, elegí abajo qué hacer.</span></p>`:`<p class="wp-today-text"><small>Hoy toca (${esc(T.WEEKDAYS[today-1].toLowerCase())})</small><strong>${esc(todayTitle)}</strong><span class="muted small">Según tu semana.</span></p><button type="button" class="btn" id="wpStartToday">Ver la sesión</button>`)
+      :`<p class="wp-today-text"><small>${hasPlan?'Hoy no tiene nada asignado · Te recomendamos':'Te recomendamos para hoy'}</small><strong>${esc(todayTitle)}</strong><span class="muted small">${esc(rec.reason||'')}</span></p><button type="button" class="btn" id="wpStartToday">Ver la sesión</button>`;
+    return `<div class="week-plan" id="weekPlan"><div class="wp-head"><div><strong>Mi semana</strong><small class="muted">${hasPlan?'Tocá un día para cambiar qué entrenás.':'Elegí qué querés entrenar cada día, o usá una rutina lista.'}</small></div><button type="button" class="btn secondary btn-sm wp-programs-btn" id="wpProgramsToggle" aria-expanded="false">Rutinas listas</button></div>
+      <div class="wp-days" role="group" aria-label="Días de la semana">${chips}</div>
+      <div class="wp-today">${todayBox}</div>
+      <div id="wpPrograms" hidden></div></div>`;
+  }
+  function weekEditorMarkup(){
+    const T=FittFormaTraining,d=weekEditDay;if(!d)return '';const cur=weekDays()[d],is=(k,v)=>cur&&cur.kind===k&&(v==null||cur.key===v||cur.id===v);
+    const focusChips=Object.entries(T.FOCUS).map(([k,f])=>`<button type="button" class="ff-chip${is('focus',k)?' active':''}" data-wp-set="focus:${k}">${esc(f.title)}</button>`).join('');
+    const routineChips=(state.routines||[]).slice(0,12).map(r=>`<button type="button" class="ff-chip${is('routine',String(r.id))?' active':''}" data-wp-set="routine:${esc(String(r.id))}">${esc(r.name)}</button>`).join('');
+    const groupsSel=cur?.kind==='groups'?cur.groups:[];
+    return `<div class="wp-editor"><div class="wp-editor-head"><strong>${esc(T.WEEKDAYS[d-1])}: ¿qué querés entrenar?</strong><button type="button" class="link-btn" data-wp-close>Listo</button></div>
+      <div class="ff-chips">${focusChips}<button type="button" class="ff-chip${is('rest')?' active':''}" data-wp-set="rest">Descanso</button><button type="button" class="ff-chip" data-wp-set="none">Sin asignar</button></div>
+      ${routineChips?`<small class="muted">Mis rutinas</small><div class="ff-chips">${routineChips}</div>`:''}
+      <details class="wp-groups"${weekGroupsOpen||cur?.kind==='groups'?' open':''}><summary>Elegir grupos a mano</summary><div class="focus-groups">${Object.entries(T.MUSCLE_GROUPS).map(([k,g])=>`<label class="focus-group"><input type="checkbox" data-wp-group="${k}"${groupsSel.includes(k)?' checked':''}><span>${esc(g.label)}</span></label>`).join('')}</div><button type="button" class="btn secondary btn-sm" data-wp-groups-save>Guardar estos grupos</button></details></div>`;
+  }
+  function programsMarkup(){
+    const T=FittFormaTraining,p=state.profile||{},list=T.recommendPrograms(p,state.sessions||[],dateKey()),days=Math.max(2,Math.min(6,Number(p.days)||3));
+    const top=list.find(r=>r.fits&&r.score>0);
+    return `<div class="wp-programs"><div class="wp-days-per-week"><span>¿Cuántos días por semana podés entrenar?</span><div class="ff-chips">${[2,3,4,5,6].map(n=>`<button type="button" class="ff-chip${n===days?' active':''}" data-wp-perweek="${n}" aria-pressed="${n===days}">${n}</button>`).join('')}</div></div>
+      ${list.filter(r=>r.fits).map(r=>{const w=T.programWeek(r.id),rec=top&&r.id===top.id;return `<article class="wp-program${rec?' is-recommended':''}${state.weekPlan?.programId===r.id?' is-current':''}">${rec?'<span class="wp-rec-badge">Recomendada para vos</span>':''}<h4>${esc(r.title)}</h4><p class="muted small">${esc(r.desc)}</p>
+        <ul class="wp-program-days">${T.WEEKDAYS.map((n,i)=>{const day=w[i+1];return day.kind==='rest'?'':`<li><small>${esc(n)}</small><span>${esc(T.FOCUS[day.key].title)}</span></li>`;}).join('')}</ul>
+        ${rec&&r.reasons.length?`<ul class="wp-reasons">${r.reasons.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+        <button type="button" class="btn ${rec?'':'secondary'} btn-sm" data-wp-program="${r.id}">${state.weekPlan?.programId===r.id?'Usándola':'Usar esta'}</button></article>`;}).join('')}
+      <p class="muted small">Al usar una rutina se completa tu semana; después podés cambiar cualquier día. Las sesiones se arman con tu equipamiento, nivel y objetivo.</p></div>`;
+  }
+  function setWeekDay(d,value){
+    const days={...weekDays()};if(value==null)delete days[d];else days[d]=value;
+    state.weekPlan=sanitizeWeekPlan({days,programId:'',updatedAt:new Date().toISOString()});save();
+  }
+  function startWeekDay(day){
+    const T=FittFormaTraining;if(!day)return;
+    if(day.kind==='routine'){startRoutine(day.id);return;}
+    const d=day.kind==='focus'?T.buildFocusDay(day.key,focusProfile()):day.kind==='groups'?T.buildGroupsDay(day.groups,focusProfile(),{title:weekDayLabel(day),split:'Mi semana'}):null;
+    if(!d){toast('Hoy es descanso. Si igual querés entrenar, elegí una combinación abajo.');return;}
+    setFocusDraft(d);$('focusPreview')?.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  function bindWeekPlan(root){
+    const box=root.querySelector('#weekPlan');if(!box)return;
+    const rerender=()=>{renderTrain();};
+    box.onclick=e=>{
+      const t=e.target.closest('button');if(!t)return;
+      if(t.dataset.wpDay){const d=Number(t.dataset.wpDay);weekEditDay=weekEditDay===d?0:d;weekGroupsOpen=false;rerender();return;}
+      if(t.hasAttribute('data-wp-close')){weekEditDay=0;rerender();return;}
+      if(t.dataset.wpSet){const [k,v]=t.dataset.wpSet.split(/:(.*)/s);setWeekDay(weekEditDay,k==='none'?null:k==='rest'?{kind:'rest'}:k==='focus'?{kind:'focus',key:v}:{kind:'routine',id:v});toast(`${FittFormaTraining.WEEKDAYS[weekEditDay-1]}: ${weekDayLabel(weekDays()[weekEditDay])}.`);weekEditDay=0;rerender();return;}
+      if(t.hasAttribute('data-wp-groups-save')){const g=[...box.querySelectorAll('[data-wp-group]:checked')].map(x=>x.dataset.wpGroup);if(!g.length){toast('Elegí al menos un grupo muscular.');return;}setWeekDay(weekEditDay,{kind:'groups',groups:g});weekEditDay=0;rerender();return;}
+      if(t.id==='wpStartToday'){startWeekDay(todayRecommendation().day);return;}
+      if(t.id==='wpProgramsToggle'){const host=$('wpPrograms'),open=host.hidden;host.hidden=!open;t.setAttribute('aria-expanded',String(open));if(open)host.innerHTML=programsMarkup();return;}
+      if(t.dataset.wpPerweek){state.profile={...state.profile,days:String(t.dataset.wpPerweek)};save();$('wpPrograms').innerHTML=programsMarkup();return;}
+      if(t.dataset.wpProgram){const id=t.dataset.wpProgram,prog=FittFormaTraining.PROGRAMS[id];if(Object.keys(weekDays()).length&&state.weekPlan?.programId!==id&&!confirm(`¿Reemplazar tu semana por «${prog.title}»?`))return;
+        state.weekPlan=sanitizeWeekPlan({days:FittFormaTraining.programWeek(id),programId:id,updatedAt:new Date().toISOString()});state.profile={...state.profile,days:String(Object.keys(prog.days).length)};weekEditDay=0;if(save())toast(`Tu semana ahora sigue «${prog.title}». Podés cambiar cualquier día.`);rerender();}
+    };
+  }
   function trainLauncherMarkup(){
     const routines=(state.routines||[]).slice(0,6),days=state.plan?.days||[];
-    return `<div class="card train-launch"><div class="eyebrow">Empezar a entrenar</div><h3>¿Qué vas a entrenar hoy?</h3>`+dailyCardMarkup()+focusPickerMarkup()+
+    return `<div class="card train-launch"><div class="eyebrow">Empezar a entrenar</div><h3>¿Qué vas a entrenar hoy?</h3>`+weekPlanMarkup()+dailyCardMarkup()+focusPickerMarkup()+
       (days.length?`<details class="train-extra"><summary>Hacer un día del plan como rutina adicional</summary><div class="train-launch-list">${days.map((d,i)=>`<button type="button" class="ff-list-row train-launch-row" data-start-plan-extra="${i}"><span><b>${esc(d.title)}</b><small>${d.exercises.length} ejercicios · no cambia la progresión diaria</small></span><span class="link-btn">Iniciar</span></button>`).join('')}</div></details>`:'')+
       (routines.length?`<div class="train-launch-list"><strong>Mis rutinas</strong>${routines.map(r=>`<button type="button" class="ff-list-row train-launch-row" data-start-routine="${esc(String(r.id))}"><span><b>${esc(r.name)}</b><small>${r.exercises.length} ejercicios</small></span><span class="link-btn">Iniciar</span></button>`).join('')}</div>`:'')+
       `<div class="btn-row"><button type="button" class="btn ${days.length||routines.length?'secondary':''}" id="startFreeWorkout">Entrenamiento libre</button><button type="button" class="btn ghost" id="openManualLog">Registrar uno ya hecho</button><button type="button" class="btn ghost" id="goPlan">${state.plan||routines.length?'Rutinas y plan':'Crear una rutina'}</button></div>`+
@@ -3611,7 +3715,7 @@ function findCatalogExercise(name){
     root.querySelectorAll('[data-start-routine]').forEach(b=>b.onclick=()=>startRoutine(b.dataset.startRoutine));
     if($('startFreeWorkout'))$('startFreeWorkout').onclick=startFreeWorkout;
     if($('openManualLog'))$('openManualLog').onclick=openManualLog;
-    bindFocusPicker(root);
+    bindFocusPicker(root);bindWeekPlan(root);
     if($('goPlan'))$('goPlan').onclick=()=>switchView('routines');
     clearInterval(dailyCountdownTimer);dailyCountdownTimer=$('dailyCountdown')?setInterval(tickDailyCountdown,1000):null;
   }
@@ -4152,13 +4256,13 @@ function findCatalogExercise(name){
   }
   function renderBadgeDetail(item){
     const root=$('badgeDetail');if(!root||!item)return;
-    if(item.customPlaceholder){root.innerHTML=`<div class="empty">${BadgeEngine.medalSvg({glyph:'star',locked:true,size:56})}<strong>Creá un desafío para otro ejercicio</strong><p>Escribí el nombre y tu mejor serie. Vas a seguir sus 12 niveles con los umbrales genéricos por repeticiones.</p></div>`;return;}
+    if(item.customPlaceholder){root.innerHTML=`<div class="empty">${BadgeEngine.medalSvg({glyph:'star',locked:true,size:56})}<strong>Creá un desafío para otro ejercicio</strong><p>Escribí el nombre y tu mejor serie. Vas a seguir sus 15 niveles con los umbrales genéricos por repeticiones.</p></div>`;return;}
     const metric=getBadgeMetric(item),thresholds=BadgeEngine.thresholdsForExercise(item),progress=BadgeEngine.progressForValue(metric.value,thresholds),unlocks=state.badgeUnlocks||{};
     const rank=progress.highest>=0?BadgeEngine.rankForLevel(progress.highest):null;
     const valueLabel=metric.value>0?formatBadgeValue(metric.value,item.measure):'Todavía sin marca';
     const evidence=metric.value>0&&item.measure!=='days'?`<span class="ff-evidence ${metric.evidence==='gps_device'?'is-gps':''}">${esc(BadgeEngine.evidenceLabel(metric.evidence))}</span>`:'';
     root.innerHTML=`<div class="achievement-title-row"><div class="achievement-hero-medal">${badgeMedalFor(item,progress.highest,{size:64})}</div><div><div class="eyebrow">${esc(BadgeEngine.categoryLabel(item.category))}</div><h3>${esc(item.name)}</h3><p class="achievement-value"><strong>${esc(valueLabel)}</strong>${evidence}</p><p class="muted small">${rank?`Rango actual: ${esc(rank.label)}`:'Sin rango todavía'}</p></div></div>
-      ${metric.needsBodyweight?`<p class="notice small">Cargá tu peso corporal en Perfil para calcular esta insignia${metric.bestKg?` (tu mejor serie registrada: ${esc(String(metric.bestKg))} kg × ${esc(String(metric.bestReps))})`:''}.</p>`:''}<div class="achievement-progress-head"><span>${esc(metric.needsBodyweight?'Necesita tu peso corporal.':BadgeEngine.nextStepMessage(metric.value,thresholds,item.measure))}</span><strong>${Math.max(0,progress.highest+1)}/12</strong></div><div class="achievement-progress" role="progressbar" aria-label="Avance hacia el próximo nivel de ${esc(item.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.pct}"><span style="width:${progress.pct}%"></span></div>
+      ${metric.needsBodyweight?`<p class="notice small">Cargá tu peso corporal en Perfil para calcular esta insignia${metric.bestKg?` (tu mejor serie registrada: ${esc(String(metric.bestKg))} kg × ${esc(String(metric.bestReps))})`:''}.</p>`:''}<div class="achievement-progress-head"><span>${esc(metric.needsBodyweight?'Necesita tu peso corporal.':BadgeEngine.nextStepMessage(metric.value,thresholds,item.measure))}</span><strong>${Math.max(0,progress.highest+1)}/${thresholds.length}</strong></div><div class="achievement-progress" role="progressbar" aria-label="Avance hacia el próximo nivel de ${esc(item.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.pct}"><span style="width:${progress.pct}%"></span></div>
       <ol class="achievement-milestones" aria-label="Niveles del desafío">${thresholds.map((threshold,index)=>{const rankInfo=BadgeEngine.rankForLevel(index),entry=unlocks[badgeIdFor(item,index)],unlocked=Boolean(entry),gps=hasGpsEvidence(entry);return `<li class="achievement-milestone rank-${rankInfo.key} ${unlocked?'unlocked':'locked'}">${BadgeEngine.medalSvg({rankKey:rankInfo.key,numeral:rankInfo.numeral,glyph:BadgeEngine.glyphFor(item),category:item.category,locked:!unlocked,size:34})}<strong>${esc(rankInfo.label)}</strong><small>${esc(formatBadgeValue(threshold,item.measure))}</small><span class="achievement-status ${gps?'verified':''}">${unlocked?`${esc(BadgeEngine.evidenceLabel(gps?'gps_device':entry.evidence))} · ${esc(prettyDate(entry.earnedAt))}`:'Bloqueada'}</span></li>`;}).join('')}</ol>
       <p class="muted small achievement-rule">${item.measure==='bw'?'Cada nivel compara el peso de tu mejor serie completada (al menos 1 repetición) con tu peso corporal. No cuenta el volumen total de la sesión.':item.measure==='sessions'?'Se cuentan entrenamientos completos; las sesiones parciales no suman.':item.measure==='streak'?'Se cuenta la racha más larga de días seguidos con actividad registrada.':item.measure==='km'?'Cada nivel mide la distancia de una sola actividad, no la suma de varias.':item.measure==='days'?'Se cuentan días distintos con actividad registrada, no la cantidad de ejercicios.':item.measure==='seconds'?'Se cuenta el tiempo sostenido en una única serie.':'Se cuenta la mejor serie de un mismo movimiento, no la suma de varias series.'} Máximo admitido por serie: ${esc(formatBadgeValue(BadgeEngine.maxPlausible(item),item.measure))}.</p>`;
   }
@@ -4177,9 +4281,14 @@ function findCatalogExercise(name){
     if(filter==='started')shown.sort((a,b)=>(b.progress.highest-a.progress.highest)||(b.progress.pct-a.progress.pct));
     document.querySelectorAll('[data-badge-filter]').forEach(b=>{const on=b.dataset.badgeFilter===filter;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});
     if(!shown.length){root.innerHTML=filter==='started'?`<div class="empty ff-empty-wide">${BadgeEngine.medalSvg({glyph:'star',locked:true,size:56})}<strong>Todavía no empezaste ningún desafío</strong><p>Registrá tu mejor serie de flexiones, una plancha o una carrera para ganar tu primer Bronce I.</p><button class="btn" type="button" data-badge-filter-go="all">Ver todos los desafíos</button></div>`:'<div class="empty"><strong>No hay desafíos en esta categoría</strong><p>Probá con otra categoría.</p></div>';return;}
+    // v58: como el «Sistema de insignias» de referencia: cada desafío muestra su fila de rangos (Bronce → Legendario).
+    const RK=BadgeEngine.RANKS,rowHtml=({item,metric,thresholds,progress})=>{const hi=progress.highest,glyph=BadgeEngine.glyphFor(item);
+      const tiers=RK.map((r,ri)=>{const first=ri*3,last=first+2,reached=hi>=first,lvl=reached?Math.min(hi,last)-first:0,num=r.roman?r.roman[lvl]:['I','II','III'][lvl];return `<span class="brc-tier${reached?' is-on':''}${reached&&hi<=last?' is-current':''}">${BadgeEngine.medalSvg({rankKey:r.key,numeral:reached?num:'',glyph,category:item.category,locked:!reached,size:46})}<small>${esc(r.name)}${reached?' '+esc(num):''}</small></span>`;}).join('');
+      return `<button type="button" class="badge-row-card" data-badge-open="${esc(item.id)}"><span class="brc-head"><span class="brc-icon" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">${BadgeEngine.GLYPHS[glyph]||BadgeEngine.GLYPHS.star}</svg></span><span class="brc-title"><strong>${esc(item.name)}</strong><small>${esc(metric.needsBodyweight?'Necesita tu peso corporal.':BadgeEngine.nextStepMessage(metric.value,thresholds,item.measure))}</small></span><b class="brc-count">${Math.max(0,hi+1)}/${thresholds.length}</b></span><span class="brc-tiers">${tiers}</span></button>`;};
     const tileHtml=({item,metric,thresholds,progress})=>{const rank=progress.highest>=0?BadgeEngine.rankForLevel(progress.highest):null;return `<button type="button" class="badge-tile rank-${rank?rank.key:'none'}" data-badge-open="${esc(item.id)}" title="${esc(BadgeEngine.nextStepMessage(metric.value,thresholds,item.measure))}">${badgeMedalFor(item,progress.highest,{size:58})}<span class="badge-tile-copy"><strong>${esc(item.name)}</strong><small>${rank?esc(rank.label):'Bloqueado'}${metric.value>0&&metric.evidence==='gps_device'?' · GPS':''}</small><span class="badge-tile-bar" aria-hidden="true"><i style="width:${progress.pct}%"></i></span><small class="badge-tile-next">${esc(BadgeEngine.nextStepMessage(metric.value,thresholds,item.measure))}</small></span></button>`;};
     const cats=[...new Set(shown.map(x=>x.item.category))];
-    root.innerHTML=cats.map(c=>`<section class="badge-group"><h4>${esc(BadgeEngine.categoryLabel(c))}</h4><div class="badge-group-grid">${shown.filter(x=>x.item.category===c).map(tileHtml).join('')}</div></section>`).join('');
+    const legend=`<div class="badge-system"><div><strong>Sistema de insignias</strong><small>Entrená · Mejorá · Superá tus límites</small></div><ul>${RK.map(r=>`<li>${BadgeEngine.medalSvg({rankKey:r.key,glyph:'star',size:34})}<span>${esc(r.name)}</span><small>Niveles I–III</small></li>`).join('')}</ul></div>`;
+    root.innerHTML=legend+cats.map(c=>`<section class="badge-group"><h4>${esc(BadgeEngine.categoryLabel(c))}</h4><div class="badge-row-grid">${shown.filter(x=>x.item.category===c).map(rowHtml).join('')}</div></section>`).join('');void tileHtml;
   }
   function openBadge(id){
     const select=$('badgeExerciseSelect'),filter=$('badgeCategoryFilter');if(!select||!filter)return;
@@ -4915,8 +5024,46 @@ function findCatalogExercise(name){
     history.innerHTML=weekly.days.map(day=>`<div class="habit-week-day ${day.isToday?'today':''}" title="${prettyDate(day.key)}: ${day.completed} de ${day.total} hábitos"><span>${day.label}</span><strong>${day.completed}/${day.total}</strong><div class="habit-week-dots" aria-hidden="true">${Array.from({length:day.total},(_,i)=>`<i class="${i<day.completed?'done':''}"></i>`).join('')}</div></div>`).join('');
     checklist.querySelectorAll('[data-habit-key]').forEach(input=>input.addEventListener('change',()=>{const key=dateKey(),log=state.habitLogs[key]&&typeof state.habitLogs[key]==='object'?state.habitLogs[key]:{};log[input.dataset.habitKey]=input.checked;state.habitLogs[key]=log;save();renderHabitTracker();}));
   }
+  // ---------- v58: qué comer hoy según el objetivo y «Completá tu día» ----------
+  let goalMenuPicks={},goalMenuData=null;
+  function nutritionTargets(){const g=state.nutritionGoals||defaults.nutritionGoals;return {kcal:Number(g.calories)||2000,protein:Number(g.protein)||120};}
+  function mealFromSuggestion(type,m,tag){
+    const items=m.items.map(x=>({foodId:x.foodId,amount:x.grams,unit:'g',grams:x.grams,source:String(x.foodId).startsWith('rc-')?'estimate':'usda'}));
+    return {id:Date.now()+Math.random(),date:dateKey(),type,name:`${m.name} (${m.items.map(x=>`${x.grams} g`).join(', ')})`.slice(0,160),calories:m.totals.kcal,protein:m.totals.protein,carbs:m.totals.carbs,fat:m.totals.fat,items,estimated:true,source:tag};
+  }
+  function renderGoalMenu(){
+    const root=$('goalMenu'),NG=window.FittFormaNutritionGuides;if(!root||!NG?.dailyMenu)return;
+    const key=currentGuideKey(),t=nutritionTargets();goalMenuData=NG.dailyMenu(FOOD_DB,{goal:key,...t},goalMenuPicks);const m=goalMenuData;
+    const diff=Math.round(m.totals.kcal-m.target.kcal);
+    root.innerHTML=`<p class="goal-menu-target"><span><small>Objetivo</small><b>${esc(NG.GUIDES[key].title)}</b></span><span><small>Calorías</small><b>${m.totals.kcal} / ${m.target.kcal} kcal</b></span><span><small>Proteína</small><b>${Math.round(m.totals.protein)} / ${m.target.protein} g</b></span></p>
+      ${Math.abs(diff)>m.target.kcal*0.08?`<p class="muted small">Con porciones razonables este menú queda en ${m.totals.kcal} kcal (${diff>0?'+':''}${diff}). ${diff<0?'Si te falta, sumá una fruta, pan o un puñado de frutos secos.':'Si te sobra, achicá un poco los carbohidratos.'}</p>`:''}
+      <div class="goal-menu-list">${m.meals.map(x=>`<article class="goal-meal"><div class="goal-meal-head"><div><small>${esc(x.type)}</small><strong>${esc(x.name)}</strong><span class="muted small">${x.totals.kcal} kcal · ${Math.round(x.totals.protein)} g proteína</span></div></div><ul>${x.items.map(i=>`<li><b>${i.grams} g</b><span><span>${esc(i.name)}</span>${i.variant?` <small class="muted">${esc(i.variant)}</small>`:''}</span></li>`).join('')}</ul><div class="btn-row"><button type="button" class="btn ghost btn-sm" data-goal-swap="${esc(x.type)}"${x.options<2?' disabled':''}>Otra opción</button><button type="button" class="btn secondary btn-sm" data-goal-add="${esc(x.type)}">Agregar a hoy</button></div></article>`).join('')}</div>`;
+  }
+  function renderCompleteDay(){
+    const root=$('completeDayCard'),NG=window.FittFormaNutritionGuides;if(!root||!NG?.completeDay)return;
+    const t=nutritionTargets(),meals=todayMeals(),kcal=meals.reduce((a,m)=>a+(Number(m.calories)||0),0),prot=meals.reduce((a,m)=>a+(Number(m.protein)||0),0);
+    const kl=Math.round(t.kcal-kcal),pl=Math.round(t.protein-prot),res=NG.completeDay(FOOD_DB,{goal:currentGuideKey(),kcalLeft:kl,proteinLeft:pl});
+    const head=`<div class="section-head"><div><div class="eyebrow">Completá tu día</div><h3>${!meals.length?'Todavía no registraste comidas hoy':res.status==='done'?'¡Llegaste a tus objetivos de hoy!':res.status==='kcal-reached'?'Ya llegaste a tus calorías de hoy':`Te faltan ${Math.max(0,kl)} kcal y ${Math.max(0,pl)} g de proteína`}</h3></div></div>`;
+    if(!meals.length){root.innerHTML=head+`<p class="muted small">Registrá lo que comiste o mirá el menú de ejemplo según tu objetivo en la pestaña Plan.</p><button type="button" class="btn secondary btn-sm" data-goal-open-plan>Ver menú de ejemplo</button>`;return;}
+    if(!res.options.length){root.innerHTML=head+`<p class="muted small">${res.status==='kcal-reached'&&pl>=10?`Te faltan ${pl} g de proteína, pero ya llegaste a tus calorías: mañana sumá proteína en las primeras comidas.`:'No hace falta sumar nada más hoy. Si tenés hambre, priorizá verduras o una fruta.'}</p>`;return;}
+    root.innerHTML=head+`<p class="muted small">${res.status==='protein'?'Opciones con mucha proteína que entran en lo que te queda:':'Opciones que entran en las calorías que te quedan:'}</p><div class="complete-day-list">${res.options.map((o,i)=>`<div class="complete-day-item"><div><strong>${esc(o.name)}</strong><small>${o.items.map(x=>`${x.grams} g`).join(' + ')} · ${o.totals.kcal} kcal · ${Math.round(o.totals.protein)} g proteína</small></div><button type="button" class="btn secondary btn-sm" data-complete-add="${i}">Agregar</button></div>`).join('')}</div>`;
+    root._options=res.options;
+  }
+  function initGoalNutrition(){
+    $('goalMenuCard')?.addEventListener('click',e=>{
+      const sw=e.target.closest('[data-goal-swap]');if(sw){const k=sw.dataset.goalSwap;goalMenuPicks={...goalMenuPicks,[k]:(goalMenuPicks[k]||0)+1};renderGoalMenu();return;}
+      const ad=e.target.closest('[data-goal-add]');if(ad&&goalMenuData){const m=goalMenuData.meals.find(x=>x.type===ad.dataset.goalAdd);if(!m)return;state.meals.push(mealFromSuggestion(m.type,m,'goal-menu'));if(save()){renderNutrition();renderHome();toast(`Agregado a ${m.type}: ${m.totals.kcal} kcal.`);}return;}
+    });
+    $('goalMenuAddAll')?.addEventListener('click',()=>{if(!goalMenuData)return;const have=new Set(todayMeals().map(m=>m.type));const add=goalMenuData.meals.filter(m=>!have.has(m.type));if(!add.length){toast('Ya registraste todas las comidas de hoy.');return;}add.forEach(m=>state.meals.push(mealFromSuggestion(m.type,m,'goal-menu')));if(save()){renderNutrition();renderHome();toast(`${add.length} ${add.length===1?'comida agregada':'comidas agregadas'} a hoy.`);}});
+    $('completeDayCard')?.addEventListener('click',e=>{
+      if(e.target.closest('[data-goal-open-plan]')){document.querySelector('#view-nutrition [data-view-tab=plan]')?.click();setTimeout(()=>$('goalMenuCard')?.scrollIntoView({behavior:'smooth',block:'start'}),60);return;}
+      const b=e.target.closest('[data-complete-add]');if(!b)return;const o=$('completeDayCard')._options?.[Number(b.dataset.completeAdd)];if(!o)return;
+      const h=new Date().getHours(),type=h<11?'Desayuno':h<15?'Almuerzo':h<19?'Merienda':'Cena';
+      state.meals.push(mealFromSuggestion(type,o,'complete-day'));if(save()){renderNutrition();renderHome();toast(`Agregado a ${type}: ${o.totals.kcal} kcal.`);}
+    });
+  }
   function renderNutrition(){
-    const g=state.nutritionGoals||defaults.nutritionGoals;
+    const g=state.nutritionGoals||defaults.nutritionGoals;try{renderGoalMenu();renderCompleteDay();}catch(e){console.error(e);}
     $('calorieGoal').value=g.calories;$('proteinGoal').value=g.protein;$('carbGoal').value=g.carbs??280;$('fatGoal').value=g.fat??80;$('waterGoal').value=g.water;
     if(!state.waterLogs||typeof state.waterLogs!=='object'||Array.isArray(state.waterLogs))state.waterLogs={};
     const todayKey=dateKey();
@@ -5027,7 +5174,7 @@ function findCatalogExercise(name){
     view.addEventListener('click',e=>{
       const b=e.target.closest('button');if(!b)return;
       if(b.dataset.planDay){mealPlanDay=Number(b.dataset.planDay);renderMealPlan();renderRecipes();return;}
-      if(b.dataset.guide){guideKeyChoice=b.dataset.guide;renderNutritionGuide();renderRecipes();return;}
+      if(b.dataset.guide){guideKeyChoice=b.dataset.guide;goalMenuPicks={};renderNutritionGuide();renderRecipes();renderGoalMenu();renderCompleteDay();return;}
       if(b.dataset.recipeFilter){recipeFilter=b.dataset.recipeFilter;renderRecipes();return;}
       if(b.dataset.guideRecipe){const el=document.querySelector(`[data-recipe-log="${CSS.escape(b.dataset.guideRecipe)}"]`)?.closest('details');if(!el){recipeFilter='all';renderRecipes();}const d=document.querySelector(`[data-recipe-log="${CSS.escape(b.dataset.guideRecipe)}"]`)?.closest('details');if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'center'});}return;}
       const recipe=RECIPES.find(r=>r.id===(b.dataset.recipeLog||b.dataset.recipePlan));
@@ -5527,7 +5674,7 @@ function findCatalogExercise(name){
     if(!response.ok)return {config:null,source:'backend',message:`El endpoint /api/public-config respondió HTTP ${response.status}. Render podría estar sirviendo una versión anterior o una ruta incorrecta.`};
     let payload;
     try{payload=await response.json();}catch{return {config:null,source:'backend',message:'Render respondió, pero /api/public-config no devolvió JSON válido.'};}
-    if(payload?.version&&payload.version!=='0.57.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.57.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
+    if(payload?.version&&payload.version!=='0.58.0')return {config:null,source:'backend',message:`Render está ejecutando la versión ${payload.version}, pero esta app espera 0.58.0. Confirmá que GitHub recibió la actualización y que Render terminó el último deploy.`};
     if(!payload?.supabase?.configured){
       const missing=Array.isArray(payload?.missing)?payload.missing.join(', '):'SUPABASE_URL y SUPABASE_ANON_KEY';
       const msg=payload?.issue==='invalid_project_url'
@@ -5628,6 +5775,55 @@ function findCatalogExercise(name){
   }
 
   // v40.21: panel de Inicio. Solo muestra datos guardados en este dispositivo; sin datos, ceros y un aviso de ayuda.
+  // ---------- v58: Inicio personalizable, «Hoy toca» y lo que hiciste en el gym ----------
+  const HOME_BLOCKS=[['today','Entrenamiento de hoy'],['gym','Lo que hiciste en el gym'],['week','Progreso semanal'],['summary','Resumen de hoy'],['tiles','Accesos rápidos'],['badges','Próxima insignia'],['body','Peso y objetivo'],['habits','Hábitos de hoy'],['recent','Actividad reciente'],['quote','Frase del día'],['stats','Tu constancia']];
+  const HOME_DEFAULT_ORDER=['week','today','gym','summary','tiles','badges','body','habits','recent','quote','stats'];
+  function homeLayout(){
+    const l=isPlainObj(state.homeLayout)?state.homeLayout:{},known=HOME_BLOCKS.map(b=>b[0]);
+    const order=[...new Set((Array.isArray(l.order)?l.order:[]).filter(k=>known.includes(k)))];for(const k of HOME_DEFAULT_ORDER)if(!order.includes(k))order.push(k);
+    return {order,hidden:(Array.isArray(l.hidden)?l.hidden:[]).filter(k=>known.includes(k))};
+  }
+  function applyHomeLayout(){
+    const dash=document.querySelector('#view-plan .home-dash');if(!dash)return;const {order,hidden}=homeLayout(),anchor=dash.querySelector('.home-customize-row');
+    for(const k of order){const el=dash.querySelector(`.home-block[data-home-block="${k}"]`);if(!el)continue;el.hidden=hidden.includes(k);if(anchor)dash.insertBefore(el,anchor);}
+  }
+  function renderHomeLayoutEditor(){
+    const list=$('homeLayoutList');if(!list)return;const {order,hidden}=homeLayout(),name=Object.fromEntries(HOME_BLOCKS);
+    list.innerHTML=order.map((k,i)=>`<li class="${hidden.includes(k)?'is-hidden':''}"><label><input type="checkbox" data-layout-show="${k}"${hidden.includes(k)?'':' checked'}><span>${esc(name[k])}</span></label><span class="home-layout-move"><button type="button" class="icon-btn" data-layout-move="${k}:-1" aria-label="Subir ${esc(name[k])}"${i?'':' disabled'}>↑</button><button type="button" class="icon-btn" data-layout-move="${k}:1" aria-label="Bajar ${esc(name[k])}"${i===order.length-1?' disabled':''}>↓</button></span></li>`).join('');
+  }
+  function saveHomeLayout(order,hidden){state.homeLayout={order,hidden};save();applyHomeLayout();renderHomeLayoutEditor();}
+  function initHomeLayout(){
+    const dlg=$('homeLayoutDialog');if(!dlg)return;
+    $('homeCustomize')?.addEventListener('click',()=>{renderHomeLayoutEditor();dlg.showModal?dlg.showModal():dlg.setAttribute('open','');});
+    $('homeLayoutReset')?.addEventListener('click',()=>{saveHomeLayout(HOME_DEFAULT_ORDER.slice(),[]);toast('Inicio restablecido.');});
+    $('homeLayoutList')?.addEventListener('change',e=>{const k=e.target.dataset.layoutShow;if(!k)return;const {order,hidden}=homeLayout();const h=new Set(hidden);if(e.target.checked)h.delete(k);else h.add(k);saveHomeLayout(order,[...h]);});
+    $('homeLayoutList')?.addEventListener('click',e=>{const b=e.target.closest('[data-layout-move]');if(!b)return;const [k,dir]=b.dataset.layoutMove.split(':'),{order,hidden}=homeLayout(),i=order.indexOf(k),j=i+Number(dir);if(j<0||j>=order.length)return;[order[i],order[j]]=[order[j],order[i]];saveHomeLayout(order,hidden);$('homeLayoutList').querySelector(`[data-layout-move="${k}:${dir}"]`)?.focus();});
+    document.addEventListener('click',e=>{if(e.target.closest('[data-home-gym-log]')){switchView('train');setTimeout(()=>{openManualLog();$('manualLogHost')?.scrollIntoView({behavior:'smooth',block:'start'});},60);}const r=e.target.closest('[data-home-repeat]');if(r)repeatSession(r.dataset.homeRepeat);});
+    applyHomeLayout();
+  }
+  // «Hoy toca» en Inicio cuando no hay un plan generado: sale de Mi semana o, si no la armaste, de lo que entrenaste.
+  function homeWeekToday(){
+    const T=FittFormaTraining;if(!T.recommendToday)return null;const rec=todayRecommendation(),day=rec.day,lbl=weekDayLabel(day);
+    if(rec.source==='week'&&day.kind==='rest')return {title:'Hoy: descanso',meta:['Mi semana','Recuperar también es entrenar'],cta:'Ver mi semana',action:'view:train'};
+    if(rec.source==='week')return {title:'Hoy toca: '+lbl,meta:['Mi semana',T.WEEKDAYS[rec.weekday-1]],cta:'Ver la sesión',action:'week:today'};
+    if(rec.source==='history')return {title:'Te recomendamos: '+lbl,meta:[rec.reason].filter(Boolean),cta:'Ver la sesión',action:'week:today'};
+    return null;
+  }
+  function gymSessions(){return (state.sessions||[]).filter(x=>x&&x.status!=='cancelled'&&Array.isArray(x.exercises)&&x.exercises.some(e=>(e.kind||'strength')==='strength'&&(e.entries||[]).some(y=>y&&y.done))).sort((a,b)=>String(b.date).localeCompare(String(a.date))||(Number(b.id)||0)-(Number(a.id)||0));}
+  function bestSetText(ex){
+    const sets=(ex.entries||[]).filter(y=>y&&y.done).map(y=>({w:Number(String(y.weight||'').replace(',','.'))||0,r:Number(y.reps)||0})).filter(y=>y.r>0);if(!sets.length)return '';
+    const b=sets.sort((a,c)=>c.w-a.w||c.r-a.r)[0];return b.w>0?`${String(b.w).replace('.',',')} kg × ${b.r}`:`${b.r} reps`;
+  }
+  function renderHomeGym(){
+    const host=$('homeGym');if(!host)return;const list=gymSessions().slice(0,3);
+    if(!list.length){host.innerHTML='<p class="muted small">Cuando registres un entrenamiento de fuerza vas a ver acá tus ejercicios y tus mejores series. Si ya entrenaste, tocá «Registrar uno».</p>';return;}
+    host.innerHTML=list.map(x=>{const ex=x.exercises.filter(e=>(e.entries||[]).some(y=>y&&y.done));return `<article class="home-gym-item"><div class="home-gym-head"><div><strong>${esc(x.title||'Entrenamiento')}</strong><small>${esc(prettyDate(x.date))}${Number(x.minutes)>0?' · '+esc(String(x.minutes))+' min':''} · ${ex.length} ${ex.length===1?'ejercicio':'ejercicios'}</small></div><button type="button" class="btn secondary btn-sm" data-home-repeat="${esc(String(x.id))}">Repetir</button></div><ul>${ex.slice(0,4).map(e=>`<li><span>${esc(e.name)}</span><b>${esc(bestSetText(e))}</b></li>`).join('')}${ex.length>4?`<li class="muted small">y ${ex.length-4} más</li>`:''}</ul></article>`;}).join('');
+  }
+  function repeatSession(id){
+    const x=(state.sessions||[]).find(s=>String(s.id)===String(id));if(!x)return;
+    const ex=x.exercises.filter(e=>(e.entries||[]).some(y=>y&&y.done)).map(e=>{const done=(e.entries||[]).filter(y=>y&&y.done),lib=FittFormaTraining.libraryEntry(e.name);return {name:e.name,group:e.group||lib?.group||'',kind:e.kind||'strength',sets:Math.max(1,done.length),reps:String(e.targetReps||done[0]?.reps||'10'),rest:Number(e.rest)||90};});
+    if(ex.length&&beginSession({type:'custom',title:x.title||'Entrenamiento'},ex))toast(`Repetís «${x.title||'Entrenamiento'}». Tus marcas anteriores aparecen como referencia.`);
+  }
   function renderHome(){
     renderHomeBodyGoal();
     const set=(id,value)=>{const el=$(id);if(el)el.textContent=value;};
@@ -5680,10 +5876,11 @@ function findCatalogExercise(name){
     else if(todays.length&&outdoor(todays[0])){title=todays[0].title||todays[0].type;meta=[todays[0].type,'Planificado para hoy'];cta='Ir a '+(todays[0].type==='Correr'?'correr':todays[0].type==='Caminar'?'caminar':'pedalear');action='view:running';}
     else if(todays.length&&nextDay){title=todays[0].title||nextDay.title;meta=[todays[0].type,nextDay.title+' · '+nextDay.exercises.length+' ejercicios'];cta='Empezar entrenamiento';action='start:'+nextIndex;}
     else if(todays.length){title=todays[0].title||todays[0].type;meta=[todays[0].type,'Planificado para hoy'];cta='Crear mi rutina';action='view:routines';}
+    else if(!nextDay&&!restDay&&homeWeekToday()){const w=homeWeekToday();title=w.title;meta=w.meta;cta=w.cta;action=w.action;}
     else if(restDay){title='Hoy toca descansar';meta=['Descanso planificado'];cta=nextDay?'Entrenar igual':'Ver rutinas';action=nextDay?'start:'+nextIndex:'view:routines';}
     else if(nextDay){title='Siguiente: '+nextDay.title;meta=[nextDay.exercises.length+' ejercicios',(profile.duration||'')+' min',equipment].filter(Boolean);cta='Empezar entrenamiento';action='start:'+nextIndex;}
     else{title='Armá tu primera rutina';meta=['Elegí tu objetivo, nivel y equipamiento'];cta='Crear mi rutina';action='view:routines';}
-    set('homeTodayTitle',title);
+    set('homeTodayTitle',title);renderHomeGym();applyHomeLayout();
     const metaBox=$('homeTodayMeta');if(metaBox){metaBox.innerHTML='';meta.forEach(text=>{const span=document.createElement('span');span.textContent=text;metaBox.appendChild(span);});}
     const start=$('homeStartBtn');if(start){start.textContent=cta;start.dataset.homeAction=action;}
     // Resumen de hoy
@@ -6057,7 +6254,7 @@ function findCatalogExercise(name){
   document.querySelectorAll('[data-shortcut-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.shortcutView)));
   $('homeBodyGoal')?.addEventListener('click',()=>{switchView('profile');setTimeout(()=>$('bodyProfileCard')?.scrollIntoView({behavior:'smooth',block:'start'}),60);});
   document.querySelectorAll('[data-subview]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.subview)));
-  $('homeStartBtn').addEventListener('click',()=>{const parts=String($('homeStartBtn').dataset.homeAction||'view:train').split(':');if(parts[0]==='start'){const index=Number(parts[1]);if(Number.isInteger(index)&&state.plan&&state.plan.days&&state.plan.days[index])startWorkout(index);else switchView('routines');}else switchView(parts[1]||'train');});
+  $('homeStartBtn').addEventListener('click',()=>{const parts=String($('homeStartBtn').dataset.homeAction||'view:train').split(':');if(parts[0]==='week'){switchView('train');setTimeout(()=>startWeekDay(todayRecommendation().day),60);return;}if(parts[0]==='start'){const index=Number(parts[1]);if(Number.isInteger(index)&&state.plan&&state.plan.days&&state.plan.days[index])startWorkout(index);else switchView('routines');}else switchView(parts[1]||'train');});
   $('homeHabits').addEventListener('click',event=>{const button=event.target.closest('[data-home-habit]');if(!button)return;const habitKey=button.dataset.homeHabit;if(!dailyHabitDefinitions.some(item=>item.key===habitKey))return;if(!state.habitLogs||typeof state.habitLogs!=='object'||Array.isArray(state.habitLogs))state.habitLogs={};const day=dateKey(),log=state.habitLogs[day]&&typeof state.habitLogs[day]==='object'?state.habitLogs[day]:{};log[habitKey]=!log[habitKey];state.habitLogs[day]=log;save();renderHabitTracker();renderHome();});
   document.querySelectorAll('[data-run-plan]').forEach(b=>b.addEventListener('click',()=>{if(!runningPlans[b.dataset.runPlan])return;state.runningPlan=b.dataset.runPlan;save();renderRunningPlan();}));
   $('plannedActivityForm').addEventListener('submit',e=>{e.preventDefault();const date=$('scheduleDate').value,type=$('scheduleType').value,title=$('scheduleTitle').value.trim();if(!date){toast('Elegí una fecha para planificar.');return;}if(date<dateKey()){toast('Elegí hoy o una fecha futura.');return;}state.plannedActivities=state.plannedActivities||[];state.plannedActivities.push({id:Date.now(),date,type,title:title||type});state.plannedActivities.sort((a,b)=>a.date.localeCompare(b.date));save();$('scheduleTitle').value='';renderPlanner();toast('Actividad agregada al calendario.');});
@@ -6322,7 +6519,7 @@ function findCatalogExercise(name){
   window.FittFormaRetrySupabase=initCloud;checkCoachConnection();$('cloudAuthForm').addEventListener('submit',cloudLogin);$('cloudRegister').addEventListener('click',cloudRegister);$('cloudLogout').addEventListener('click',cloudLogout);$('cloudUpload').addEventListener('click',cloudSave);$('cloudDownload').addEventListener('click',cloudLoad);initCloudAuto();initCloud();
   $('undoPlan').addEventListener('click',undoPlan);
   $('foodSearch').addEventListener('input',()=>{if(foodCat==='envasados')foodCat='';renderFoodOptions();});$('foodAmount').addEventListener('input',updateFoodEstimate);$('foodUnit').addEventListener('change',updateFoodEstimate);$('useFood').addEventListener('click',useFood);$('foodAddMeal').addEventListener('click',addFoodToMeals);$('foodMealType').addEventListener('change',()=>{selectFood.touched=true;});$('foodOnline').addEventListener('click',searchFoodOnline);
-  $('foodFinder').addEventListener('click',e=>{const c=e.target.closest('[data-food-cat]');if(c){foodCat=foodCat===c.dataset.foodCat?'':c.dataset.foodCat;renderFoodOptions();return;}const b=e.target.closest('[data-food-id]');if(b){const f=foodById(b.dataset.foodId);if(f)selectFood(f);return;}if(e.target.closest('#foodFav')&&foodSelected){state.foodFavorites=Array.isArray(state.foodFavorites)?state.foodFavorites:[];const i=state.foodFavorites.indexOf(foodSelected.id);if(i>=0)state.foodFavorites.splice(i,1);else{state.foodFavorites.push(foodSelected.id);if(foodSelected.cat==='envasados'){state.customFoods=Array.isArray(state.customFoods)?state.customFoods:[];if(!state.customFoods.some(x=>x.id===foodSelected.id))state.customFoods.push(foodSelected);}}state.foodFavorites=state.foodFavorites.slice(-60);save();renderFoodOptions();toast(i>=0?'Quitado de favoritos.':'Guardado en favoritos.');}});$('generateMenu').addEventListener('click',generateMenu);
+  $('foodFinder').addEventListener('click',e=>{const c=e.target.closest('[data-food-cat]');if(c){foodCat=foodCat===c.dataset.foodCat?'':c.dataset.foodCat;renderFoodOptions();return;}const b=e.target.closest('[data-food-id]');if(b){const f=foodById(b.dataset.foodId);if(f)selectFood(f);return;}if(e.target.closest('#foodFav')&&foodSelected){state.foodFavorites=Array.isArray(state.foodFavorites)?state.foodFavorites:[];const i=state.foodFavorites.indexOf(foodSelected.id);if(i>=0)state.foodFavorites.splice(i,1);else{state.foodFavorites.push(foodSelected.id);if(foodSelected.cat==='envasados'){state.customFoods=Array.isArray(state.customFoods)?state.customFoods:[];if(!state.customFoods.some(x=>x.id===foodSelected.id))state.customFoods.push(foodSelected);}}state.foodFavorites=state.foodFavorites.slice(-60);save();renderFoodOptions();toast(i>=0?'Quitado de favoritos.':'Guardado en favoritos.');}});$('generateMenu').addEventListener('click',()=>{goalMenuPicks=Object.fromEntries(Object.keys(goalMenuPicks).length?Object.entries(goalMenuPicks).map(([k,v])=>[k,v+1]):[['Desayuno',1],['Almuerzo',1],['Merienda',1],['Cena',1]]);renderGoalMenu();});
   $('lookupBarcode').addEventListener('click',lookupBarcode);$('barcodeInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lookupBarcode();}});$('startBarcodeCamera').addEventListener('click',startBarcodeCamera);$('stopBarcodeCamera').addEventListener('click',stopBarcodeCamera);$('analyzeMealPhoto').addEventListener('click',analyzeMealPhoto);window.addEventListener('pagehide',()=>{if(barcodeStream)barcodeStream.getTracks().forEach(t=>t.stop());suspendGpsForPageExit();});window.addEventListener('pageshow',()=>{if(gpsStartedAt&&gpsPaused){$('gpsStatus').textContent='Sesión en pausa. Tocá “Reanudar” para volver a tomar señal.';}});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')persistGpsDraft(true);else if(gpsStartedAt&&!gpsPaused)acquireGpsWakeLock();});
   $('gpsStart').addEventListener('click',startGps);$('gpsPause').addEventListener('click',pauseGps);$('gpsStop').addEventListener('click',()=>stopGps(true));$('gpsCenter').addEventListener('click',()=>{const last=gpsPoints[gpsPoints.length-1];if(last&&gpsMapInstance)gpsMapInstance.setView([Number(last.lat),Number(last.lon)],16,{animate:true});else if(gpsPoints.length)drawGpsRoute();else toast('Todavía no hay una ubicación para centrar.');});$('gpsRestoreDraft').addEventListener('click',restoreGpsDraft);$('gpsDiscardDraft').addEventListener('click',discardGpsDraft);
   $('exportData').addEventListener('click',()=>{
@@ -6355,7 +6552,7 @@ function findCatalogExercise(name){
     if(!deferredInstall){toast('En iPhone: abrí el sitio en Safari, tocá Compartir y “Agregar a pantalla de inicio”.');return;}
     deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true;
   });
-  const APP_VERSION='0.57.0';
+  const APP_VERSION='0.58.0';
   function showUpdateNotice(){
     if(document.getElementById('updateNotice'))return;
     const box=document.createElement('div');box.id='updateNotice';box.className='update-notice';box.setAttribute('role','status');
@@ -6403,7 +6600,7 @@ function findCatalogExercise(name){
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncServerTime().then(()=>{if(!activeSession)renderTrain();});});
   $('badgeCelebrationClose')?.addEventListener('click',()=>$('badgeCelebration').close());
   $('badgeCelebrationView')?.addEventListener('click',()=>{$('badgeCelebration').close();switchView('progress');showProgressTab('badges');});
-  {const p=state.profile||{},d=$('bodyEditDetails');if(d&&Number(p.currentWeightKg)>0&&Number(p.heightCm)>0&&Number(p.age)>0)d.open=false;}initBadgeCenter();initProgressTabs();if(MR&&!isPlainObj(state.muscleRanksSeen)){const r=muscleRanksNow();state.muscleRanksSeen=Object.fromEntries(r.muscles.map(m=>[m.id,m.rank]));}document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});$('coachMessages')?.addEventListener('click',e=>{const b=e.target.closest('[data-ai-go]');if(b)fittaiGo(b.dataset.aiGo);});initViewTabs();initRoutines();initBodyTracking();initNotifications();initTheme();$('homeRecentAll')?.addEventListener('click',()=>{switchView('progress');showProgressTab('history');});initAvatar();initQuickAdd();initWelcome();initMealPlanning();$('deleteCloudAccount')?.addEventListener('click',deleteCloudAccount);initSessionHistoryEditing();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
+  {const p=state.profile||{},d=$('bodyEditDetails');if(d&&Number(p.currentWeightKg)>0&&Number(p.heightCm)>0&&Number(p.age)>0)d.open=false;}initBadgeCenter();initProgressTabs();if(MR&&!isPlainObj(state.muscleRanksSeen)){const r=muscleRanksNow();state.muscleRanksSeen=Object.fromEntries(r.muscles.map(m=>[m.id,m.rank]));}document.addEventListener('click',e=>{if(e.target.closest('[data-show-badges]'))showBadges();const q=e.target.closest('[data-home-quick]');if(q)homeQuickAction(q.dataset.homeQuick);});$('coachMessages')?.addEventListener('click',e=>{const b=e.target.closest('[data-ai-go]');if(b)fittaiGo(b.dataset.aiGo);});initViewTabs();initRoutines();initBodyTracking();initNotifications();initTheme();$('homeRecentAll')?.addEventListener('click',()=>{switchView('progress');showProgressTab('history');});initAvatar();initQuickAdd();initWelcome();initMealPlanning();initHomeLayout();initGoalNutrition();$('deleteCloudAccount')?.addEventListener('click',deleteCloudAccount);initSessionHistoryEditing();syncForm();$('runDate').value=dateKey();$('scheduleDate').value=dateKey();$('activityDate').value=dateKey();renderFoodOptions();renderAll();renderTrain();renderExerciseLibrary();updateRunPacePreview();restoreGpsDraftPrompt();
   setTimeout(()=>checkWorkoutReminders(),1200);setInterval(()=>{if(document.visibilityState==='visible')checkWorkoutReminders();},30000);window.addEventListener('focus',()=>{renderReminderSettings();checkWorkoutReminders();});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){renderReminderSettings();checkWorkoutReminders();}});
   document.addEventListener('visibilitychange',()=>{if(!activeSession)return;if(document.visibilityState==='hidden'&&!activeSession.pausedAt){activeSession.elapsedMs=activeSessionElapsedMs(activeSession);activeSession.segmentStartedAt=Date.now();activeSession.pausedAt=Date.now();activeSession.pauseReason='background';persistActiveSessionDraft();}else if(document.visibilityState==='visible'&&activeSession.pausedAt&&activeSession.pauseReason==='background'){activeSession.pausedAt=0;activeSession.pauseReason='';activeSession.segmentStartedAt=Date.now();persistActiveSessionDraft();updateWorkoutClock();}});
   window.addEventListener('pagehide',()=>{if(activeSession)persistActiveSessionDraft();});
