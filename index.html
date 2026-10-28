@@ -2398,6 +2398,7 @@
             <button class="btn full" type="submit">Guardar recordatorios</button>
           </div>
           <button class="btn secondary full" id="downloadCalendarReminder" type="button" style="margin-top:10px">Descargar recordatorio para calendario (.ics)</button>
+          <button class="btn secondary full" id="downloadWeekPlanIcs" type="button" style="margin-top:8px">Agregar Mi semana al calendario (.ics)</button>
         </form>
         <p class="muted small" id="calendarReminderHelp" style="margin-bottom:8px">Importá el archivo .ics en Google Calendar, Apple Calendar u otra agenda para tener un aviso programado aunque FittForma esté cerrada. Es un evento recurrente independiente: el calendario no sabe si ya registraste tu entrenamiento.</p>
         <p class="muted small" style="margin-bottom:0">Los recordatorios internos se revisan mientras FittForma está abierta y al volver a abrirla. No se garantiza la entrega si queda en segundo plano o cerrada; para notificaciones push propias hace falta configurar un servicio en el servidor.</p><p class="muted small" style="margin-bottom:0">En iPhone, agregá FittForma a la pantalla de inicio para habilitar las notificaciones web compatibles (iOS 16.4 o posterior). Después aceptá el permiso y probá el aviso.</p>
@@ -3663,6 +3664,7 @@ function findCatalogExercise(name){
     return `<div class="week-plan" id="weekPlan"><div class="wp-head"><div><strong>Mi semana</strong><small class="muted">${hasPlan?'Tocá un día para cambiarlo.':'Tocá un día para elegir qué entrenar, o usá una rutina lista.'}</small></div><button type="button" class="btn secondary btn-sm wp-programs-btn" id="wpProgramsToggle" aria-expanded="false">Rutinas listas</button></div>
       <div class="wp-days" role="group" aria-label="Días de la semana">${chips}</div>
       <div class="wp-today">${todayBox}</div>
+      ${hasPlan?`<div class="wp-remind"><span class="wp-remind-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></span><span class="wp-remind-text"><b>Que te avise</b><small>${state.reminders?.enabled?`Avisos activados a las ${esc(state.reminders.time||'18:00')}, con lo que toca cada día.`:'Recibí «Hoy toca…» los días que entrenás.'}</small></span><span class="wp-remind-btns"><button type="button" class="btn secondary btn-sm" data-wp-remind-cal>Agregar al calendario</button><button type="button" class="link-btn" data-wp-remind-settings>${state.reminders?.enabled?'Cambiar':'Activar avisos'}</button></span></div>`:''}
       <div id="wpPrograms" hidden></div>
       <dialog class="wp-sheet" id="wpSheet" aria-labelledby="wpSheetTitle"><div id="wpEditor">${weekEditorMarkup()}</div></dialog></div>`;
   }
@@ -3713,6 +3715,8 @@ function findCatalogExercise(name){
       if(t.dataset.wpSet){const [k,v]=t.dataset.wpSet.split(/:(.*)/s);setWeekDay(weekEditDay,k==='none'?null:k==='rest'?{kind:'rest'}:k==='focus'?{kind:'focus',key:v}:{kind:'routine',id:v});toast(`${FittFormaTraining.WEEKDAYS[weekEditDay-1]}: ${weekDayLabel(weekDays()[weekEditDay])}.`);weekEditDay=0;rerender();return;}
       if(t.hasAttribute('data-wp-groups-save')){const g=[...box.querySelectorAll('[data-wp-group]:checked')].map(x=>x.dataset.wpGroup);if(!g.length){toast('Elegí al menos un grupo muscular.');return;}setWeekDay(weekEditDay,{kind:'groups',groups:g});weekEditDay=0;rerender();return;}
       if(t.id==='wpStartToday'){startWeekDay(todayRecommendation().day);return;}
+      if(t.hasAttribute('data-wp-remind-cal')){downloadWeekPlanIcs();return;}
+      if(t.hasAttribute('data-wp-remind-settings')){switchView('profile');const card=$('workoutReminderCard');card?.closest('details')?.setAttribute('open','');setTimeout(()=>card?.scrollIntoView({behavior:'smooth',block:'start'}),120);return;}
       if(t.id==='wpProgramsToggle'){const host=$('wpPrograms'),open=host.hidden;host.hidden=!open;t.setAttribute('aria-expanded',String(open));if(open)host.innerHTML=programsMarkup();return;}
       if(t.dataset.wpPerweek){state.profile={...state.profile,days:String(t.dataset.wpPerweek)};save();$('wpPrograms').innerHTML=programsMarkup();return;}
       if(t.dataset.wpProgram){const id=t.dataset.wpProgram,prog=FittFormaTraining.PROGRAMS[id];if(Object.keys(weekDays()).length&&state.weekPlan?.programId!==id&&!confirm(`¿Reemplazar tu semana por «${prog.title}»?`))return;
@@ -6330,6 +6334,38 @@ function findCatalogExercise(name){
     save();syncForm();renderIdentityProfile();renderHome();toast('Perfil guardado en este dispositivo.');
   });
 
+  // v60: avisos según Mi semana. Lo que toca hoy (o null si no hay semana armada); 'rest' si hoy es descanso.
+  function weekPlanToday(now=new Date()){
+    const T=window.FittFormaTraining;if(!T?.weekdayOf)return null;const day=(state.weekPlan?.days||{})[T.weekdayOf(dateKey(now))];
+    if(!day)return null;return day.kind==='rest'?'rest':{label:weekDayLabel(day)};
+  }
+  // v60: calendario semanal desde Mi semana: un evento que se repite cada semana por cada día con entrenamiento,
+  // con lo que toca en el título. El calendario avisa aunque la app esté cerrada (no sabe si ya entrenaste).
+  function buildWeekPlanIcs(days,time,referenceDate=new Date()){
+    const match=/^([01]\d|2[0-3]):([0-5]\d)$/.exec(String(time||''));if(!match)throw new Error('Elegí una hora válida para el recordatorio del calendario.');
+    const entries=Object.entries(days||{}).map(([d,v])=>[Number(d),v]).filter(([d,v])=>d>=1&&d<=7&&v&&v.kind!=='rest').sort((a,b)=>a[0]-b[0]);
+    if(!entries.length)throw new Error('Armá Mi semana con al menos un día de entrenamiento.');
+    const now=referenceDate instanceof Date&&Number.isFinite(referenceDate.getTime())?referenceDate:new Date();
+    const hour=Number(match[1]),minute=Number(match[2]),hm=String(hour).padStart(2,'0')+String(minute).padStart(2,'0');
+    const BY=['MO','TU','WE','TH','FR','SA','SU'],pad=n=>String(n).padStart(2,'0');
+    const esc=v=>String(v).replace(/\\/g,'\\\\').replace(/;/g,'\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');
+    const fold=line=>{const parts=[];let part='',bytes=0;for(const ch of line){const n=new TextEncoder().encode(ch).length;if(bytes+n>75){parts.push(part);part=' '+ch;bytes=1+n;}else{part+=ch;bytes+=n;}}parts.push(part);return parts.join('\r\n');};
+    const stamp=now.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z'),lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//FittForma AI//Mi semana//ES','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+    for(const [d,v] of entries){
+      const js=d%7,nowMin=now.getHours()*60+now.getMinutes();let delta=(js-now.getDay()+7)%7;if(delta===0&&hour*60+minute<=nowMin)delta=7;
+      const first=new Date(now.getFullYear(),now.getMonth(),now.getDate()+delta),label=weekDayLabel(v);
+      lines.push('BEGIN:VEVENT',`UID:fittforma-semana-${BY[d-1].toLowerCase()}-${hm}@fittforma-ai.local`,`DTSTAMP:${stamp}`,`DTSTART:${first.getFullYear()}${pad(first.getMonth()+1)}${pad(first.getDate())}T${hm}00`,'DURATION:PT45M',`RRULE:FREQ=WEEKLY;BYDAY=${BY[d-1]}`,`SUMMARY:${esc('Hoy toca: '+label)}`,`DESCRIPTION:${esc('Según tu semana en FittForma AI. El calendario no sabe si ya registraste la sesión.')}`,'BEGIN:VALARM','TRIGGER:-PT10M','ACTION:DISPLAY',`DESCRIPTION:${esc('Hoy toca: '+label)}`,'END:VALARM','END:VEVENT');
+    }
+    lines.push('END:VCALENDAR');return lines.map(fold).join('\r\n')+'\r\n';
+  }
+  function downloadWeekPlanIcs(){
+    try{
+      const content=buildWeekPlanIcs(state.weekPlan?.days,state.reminders?.time||'18:00');
+      const blob=new Blob([content],{type:'text/calendar;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+      link.href=url;link.download='fittforma-mi-semana.ics';link.style.display='none';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+      toast(`Calendario de tu semana descargado (aviso a las ${state.reminders?.time||'18:00'}). Abrilo para agregarlo a tu calendario.`);
+    }catch(error){toast(error?.message||'No se pudo crear el archivo de calendario.');}
+  }
   function reminderText(text){return window.FittFormaI18n?.translate?.(text)||text;}
   function normalizeReminderDays(days){return Array.isArray(days)?[...new Set(days.map(Number).filter(day=>Number.isInteger(day)&&day>=0&&day<=6))]:defaults.reminders.days.slice();}
   function buildCalendarReminderIcs(cfg,referenceDate=new Date()){
@@ -6400,20 +6436,22 @@ function findCatalogExercise(name){
     if(reminderCheckRunning||!state.reminders?.enabled||!('Notification' in window)||Notification.permission!=='granted')return;
     const cfg=state.reminders,now=new Date(),today=dateKey(now),todaysPlans=(state.plannedActivities||[]).filter(item=>item.date===today),planned=todaysPlans.some(item=>item.type!=='Descanso');
     if(shouldSkipReminderForRest(todaysPlans))return;
-    const reminderType=getReminderType(cfg,now,today,workoutLoggedOn(today),planned);
+    const wk=weekPlanToday(now);if(wk==='rest')return;
+    const reminderType=getReminderType(cfg,now,today,workoutLoggedOn(today),planned||!!wk);
     if(!reminderType)return;
     reminderCheckRunning=true;
     try{
       if(reminderType==='missed'){
-        const sent=await showWorkoutNotification('Aviso de seguimiento','Todavía no registraste entrenamiento hoy. Si descansás o ya entrenaste fuera de la app, podés ignorar este aviso.','fittforma-missed-'+today);
+        const sent=await showWorkoutNotification('Aviso de seguimiento',wk?`Todavía no registraste tu entrenamiento de hoy (${wk.label}). Si ya entrenaste fuera de la app, podés ignorar este aviso.`:'Todavía no registraste entrenamiento hoy. Si descansás o ya entrenaste fuera de la app, podés ignorar este aviso.','fittforma-missed-'+today);
         if(sent){state.reminders.lastMissedNoticeDate=today;state.reminders.lastTrainingNoticeDate=today;save();}
       }else if(reminderType==='training'){
-        const sent=await showWorkoutNotification('Recordatorio de entrenamiento','Hoy toca moverse. Abrí FittForma y completá tu sesión.','fittforma-training-'+today);
+        const sent=wk?await showWorkoutNotification('Hoy toca: '+wk.label,'Según tu semana. Abrí FittForma y empezá la sesión.','fittforma-training-'+today):await showWorkoutNotification('Recordatorio de entrenamiento','Hoy toca moverse. Abrí FittForma y completá tu sesión.','fittforma-training-'+today);
         if(sent){state.reminders.lastTrainingNoticeDate=today;save();}
       }
     }finally{reminderCheckRunning=false;}
   }
   $('downloadCalendarReminder').addEventListener('click',downloadCalendarReminderIcs);
+  $('downloadWeekPlanIcs')?.addEventListener('click',downloadWeekPlanIcs);
   $('workoutReminderForm').addEventListener('submit',e=>{
     e.preventDefault();
     const enabled=$('remindersEnabled').checked,days=normalizeReminderDays([...document.querySelectorAll('[data-reminder-day]:checked')].map(input=>input.dataset.reminderDay));
