@@ -1,5 +1,22 @@
 # FittForma AI — Registro de cambios
 
+## v62.0 — Más interacción en toda la app y datos físicos privados con opción de mostrarlos (28 de octubre de 2026)
+
+- **Todo lo que muestra un número lleva a su sección** (con el dedo o con Enter):
+  - Inicio: los números de la semana (entrenamientos, comidas, agua, días activos), los círculos de hoy, «Tu constancia», lo último que hiciste y la próxima insignia.
+  - Perfil: entrenamientos, días activos, insignias e insignias destacadas.
+  - Progreso: los mosaicos y las series por grupo muscular.
+- **Comunidad:**
+  - En un chat, tocar el nombre o la foto abre el perfil de esa persona.
+  - Tocar una insignia (tuya o de otra persona) abre su ficha: rango, nivel de 15, categoría, marca del nivel, fecha y cómo se registró.
+  - En las tuyas aparece «Ver en mis insignias».
+- **Datos físicos privados por defecto:**
+  - Peso actual, altura, peso objetivo y objetivo de entrenamiento no se muestran en Comunidad.
+  - En Comunidad → Mi perfil → «Datos físicos» cada uno se activa por separado.
+  - Solo se sube a la nube lo que está activado. Si cambiás el peso en Perfil, se actualiza solo si lo activaste. Al apagarlo, se quita de la nube.
+  - Los ve quien puede ver tu perfil (si es privado, solo tus seguidores aceptados) y nunca alguien bloqueado.
+- **Base de datos:** migración aditiva `2026-10-31_v62_body_share.sql` (incluida en `APLICAR_MIGRACIONES.sql`). También fija el `search_path` de tres funciones que marcaba el asesor de seguridad de Supabase.
+
 ## v61.0 — Comunidad: estadísticas públicas desde el inicio, una sola foto de perfil, versus por músculo y Legendario (28 de octubre de 2026)
 
 - **Estadísticas públicas desde el inicio:**

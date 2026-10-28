@@ -29,7 +29,8 @@ create policy community_body_update_own on public.community_body for update to a
 revoke all on public.community_body from anon, authenticated;
 grant select on public.community_body to authenticated;
 grant insert (user_id, weight_kg, height_cm, target_weight_kg, goal) on public.community_body to authenticated;
-grant update (weight_kg, height_cm, target_weight_kg, goal) on public.community_body to authenticated;
+-- user_id también, para que el «upsert» de la app funcione; el disparador lo deja siempre como estaba.
+grant update (user_id, weight_kg, height_cm, target_weight_kg, goal) on public.community_body to authenticated;
 
 create or replace function public.community_body_touch()
 returns trigger language plpgsql set search_path = public as $$

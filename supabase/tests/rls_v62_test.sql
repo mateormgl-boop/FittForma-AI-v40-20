@@ -21,6 +21,9 @@ select t.expect_rows($q$insert into public.community_body(user_id,weight_kg,goal
 select t.expect_error($q$insert into public.community_body(user_id,weight_kg) values('a6200000-0000-0000-0000-0000000000f2',80)$q$,'v62 no se guardan datos en nombre de otra persona');
 select t.expect_error($q$update public.community_body set weight_kg=900 where user_id='a6200000-0000-0000-0000-0000000000f1'$q$,'v62 peso fuera de rango rechazado');
 select t.expect_error($q$update public.community_body set goal='otro' where user_id='a6200000-0000-0000-0000-0000000000f1'$q$,'v62 objetivo desconocido rechazado');
+select t.expect_rows($q$insert into public.community_body(user_id,weight_kg,goal) values('a6200000-0000-0000-0000-0000000000f1',72.5,'muscle') on conflict (user_id) do update set user_id=excluded.user_id, weight_kg=excluded.weight_kg, goal=excluded.goal$q$,1,'v62 la app puede guardar con upsert');
+select t.expect_rows($q$update public.community_body set user_id='a6200000-0000-0000-0000-0000000000f2' where user_id='a6200000-0000-0000-0000-0000000000f1'$q$,1,'v62 intentar pasar la fila a otra cuenta…');
+select t.expect_count($q$select 1 from public.community_body where user_id='a6200000-0000-0000-0000-0000000000f1'$q$,1,'v62 …la deja en la cuenta original');
 select t.expect_error($q$update public.community_body set updated_at='2020-01-01' where user_id='a6200000-0000-0000-0000-0000000000f1'$q$,'v62 la fecha la pone el servidor');
 select t.expect_error($q$delete from public.community_body where user_id='a6200000-0000-0000-0000-0000000000f1'$q$,'v62 la fila no se borra: se apagan los datos');
 -- Beto no puede leer la tabla de Ana directamente; sí lo que Ana eligió mostrar.

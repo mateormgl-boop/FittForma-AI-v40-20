@@ -1,8 +1,14 @@
-# FittForma AI — v61.0
+# FittForma AI — v62.0
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v62.0
+
+- Más interacción en toda la app: los números y mosaicos de Inicio, Perfil y Progreso llevan a su sección; en Comunidad, el chat abre el perfil y las insignias abren su ficha.
+- Peso, altura, peso objetivo y objetivo: privados por defecto; cada persona elige cuáles mostrar en Comunidad.
+- Migración nueva: `supabase/migrations/2026-10-31_v62_body_share.sql` (ya incluida en `supabase/APLICAR_MIGRACIONES.sql`).
 
 ## Novedades v61.0
 
