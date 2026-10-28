@@ -49,4 +49,5 @@ test('textos nuevos traducidos', () => {
   for (const s of ['Ver perfil ›', 'Ver en mis insignias', 'Datos físicos', 'Mostrar mi peso actual', 'Sin cargar en Perfil', 'Los eligió mostrar esta persona. No es una evaluación de salud.'])
     assert.ok(i18n.includes(JSON.stringify(s) + ','), s);
   assert.ok(i18n.includes('nivel (\\d+) de 15'), 'nivel X de 15');
+  assert.ok(i18n.includes('Ver la insignia (.+)'), 'etiqueta de la próxima insignia en Inicio');
 });

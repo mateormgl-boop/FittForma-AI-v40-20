@@ -1140,5 +1140,6 @@ window.FittFormaI18nDynamic = [
     if (m[1] === 'Primero cargá') return [`First enter ${f} in Profile → Body data.`, `Primeiro informe ${f} em Perfil → Dados físicos.`, `Saisis d'abord ${f} dans Profil → Données physiques.`, `Prima inserisci ${f} in Profilo → Dati fisici.`, `Trag zuerst ${f} unter Profil → Körperdaten ein.`][i];
     if (m[1] === 'Ahora se muestra') return [`Your community profile now shows ${f}.`, `Agora seu perfil da Comunidade mostra ${f}.`, `Ton profil Communauté affiche maintenant ${f}.`, `Ora il tuo profilo Community mostra ${f}.`, `Dein Community-Profil zeigt jetzt ${f}.`][i];
     return [`You stopped showing ${f}: it's private again.`, `Você deixou de mostrar ${f}: voltou a ser privado.`, `Tu n'affiches plus ${f} : c'est de nouveau privé.`, `Hai smesso di mostrare ${f}: è di nuovo privato.`, `Du zeigst ${f} nicht mehr an: wieder privat.`][i];
-  }]
+  }],
+[/^Ver la insignia (.+)$/, (m, i, t) => `${['See the badge', 'Ver a insígnia', 'Voir le badge', 'Vedi il badge', 'Abzeichen ansehen:'][i]} ${t(m[1])}`]
 ].concat(window.FittFormaI18nDynamic || []);
