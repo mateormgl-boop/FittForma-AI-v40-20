@@ -14,14 +14,14 @@ const E = context.FittFormaBadgeEngine;
 const html = await read('index.html');
 const community = await read('community.js');
 
-test('v41: catálogo principal con 12 umbrales crecientes, categoría válida y tope por encima de Diamante III', () => {
+test('v41/v57: catálogo principal con 15 umbrales crecientes, categoría válida y tope por encima de Legendario III', () => {
   const categories = new Set(E.CATEGORIES.map(c => c.key));
   for (const item of [...E.CORE_EXERCISES, ...E.ACTIVITY_CHALLENGES]) {
     const t = E.thresholdsForExercise(item);
-    assert.equal(t.length, 12, item.name);
-    for (let i = 1; i < 12; i++) assert.ok(t[i] > t[i - 1], `${item.name} nivel ${i + 1}`);
+    assert.equal(t.length, 15, item.name);
+    for (let i = 1; i < 15; i++) assert.ok(t[i] > t[i - 1], `${item.name} nivel ${i + 1}`);
     assert.ok(categories.has(item.category), `${item.name} categoría ${item.category}`);
-    if (item.measure !== 'days') assert.ok(E.maxPlausible(item) >= t[11], `${item.name}: el tope debe permitir Diamante III`);
+    if (item.measure !== 'days') assert.ok(E.maxPlausible(item) >= t[14], `${item.name}: el tope debe permitir Legendario III`);
   }
   for (const key of ['calisthenics', 'strength', 'legs', 'core', 'hold', 'cardio', 'running', 'consistency']) assert.ok(categories.has(key), key);
 });
@@ -29,7 +29,10 @@ test('v41: catálogo principal con 12 umbrales crecientes, categoría válida y 
 test('v41: los IDs de desafíos de v40.20 se conservan para no invalidar insignias guardadas', () => {
   const ids = E.CORE_EXERCISES.map(x => x.id);
   for (const id of ['exercise-flexiones', 'exercise-dominadas', 'exercise-sentadillas', 'exercise-abdominales', 'exercise-plancha-frontal']) assert.ok(ids.includes(id), id);
-  assert.deepEqual([...E.CORE_EXERCISES.find(x => x.id === 'exercise-flexiones').thresholds], [5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 75, 100]);
+  // v57: los 12 niveles de siempre no cambian (nadie pierde una insignia); solo se agregan 3 niveles Legendario.
+  assert.deepEqual([...E.CORE_EXERCISES.find(x => x.id === 'exercise-flexiones').thresholds].slice(0, 12), [5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 75, 100]);
+  assert.deepEqual([...E.CORE_EXERCISES.find(x => x.id === 'exercise-flexiones').thresholds].slice(12), [125, 150, 200]);
+  assert.deepEqual([...E.CORE_EXERCISES.find(x => x.id === 'exercise-dominadas').thresholds].slice(0, 12), [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 18, 20]);
 });
 
 test('v41: el mensaje de progreso es concreto y correcto', () => {
@@ -37,7 +40,8 @@ test('v41: el mensaje de progreso es concreto y correcto', () => {
   assert.equal(E.nextStepMessage(17, flex.thresholds, 'reps'), 'Te faltan 3 repeticiones para Plata I.');
   assert.equal(E.nextStepMessage(19, flex.thresholds, 'reps'), 'Te falta 1 repetición para Plata I.');
   assert.equal(E.nextStepMessage(0, flex.thresholds, 'reps'), 'Tu primera marca de 5 repeticiones desbloquea Bronce I.');
-  assert.equal(E.nextStepMessage(100, flex.thresholds, 'reps'), 'Completaste los 12 niveles de este desafío.');
+  assert.equal(E.nextStepMessage(100, flex.thresholds, 'reps'), 'Te faltan 25 repeticiones para Legendario I.');
+  assert.equal(E.nextStepMessage(200, flex.thresholds, 'reps'), 'Completaste los 15 niveles de este desafío.');
   assert.match(E.nextStepMessage(3.2, E.RUN_DISTANCE_TARGETS, 'km'), /Te faltan 1,8 km para Plata I\./);
 });
 

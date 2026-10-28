@@ -1,13 +1,24 @@
-# Despliegue de FittForma AI v56.0
+# Despliegue de FittForma AI v57.0
 
-Esta guía es la lista de pasos para publicar v56.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v57.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
+
+## Qué cambia en v57.0
+
+- **Migración nueva (aditiva):** `supabase/migrations/2026-10-30_v57_legend_badges.sql`.
+  - Solo reemplaza dos funciones de validación (`community_valid_achievement` y `community_valid_featured`) para aceptar los niveles 13 a 15 con rango `legend`.
+  - No borra tablas, datos ni políticas, y se puede ejecutar más de una vez.
+  - Sin ella, la app funciona igual, pero Comunidad rechaza publicar un logro Legendario.
+- **Animaciones:** `assets/exercises/gif/` (GIF) se reemplaza por `assets/exercises/anim/` (WebP animado, 9 MB en total). `exercise-gifs.js` apunta a los archivos nuevos.
+- **Archivos que se actualizan:** `food-db.js`, `food-core.js`, `achievements.js`, `muscle-ranks.js`, `anatomy.js`, `community.js`, `athlete-stats.js` e `i18n-v53.js`.
+- La copia automática en la nube usa la tabla `user_app_data` que ya existía; no necesita cambios en Supabase.
+- El service worker cambia a `fittforma-ai-static-v57-0`.
 
 ## Qué cambia en v56.0
 
 - **No hay migraciones nuevas.**
 - **Archivos nuevos:**
-  - 31 animaciones en `assets/exercises/gif/`.
+  - 31 animaciones en `assets/exercises/gif/` (desde v57, todas en `assets/exercises/anim/` como WebP animado).
   - 62 fotos en `assets/exercises/lib/`.
 - **Archivos que se actualizan:** `exercise-gifs.js`, `exercise-media.js`, `exercise-guides.js` y `training-core.js`.
 - El service worker cambia a `fittforma-ai-static-v56-0`, así que los teléfonos descargan la versión nueva al abrir la app.
@@ -170,6 +181,11 @@ un proyecto de **pruebas** y después en producción:
    *Settings › API › Reload schema* o `notify pgrst, 'reload schema';`)
 8. `supabase/migrations/2026-10-24_v50_community_directory.sql` (directorio y privacidad v50; después, recargar el
    esquema igual que en el paso 7)
+9. `supabase/migrations/2026-10-26_v52_rank_board.sql` (ranking de rangos con amigos)
+10. `supabase/migrations/2026-10-27_v53_athlete_community.sql` (comunidad de atletas; después, recargar el esquema)
+11. `supabase/migrations/2026-10-28_v53_profile_extras.sql` (músculos en el perfil, bandera y «Mi físico»)
+12. `supabase/migrations/2026-10-29_v54_weekly_alerts.sql` (ranking semanal, historial y avisos)
+13. `supabase/migrations/2026-10-30_v57_legend_badges.sql` (insignias de 15 niveles con Legendario)
 
 No volver a ejecutar `schema.sql` ni `community.sql`. RLS queda activado en todas las tablas: no
 desactivarlo para resolver errores.

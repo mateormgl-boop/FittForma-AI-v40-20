@@ -67,7 +67,8 @@ for i in out:
     if i['name'] in ALIASES: i['alias'] = ALIASES[i['name']]
     if i['name'] == 'Harina de garbanzo': i['cat'] = 'legumbres'
 # Recetas: suma de nutrientes de los ingredientes / peso final. Se marcan como estimación.
-for name, cat, final_g, ings, note in RECIPES:
+for rec in RECIPES:
+    name, cat, final_g, ings, note = rec[:5]; por = rec[5] if len(rec) > 5 else None
     tot = {'kcal': 0, 'p': 0, 'c': 0, 'f': 0, 'fib': 0}; parts = []; ok = True
     for iname, ivar, g in ings:
         it = byname.get((iname, ivar))
@@ -78,7 +79,7 @@ for name, cat, final_g, ings, note in RECIPES:
     k = 100 / final_g
     out.append({'id': 'rc-' + re.sub(r'[^a-z0-9]+', '-', name.lower().encode('ascii', 'ignore').decode()).strip('-'), 'name': name, 'variant': 'Receta casera', 'base': name, 'cat': cat,
                 'kcal': round(tot['kcal'] * k), 'p': round(tot['p'] * k, 1), 'c': round(tot['c'] * k, 1), 'f': round(tot['f'] * k, 1), 'fib': round(tot['fib'] * k, 1),
-                'src': {'type': 'receta', 'yield': final_g, 'ingredients': parts, 'note': note}, 'portions': [{'label': '1 porción', 'g': round(min(final_g, 300 if final_g > 600 else final_g), 0)}]})
+                'src': {'type': 'receta', 'yield': final_g, 'ingredients': parts, 'note': note}, 'portions': [{'label': por[0], 'g': por[1]} if por else {'label': '1 porción', 'g': round(min(final_g, 300 if final_g > 600 else final_g), 0)}]})
 if '--check' in sys.argv:
     for i in out: print(f"{i['cat']:11} {i['name'][:30]:30} {i['variant'][:26]:26} #{i['src'].get('ndb','receta')} {i['kcal']:4} kcal  P{i['p']} C{i['c']} G{i['f']}  {i['src'].get('desc', i['src'].get('note',''))[:70]}")
 for p in problems: print('PROBLEMA', p, file=sys.stderr)

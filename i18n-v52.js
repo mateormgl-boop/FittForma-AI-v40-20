@@ -53,7 +53,7 @@
   ["Tibial anterior", "Tibialis anterior", "Tibial anterior", "Tibial antérieur", "Tibiale anteriore", "Vorderer Schienbeinmuskel"]
 );
 
-const MR_RANK = { Hierro: ['Iron', 'Ferro', 'Fer', 'Ferro', 'Eisen'], Bronce: ['Bronze', 'Bronze', 'Bronze', 'Bronzo', 'Bronze'], Plata: ['Silver', 'Prata', 'Argent', 'Argento', 'Silber'], Oro: ['Gold', 'Ouro', 'Or', 'Oro', 'Gold'], Rubí: ['Ruby', 'Rubi', 'Rubis', 'Rubino', 'Rubin'], Esmeralda: ['Emerald', 'Esmeralda', 'Émeraude', 'Smeraldo', 'Smaragd'], Diamante: ['Diamond', 'Diamante', 'Diamant', 'Diamante', 'Diamant'], Campeón: ['Champion', 'Campeão', 'Champion', 'Campione', 'Champion'], Leyenda: ['Legend', 'Lenda', 'Légende', 'Leggenda', 'Legende'] };
+const MR_RANK = { Hierro: ['Iron', 'Ferro', 'Fer', 'Ferro', 'Eisen'], Bronce: ['Bronze', 'Bronze', 'Bronze', 'Bronzo', 'Bronze'], Plata: ['Silver', 'Prata', 'Argent', 'Argento', 'Silber'], Oro: ['Gold', 'Ouro', 'Or', 'Oro', 'Gold'], Rubí: ['Ruby', 'Rubi', 'Rubis', 'Rubino', 'Rubin'], Esmeralda: ['Emerald', 'Esmeralda', 'Émeraude', 'Smeraldo', 'Smaragd'], Diamante: ['Diamond', 'Diamante', 'Diamant', 'Diamante', 'Diamant'], Campeón: ['Champion', 'Campeão', 'Champion', 'Campione', 'Champion'], Platino: ['Platinum', 'Platina', 'Platine', 'Platino', 'Platin'], Leyenda: ['Legend', 'Lenda', 'Légende', 'Leggenda', 'Legende'] };
 const mrRank = (n, i) => MR_RANK[n]?.[i] || n;
 window.FittFormaI18nDynamic = [
   [/^Siguiente rango: (.+)$/, (m, i) => `${['Next rank', 'Próximo nível', 'Rang suivant', 'Grado successivo', 'Nächster Rang'][i]}: ${m[1]}`],

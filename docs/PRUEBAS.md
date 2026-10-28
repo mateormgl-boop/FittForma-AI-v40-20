@@ -9,6 +9,31 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v57
+
+- `tests/v57.test.mjs`:
+  - El lector de comidas reconoce «100 g de hamburguesa, 2 croquetas de papa y 200 g de pan» con 100, 90 y 200 g.
+  - Los platos con «con» no se parten, las unidades usan su peso típico y lo desconocido se avisa.
+  - Hay 15 niveles de insignias con Legendario; los 12 umbrales anteriores de dominadas no cambian y todos crecen.
+  - La migración v57 es aditiva y solo acepta los niveles 13 a 15 con rango `legend`.
+  - Músculos va de Bronce a Leyenda con los mismos mínimos de series; Leyenda se pinta negra con borde dorado.
+  - La ficha tiene las dos pestañas.
+  - Guardas de la copia automática en la nube.
+  - Cada texto de las 31 fichas nuevas tiene su fila de traducción.
+- `tests/e2e/v57.e2e.mjs` (19 pasos, solo la app):
+  - Gramos por alimento editables y guardados.
+  - Medalla Legendario con 40 dominadas.
+  - Escalera de Músculos, «Sin entrenar», mapa y «Comparar».
+  - Ficha en pestañas con animación WebP, traducida al inglés.
+  - 320 px sin desborde y sin errores de JavaScript.
+- `tests/e2e/cloud-backup.e2e.mjs` (15 pasos, con PostgREST y PostgreSQL local, igual que `community.e2e.mjs`):
+  - La primera copia se sube sola y los cambios se suben al salir de la app.
+  - No pisa una copia más nueva de otro dispositivo y avisa qué hacer.
+  - Después de elegir, sigue sola.
+  - Con el dispositivo vacío no reemplaza la nube.
+  - Apagada no sube nada, y el botón manual sigue funcionando.
+- `supabase/tests/rls_v57_test.sql`: 6 comprobaciones de los logros Legendario (válidos e inválidos) y de que los de antes siguen siendo válidos.
+
 ### v56
 
 - `tests/v56.test.mjs`:

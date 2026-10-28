@@ -1,5 +1,49 @@
 # FittForma AI — Registro de cambios
 
+## v57.0 — Nutrición con cantidades, insignias Legendario, Músculos desde Bronce y ficha más clara (28 de octubre de 2026)
+
+- **Nutrición: escribís lo que comiste con la cantidad y la app lo lee.**
+  - Ejemplo: «100 g de hamburguesa, 2 croquetas de papa y 200 g de pan».
+  - Busca cada alimento en toda la base (306 alimentos), no solo en una lista corta.
+  - Entiende gramos, mililitros, unidades («2 huevos», «3 croquetas») y porciones comunes («un plato», «un vaso»).
+  - «Lo que reconocí» muestra cada alimento con sus gramos aproximados. Se pueden cambiar los gramos, elegir otra variante o quitar un alimento, y el total se recalcula.
+  - Lo que no reconoce se avisa con un ejemplo de cómo escribirlo; no se inventa.
+  - Los platos con «con» se mantienen juntos (por ejemplo, «fideos con tuco»).
+  - **25 alimentos nuevos:**
+    - De USDA: facturas, panqueques, waffles, brownie, galletitas con chips, cheesecake, tarta de manzana, masitas secas, maicena, masa de tarta y burrito.
+    - Recetas caseras (marcadas como estimación): croquetas de papa, alfajor de maicena y de chocolate, tarta y empanada de jamón y queso, fideos y polenta con tuco, ensalada mixta, sándwich de milanesa, pizza casera, hamburguesa casera al pan, revuelto gramajo y panqueques finos.
+    - Ningún alimento que ya existía cambió sus valores.
+- **Insignias: 15 niveles, con «Legendario» de material negro.**
+  - Arriba de Diamante hay tres niveles nuevos: Legendario I, II y III. La medalla es negra con borde y corona dorados.
+  - Los techos son más altos. Por ejemplo, dominadas: 25, 30 y 40 repeticiones (antes terminaba en 20). Flexiones: 125, 150 y 200.
+  - Los 12 niveles anteriores tienen los mismos umbrales: nadie pierde una insignia ya ganada.
+  - Migración aditiva `2026-10-30_v57_legend_badges.sql` para que Comunidad acepte los niveles 13 a 15.
+- **Músculos:**
+  - La escalera empieza en Bronce y sube por Plata, Oro, Platino, Esmeralda, Rubí, Diamante y Campeón hasta Leyenda (negro con brillo dorado).
+  - Usa las mismas series que antes para cada rango: los rangos guardados siguen valiendo lo mismo.
+  - Un músculo sin series dice «Sin entrenar».
+  - El mapa muscular está redibujado:
+    - cuerpo oscuro con volumen;
+    - abdominales por bloques;
+    - tres cabezas del cuádriceps, dos de los gemelos y dos de los isquiotibiales;
+    - líneas de definición.
+  - La sección tiene un orden más claro: tu rango, el mapa grande, «Qué entrenar» y el detalle músculo por músculo. «Comparar» muestra frente y espalda por separado.
+- **Ficha del ejercicio en dos pestañas:**
+  - «Cómo se hace»: músculos, pasos, dosis, alternativas y video.
+  - «Mi progreso»: «Lo hice», rango e historial.
+- **Animaciones más livianas:**
+  - Las 193 animaciones pasaron de GIF a WebP animado: de 34 MB a 9 MB.
+  - Tienen el mismo contenido y más color.
+- **Copia automática en la nube:**
+  - Con la sesión iniciada, tus cambios se suben solos unos segundos después, o al salir de la app.
+  - Nunca pisa una copia más nueva hecha desde otro dispositivo: en ese caso se pausa y te pide elegir entre cargar o guardar.
+  - Si este dispositivo quedó vacío, no reemplaza la copia de la nube.
+  - Se puede apagar.
+- **Traducciones:**
+  - Las 31 fichas de v56 están en inglés, portugués, francés, italiano y alemán.
+  - También textos de la ficha que quedaban en español en todos los ejercicios: equipamiento, avisos y alternativas.
+- Pruebas: `tests/v57.test.mjs`, `tests/e2e/v57.e2e.mjs`, `tests/e2e/cloud-backup.e2e.mjs` y `supabase/tests/rls_v57_test.sql`.
+
 ## v56.0 — Ejercicios nuevos, biblioteca mejorada, progresión con números y Progreso más completo (28 de octubre de 2026)
 
 - **Hidratación:** en Inicio y en el menú rápido, «+1 vaso de agua» ahora se llama «Hidratación» (y sigue sumando un vaso al tocarlo).

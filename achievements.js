@@ -19,17 +19,20 @@
     { key: 'bronze', name: 'Bronce', roman: ['I', 'II', 'III'] },
     { key: 'silver', name: 'Plata', roman: ['I', 'II', 'III'] },
     { key: 'gold', name: 'Oro', roman: ['I', 'II', 'III'] },
-    { key: 'diamond', name: 'Diamante', roman: ['I', 'II', 'III'] }
+    { key: 'diamond', name: 'Diamante', roman: ['I', 'II', 'III'] },
+    // v57: tres niveles más, de material negro. Los 12 niveles anteriores no cambian (nadie pierde una insignia).
+    { key: 'legend', name: 'Legendario', roman: ['I', 'II', 'III'] }
   ];
-  const GENERIC_REP_TARGETS = [1, 3, 5, 8, 10, 12, 15, 20, 25, 30, 40, 50];
-  const GENERIC_SECONDS_TARGETS = [10, 20, 30, 45, 60, 90, 120, 180, 240, 300, 360, 600];
-  const GENERIC_MINUTE_TARGETS = [3, 5, 8, 10, 15, 20, 30, 45, 60, 90, 120, 180];
-  const RUN_DISTANCE_TARGETS = [1, 2, 3, 5, 7, 10, 12, 15, 18, 21.1, 30, 42.2];
-  const WALK_DISTANCE_TARGETS = [1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 40, 50];
-  const BIKE_DISTANCE_TARGETS = [3, 5, 10, 15, 20, 30, 40, 60, 80, 100, 150, 200];
-  const ACTIVE_DAY_TARGETS = [1, 3, 5, 7, 10, 14, 21, 30, 45, 60, 90, 120];
-  const SESSION_COUNT_TARGETS = [1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150];
-  const STREAK_TARGETS = [2, 3, 4, 5, 7, 10, 14, 21, 30, 45, 60, 90];
+  const LEVELS = RANKS.length * 3; // 15
+  const GENERIC_REP_TARGETS = [1, 3, 5, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75, 100];
+  const GENERIC_SECONDS_TARGETS = [10, 20, 30, 45, 60, 90, 120, 180, 240, 300, 360, 600, 900, 1200, 1800];
+  const GENERIC_MINUTE_TARGETS = [3, 5, 8, 10, 15, 20, 30, 45, 60, 90, 120, 180, 240, 300, 360];
+  const RUN_DISTANCE_TARGETS = [1, 2, 3, 5, 7, 10, 12, 15, 18, 21.1, 30, 42.2, 50, 60, 80];
+  const WALK_DISTANCE_TARGETS = [1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80];
+  const BIKE_DISTANCE_TARGETS = [3, 5, 10, 15, 20, 30, 40, 60, 80, 100, 150, 200, 250, 300, 400];
+  const ACTIVE_DAY_TARGETS = [1, 3, 5, 7, 10, 14, 21, 30, 45, 60, 90, 120, 180, 270, 365];
+  const SESSION_COUNT_TARGETS = [1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200, 300, 500];
+  const STREAK_TARGETS = [2, 3, 4, 5, 7, 10, 14, 21, 30, 45, 60, 90, 120, 180, 365];
 
   // Valores por encima de estos topes se rechazan como marca de una sola serie/actividad.
   const GENERIC_MAX = { reps: 300, seconds: 3600, minutes: 360, km: 100, days: 100000, bw: 5, sessions: 100000, streak: 100000 };
@@ -50,20 +53,20 @@
   // Ejercicios principales con umbrales propios. Los IDs y umbrales se conservan desde v40.20
   // para no alterar insignias ya obtenidas; la categoría y el tope de plausibilidad son nuevos.
   const CORE_EXERCISES = [
-    { id: 'exercise-flexiones', name: 'Flexiones', group: 'Pecho', category: 'calisthenics', measure: 'reps', thresholds: [5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 75, 100], max: 250 },
-    { id: 'exercise-dominadas', name: 'Dominadas', group: 'Espalda', category: 'calisthenics', measure: 'reps', thresholds: [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 18, 20], max: 80 },
-    { id: 'exercise-fondos', name: 'Fondos en paralelas', group: 'Brazos', category: 'calisthenics', measure: 'reps', thresholds: [3, 5, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60], max: 150 },
-    { id: 'exercise-sentadillas', name: 'Sentadillas', group: 'Piernas', category: 'legs', measure: 'reps', thresholds: [10, 20, 30, 40, 50, 60, 80, 100, 120, 150, 200, 250], max: 1000 },
-    { id: 'exercise-zancadas', name: 'Zancadas', group: 'Piernas', category: 'legs', measure: 'reps', thresholds: [10, 20, 30, 40, 50, 60, 80, 100, 120, 150, 200, 250], max: 1000 },
-    { id: 'exercise-elevacion-talones', name: 'Elevación de talones', group: 'Piernas', category: 'legs', measure: 'reps', thresholds: [15, 25, 35, 45, 60, 75, 100, 125, 150, 200, 250, 300], max: 1000 },
-    { id: 'exercise-abdominales', name: 'Abdominales', group: 'Core', category: 'core', measure: 'reps', thresholds: [10, 20, 30, 40, 50, 60, 80, 100, 120, 150, 200, 250], max: 1000 },
-    { id: 'exercise-escaladores', name: 'Escaladores', group: 'Core', category: 'core', measure: 'reps', thresholds: [10, 20, 30, 40, 50, 60, 80, 100, 120, 150, 200, 250], max: 1000 },
-    { id: 'exercise-plancha-frontal', name: 'Plancha frontal', group: 'Core', category: 'hold', measure: 'seconds', thresholds: [15, 30, 45, 60, 75, 90, 120, 150, 180, 240, 300, 360], max: 3600 },
-    { id: 'exercise-plancha-lateral', name: 'Plancha lateral', group: 'Core', category: 'hold', measure: 'seconds', thresholds: [10, 20, 30, 45, 60, 75, 90, 120, 150, 180, 240, 300], max: 1800 },
-    { id: 'exercise-sentadilla-isometrica-pared', name: 'Sentadilla isométrica en pared', group: 'Piernas', category: 'hold', measure: 'seconds', thresholds: [15, 30, 45, 60, 75, 90, 120, 150, 180, 240, 300, 360], max: 2400 },
-    { id: 'exercise-equilibrio-pierna', name: 'Equilibrio a una pierna', group: 'Core', category: 'hold', measure: 'seconds', thresholds: [10, 20, 30, 45, 60, 75, 90, 120, 150, 180, 240, 300], max: 3600 },
-    { id: 'exercise-burpees', name: 'Burpees', group: 'Cardio', category: 'cardio', measure: 'reps', thresholds: [3, 5, 8, 10, 15, 20, 25, 30, 40, 50, 60, 75], max: 400 },
-    { id: 'exercise-jumping-jacks', name: 'Jumping jacks', group: 'Cardio', category: 'cardio', measure: 'reps', thresholds: [20, 40, 60, 80, 100, 120, 150, 200, 250, 300, 400, 500], max: 3000 }
+    { id: 'exercise-flexiones', name: 'Flexiones', group: 'Pecho', category: 'calisthenics', measure: 'reps', thresholds: [5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 75, 100, 125, 150, 200], max: 250 },
+    { id: 'exercise-dominadas', name: 'Dominadas', group: 'Espalda', category: 'calisthenics', measure: 'reps', thresholds: [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 18, 20, 25, 30, 40], max: 80 },
+    { id: 'exercise-fondos', name: 'Fondos en paralelas', group: 'Brazos', category: 'calisthenics', measure: 'reps', thresholds: [3, 5, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75, 90, 120], max: 150 },
+    { id: 'exercise-sentadillas', name: 'Sentadillas', group: 'Piernas', category: 'legs', measure: 'reps', thresholds: [10, 20, 30, 40, 50, 60, 80, 100, 120, 150, 200, 250, 300, 400, 500], max: 1000 },
+    { id: 'exercise-zancadas', name: 'Zancadas', group: 'Piernas', category: 'legs', measure: 'reps', thresholds: [10, 20, 30, 40, 50, 60, 80, 100, 120, 150, 200, 250, 300, 400, 500], max: 1000 },
+    { id: 'exercise-elevacion-talones', name: 'Elevación de talones', group: 'Piernas', category: 'legs', measure: 'reps', thresholds: [15, 25, 35, 45, 60, 75, 100, 125, 150, 200, 250, 300, 400, 500, 750], max: 1000 },
+    { id: 'exercise-abdominales', name: 'Abdominales', group: 'Core', category: 'core', measure: 'reps', thresholds: [10, 20, 30, 40, 50, 60, 80, 100, 120, 150, 200, 250, 300, 400, 500], max: 1000 },
+    { id: 'exercise-escaladores', name: 'Escaladores', group: 'Core', category: 'core', measure: 'reps', thresholds: [10, 20, 30, 40, 50, 60, 80, 100, 120, 150, 200, 250, 300, 400, 500], max: 1000 },
+    { id: 'exercise-plancha-frontal', name: 'Plancha frontal', group: 'Core', category: 'hold', measure: 'seconds', thresholds: [15, 30, 45, 60, 75, 90, 120, 150, 180, 240, 300, 360, 480, 600, 900], max: 3600 },
+    { id: 'exercise-plancha-lateral', name: 'Plancha lateral', group: 'Core', category: 'hold', measure: 'seconds', thresholds: [10, 20, 30, 45, 60, 75, 90, 120, 150, 180, 240, 300, 360, 480, 600], max: 1800 },
+    { id: 'exercise-sentadilla-isometrica-pared', name: 'Sentadilla isométrica en pared', group: 'Piernas', category: 'hold', measure: 'seconds', thresholds: [15, 30, 45, 60, 75, 90, 120, 150, 180, 240, 300, 360, 480, 600, 900], max: 2400 },
+    { id: 'exercise-equilibrio-pierna', name: 'Equilibrio a una pierna', group: 'Core', category: 'hold', measure: 'seconds', thresholds: [10, 20, 30, 45, 60, 75, 90, 120, 150, 180, 240, 300, 450, 600, 900], max: 3600 },
+    { id: 'exercise-burpees', name: 'Burpees', group: 'Cardio', category: 'cardio', measure: 'reps', thresholds: [3, 5, 8, 10, 15, 20, 25, 30, 40, 50, 60, 75, 100, 150, 200], max: 400 },
+    { id: 'exercise-jumping-jacks', name: 'Jumping jacks', group: 'Cardio', category: 'cardio', measure: 'reps', thresholds: [20, 40, 60, 80, 100, 120, 150, 200, 250, 300, 400, 500, 750, 1000, 1500], max: 3000 }
   ];
   const ACTIVITY_CHALLENGES = [
     { id: 'activity-running', name: 'Running · distancia', group: 'Running', category: 'running', measure: 'km', activityType: 'Correr', thresholds: RUN_DISTANCE_TARGETS, max: 100 },
@@ -79,10 +82,10 @@
    * Sin peso corporal cargado no se calcula (no se inventan umbrales absolutos). Umbrales configurables, en
    * múltiplos del peso corporal; criterio documentado en docs/INSIGNIAS.md. El volumen de la sesión nunca cuenta. */
   const LOAD_CHALLENGES = [
-    { id: 'load-press-banca', name: 'Press de banca · carga', group: 'Pecho', category: 'strength', measure: 'bw', symbol: 'bench', match: '^press de banca( con barra)?$|^press de banca plano', thresholds: [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.15, 1.3, 1.5, 1.75] },
-    { id: 'load-sentadilla', name: 'Sentadilla con barra · carga', group: 'Piernas', category: 'strength', measure: 'bw', symbol: 'squatbar', match: '^sentadilla (con barra|trasera)', thresholds: [0.4, 0.5, 0.65, 0.8, 0.95, 1.1, 1.25, 1.4, 1.6, 1.8, 2.0, 2.4] },
-    { id: 'load-peso-muerto', name: 'Peso muerto · carga', group: 'Espalda', category: 'strength', measure: 'bw', symbol: 'deadlift', match: '^peso muerto( con barra| convencional)?$', thresholds: [0.5, 0.65, 0.8, 1.0, 1.15, 1.3, 1.5, 1.7, 1.9, 2.1, 2.4, 2.8] },
-    { id: 'load-press-militar', name: 'Press militar · carga', group: 'Hombros', category: 'strength', measure: 'bw', symbol: 'ohp', match: '^press militar( con barra| de pie| con barra de pie)?$', thresholds: [0.2, 0.25, 0.3, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.15] }
+    { id: 'load-press-banca', name: 'Press de banca · carga', group: 'Pecho', category: 'strength', measure: 'bw', symbol: 'bench', match: '^press de banca( con barra)?$|^press de banca plano', thresholds: [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.15, 1.3, 1.5, 1.75, 2.0, 2.25, 2.5] },
+    { id: 'load-sentadilla', name: 'Sentadilla con barra · carga', group: 'Piernas', category: 'strength', measure: 'bw', symbol: 'squatbar', match: '^sentadilla (con barra|trasera)', thresholds: [0.4, 0.5, 0.65, 0.8, 0.95, 1.1, 1.25, 1.4, 1.6, 1.8, 2.0, 2.4, 2.75, 3.0, 3.5] },
+    { id: 'load-peso-muerto', name: 'Peso muerto · carga', group: 'Espalda', category: 'strength', measure: 'bw', symbol: 'deadlift', match: '^peso muerto( con barra| convencional)?$', thresholds: [0.5, 0.65, 0.8, 1.0, 1.15, 1.3, 1.5, 1.7, 1.9, 2.1, 2.4, 2.8, 3.0, 3.25, 3.5] },
+    { id: 'load-press-militar', name: 'Press militar · carga', group: 'Hombros', category: 'strength', measure: 'bw', symbol: 'ohp', match: '^press militar( con barra| de pie| con barra de pie)?$', thresholds: [0.2, 0.25, 0.3, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.15, 1.3, 1.45, 1.6] }
   ];
   function loadChallengeFor(name) { const n = normalizeName(name); return LOAD_CHALLENGES.find(c => new RegExp(c.match).test(n)) || null; }
 
@@ -93,7 +96,7 @@
   }
   function slug(value) { return normalizeName(value).replace(/\s+/g, '-').slice(0, 64) || 'ejercicio'; }
   function thresholdsForExercise(item = {}) {
-    if (Array.isArray(item.thresholds) && item.thresholds.length === 12 && item.thresholds.every((v, i, a) => Number.isFinite(Number(v)) && Number(v) > 0 && (i === 0 || Number(v) > Number(a[i - 1])))) return item.thresholds.map(Number);
+    if (Array.isArray(item.thresholds) && (item.thresholds.length === 12 || item.thresholds.length === LEVELS) && item.thresholds.every((v, i, a) => Number.isFinite(Number(v)) && Number(v) > 0 && (i === 0 || Number(v) > Number(a[i - 1])))) return item.thresholds.map(Number);
     if (item.measure === 'seconds') return GENERIC_SECONDS_TARGETS.slice();
     if (item.measure === 'minutes') return GENERIC_MINUTE_TARGETS.slice();
     if (item.measure === 'km') return RUN_DISTANCE_TARGETS.slice();
@@ -101,7 +104,7 @@
     return GENERIC_REP_TARGETS.slice();
   }
   function rankForLevel(index) {
-    const safe = Math.max(0, Math.min(11, Math.floor(Number(index) || 0)));
+    const safe = Math.max(0, Math.min(LEVELS - 1, Math.floor(Number(index) || 0)));
     const rank = RANKS[Math.floor(safe / 3)];
     const numeral = rank.roman[safe % 3];
     return { key: rank.key, name: rank.name, numeral, label: `${rank.name} ${numeral}`, index: safe };
@@ -166,7 +169,7 @@
   function nextStepMessage(value, thresholds, measure) {
     const list = thresholdsForExercise({ thresholds, measure });
     const p = progressForValue(value, list);
-    if (p.complete) return 'Completaste los 12 niveles de este desafío.';
+    if (p.complete) return `Completaste los ${LEVELS} niveles de este desafío.`;
     const next = rankForLevel(p.highest + 1).label;
     if (p.value <= 0) return `Tu primera marca de ${formatValue(list[0], measure)} desbloquea ${next}.`;
     if (measure === 'bw') return `Llegá a ${formatValue(p.nextTarget, measure)} en una serie completa para ${next}.`;
@@ -302,10 +305,11 @@
     bronze: `<path class="ff-medal-shape" d="${pathOf(OUTER)}"/>`,
     silver: `<path class="ff-medal-shape" d="${pathOf(chamfer(OUTER, 0.16))}"/><path class="ff-medal-facet" d="${pathOf(hexPts(17.4))}"/>`,
     gold: `<path class="ff-medal-laurel" d="M7 36c-4-5-5-12-2-19M41 36c4-5 5-12 2-19M5.5 30l-3 1M5 24l-3-.5M6 18.5 3.5 17M42.5 30l3 1M43 24l3-.5M42 18.5l2.5-1.5"/><path class="ff-medal-shape" d="${pathOf(spiked(20.5))}"/><path class="ff-medal-facet" d="${pathOf(hexPts(17.6))}"/>`,
+    legend: `<path class="ff-medal-aura" d="M24 1.5 28 7l6.5-2.5L33 11l7 2-5.5 4.5L41 22l-6.5 1L37 30l-7-1.5L28 35l-4-4.5-4 4.5-2-6.5-7 1.5 2.5-7L7 22l6-4.5L7.5 13l7-2-1.5-6.5L19.5 7z"/><path class="ff-medal-shape" d="${pathOf(chamfer(hexPts(19.6, 24, 23.8, 1.04), 0.1))}"/><path class="ff-medal-facet" d="${pathOf(hexPts(17.2, 24, 23.8, 1.04))}"/><path class="ff-medal-crown" d="M15.5 7.6 17.6 1.6l3.4 3.5L24 0.6l3 4.5 3.4-3.5 2.1 6z"/>`,
     diamond: `<path class="ff-medal-spark" d="M5 6v4M3 8h4M43 5v4M41 7h4M44 33v3M42.5 34.5h3"/><path class="ff-medal-shape" d="${pathOf(hexPts(20.5, 24, 23, 1.06))}"/><path class="ff-medal-facet" d="${pathOf(hexPts(20.5, 24, 23, 1.06)).replace(/[MZ]/g, '').split('L').map(p => `M24 23L${p}`).join('')}"/>`
   };
   function medalSvg({ rankKey = 'bronze', numeral = '', glyph = 'star', locked = false, size = 48, title = '', category = '' } = {}) {
-    const key = ['bronze', 'silver', 'gold', 'diamond'].includes(rankKey) ? rankKey : 'bronze';
+    const key = ['bronze', 'silver', 'gold', 'diamond', 'legend'].includes(rankKey) ? rankKey : 'bronze';
     const g = GLYPHS[glyph] || GLYPHS.star;
     const cat = category || (CATEGORIES.find(c => c.glyph === glyph) || {}).key || 'custom';
     const hue = CATEGORY_HUES[cat] || CATEGORY_HUES.custom;
@@ -317,7 +321,7 @@
   }
 
   root.FittFormaBadgeEngine = Object.freeze({
-    RANKS, CATEGORIES, CORE_EXERCISES, ACTIVITY_CHALLENGES, LOAD_CHALLENGES, GENERIC_MAX, GLYPHS, SYMBOL_BY_ID, loadChallengeFor,
+    RANKS, LEVELS, CATEGORIES, CORE_EXERCISES, ACTIVITY_CHALLENGES, LOAD_CHALLENGES, GENERIC_MAX, GLYPHS, SYMBOL_BY_ID, loadChallengeFor,
     GENERIC_REP_TARGETS, GENERIC_SECONDS_TARGETS, GENERIC_MINUTE_TARGETS,
     RUN_DISTANCE_TARGETS, WALK_DISTANCE_TARGETS, BIKE_DISTANCE_TARGETS, ACTIVE_DAY_TARGETS,
     normalizeName, slug, thresholdsForExercise, rankForLevel, progressForValue, validGpsActivity,

@@ -65,28 +65,28 @@ test('pruebas de integración HTTP del backend', async t => {
       const { monetization, ...rest } = payload;
       assert.equal(monetization.enabled, false, 'monetización apagada por defecto');
       assert.equal(monetization.ads.provider, 'none');
-      assert.deepEqual(rest, { version: '0.56.0', supabase: { configured: true, url: 'https://fittforma-test.supabase.co', anonKey: 'sb_publishable_test_key_for_runtime_checks', keyType: 'publishable' }, missing: [], issue: null });
+      assert.deepEqual(rest, { version: '0.57.0', supabase: { configured: true, url: 'https://fittforma-test.supabase.co', anonKey: 'sb_publishable_test_key_for_runtime_checks', keyType: 'publishable' }, missing: [], issue: null });
       assert.doesNotMatch(raw, /service_role_SECRET_SENTINEL|GEMINI_API_KEY|GEMINI_MODEL|SUPABASE_SERVICE_ROLE_KEY/);
     });
 
     await t.test('responde en salud, página principal y estado de IA', async () => {
       const health = await fetch(`${base}/healthz`);
       assert.equal(health.status, 200);
-      assert.deepEqual(await health.json(), { ok: true, service: 'fittforma-ai', version: '0.56.0' });
+      assert.deepEqual(await health.json(), { ok: true, service: 'fittforma-ai', version: '0.57.0' });
 
       const home = await fetch(`${base}/`);
       assert.equal(home.status, 200);
       assert.match(home.headers.get('content-type') || '', /text\/html/);
       const html = await home.text();
       assert.match(html, /FittForma AI/);
-      assert.match(html, /Versión 56\.0/);
+      assert.match(html, /Versión 57\.0/);
       assert.match(html, /workoutAutosaveStatus/);
 
       const status = await fetch(`${base}/api/status`);
       assert.equal(status.status, 200);
       const payload = await status.json();
       assert.equal(payload.frontendAvailable, true);
-      assert.equal(payload.version, '0.56.0');
+      assert.equal(payload.version, '0.57.0');
       assert.equal(payload.supabaseConfigured, true);
       assert.equal(payload.configured, false);
       assert.equal(payload.mode, 'demo');

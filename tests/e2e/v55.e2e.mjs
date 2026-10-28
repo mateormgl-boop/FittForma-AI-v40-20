@@ -44,6 +44,8 @@ step('Sin sesión en curso para seguir', await page.evaluate(() => !localStorage
 const before = (await st()).sessions?.length || 0;
 await page.evaluate(() => { const all = [...document.querySelectorAll('[data-exercise-detail]')]; const b = all.find(x => /Press de banca/.test(x.dataset.exerciseDetail)) || all.find(x => (x.dataset.exerciseKind || 'strength') === 'strength' && !/plancha|isométric/i.test(x.dataset.exerciseDetail)); b?.click(); });
 await page.waitForTimeout(300);
+// v57: «Lo hice» está en la pestaña «Mi progreso» de la ficha.
+await page.click('#exTabMineBtn').catch(() => {}); await page.waitForTimeout(100);
 step('La ficha del ejercicio ofrece «Lo hice»', await page.isVisible('#quickLogOpen'), JSON.stringify(await page.evaluate(() => [document.querySelectorAll('[data-exercise-detail]').length, document.querySelector('.view.active')?.id, document.getElementById('exerciseModal')?.open, [...document.querySelectorAll('dialog[open]')].map(d => d.id)])));
 await page.click('#quickLogOpen'); await page.fill('#qlSets', '3'); await page.fill('#qlValue', '10'); await page.fill('#qlWeight', '40');
 await page.click('#quickLogForm button[type="submit"]'); await page.waitForTimeout(300);

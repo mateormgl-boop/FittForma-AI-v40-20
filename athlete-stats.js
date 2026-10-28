@@ -24,7 +24,7 @@
 
   const CATEGORIES = [
     { key: 'rank', label: 'Rango general', unit: '', period: 'Todo tu historial',
-      measures: 'El rango del Mapa de avances: la mediana de series efectivas de tus 20 músculos (de Hierro a Leyenda).',
+      measures: 'El rango del Mapa de avances: la mediana de series efectivas de tus 20 músculos (de Bronce a Leyenda).',
       order: 'Del rango más alto al más bajo; a igual rango, primero quien tiene más músculos con rango.' },
     { key: 'constancy', label: 'Constancia', unit: 'días', period: 'Últimos 30 días',
       measures: 'Días distintos con al menos un entrenamiento o una actividad completada.',
@@ -131,7 +131,7 @@
       .map(b => ({
         exerciseId: String(b.exerciseId || '').slice(0, 80), exerciseName: String(b.exerciseName).slice(0, 72),
         category: String(b.category || '').replace(/[^a-z]/g, '').slice(0, 20), rank: String(b.rank || '').slice(0, 20),
-        level: clamp(Math.round(Number(b.level) || 1), 1, 12), measure: String(b.measure || 'reps').slice(0, 12),
+        level: clamp(Math.round(Number(b.level) || 1), 1, 15), measure: String(b.measure || 'reps').slice(0, 12),
         evidence: ['gps_device', 'session', 'declared'].includes(b.evidence) ? b.evidence : 'declared',
         earnedAt: validDate(b.earnedAt) ? String(b.earnedAt).slice(0, 10) : null
       }));

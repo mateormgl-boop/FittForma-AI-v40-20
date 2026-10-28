@@ -195,3 +195,31 @@ RECIPES = [
   ('Refuerzo de jamón y queso', 'preparadas', 90, [('Pan', 'Molde blanco', 50), ('Jamón cocido', 'Fiambre', 20), ('Queso tipo gouda (dambo)', '', 20)], 'Sándwich simple en pan de molde.'),
   ('Puchero', 'preparadas', 2000, [('Asado de tira', 'Cocido, sin hueso', 400), ('Papa', 'Hervida', 400), ('Boniato', 'Hervido', 300), ('Zapallo (tipo calabacín butternut)', 'Al horno', 300), ('Choclo', 'Hervido', 200), ('Zanahoria', 'Hervida', 200), ('Repollo', 'Crudo', 200)], 'Sin el caldo; carne y verduras hervidas.'),
 ]
+
+# ---------- v57: comidas que faltaban (datos USDA) ----------
+add('dulces', 'Factura', [('Factura', 'Masa danesa con queso crema', r'^Danish pastry, cheese'), ('Factura', 'Masa danesa con frutas', r'^Danish pastry, fruit, enriched')])
+for n, q in [('Panqueques (tipo pancake)', r'^Pancakes plain, frozen, ready-to-heat'), ('Waffles', r'^Waffles, plain, frozen, ready-to-heat$'),
+             ('Brownie', r'^Cookies, brownies, commercially prepared'), ('Galletitas con chips de chocolate', r'^Cookies, chocolate chip, commercially prepared, soft-type'),
+             ('Cheesecake', r'^Cheesecake commercially prepared'), ('Tarta de manzana', r'^Pie, apple, commercially prepared, enriched flour'),
+             ('Masitas secas (tipo manteca)', r'^Cookies, shortbread, commercially prepared, plain')]:
+    add('dulces', n, [(n, q)])
+add('cereales', 'Maicena', [('Maicena', 'Almidón de maíz', r'^Cornstarch')])
+add('cereales', 'Masa de tarta', [('Masa de tarta', 'Horneada', r'^Pie crust, standard-type, frozen, ready-to-bake, enriched, baked')])
+add('preparadas', 'Burrito de carne y porotos (comida rápida)', [('Burrito de carne y porotos (comida rápida)', r'^Fast foods, burrito, with beans and beef')])
+
+# Recetas v57 (ESTIMACIÓN). Sexto valor opcional: porción típica (etiqueta, gramos).
+RECIPES += [
+  ('Croquetas de papa', 'preparadas', 360, [('Papa', 'Puré con leche y manteca', 300), ('Huevo', 'Crudo', 30), ('Pan rallado', '', 40), ('Aceite de girasol', '', 30)], 'Fritas: incluye el aceite que absorben. Unas 8 croquetas de 45 g.', ('1 unidad', 45)),
+  ('Alfajor de maicena', 'dulces', 50, [('Maicena', 'Almidón de maíz', 15), ('Harina de trigo', 'Común', 8), ('Manteca', 'Con sal', 8), ('Azúcar', '', 6), ('Yema de huevo', 'Cruda', 3), ('Dulce de leche', '', 12), ('Coco rallado', '', 2)], 'Dos tapitas de maicena con dulce de leche y coco.', ('1 unidad', 50)),
+  ('Alfajor de chocolate', 'dulces', 50, [('Galletitas dulces', 'De vainilla', 22), ('Dulce de leche', '', 13), ('Chocolate con leche', '', 15)], 'Galletitas con dulce de leche y baño de chocolate.', ('1 unidad', 50)),
+  ('Tarta de jamón y queso', 'preparadas', 800, [('Masa de tarta', 'Horneada', 250), ('Jamón cocido', 'Fiambre', 150), ('Queso muzzarella', '', 200), ('Huevo', 'Crudo', 150), ('Leche', 'Entera', 100)], 'Tarta mediana; una porción es un cuarto.', ('1 porción', 200)),
+  ('Empanada de jamón y queso', 'preparadas', 90, [('Masa de tarta', 'Horneada', 45), ('Jamón cocido', 'Fiambre', 20), ('Queso muzzarella', '', 25)], 'Al horno.', ('1 unidad', 90)),
+  ('Fideos con tuco', 'preparadas', 400, [('Fideos', 'Cocidos', 250), ('Salsa de tomate', '', 100), ('Carne picada', 'Común (80/20), cocida', 40), ('Aceite de oliva', '', 5), ('Queso parmesano', 'Rallado', 5)], 'Un plato con salsa de tomate y un poco de carne picada.', ('1 plato', 400)),
+  ('Polenta con tuco', 'preparadas', 410, [('Polenta', 'Cocida con agua (sémola de maíz)', 300), ('Salsa de tomate', '', 100), ('Queso parmesano', 'Rallado', 10)], 'Un plato.', ('1 plato', 410)),
+  ('Ensalada mixta', 'preparadas', 200, [('Lechuga', 'Cruda', 60), ('Tomate', 'Crudo', 100), ('Cebolla', 'Cruda', 30), ('Aceite de oliva', '', 10)], 'Lechuga, tomate y cebolla con una cucharada de aceite.', ('1 plato', 200)),
+  ('Sándwich de milanesa', 'preparadas', 280, [('Peceto', 'Al horno', 110), ('Huevo', 'Crudo', 15), ('Pan rallado', '', 25), ('Aceite de girasol', '', 12), ('Pan', 'Flauta / felipe (blanco)', 80), ('Lechuga', 'Cruda', 15), ('Tomate', 'Crudo', 25), ('Mayonesa', '', 10)], 'Milanesa frita al pan con lechuga, tomate y mayonesa.', ('1 unidad', 280)),
+  ('Pizza casera', 'preparadas', 150, [('Harina de trigo', 'Común', 60), ('Aceite de oliva', '', 5), ('Salsa de tomate', '', 30), ('Queso muzzarella', '', 50)], 'Una porción (un octavo de pizza grande); el peso incluye el agua de la masa.', ('1 porción', 150)),
+  ('Hamburguesa casera al pan', 'preparadas', 220, [('Hamburguesa vacuna', 'A la plancha', 100), ('Pan de hamburguesa', '', 60), ('Lechuga', 'Cruda', 15), ('Tomate', 'Crudo', 25), ('Queso cheddar', '', 20)], 'Con queso, lechuga y tomate.', ('1 unidad', 220)),
+  ('Revuelto gramajo', 'preparadas', 320, [('Papa', 'Fritas congeladas, al horno', 150), ('Huevo', 'Revuelto', 100), ('Jamón cocido', 'Fiambre', 40), ('Cebolla', 'Cruda', 30), ('Aceite de girasol', '', 10)], 'Un plato.', ('1 plato', 320)),
+  ('Panqueques finos (crepes)', 'dulces', 100, [('Harina de trigo', 'Común', 30), ('Leche', 'Entera', 60), ('Huevo', 'Crudo', 20), ('Manteca', 'Con sal', 3)], 'Dos panqueques finos, sin relleno.', ('1 unidad', 50)),
+]

@@ -459,7 +459,6 @@ body{font-feature-settings:"cv11","ss01"}
 :root{--anat-body:#22314d;--anat-muscle:#33456a;--anat-edge:#0b1222;--anat-primary:#ef4444;--anat-secondary:#f59e0b}
 :root[data-theme="light"]{--anat-body:#d3dbe8;--anat-muscle:#b6c2d6;--anat-edge:#f3f6fb;--anat-primary:#dc2626;--anat-secondary:#d97706}
 .anatomy-map{display:block;width:100%;height:auto}
-.anatomy-map .am-body{fill:var(--anat-body)}
 .anatomy-map .am-m{fill:var(--anat-muscle);stroke:var(--anat-edge);stroke-width:.6;transition:fill .25s ease}
 .anatomy-map .am-m.is-primary{fill:var(--anat-primary)}
 .anatomy-map .am-m.is-secondary{fill:var(--anat-secondary);opacity:.85}
@@ -934,7 +933,6 @@ body{font-feature-settings:"cv11","ss01"}
 .mr-map{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:18px;background:#05080f;border:1px solid var(--ff-border)}
 .mr-map figcaption{font-size:13px;font-weight:800;color:var(--text-2)}
 .mr-map .anatomy-map{width:100%;max-width:170px;height:auto}
-.mr-fig .am-body{fill:#c9ced8}
 .mr-fig .am-m{fill:#e7eaf0;stroke:#5b6475;stroke-width:.5}
 .mr-fig .am-m.is-ranked{stroke:#0b1222;stroke-width:.7}
 .mr-fig .am-cap{display:none}
@@ -1431,3 +1429,68 @@ body{font-feature-settings:"cv11","ss01"}
 .body-edit>summary{cursor:pointer;padding:12px 0;font-weight:800;list-style-position:inside}
 .body-edit[open]>summary{border-bottom:1px solid var(--ff-border);margin-bottom:10px}
 .settings-title{margin:22px 4px 8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3)}
+/* v57: lector de comidas con gramos editables */
+.meal-parse{margin:8px 0 4px;padding:10px;border-radius:14px;border:1px solid var(--ff-border);background:var(--ff-panel-2)}
+.meal-parse[hidden]{display:none}
+.meal-parse-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13.5px}
+.meal-parse-head span{font-weight:800}
+.meal-parse ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.meal-parse li{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:6px;align-items:center;padding-bottom:8px;border-bottom:1px solid var(--ff-border)}
+.meal-parse li:last-child{border-bottom:0;padding-bottom:0}
+.mp-food{display:grid;gap:2px;min-width:0}
+.mp-food select{width:100%;min-height:38px;font-size:13.5px;padding:6px 26px 6px 8px;text-overflow:ellipsis}
+.mp-food small{font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mp-grams{display:flex;align-items:center;gap:3px}
+.mp-grams input{width:68px;min-height:38px;padding:6px;text-align:right;font-size:14px}
+.mp-kcal{font-size:12.5px;font-weight:700;white-space:nowrap;min-width:52px;text-align:right}
+.mp-remove{width:34px;height:34px;border-radius:50%;border:1px solid var(--ff-border);background:transparent;color:var(--text-2);font-size:18px;line-height:1;cursor:pointer}
+.mp-unknown{margin:8px 0 0;font-size:12.5px;color:#b45309}
+html[data-theme="dark"] .mp-unknown{color:#fbbf24}
+@media(max-width:380px){.meal-parse li{grid-template-columns:minmax(0,1fr) auto auto}.mp-food{grid-column:1/-1}}
+/* v57: insignia Legendaria — obsidiana negra con borde dorado y aura violeta */
+.ff-medal--legend .ff-medal-shape{fill:url(#ffMedalLegend)!important;stroke:url(#ffLegendEdge)!important;stroke-width:1.6!important}
+.ff-medal--legend .ff-medal-inner{fill:url(#ffFaceLegend)!important;stroke:#d4a017!important}
+.ff-medal--legend .ff-medal-facet{stroke:rgba(212,160,23,.55)}
+.ff-medal--legend .ff-medal-glyph{stroke:#f6d26b!important}
+.ff-medal--legend .ff-medal-aura{fill:#8f5bff;opacity:.28;stroke:#d4a017;stroke-width:.6;stroke-opacity:.6}
+.ff-medal--legend .ff-medal-crown{fill:url(#ffLegendEdge);stroke:#3a2a00;stroke-width:.5}
+.ff-medal--legend .ff-medal-banner{fill:#0b0b0f;stroke:#d4a017;stroke-width:.6}
+.ff-medal--legend .ff-medal-pip{fill:#f6d26b}
+.ff-medal--legend .ff-medal-ring{stroke:rgba(246,210,107,.5)}
+.ff-medal.is-locked .ff-medal-aura,.ff-medal.is-locked .ff-medal-crown{fill:transparent;stroke:var(--ff-border)}
+.badge-celebration[data-rank="legend"]{--glow:#8f5bff}
+.badge-celebration[data-rank="legend"] .badge-celebration-rank{color:#d4a017}
+/* v57: mapa muscular redibujado (volumen, separaciones y brillo) */
+.anatomy-map .am-b1{stop-color:var(--anat-body)}
+.anatomy-map .am-b0{stop-color:color-mix(in srgb,var(--anat-body) 78%,#000)}
+.anatomy-map .am-detail path{fill:none;stroke:var(--anat-edge);stroke-width:.7;stroke-linecap:round;opacity:.55}
+.anatomy-map .am-gloss path,.anatomy-map path.am-gloss{pointer-events:none;stroke:none}
+.anatomy-map .am-m{stroke-linejoin:round}
+.mr-fig .am-b1{stop-color:#3a4660}
+.mr-fig .am-b0{stop-color:#232b3d}
+.mr-fig .am-m:not(.is-ranked){fill:#4a5672!important}
+.mr-fig .am-m{stroke:#141a28;stroke-width:.7}
+.mr-fig .am-m.is-ranked{stroke:#0b1222;stroke-width:.8}
+.mr-fig .am-detail path{stroke:#0e1420;opacity:.6}
+.mr-map{background:radial-gradient(120% 80% at 50% 10%,#16213a,#05080f 70%)!important}
+.mr-maps.is-single{display:block}
+.mr-map-big{padding:14px 8px 10px!important}
+.mr-map-big .anatomy-map{max-width:340px!important;margin:0 auto}
+.mr-side-chips{margin:6px 0 0}
+.mr-side-chips[hidden]{display:none}
+/* v57: ficha del ejercicio en dos pestañas */
+.ex-tabs{position:sticky;top:-1px;z-index:3;display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:12px 0;padding:4px;border-radius:14px;background:var(--ff-panel-2);border:1px solid var(--ff-border)}
+.ex-tab{border:0;border-radius:11px;background:transparent;color:var(--text-2);font:inherit;font-size:14px;font-weight:800;padding:10px 6px;min-height:42px;cursor:pointer}
+.ex-tab.active{background:var(--mod,var(--blue));color:#fff}
+.ex-tab-count{font-weight:700;opacity:.85}
+.ex-tab-panel[hidden]{display:none}
+#exTabMine .rk-hero-emblem{margin:4px auto}
+
+/* v57: copia automática en la nube */
+.cloud-auto{margin-top:12px;padding:12px;border:1px solid var(--line, rgba(127,127,127,.25));border-radius:14px}
+.cloud-auto-toggle{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.cloud-auto-toggle input{margin-top:3px;width:18px;height:18px;flex:none}
+.cloud-auto-toggle span{display:flex;flex-direction:column;gap:2px}
+.cloud-auto-toggle small{opacity:.75}
+.cloud-auto p{margin:8px 0 0}
+.cloud-auto p[data-state="newer"],.cloud-auto p[data-state="empty"],.cloud-auto p[data-state="error"]{color:var(--warn, #c77700)}

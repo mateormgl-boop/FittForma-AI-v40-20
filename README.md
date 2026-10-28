@@ -4,6 +4,17 @@ Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HT
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
 
+## Novedades v57.0
+
+- Nutrición: escribís lo que comiste con cantidades (por ejemplo, «100 g de hamburguesa, 2 croquetas de papa y 200 g de pan»). Ves los gramos de cada alimento y los podés cambiar. Hay 25 alimentos nuevos.
+- Insignias de 15 niveles, con Legendario (medalla negra) y techos más altos; los niveles ya ganados no cambian.
+- Músculos: escalera desde Bronce hasta Leyenda, mapa muscular redibujado y sección más clara.
+- Ficha del ejercicio en dos pestañas: «Cómo se hace» y «Mi progreso».
+- Animaciones en WebP animado (de 34 MB a 9 MB).
+- Copia automática en la nube, sin pisar copias de otro dispositivo.
+- Las 31 fichas nuevas están traducidas a 5 idiomas.
+- Migración nueva aditiva: `2026-10-30_v57_legend_badges.sql`.
+
 ## Novedades v56.0
 
 - 31 ejercicios nuevos (187 en total), cada uno con ficha, animación propia y fotos de dominio público.
