@@ -16,6 +16,16 @@ usa la ecuación que corresponde a la velocidad, y se avisa.
 Referencias: American College of Sports Medicine, *ACSM's Guidelines for Exercise Testing and Prescription*
 (ecuaciones metabólicas); Ainsworth BE et al., *2011 Compendium of Physical Activities*, Med Sci Sports Exerc 43(8).
 
+## Por ejercicio, durante la sesión (v59)
+
+`estimateExerciseCalories` en `activity-core.js`, probado en `tests/v59.test.mjs`:
+
+- **Fuerza:** MET 3,5 × kg × tiempo de las series **hechas**.
+  - Cada serie cuenta su trabajo (unos 3 s por repetición, o los segundos sostenidos, entre 10 y 600 s) más el descanso indicado del ejercicio (90 s si no tiene).
+- **Cardio cargado en minutos:** MET 5,0 × kg × minutos.
+- **Al terminar:** la sesión guarda el mayor entre este cálculo y el de la duración total, y lo aclara en una nota.
+- **Sin peso:** no se calcula y se pide cargarlo en Perfil.
+
 ## Reglas
 - **Peso**: se usa el peso actual del perfil. Sin peso no se calcula (no se usa un peso inventado).
 - **Pendiente**: solo si hay desnivel medido con altitud precisa (±10 m o mejor); si no, terreno plano y se avisa.

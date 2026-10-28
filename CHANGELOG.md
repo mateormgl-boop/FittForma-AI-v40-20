@@ -1,5 +1,27 @@
 # FittForma AI — Registro de cambios
 
+## v59.0 — Calorías por ejercicio, Mi semana compacta y revisión visual (28 de octubre de 2026)
+
+- **Calorías estimadas mientras entrenás:**
+  - Al completar todas las series de un ejercicio aparece «¡Press de banca completo! ≈ 33 kcal (estimación)».
+  - Durante la sesión se ve el total estimado en vivo.
+  - Al terminar, el resumen muestra las calorías de la sesión, el detalle por ejercicio y los récords nuevos (por ejemplo, «22 kg × 10 (antes 20 kg)»).
+  - Cálculo: MET 3,5 (Compendio 2011, código 02054) × tu peso × tiempo de trabajo y descanso de las series hechas; para la sesión se usa el mayor entre ese cálculo y el de la duración. Siempre se aclara que es una estimación.
+  - Sin peso cargado no se inventa: se pide cargarlo y «Cargar peso» lleva al campo en Perfil.
+- **Entrenamiento diario en espera:** el círculo negro se reemplazó por un anillo de progreso con el tiempo que falta y cuándo se habilita.
+- **Mi semana compacta:**
+  - Los 7 días en una fila, cada uno con un mini dibujo de los músculos que toca (o descanso / elegir).
+  - Al tocar un día se abre una hoja desde abajo con las combinaciones dibujadas y los músculos de cada una; también descanso, sin asignar, tus rutinas y grupos a mano.
+  - «Hoy toca» muestra el mapa de músculos del día.
+- **Revisión visual en el celular (tema oscuro):**
+  - Encabezados de sección más finos.
+  - Entrenar sin tarjetas dentro de tarjetas, y las combinaciones ya no se cortan a la derecha.
+  - Inicio: accesos rápidos en 4 columnas.
+  - Hidratación: el aviso sin registros ya no se corta.
+  - Comunidad: el aviso de conexión ocupa todo el ancho.
+- Sin emojis en la interfaz (íconos dibujados) y textos nuevos traducidos a los 6 idiomas.
+- Sin migraciones nuevas.
+
 ## v58.0 — Mi semana, rutinas listas, Inicio personalizable, qué comer según tu objetivo e insignias nuevas (28 de octubre de 2026)
 
 - **Mi semana (Entrenar):**
