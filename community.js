@@ -92,7 +92,7 @@
     $('communityOwnName').textContent=p.display_name||p.username||'Tu perfil';
     if($('communityOwnHandle'))$('communityOwnHandle').textContent=p.username?`@${p.username}`:'';
     if($('communityOwnBio'))$('communityOwnBio').textContent=p.bio||'';
-    renderOwnHeader();
+    renderOwnHeader();renderAvatarOffer();
     if(client&&user?.id===p.user_id){refreshOwnCounts();syncFeaturedBadges();}
   }
   async function renderOwnHeader(){
@@ -232,6 +232,22 @@
   }
   async function uploadImage(file,path,options={}){
     const processed=await prepareImage(file,options);const upload={cacheControl:'600',upsert:false,contentType:'image/jpeg'};const {error}=await client.storage.from(bucket).upload(path,processed,upload);if(error)throw error;return path;
+  }
+  // v61: si la persona no tiene foto en Comunidad, se le ofrece usar la de su Perfil (un toque) o elegir una.
+  // Nunca se sube sola: una foto de la cara es un dato personal y la publica la persona.
+  const AVATAR_OFFER_KEY='fittforma-v61-avatar-offer';
+  function fileFromDataUrl(u){const b=atob(String(u).split(',')[1]||''),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return new File([a],'avatar.jpg',{type:'image/jpeg'});}
+  function renderAvatarOffer(){
+    const box=$('communityAvatarOffer');if(!box)return;
+    let dismissed='';try{dismissed=localStorage.getItem(AVATAR_OFFER_KEY)||'';}catch{}
+    const show=authReady()&&ownProfile&&!ownProfile.avatar_path&&dismissed!==user.id&&['world','profile'].includes(currentSubView);
+    box.hidden=!show;if(!show)return;
+    const local=window.FittFormaLocalAvatar?.()||'';
+    box.innerHTML=`<div class="cm-avatar-offer-pic">${local?`<img src="${esc(local)}" alt="Tu foto de perfil de la app" width="56" height="56">`:'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>'}</div>
+      <div class="cm-avatar-offer-text"><strong>${local?'¿Usar tu foto de perfil en Comunidad?':'Agregá una foto de perfil'}</strong><span class="muted small">${local?'Es la que elegiste en Perfil. Las demás personas la van a ver junto a tu nombre.':'Así te reconocen tus amigos. Podés cambiarla o quitarla cuando quieras.'}</span>
+      <span class="cm-avatar-offer-btns">${local?'<button type="button" class="btn btn-sm" data-avatar-offer-use>Usar mi foto</button>':''}<label class="btn ${local?'ghost':''} btn-sm" for="communityAvatarInput">${local?'Elegir otra':'Elegir foto'}</label><button type="button" class="link-btn" data-avatar-offer-dismiss>Ahora no</button></span></div>`;
+    box.querySelector('[data-avatar-offer-use]')?.addEventListener('click',()=>{const u=window.FittFormaLocalAvatar?.();if(u)changeAvatar(fileFromDataUrl(u));});
+    box.querySelector('[data-avatar-offer-dismiss]')?.addEventListener('click',()=>{try{localStorage.setItem(AVATAR_OFFER_KEY,user.id);}catch{}box.hidden=true;});
   }
   // v49: foto de perfil propia (cuadrada, 512 px, sin metadatos), en la carpeta de la cuenta.
   async function changeAvatar(file){
@@ -732,8 +748,7 @@
     box.hidden=!show;if(show&&!noticeState())setNotice('shown');
   }
   function reflectStatsToggles(){const on=ownStats?ownStats.stats_public!==false:true;['communityStatsPublic','rkShareToggle'].forEach(id=>{const el=$(id);if(el)el.checked=on;});}
-  // Sube las estadísticas actuales (si cambiaron). Solo después de mostrar el aviso al menos una vez, y nunca
-  // si la persona las ocultó. Devuelve la fila propia ({stats_public, ...}) o null.
+  // Sube las estadísticas actuales (si cambiaron), nunca si la persona las ocultó. Devuelve la fila propia ({stats_public, ...}) o null.
   async function syncStats(force=false){
     if(!authReady()||athleteEnabled===false)return ownStats;
     if(statsBusy)return statsBusy;
@@ -745,7 +760,8 @@
           ownStats=r.data||null;ownStatsLoaded=true;reflectStatsToggles();
         }
         if(ownStats?.stats_public===false)return ownStats;
-        if(!ownStats&&!noticeState())return null;
+        // v61: públicas desde el inicio. Se publican al iniciar sesión, sin esperar el aviso (que sigue siendo informativo
+        // y ofrece «Ocultar mis estadísticas»). Nunca incluyen peso, altura, medidas ni objetivos.
         const row=window.FittFormaAthleteStatsNow?.();if(!row)return ownStats;
         const sig=JSON.stringify(row);if(!force&&ownStats&&sig===statsSig)return ownStats;
         const version=statsVersion;
@@ -1108,6 +1124,27 @@
     if(row.key==='run_km_30d')return formatMetric('running',v);
     return `${Number(v).toLocaleString(undefined,{maximumFractionDigits:1})}${row.unit?' '+row.unit:''}`;
   }
+  // v61: el versus también compara músculo por músculo (rango del Mapa de avances de cada persona, publicado por ella).
+  async function muscleCompareHtml(uid,them){
+    const A=window.FittFormaAnatomy,R=MRK();if(extrasEnabled===false||!A?.muscleFillSvg||!R)return '';
+    const [x,y]=await Promise.all([client.rpc('community_athlete_extras',{p_user:user.id}),client.rpc('community_athlete_extras',{p_user:uid})]);
+    if((x.error&&missingExtras(x.error))||(y.error&&missingExtras(y.error))){extrasEnabled=false;return '';}
+    const clean=r=>{const o={};for(const [k,v] of Object.entries(r&&typeof r==='object'?r:{})){const n=Number(v);if(Number.isInteger(n)&&R.RANKS[n])o[k]=n;}return o;};
+    const mine=clean(x.data?.[0]?.muscle_ranks),theirs=clean(y.data?.[0]?.muscle_ranks),name=esc(them.display_name||them.username);
+    if(!Object.keys(mine).length&&!Object.keys(theirs).length)return `<section class="cm-section cm-muscle-vs"><h4>Músculos</h4><p class="muted small">Ninguno de los dos tiene músculos con rango todavía.</p></section>`;
+    const fills=r=>Object.fromEntries(Object.entries(r).map(([k,v])=>[k,R.RANKS[v].color]));
+    const names=A.MUSCLES||{},ids=[...new Set([...Object.keys(mine),...Object.keys(theirs)])].filter(id=>names[id]);
+    ids.sort((a,b)=>Math.max(mine[b]??-1,theirs[b]??-1)-Math.max(mine[a]??-1,theirs[a]??-1)||String(names[a]).localeCompare(names[b]));
+    let win=0,lose=0,tie=0;
+    const rows=ids.map(id=>{const m=mine[id],t=theirs[id],mv=m??-1,tv=t??-1;if(mv>tv)win++;else if(tv>mv)lose++;else tie++;
+      const cell=v=>v==null?'<span class="cm-mvs-none">Sin entrenar</span>':rankChip(v,20);
+      return `<li class="cm-mvs-row${mv>tv?' is-mine':tv>mv?' is-theirs':''}"><strong>${esc(names[id])}</strong><span class="cm-mvs-cell is-me">${cell(m)}</span><span class="cm-mvs-cell">${cell(t)}</span></li>`;}).join('');
+    return `<section class="cm-section cm-muscle-vs"><h4>Músculos</h4>
+      <div class="cm-mvs-maps"><figure>${A.muscleFillSvg(fills(mine),{label:'Tu rango por músculo'})}<figcaption>Vos</figcaption></figure><figure>${A.muscleFillSvg(fills(theirs),{label:`Rango por músculo de ${them.display_name||them.username}`})}<figcaption>${name}</figcaption></figure></div>
+      <p class="cm-mvs-sum">${win} ${win===1?'músculo':'músculos'} a tu favor · ${lose} a favor de ${name} · ${tie} ${tie===1?'empate':'empates'}</p>
+      <ul class="cm-mvs-list"><li class="cm-mvs-row cm-mvs-head" aria-hidden="true"><span></span><span>Vos</span><span>${name}</span></li>${rows}</ul>
+      <p class="muted small">Rango del Mapa de avances (series efectivas de cada músculo, de Bronce a Leyenda). Cada persona lo publica desde su app.</p></section>`;
+  }
   async function openCompare(uid){
     if(!authReady()){toast(authHint());return;}
     compareUser=uid;showCommunitySubView('compare');const root=$('communityCompare');root.innerHTML='<div class="cm-skeleton" aria-hidden="true"><i></i><i></i><i></i></div>';
@@ -1130,6 +1167,7 @@
         const bar=v=>both?`<span class="cm-cmp-bar"><i style="width:${Math.max(4,Math.round(Number(v)/max*100))}%"></i></span>`:'';
         const lead=both?(row.diff>0?`Vos +${compareValue({...row,kind:'num'},Math.abs(row.diff))}`:row.diff<0?`${esc(them.display_name||them.username)} +${compareValue({...row,kind:'num'},Math.abs(row.diff))}`:'Empate'):'';
         return `<li class="cm-cmp-row"><div class="cm-cmp-label"><strong>${esc(row.label)}</strong><small class="muted">${esc(row.period)}</small></div><div class="cm-cmp-vals"><span class="is-me${row.mine==null?' is-empty':''}">${esc(compareValue(row,row.mine))}${bar(row.mine)}</span><span class="${row.theirs==null?'is-empty':''}">${esc(compareValue(row,row.theirs))}${bar(row.theirs)}</span></div>${lead&&row.kind!=='rank'?`<small class="cm-cmp-lead">${esc(lead)}</small>`:''}</li>`;}).join('')}</ul>
+        ${await muscleCompareHtml(uid,them)}
         ${await evolutionHtml(user.id,uid,them.display_name||them.username)}
         <p class="muted small cm-footnote">Se compara la misma métrica, con la misma unidad y el mismo período, con los registros de cada persona en la app. Cuando a alguien le falta un dato se muestra «Sin datos disponibles»: no se estima. La app publica solo los últimos 30 días, así que no hay comparación por semana. No es un diagnóstico médico ni una medición de masa muscular: sirve para motivarse y ponerse objetivos.</p>`;
     }
@@ -1238,13 +1276,13 @@
       return {ok:true,stage:'database',message:coreMessage+(authReady()?' También se comprobaron chat, bloqueos y sincronización de la cuenta.':' Iniciá sesión para comprobar además chat, bloqueos y sincronización de la cuenta.')};
     }catch(error){return {ok:false,stage:'network',message:friendlySupabaseError(error,'comprobar la conexión con Supabase')};}
   }
-  function setSession(supabase,userSession){client=supabase||client;user=userSession||null;if(!user){ownProfile=null;stopChatPoll();['communityChatMessages','communityReportsList'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});if($('communityChatText'))$('communityChatText').value='';if($('communityModerationCard'))$('communityModerationCard').hidden=true;if($('communityDisplayName'))$('communityDisplayName').value='';if($('communityUsername'))$('communityUsername').value='';if($('communityBio'))$('communityBio').value='';if($('communityVisibility'))$('communityVisibility').value='private';if($('communityOwnName'))$('communityOwnName').textContent='Tu perfil';if($('communityOwnAvatar'))$('communityOwnAvatar').innerHTML='<span aria-hidden="true">FF</span>';if($('communityOwnHandle'))$('communityOwnHandle').textContent='';if($('communityOwnBio'))$('communityOwnBio').textContent='';if($('communityOwnFeatured'))$('communityOwnFeatured').innerHTML='';if($('communityOwnStats'))$('communityOwnStats').innerHTML=statsHtml(0,0,0);if($('communityConversations'))$('communityConversations').innerHTML='';if($('communityFollowRequests'))$('communityFollowRequests').textContent='Iniciá sesión para administrar solicitudes.';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communityBlockedList'))$('communityBlockedList').textContent='Iniciá sesión para administrar los bloqueos.';}setControls();updateKindAvailability();ownStats=null;ownStatsLoaded=false;statsSig='';friendPositions=new Map();ownPhysique={pair:null,single:null};if($('communityAlertsBadge'))$('communityAlertsBadge').hidden=true;if($('communityChallenge'))$('communityChallenge').hidden=true;if($('communityOwnFlag'))$('communityOwnFlag').innerHTML='';if($('communityPhysiqueEdit'))$('communityPhysiqueEdit').innerHTML='';reflectStatsToggles();renderStatsNotice();if(client)Promise.resolve().then(()=>refresh());else loadCurrentView();}
+  function setSession(supabase,userSession){client=supabase||client;const wasId=user?.id;user=userSession||null;if(user&&user.id!==wasId){ownStats=null;ownStatsLoaded=false;statsSig='';setTimeout(()=>{syncStats().catch?.(()=>{});},1500);}if(!user){ownProfile=null;stopChatPoll();['communityChatMessages','communityReportsList'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});if($('communityChatText'))$('communityChatText').value='';if($('communityModerationCard'))$('communityModerationCard').hidden=true;if($('communityDisplayName'))$('communityDisplayName').value='';if($('communityUsername'))$('communityUsername').value='';if($('communityBio'))$('communityBio').value='';if($('communityVisibility'))$('communityVisibility').value='private';if($('communityOwnName'))$('communityOwnName').textContent='Tu perfil';if($('communityOwnAvatar'))$('communityOwnAvatar').innerHTML='<span aria-hidden="true">FF</span>';if($('communityOwnHandle'))$('communityOwnHandle').textContent='';if($('communityOwnBio'))$('communityOwnBio').textContent='';if($('communityOwnFeatured'))$('communityOwnFeatured').innerHTML='';if($('communityOwnStats'))$('communityOwnStats').innerHTML=statsHtml(0,0,0);if($('communityConversations'))$('communityConversations').innerHTML='';if($('communityFollowRequests'))$('communityFollowRequests').textContent='Iniciá sesión para administrar solicitudes.';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communityBlockedList'))$('communityBlockedList').textContent='Iniciá sesión para administrar los bloqueos.';}setControls();updateKindAvailability();ownStats=null;ownStatsLoaded=false;statsSig='';friendPositions=new Map();ownPhysique={pair:null,single:null};if($('communityAlertsBadge'))$('communityAlertsBadge').hidden=true;if($('communityChallenge'))$('communityChallenge').hidden=true;if($('communityOwnFlag'))$('communityOwnFlag').innerHTML='';if($('communityPhysiqueEdit'))$('communityPhysiqueEdit').innerHTML='';reflectStatsToggles();renderStatsNotice();if(client)Promise.resolve().then(()=>refresh());else loadCurrentView();}
   const communityViews=['world','ranking','friends','publish','messages','profile','user','compare','alerts'];
   const MAIN_TABS=['world','ranking','friends'];
   function showCommunitySubView(name,focusTab=false){
     if(name==='feed'||name==='explore')name='world';
     if(!communityViews.includes(name))name='world';
-    const previous=currentSubView;currentSubView=name;if(!['user','compare'].includes(name))lastTab=name;
+    const previous=currentSubView;currentSubView=name;setTimeout(renderAvatarOffer,0);if(!['user','compare'].includes(name))lastTab=name;
     if(name!=='messages')stopChatPoll();
     const activeTab=MAIN_TABS.includes(name)?name:['user','compare'].includes(name)&&MAIN_TABS.includes(lastTab)?lastTab:name;
     document.querySelectorAll('[data-community-tab]').forEach(button=>{
@@ -1309,5 +1347,5 @@
     const today=localDateKey();if($('communityEndDate'))$('communityEndDate').value=today;if($('communityStartDate'))$('communityStartDate').value=today;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
-  window.FittFormaCommunity={init,setSession,refresh,loadChatContacts,loadMessages,loadBlockedUsers,testConnection,syncStats,setStatsPublic,show:name=>showCommunitySubView(name),openProfile:uid=>openUser(uid)};
+  window.FittFormaCommunity={init,setSession,refresh,loadChatContacts,loadMessages,loadBlockedUsers,testConnection,syncStats,setStatsPublic,show:name=>showCommunitySubView(name),openProfile:uid=>openUser(uid),setAvatar:changeAvatar};
 })();

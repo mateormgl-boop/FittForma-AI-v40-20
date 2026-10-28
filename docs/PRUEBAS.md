@@ -9,6 +9,18 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v61
+
+- `tests/v61.test.mjs` (5 pruebas):
+  - Insignias hasta 15 niveles al compartir.
+  - Estadísticas que se publican al iniciar sesión y nunca si se ocultaron.
+  - Foto de perfil única, siempre con una acción de la persona.
+  - Versus por músculo.
+  - Traducciones.
+- E2E:
+  - `athletes` suma 6 pasos: oferta de foto sin foto y con foto de Perfil; «Usar mi foto» la sube y se puede quitar; versus con los dos mapas y la lista por músculo; estadísticas publicadas al iniciar sesión.
+  - `rank-board`: el paso que exigía no publicar antes del aviso ahora comprueba que se publicaron al iniciar sesión.
+
 ### v60
 
 - `tests/v60.test.mjs` (9 pruebas):

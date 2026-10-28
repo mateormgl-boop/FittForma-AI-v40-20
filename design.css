@@ -1784,3 +1784,26 @@ html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 .faq-item:first-of-type{border-top:0}
 .faq-item summary{cursor:pointer;font-weight:700;font-size:.94rem;list-style-position:inside}
 .faq-item p{margin:6px 0 0;line-height:1.5}
+/* v61: usar la foto de Perfil en Comunidad */
+.cm-avatar-offer{display:flex;align-items:center;gap:12px;margin:0 0 12px;padding:12px 14px;border-radius:18px;border:1px solid var(--ff-border);background:linear-gradient(135deg,rgba(91,108,255,.12),rgba(125,77,255,.06))}
+.cm-avatar-offer[hidden]{display:none}
+.cm-avatar-offer-pic{flex:none;display:grid;place-items:center;width:56px;height:56px;border-radius:50%;overflow:hidden;background:var(--ff-panel-2);color:#7d8bff}
+.cm-avatar-offer-pic img{width:56px;height:56px;object-fit:cover}
+.cm-avatar-offer-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cm-avatar-offer-text strong{font-size:.95rem}
+.cm-avatar-offer-btns{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px}
+.avatar-community-opt{display:flex;align-items:center;gap:5px;margin-top:6px;font-size:.72rem;font-weight:600;color:var(--text-3);cursor:pointer;justify-content:center}
+.avatar-community-opt[hidden]{display:none}
+/* v61: versus músculo por músculo */
+.cm-mvs-maps{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 10px}
+.cm-mvs-maps figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.cm-mvs-maps svg{width:100%;height:auto;max-height:220px}
+.cm-mvs-maps figcaption{font-size:.8rem;font-weight:800}
+.cm-mvs-sum{margin:0 0 8px;font-size:.88rem}
+.cm-mvs-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.cm-mvs-row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,1fr);align-items:center;gap:8px;padding:7px 10px;border-radius:12px;background:var(--ff-panel-2);font-size:.82rem}
+.cm-mvs-row strong{font-size:.84rem;min-width:0;overflow-wrap:anywhere}
+.cm-mvs-head{background:none;padding:0 10px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;opacity:.7}
+.cm-mvs-cell{display:flex;align-items:center;gap:5px;min-width:0}
+.cm-mvs-none{opacity:.55}
+.cm-mvs-row.is-mine .cm-mvs-cell.is-me,.cm-mvs-row.is-theirs .cm-mvs-cell:not(.is-me){font-weight:800;color:#22c993}

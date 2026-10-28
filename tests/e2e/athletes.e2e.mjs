@@ -114,7 +114,9 @@ step('3. Las estadísticas ocultas no aparecen', !/Leyenda/.test(people));
 await page.click('#communityTabProfile');
 await page.fill('#communityEmail', 'alice@example.test'); await page.fill('#communityPassword', 'clave-segura-123');
 await page.click('#communityEmailLogin'); await page.waitForTimeout(1800);
-step('Antes de ver el aviso no se publica nada', sql(`select count(*) from community_athlete_stats where user_id='${A}'`) === '0');
+// v61: públicas desde el inicio (pedido de la persona dueña): se publican al iniciar sesión, sin esperar el aviso.
+for (let i = 0; i < 20 && sql(`select count(*) from community_athlete_stats where user_id='${A}'`) === '0'; i++) await page.waitForTimeout(250);
+step('Al iniciar sesión se publican las estadísticas sin esperar el aviso', sql(`select count(*) from community_athlete_stats where user_id='${A}'`) === '1');
 await page.click('#communityTabWorld'); await page.waitForTimeout(1000);
 step('Aviso: qué estadísticas se ven (y que nunca peso ni medidas)', await page.isVisible('#communityStatsNotice') && /Nunca tu peso/.test(await page.textContent('#communityStatsNotice')));
 await page.click('#communityStatsNoticeOk'); await page.waitForTimeout(1500);
@@ -208,6 +210,17 @@ step('El perfil propio muestra lo publicado', (await page.$$('#communityOwnGrid 
 await page.click('#communityViewOwnPublic'); await page.waitForTimeout(1500);
 step('«Ver cómo me ven» usa el mismo perfil completo', /Así ven tu perfil/.test(await page.textContent('#communityUserProfile')) && /Rango principal/.test(await page.textContent('#communityUserProfile')));
 
+// v61: sin foto en Comunidad se ofrece agregar una; si hay foto en Perfil, «Usar mi foto» la sube de un toque.
+await page.click('#communityTabRanking'); await page.waitForTimeout(300); await page.click('#communityTabWorld'); await page.waitForTimeout(600);
+step('v61 Sin foto en Comunidad se ofrece agregar una', await page.isVisible('#communityAvatarOffer') && /Agregá una foto de perfil/.test(await page.textContent('#communityAvatarOffer')));
+await page.evaluate(b64 => { window.FittFormaLocalAvatar = () => 'data:image/jpeg;base64,' + b64; }, PNG.toString('base64'));
+await page.click('#communityTabRanking'); await page.waitForTimeout(300); await page.click('#communityTabWorld'); await page.waitForTimeout(600);
+step('v61 Con foto en Perfil ofrece usarla en Comunidad', /¿Usar tu foto de perfil en Comunidad\?/.test(await page.textContent('#communityAvatarOffer')) && await page.isVisible('#communityAvatarOffer img'));
+await page.click('#communityAvatarOffer [data-avatar-offer-use]'); await page.waitForTimeout(1800);
+step('v61 «Usar mi foto» la sube como foto de Comunidad y la oferta desaparece', /^aaaaaaaa-0000-0000-0000-000000000001\/avatar\//.test(sql(`select coalesce(avatar_path,'') from community_profiles where user_id='${A}'`)) && !(await page.isVisible('#communityAvatarOffer')));
+await page.click('#communityTabProfile'); await page.waitForTimeout(900);
+await page.click('#communityOwnAvatarBtn'); await page.waitForTimeout(700); await page.click('#communityPhotoViewerActions [data-viewer-remove-avatar]'); await page.waitForTimeout(1500);
+step('v61 La foto se puede quitar desde Comunidad', sql(`select coalesce(avatar_path,'') from community_profiles where user_id='${A}'`) === '');
 // v53.1: foto de perfil (tocar el avatar), bandera, «Mi físico», mapa de músculos y acceso desde Inicio.
 await page.click('#communityTabProfile'); await page.waitForTimeout(900);
 let [fc] = await Promise.all([page.waitForEvent('filechooser'), page.click('#communityOwnAvatarBtn')]);
@@ -263,6 +276,7 @@ const ch = await page.textContent('#communityChallenge');
 step('v54 Reto de la semana entre amigos, con quién ganó la semana pasada', await page.isVisible('#communityChallenge') && /Más días activos/.test(ch) && /4 de 7/.test(ch) && /Semana pasada: Bruno Fit con 5 días activos/.test(ch), ch.replace(/\s+/g, ' ').slice(0, 200));
 await page.click(`#communityFriends [data-community-compare="${B}"]`); await page.waitForTimeout(1800);
 const evo = await page.textContent('#communityCompare');
+step('v61 La comparación incluye músculo por músculo (mapas de los dos y quién va adelante)', /Músculos/.test(evo) && (await page.$$('#communityCompare .cm-mvs-maps svg')).length === 2 && (await page.$$('#communityCompare .cm-mvs-row:not(.cm-mvs-head)')).length >= 3 && /a tu favor/.test(evo), evo.replace(/\s+/g, ' ').slice(0, 200));
 step('v54 La comparación muestra la evolución semanal de las dos personas', /Evolución semanal/.test(evo) && (await page.$$('#communityCompare .cm-evo-bars .cm-evo-wk')).length === 16, evo.replace(/\s+/g, ' ').slice(-200));
 if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/v54-compare.png`, fullPage: true });
 // Aviso real: Bruno empieza a seguir a Alicia (lo crea el servidor con un trigger).
