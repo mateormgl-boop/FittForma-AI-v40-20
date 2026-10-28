@@ -9,6 +9,27 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v56
+
+- `tests/v56.test.mjs`:
+  - Los 31 ejercicios nuevos están completos: biblioteca, ficha, alternativas existentes, animación, músculos, fotos y fuente.
+  - Van al final de la biblioteca.
+  - Los desafíos de carga reconocen los nombres nuevos.
+  - Progresión doble con números y sin inventar cargas.
+  - «Hoy toca» de la división semanal.
+  - Contratos de la interfaz.
+- `tests/e2e/v56.e2e.mjs` (31 pasos, solo la app):
+  - Hidratación.
+  - Filtros, orden, búsqueda por músculo y vista en lista.
+  - Historial de la ficha, agregar a rutina y alternativas.
+  - Ejercicio nuevo completo.
+  - División semanal y sugerencia «Probá 47,5 kg × 6».
+  - El peso sugerido es solo una guía.
+  - Calendario del mes y series por grupo.
+  - Repetir comidas sin duplicar.
+  - Perfil plegado.
+  - 320 px sin desborde y sin errores de JavaScript.
+
 ### v55
 
 - `tests/v55.test.mjs`:

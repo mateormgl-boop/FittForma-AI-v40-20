@@ -1,5 +1,51 @@
 # FittForma AI — Registro de cambios
 
+## v56.0 — Ejercicios nuevos, biblioteca mejorada, progresión con números y Progreso más completo (28 de octubre de 2026)
+
+- **Hidratación:** en Inicio y en el menú rápido, «+1 vaso de agua» ahora se llama «Hidratación» (y sigue sumando un vaso al tocarlo).
+- **31 ejercicios nuevos** (187 en total). Algunos de ellos:
+  - Sentadilla trasera, búlgara, sumo y con salto.
+  - Peso muerto sumo y rumano con barra.
+  - Press inclinado con barra, fondos en paralelas, aperturas en máquina.
+  - Remo en barra T, remo invertido y remo renegado.
+  - Press militar con barra, curl con barra, curl inclinado, press cerrado.
+  - Rueda abdominal, elevación de piernas colgado, leñador en polea.
+  - Swing con pesa rusa, saltar la cuerda, escaladores, entre otros.
+
+  Cada uno trae:
+  - ficha técnica completa;
+  - animación propia (`tools/exercise-gifs`);
+  - fotos reales de posición inicial y final, de dominio público (free-exercise-db, con su fuente en `assets/exercises/lib/SOURCES.md`);
+  - músculos que trabaja, para que cuente en los rangos.
+
+  Se agregaron al final de la biblioteca para no cambiar los planes ya generados.
+- **Biblioteca de ejercicios:**
+  - Filtros por nivel y por tipo (fuerza, cardio, movilidad).
+  - Orden: recomendado, A–Z, más hechos, hechos hace poco y nuevos primero.
+  - Vista en cuadrícula o en lista (se recuerda).
+  - Búsqueda por músculo (por ejemplo, «glúteo medio»).
+  - Cada tarjeta muestra los músculos principales, el nivel y cuántas veces lo hiciste.
+- **Ficha del ejercicio:**
+  - «Tu historial»: veces registrado, mejor marca, fuerza máxima estimada (Epley, solo de 1 a 12 repeticiones, orientativa), gráfico de las últimas sesiones y detalle de las últimas 5.
+  - «Agregar a la rutina» (a una existente o a una nueva).
+  - Las alternativas se tocan y abren su propia ficha.
+- **Progresión con números:**
+  - En la sesión, cada ejercicio sugiere qué hacer, por ejemplo «Probá 47,5 kg × 6 en cada serie».
+  - Usa progresión doble: primero sumar repeticiones y después carga.
+  - Se calcula solo con lo que registraste. El peso sugerido aparece como guía en el campo vacío y no se carga solo.
+- **División semanal:**
+  - Elegís una división: Empuje · Tracción · Piernas, Torso · Tren inferior, Pares clásicos + piernas, Músculos opuestos + piernas o Cuerpo completo.
+  - La app te dice qué toca hoy, según la última que hiciste.
+- **Progreso:**
+  - Calendario del mes con los días de entrenamiento y de actividad: se toca un día para ver qué hiciste y se puede ir a meses anteriores.
+  - Series por grupo muscular de esta semana, con la referencia de unas 10 series semanales.
+- **Nutrición:** «Repetir las comidas de ayer»; no duplica las que ya registraste hoy.
+- **Perfil:**
+  - El formulario de «Objetivo y actualidad» se pliega cuando ya cargaste tus datos.
+  - Las secciones de configuración quedan bajo el título «Ajustes».
+- **Insignias:** «Press militar con barra de pie» cuenta para el desafío de carga del press militar (no cambia ningún nivel ya obtenido).
+- **Sin migraciones nuevas.** Pruebas en `tests/v56.test.mjs` y `tests/e2e/v56.e2e.mjs`.
+
 ## v55.0 — Entrenar por grupos, «Lo hice», Músculos más claro y guía de alimentación (27 de octubre de 2026)
 
 - **Entrenar por grupos musculares** («¿Qué vas a entrenar hoy?»):

@@ -1,8 +1,20 @@
-# FittForma AI — v55.0
+# FittForma AI — v56.0
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v56.0
+
+- 31 ejercicios nuevos (187 en total), cada uno con ficha, animación propia y fotos de dominio público.
+- Biblioteca con filtros por nivel y tipo, orden, vista en lista y búsqueda por músculo.
+- Ficha del ejercicio con «Tu historial», «Agregar a la rutina» y alternativas que se tocan.
+- Progresión con números en la sesión.
+- División semanal con «Hoy toca».
+- Progreso: calendario del mes y series por grupo muscular de la semana.
+- «Repetir las comidas de ayer».
+- Perfil más ordenado y el acceso «Hidratación» en Inicio.
+- Sin migraciones nuevas.
 
 ## Novedades v55.0
 

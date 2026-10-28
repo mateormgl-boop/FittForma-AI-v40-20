@@ -97,7 +97,33 @@
       C('Cinta con inclinación suave', '8–20 min'),
       C('Elíptica a ritmo moderado', '10–20 min'),
       C('Remo ergómetro suave', '8–15 min'),
-      C('Escaladora a ritmo cómodo', '8–15 min')
+      C('Escaladora a ritmo cómodo', '8–15 min'),
+      // v56: ejercicios nuevos (al final para no cambiar los planes ya generados).
+      S('Sentadilla trasera con barra', 'Piernas', 3, '5–8', 'squat', 'main', 2, 3, true),
+      S('Sentadilla búlgara con mancuernas', 'Piernas', 3, '8–10 por lado', 'lunge', 'secondary', 2, 3, true),
+      S('Zancadas hacia adelante con mancuernas', 'Piernas', 3, '8–10 por lado', 'lunge', 'secondary', 1, 3, true),
+      S('Peso muerto sumo con barra', 'Piernas', 3, '5–8', 'hinge', 'main', 2, 3, true),
+      S('Peso muerto rumano con barra', 'Piernas', 3, '6–10', 'hinge', 'main', 2, 3, true),
+      S('Sentadilla sumo con mancuerna', 'Piernas', 3, '10–12', 'squat', 'secondary', 1, 3, true),
+      S('Elevación de talones en prensa', 'Piernas', 3, '12–15', 'calf', 'iso', 1, 3, true),
+      S('Press inclinado con barra', 'Pecho', 3, '6–10', 'hpush', 'main', 2, 3, true),
+      S('Fondos en paralelas', 'Pecho', 3, '6–10', 'hpush', 'secondary', 3, 3),
+      S('Aperturas en máquina', 'Pecho', 3, '10–15', 'chest_iso', 'iso', 1, 3, true),
+      S('Remo en barra T', 'Espalda', 3, '8–10', 'hpull', 'main', 2, 3, true),
+      S('Remo invertido en barra', 'Espalda', 3, '8–12', 'hpull', 'secondary', 1, 3),
+      S('Pullover con mancuerna en banco', 'Espalda', 3, '10–12', 'pull_iso', 'iso', 2, 3, true),
+      S('Remo renegado con pesas rusas', 'Espalda', 3, '6–10 por lado', 'hpull', 'secondary', 3, 3, true),
+      S('Press militar con barra de pie', 'Hombros', 3, '5–8', 'vpush', 'main', 2, 3, true),
+      S('Encogimientos con barra', 'Trapecio', 3, '10–12', 'shrug', 'iso', 1, 3, true),
+      S('Curl con barra', 'Brazos', 3, '8–12', 'biceps', 'iso', 1, 3, true),
+      S('Curl inclinado con mancuernas', 'Brazos', 3, '10–12', 'biceps', 'iso', 2, 3, true),
+      S('Curl martillo con cuerda en polea', 'Brazos', 3, '10–15', 'biceps', 'iso', 1, 3, true),
+      S('Press de banca agarre cerrado', 'Brazos', 3, '6–10', 'triceps', 'secondary', 2, 3, true),
+      S('Rueda abdominal', 'Core', 3, '6–12', 'core_ae', 'iso', 2, 3),
+      S('Elevación de piernas colgado', 'Core', 3, '8–12', 'core_flex', 'iso', 2, 3),
+      S('Leñador en polea', 'Core', 3, '10–12 por lado', 'core_rot', 'iso', 1, 3, true),
+      S('Swing con pesa rusa a una mano', 'Glúteos', 3, '10–15 por lado', 'hinge', 'secondary', 2, 3, true),
+      C('Saltar la cuerda', '5–12 min')
     ],
     home: [
       S('Sentadilla goblet', 'Piernas', 3, '8–12', 'squat', 'main', 1, 3, true),
@@ -159,7 +185,21 @@
       C('Shadow boxing de bajo impacto', '5–12 min'),
       M('Movilidad de cadera en el suelo', 'Piernas', '5–8 min'),
       M('Estiramiento de flexores de cadera', 'Piernas', '20–30 seg por lado'),
-      M('Gato-vaca para movilidad de columna', 'Espalda', '6–10 repeticiones')
+      M('Gato-vaca para movilidad de columna', 'Espalda', '6–10 repeticiones'),
+      // v56
+      S('Sentadilla búlgara con mancuernas', 'Piernas', 3, '8–10 por lado', 'lunge', 'secondary', 2, 3, true),
+      S('Zancadas hacia adelante con mancuernas', 'Piernas', 3, '8–10 por lado', 'lunge', 'secondary', 1, 3, true),
+      S('Sentadilla sumo con mancuerna', 'Piernas', 3, '10–12', 'squat', 'secondary', 1, 3, true),
+      S('Zancadas caminando sin peso', 'Piernas', 3, '10–12 por lado', 'lunge', 'secondary', 1, 3),
+      S('Sentadilla con salto', 'Piernas', 3, '8–12', 'squat', 'secondary', 2, 3),
+      S('Subida a escalón con elevación de rodilla', 'Piernas', 3, '8–10 por lado', 'lunge', 'secondary', 1, 3),
+      S('Aducción de cadera con banda', 'Piernas', 2, '12–15 por lado', 'adduct', 'iso', 1, 3),
+      S('Elevaciones laterales con banda', 'Hombros', 3, '12–15', 'lat_raise', 'iso', 1, 3),
+      S('Remo renegado con pesas rusas', 'Espalda', 3, '6–10 por lado', 'hpull', 'secondary', 3, 3, true),
+      S('Rueda abdominal', 'Core', 3, '6–12', 'core_ae', 'iso', 2, 3),
+      S('Escaladores', 'Core', 3, '10–20 por lado', 'core_ae', 'iso', 2, 3),
+      S('Swing con pesa rusa a una mano', 'Glúteos', 3, '10–15 por lado', 'hinge', 'secondary', 2, 3, true),
+      C('Saltar la cuerda', '5–12 min')
     ],
     bodyweight: [
       S('Sentadilla al aire', 'Piernas', 3, '8–15', 'squat', 'main', 1, 3),
@@ -204,7 +244,12 @@
       C('Paso lateral de bajo impacto', '5–10 min'),
       C('Jumping jacks de bajo impacto', '5–10 min'),
       M('Círculos de brazos controlados', 'Hombros', '30–45 seg'),
-      M('Movilidad de tobillo contra pared', 'Piernas', '8–12 por lado')
+      M('Movilidad de tobillo contra pared', 'Piernas', '8–12 por lado'),
+      // v56
+      S('Zancadas caminando sin peso', 'Piernas', 3, '10–12 por lado', 'lunge', 'secondary', 1, 3),
+      S('Sentadilla con salto', 'Piernas', 3, '8–12', 'squat', 'secondary', 2, 3),
+      S('Subida a escalón con elevación de rodilla', 'Piernas', 3, '8–10 por lado', 'lunge', 'secondary', 1, 3),
+      S('Escaladores', 'Core', 3, '10–20 por lado', 'core_ae', 'iso', 2, 3)
     ]
   };
 
@@ -564,7 +609,51 @@
     return out;
   }
 
-  const api = { norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
+  // v56: división semanal. «Hoy toca» = la combinación que sigue a la última que hiciste de esa división
+  // (se reconoce por el título de la sesión). Si no hiciste ninguna, empieza por la primera.
+  const SPLIT_PLANS = {
+    ppl: { title: 'Empuje · Tracción · Piernas', days: '3 o 6 días', focus: ['push', 'pull', 'legs'] },
+    upper_lower: { title: 'Torso · Tren inferior', days: '2 o 4 días', focus: ['upper', 'lower'] },
+    pairs: { title: 'Pares clásicos + piernas', days: '4 días', focus: ['chest_triceps', 'back_biceps', 'legs', 'shoulders_core'] },
+    antagonists: { title: 'Músculos opuestos + piernas', days: '3 días', focus: ['chest_back', 'legs', 'arms'] },
+    full: { title: 'Cuerpo completo', days: '2 o 3 días', focus: ['full'] }
+  };
+  function nextFocusInSplit(splitKey, sessions) {
+    const plan = SPLIT_PLANS[splitKey]; if (!plan) return null;
+    const titleOf = Object.fromEntries(plan.focus.map(k => [norm(FOCUS[k].title), k]));
+    const done = (sessions || []).filter(x => x && titleOf[norm(x.title)]).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    if (!done.length) return { key: plan.focus[0], last: null, lastDate: '' };
+    const lastKey = titleOf[norm(done[0].title)], i = plan.focus.indexOf(lastKey);
+    return { key: plan.focus[(i + 1) % plan.focus.length], last: lastKey, lastDate: String(done[0].date || '') };
+  }
+
+  // v56: progresión doble con números a partir de la última vez (primero repeticiones, después carga).
+  // prev = series registradas [{reps, weight, done}], spec = prescripción ('8–12', '10', '30–45 seg').
+  // Devuelve { kind, weight, reps, unit } o null si no hay datos suficientes. Nunca inventa una carga que no registraste.
+  const num = v => { const n = Number(String(v == null ? '' : v).replace(',', '.')); return Number.isFinite(n) ? n : NaN; };
+  function loadStep(w) { return w < 10 ? 1 : w < 40 ? 2 : 2.5; }
+  function suggestProgression(prev, spec, measure = 'reps') {
+    const sets = (prev || []).filter(x => x && x.done !== false).map(x => ({ r: num(x.reps), w: num(x.weight) })).filter(x => x.r > 0);
+    if (!sets.length) return null;
+    const m = String(spec || '').match(/(\d+)\s*[–-]\s*(\d+)/), one = String(spec || '').match(/\d+/);
+    const lo = m ? Number(m[1]) : one ? Number(one[0]) : Math.min(...sets.map(x => x.r));
+    const hi = m ? Number(m[2]) : lo;
+    const allDone = (prev || []).length > 0 && (prev || []).every(x => x && x.done === true);
+    const minR = Math.min(...sets.map(x => x.r));
+    const weights = sets.map(x => x.w).filter(w => w > 0), w = weights.length === sets.length ? Math.max(...weights) : 0;
+    if (measure === 'seconds') {
+      if (allDone && minR >= hi) return { kind: 'time', weight: w || 0, reps: minR + 5, unit: 's' };
+      return { kind: 'repeat', weight: w || 0, reps: Math.max(minR, lo), unit: 's' };
+    }
+    if (allDone && minR >= hi) {
+      if (w > 0) return { kind: 'load', weight: Math.round((w + loadStep(w)) * 2) / 2, reps: lo, unit: 'reps' };
+      return { kind: 'reps', weight: 0, reps: hi + 1, unit: 'reps' };
+    }
+    if (allDone && minR >= lo) return { kind: 'reps', weight: w, reps: Math.min(hi, minR + 1), unit: 'reps' };
+    return { kind: 'repeat', weight: w, reps: lo, unit: 'reps' };
+  }
+
+  const api = { SPLIT_PLANS, nextFocusInSplit, suggestProgression, norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaTraining = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);
