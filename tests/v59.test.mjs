@@ -64,3 +64,10 @@ test('textos nuevos traducidos', () => {
     assert.ok(i18n.includes(JSON.stringify(s) + ','), s);
   for (const re of ['completo! ≈', 'Se habilita el', 'Faltan (.+) para el próximo entrenamiento diario', 'Ahora: (.+)']) assert.ok(i18n.includes(re), re);
 });
+
+test('v59.1: los estilos nunca quedan viejos frente a una versión nueva (sin caché de 1 hora)', () => {
+  const server = readFileSync('backend/server.mjs', 'utf8'), sw = readFileSync('sw.js', 'utf8');
+  assert.match(server, /\['\.html','\.js','\.mjs','\.json','\.webmanifest','\.css'\]\.includes\(ext\)\?'no-cache'/);
+  assert.match(html, /href="\.\/design\.css\?v=[\d.]+"/, 'la hoja de estilos lleva la versión en la dirección');
+  assert.match(sw, /ignoreSearch: request\.mode === 'navigate' \|\| \/\\\.css\$\/i/, 'sin red se usa la copia guardada del CSS');
+});
