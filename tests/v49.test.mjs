@@ -146,9 +146,9 @@ test('insignias: emblema hexagonal con marco distinto por rango y símbolo propi
 test('insignias por carga: mejor serie ÷ peso corporal, umbrales crecientes y sin carga manual', () => {
   for (const c of E.LOAD_CHALLENGES) {
     const t = E.thresholdsForExercise(c);
-    assert.equal(t.length, 12, c.name);
-    for (let i = 1; i < 12; i++) assert.ok(t[i] > t[i - 1], `${c.name} nivel ${i + 1}`);
-    assert.ok(E.maxPlausible(c) >= t[11]);
+    assert.equal(t.length, 15, c.name);
+    for (let i = 1; i < 15; i++) assert.ok(t[i] > t[i - 1], `${c.name} nivel ${i + 1}`);
+    assert.ok(E.maxPlausible(c) >= t[14]);
     assert.equal(E.validateRecord(c, 100, [], '2026-10-18').ok, false, 'se calcula con las series, no se declara a mano');
   }
   assert.equal(E.loadChallengeFor('Press de banca con barra')?.id, 'load-press-banca');

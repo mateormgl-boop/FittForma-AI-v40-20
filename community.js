@@ -65,7 +65,7 @@
     return p=>signedCache.get(p)?.url||'';
   }
   function avatarHtml(profile,urlOf,size=''){const name=profile?.display_name||profile?.username||'Usuario',url=profile?.avatar_path&&urlOf?urlOf(profile.avatar_path):'';return `<span class="community-avatar${size?' community-avatar-'+size:''}${url?' has-photo':''}">${url?`<img src="${esc(url)}" alt="" loading="lazy" onerror="this.parentElement.classList.remove('has-photo');this.remove()">`:''}<span aria-hidden="true">${esc(initials(name))}</span></span>`;}
-  function featuredHtml(list,size=18){const E=window.FittFormaBadgeEngine;if(!E||!Array.isArray(list))return '';return list.slice(0,3).map(b=>{const level=Math.min(12,Math.max(1,Number(b?.level)||1)),rank=E.rankForLevel(level-1);return `<span class="community-mini-badge" title="${esc(b?.exerciseName||'')} · ${esc(rank.label)}">${E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:b?.exerciseId,name:b?.exerciseName,category:b?.category,measure:b?.measure}),category:b?.category,size,title:`${b?.exerciseName||''} · ${rank.label}`})}</span>`;}).join('');}
+  function featuredHtml(list,size=18){const E=window.FittFormaBadgeEngine;if(!E||!Array.isArray(list))return '';return list.slice(0,3).map(b=>{const level=Math.min(15,Math.max(1,Number(b?.level)||1)),rank=E.rankForLevel(level-1);return `<span class="community-mini-badge" title="${esc(b?.exerciseName||'')} · ${esc(rank.label)}">${E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:b?.exerciseId,name:b?.exerciseName,category:b?.category,measure:b?.measure}),category:b?.category,size,title:`${b?.exerciseName||''} · ${rank.label}`})}</span>`;}).join('');}
   // #hashtags clicables (se buscan en Explorar). El texto se escapa antes.
   // v53: los #hashtags se resaltan pero no abren una búsqueda de publicaciones (no hay feed general).
   function richText(text){return esc(text).replace(/(^|[\s(])#([\p{L}\p{N}_]{2,30})/gu,(m,pre,tag)=>`${pre}<span class="community-hashtag">#${tag}</span>`);}
@@ -330,7 +330,7 @@
   async function reportPost(id){if(!authReady())return alert(tr(authHint()));const reason=String(prompt(tr('Motivo de la denuncia (spam, acoso, contenido inapropiado, otro):'))??'').trim();if(!reason)return;const {error}=await client.from('community_reports').insert({reporter_id:user.id,post_id:id,reason:reason.trim().slice(0,300)});if(error)status(error.code==='23505'?'Ya enviaste una denuncia por esta publicación.':`No se pudo enviar la denuncia: ${error.message}`);else status('Denuncia enviada. Gracias por ayudar a cuidar la comunidad.');}
   async function deleteComment(id){if(!confirm(tr('¿Borrar tu comentario?')))return;const {error}=await client.from('community_comments').delete().eq('id',id).eq('user_id',user.id);if(error)status(error.message);else await refreshPosts();}
   function achievementCard(a){
-    const E=window.FittFormaBadgeEngine,level=Math.min(12,Math.max(1,Number(a?.level)||1));
+    const E=window.FittFormaBadgeEngine,level=Math.min(15,Math.max(1,Number(a?.level)||1));
     const rank=E?E.rankForLevel(level-1):{label:String(a?.rank||''),key:String(a?.rank||'bronze'),numeral:''};
     const medal=E?E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:a?.exerciseId,name:a?.exerciseName,category:a?.category,measure:a?.measure}),category:a?.category,size:56,title:rank.label}):'';
     const goal=E?E.formatValue(a?.threshold,a?.measure):String(a?.threshold??'');
@@ -812,7 +812,7 @@
     if(!p.can_view)return '';
     if(!list.length)return `<section class="cm-section"><h4>Insignias y logros</h4><p class="muted small">${p.stats_visible?'Todavía no tiene insignias.':'Sin insignias para mostrar.'}</p></section>`;
     const ev={gps_device:'Con GPS del dispositivo',session:'Registrada en un entrenamiento',declared:'Autorregistrada'};
-    const items=list.map(b=>{const level=Math.min(12,Math.max(1,Number(b?.level)||1)),rank=E?E.rankForLevel(level-1):{label:'',key:'',numeral:''};
+    const items=list.map(b=>{const level=Math.min(15,Math.max(1,Number(b?.level)||1)),rank=E?E.rankForLevel(level-1):{label:'',key:'',numeral:''};
       const medal=E?E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:b.exerciseId,name:b.exerciseName,category:b.category,measure:b.measure}),category:b.category,size:46,title:`${b.exerciseName} · ${rank.label}`}):'';
       const cat=E&&b.category?E.categoryLabel(b.category):'';const date=b.earnedAt?dateLabel(b.earnedAt):'';
       return `<li class="cm-badge">${medal}<div><strong>${esc(b.exerciseName||'Insignia')}</strong><small>${esc([cat,rank.label?`${rank.label} · nivel ${level}`:`Nivel ${level}`].filter(Boolean).join(' · '))}</small><small class="muted">${esc([date,b.evidence?ev[b.evidence]||ev.declared:''].filter(Boolean).join(' · '))}</small></div></li>`;}).join('');
@@ -856,7 +856,7 @@
   // Mosaicos de publicaciones dentro de un perfil (propio o ajeno).
   function gridTile(p,urlOf){const kind=p.post_kind||'transformation',img=urlOf(p.image_path)||(kind==='transformation'?urlOf(p.after_path):'');const E=window.FittFormaBadgeEngine;let inner='';
     if(img)inner=`<img src="${esc(img)}" alt="" loading="lazy" onerror="this.remove()">`;
-    else if(kind==='achievement'&&E&&p.achievement){const level=Math.min(12,Math.max(1,Number(p.achievement.level)||1)),rank=E.rankForLevel(level-1);inner=`<span class="community-tile-badge">${E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:p.achievement.exerciseId,name:p.achievement.exerciseName,category:p.achievement.category,measure:p.achievement.measure}),category:p.achievement.category,size:52})}<small>${esc(p.achievement.exerciseName)}</small></span>`;}
+    else if(kind==='achievement'&&E&&p.achievement){const level=Math.min(15,Math.max(1,Number(p.achievement.level)||1)),rank=E.rankForLevel(level-1);inner=`<span class="community-tile-badge">${E.medalSvg({rankKey:rank.key,numeral:rank.numeral,glyph:E.glyphFor({id:p.achievement.exerciseId,name:p.achievement.exerciseName,category:p.achievement.category,measure:p.achievement.measure}),category:p.achievement.category,size:52})}<small>${esc(p.achievement.exerciseName)}</small></span>`;}
     else inner=`<span class="community-tile-text">${esc(String(p.description||'').slice(0,90))}</span>`;
     const label=kind==='transformation'?'Transformación':kind==='achievement'?'Logro':'Publicación';
     return `<button type="button" class="community-tile${img?'':' is-text'}" data-community-open-post="${esc(p.id)}" aria-label="Abrir ${label.toLowerCase()} de ${esc((Array.isArray(p.community_profiles)?p.community_profiles[0]:p.community_profiles)?.username||'usuario')}">${inner}${kind==='transformation'?'<span class="community-tile-kind">Antes/Después</span>':''}</button>`;}

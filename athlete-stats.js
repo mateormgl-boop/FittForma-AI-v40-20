@@ -131,7 +131,7 @@
       .map(b => ({
         exerciseId: String(b.exerciseId || '').slice(0, 80), exerciseName: String(b.exerciseName).slice(0, 72),
         category: String(b.category || '').replace(/[^a-z]/g, '').slice(0, 20), rank: String(b.rank || '').slice(0, 20),
-        level: clamp(Math.round(Number(b.level) || 1), 1, 12), measure: String(b.measure || 'reps').slice(0, 12),
+        level: clamp(Math.round(Number(b.level) || 1), 1, 15), measure: String(b.measure || 'reps').slice(0, 12),
         evidence: ['gps_device', 'session', 'declared'].includes(b.evidence) ? b.evidence : 'declared',
         earnedAt: validDate(b.earnedAt) ? String(b.earnedAt).slice(0, 10) : null
       }));

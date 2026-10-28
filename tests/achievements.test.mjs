@@ -14,17 +14,19 @@ context.window = context;
 vm.runInNewContext(source, context);
 const engine = context.FittFormaBadgeEngine;
 
-test('motor de insignias publica rangos y doce hitos en orden creciente', () => {
+test('motor de insignias publica rangos y 15 hitos en orden creciente (v57: +3 Legendario)', () => {
   assert.ok(engine);
   for (const measure of ['reps', 'seconds', 'minutes', 'km', 'days']) {
     const list = engine.thresholdsForExercise({ measure });
-    assert.equal(list.length, 12);
+    assert.equal(list.length, 15);
     for (let i = 1; i < list.length; i++) assert.ok(list[i] > list[i - 1]);
   }
   assert.equal(engine.rankForLevel(0).label, 'Bronce I');
   assert.equal(engine.rankForLevel(5).label, 'Plata III');
   assert.equal(engine.rankForLevel(8).label, 'Oro III');
   assert.equal(engine.rankForLevel(11).label, 'Diamante III');
+  assert.equal(engine.rankForLevel(12).label, 'Legendario I');
+  assert.equal(engine.rankForLevel(14).label, 'Legendario III');
 });
 
 test('normaliza nombres y representa progreso sin crear hitos falsos', () => {

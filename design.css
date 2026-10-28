@@ -1449,3 +1449,16 @@ body{font-feature-settings:"cv11","ss01"}
 .mp-unknown{margin:8px 0 0;font-size:12.5px;color:#b45309}
 html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 @media(max-width:380px){.meal-parse li{grid-template-columns:minmax(0,1fr) auto auto}.mp-food{grid-column:1/-1}}
+/* v57: insignia Legendaria — obsidiana negra con borde dorado y aura violeta */
+.ff-medal--legend .ff-medal-shape{fill:url(#ffMedalLegend)!important;stroke:url(#ffLegendEdge)!important;stroke-width:1.6!important}
+.ff-medal--legend .ff-medal-inner{fill:url(#ffFaceLegend)!important;stroke:#d4a017!important}
+.ff-medal--legend .ff-medal-facet{stroke:rgba(212,160,23,.55)}
+.ff-medal--legend .ff-medal-glyph{stroke:#f6d26b!important}
+.ff-medal--legend .ff-medal-aura{fill:#8f5bff;opacity:.28;stroke:#d4a017;stroke-width:.6;stroke-opacity:.6}
+.ff-medal--legend .ff-medal-crown{fill:url(#ffLegendEdge);stroke:#3a2a00;stroke-width:.5}
+.ff-medal--legend .ff-medal-banner{fill:#0b0b0f;stroke:#d4a017;stroke-width:.6}
+.ff-medal--legend .ff-medal-pip{fill:#f6d26b}
+.ff-medal--legend .ff-medal-ring{stroke:rgba(246,210,107,.5)}
+.ff-medal.is-locked .ff-medal-aura,.ff-medal.is-locked .ff-medal-crown{fill:transparent;stroke:var(--ff-border)}
+.badge-celebration[data-rank="legend"]{--glow:#8f5bff}
+.badge-celebration[data-rank="legend"] .badge-celebration-rank{color:#d4a017}
