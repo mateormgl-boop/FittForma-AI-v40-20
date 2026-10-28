@@ -946,7 +946,26 @@
   ["Récords nuevos", "New records", "Novos recordes", "Nouveaux records", "Nuovi record", "Neue Rekorde"],
   ["para el próximo", "until the next", "até o próximo", "avant le prochain", "al prossimo", "bis zum nächsten"],
   ["1 serie", "1 set", "1 série", "1 série", "1 serie", "1 Satz"],
-  ["Con tu peso y las series que hiciste, descansos incluidos (MET 3,5 del Compendio de Actividades Físicas).", "Based on your weight and the sets you did, rests included (MET 3.5 from the Compendium of Physical Activities).", "Com seu peso e as séries que você fez, descansos incluídos (MET 3,5 do Compêndio de Atividades Físicas).", "Avec ton poids et les séries effectuées, repos compris (MET 3,5 du Compendium des activités physiques).", "Con il tuo peso e le serie che hai fatto, recuperi inclusi (MET 3,5 del Compendio delle attività fisiche).", "Mit deinem Gewicht und deinen Sätzen, Pausen inklusive (MET 3,5 aus dem Compendium of Physical Activities)."]
+  ["Con tu peso y las series que hiciste, descansos incluidos (MET 3,5 del Compendio de Actividades Físicas).", "Based on your weight and the sets you did, rests included (MET 3.5 from the Compendium of Physical Activities).", "Com seu peso e as séries que você fez, descansos incluídos (MET 3,5 do Compêndio de Atividades Físicas).", "Avec ton poids et les séries effectuées, repos compris (MET 3,5 du Compendium des activités physiques).", "Con il tuo peso e le serie che hai fatto, recuperi inclusi (MET 3,5 del Compendio delle attività fisiche).", "Mit deinem Gewicht und deinen Sätzen, Pausen inklusive (MET 3,5 aus dem Compendium of Physical Activities)."],
+  ["Lun", "Mon", "Seg", "Lun", "Lun", "Mo"],
+  ["Mar", "Tue", "Ter", "Mar", "Mar", "Di"],
+  ["Mié", "Wed", "Qua", "Mer", "Mer", "Mi"],
+  ["Jue", "Thu", "Qui", "Jeu", "Gio", "Do"],
+  ["Vie", "Fri", "Sex", "Ven", "Ven", "Fr"],
+  ["Sáb", "Sat", "Sáb", "Sam", "Sab", "Sa"],
+  ["Dom", "Sun", "Dom", "Dim", "Dom", "So"],
+  ["Tocá un día para cambiarlo.", "Tap a day to change it.", "Toque um dia para mudá-lo.", "Touche un jour pour le modifier.", "Tocca un giorno per cambiarlo.", "Tippe auf einen Tag, um ihn zu ändern."],
+  ["Tocá un día para elegir qué entrenar, o usá una rutina lista.", "Tap a day to choose what to train, or use a ready-made routine.", "Toque um dia para escolher o que treinar, ou use uma rotina pronta.", "Touche un jour pour choisir quoi entraîner, ou utilise une routine prête.", "Tocca un giorno per scegliere cosa allenare, o usa una routine pronta.", "Tippe auf einen Tag, um zu wählen, was du trainierst, oder nutze eine fertige Routine."],
+  ["Recuperación", "Recovery", "Recuperação", "Récupération", "Recupero", "Erholung"],
+  ["Lo decido ese día", "I’ll decide that day", "Decido no dia", "Je déciderai ce jour-là", "Decido quel giorno", "Entscheide ich an dem Tag"],
+  ["Listo, cerrar", "Done, close", "Pronto, fechar", "Terminé, fermer", "Fatto, chiudi", "Fertig, schließen"],
+  ["Músculos de este día", "Muscles for this day", "Músculos deste dia", "Muscles de ce jour", "Muscoli di questo giorno", "Muskeln an diesem Tag"],
+  ["Pecho tríceps", "Chest triceps", "Peito tríceps", "Pecs triceps", "Petto tricipiti", "Brust Trizeps"],
+  ["Espalda bíceps", "Back biceps", "Costas bíceps", "Dos biceps", "Schiena bicipiti", "Rücken Bizeps"],
+  ["Hombros core", "Shoulders core", "Ombros core", "Épaules gainage", "Spalle core", "Schultern Core"],
+  ["Pecho espalda", "Chest back", "Peito costas", "Pecs dos", "Petto schiena", "Brust Rücken"],
+  ["Todo el cuerpo", "Full body", "Corpo todo", "Corps entier", "Total body", "Ganzkörper"],
+  ["Glúteos isquios", "Glutes hams", "Glúteos posteriores", "Fessiers ischios", "Glutei femorali", "Po Beinbeuger"]
 );
 window.FittFormaI18nDynamic = [
   [/^Quedan (\d+) (día|días)$/, (m, i) => [`${m[1]} ${m[1] === '1' ? 'day' : 'days'} left`, `Faltam ${m[1]} ${m[1] === '1' ? 'dia' : 'dias'}`, `Plus que ${m[1]} ${m[1] === '1' ? 'jour' : 'jours'}`, `${m[1] === '1' ? 'Manca' : 'Mancano'} ${m[1]} ${m[1] === '1' ? 'giorno' : 'giorni'}`, `Noch ${m[1]} ${m[1] === '1' ? 'Tag' : 'Tage'}`][i]],
@@ -1022,5 +1041,7 @@ window.FittFormaI18nDynamic = [
   [/^(\d+) repeticiones \(antes (\d+)\)$/, (m, i) => `${m[1]} ${['reps', 'repetições', 'répétitions', 'ripetizioni', 'Wiederholungen'][i]} (${['before', 'antes', 'avant', 'prima', 'vorher'][i]} ${m[2]})`],
 [/^(.+) · Sesión guardada en tu historial\.$/, (m, i, t) => `${t(m[1])} · ${['Session saved to your history.', 'Sessão salva no seu histórico.', 'Séance enregistrée dans ton historique.', 'Sessione salvata nel tuo storico.', 'Einheit in deinem Verlauf gespeichert.'][i]}`],
   [/^✓ Tu sesión está guardada en este dispositivo\. Las series marcadas como listas quedaron registradas\.$/, (m, i) => ['✓ Your session is saved on this device. The sets marked as done were recorded.', '✓ Sua sessão está salva neste dispositivo. As séries marcadas como concluídas foram registradas.', '✓ Ta séance est enregistrée sur cet appareil. Les séries cochées ont été enregistrées.', '✓ La tua sessione è salvata su questo dispositivo. Le serie segnate come fatte sono state registrate.', '✓ Deine Einheit ist auf diesem Gerät gespeichert. Die als erledigt markierten Sätze wurden erfasst.'][i]],
-  [/^✓ Tu sesión está guardada en este dispositivo\. (\d+) serie\(s\) tenían datos pero no quedaron marcadas como completadas\.$/, (m, i) => [`✓ Your session is saved on this device. ${m[1]} set(s) had data but weren’t marked as done.`, `✓ Sua sessão está salva neste dispositivo. ${m[1]} série(s) tinham dados mas não foram marcadas como concluídas.`, `✓ Ta séance est enregistrée sur cet appareil. ${m[1]} série(s) avaient des données mais n’ont pas été cochées.`, `✓ La tua sessione è salvata su questo dispositivo. ${m[1]} serie avevano dati ma non sono state segnate come fatte.`, `✓ Deine Einheit ist auf diesem Gerät gespeichert. ${m[1]} Satz/Sätze hatten Daten, wurden aber nicht als erledigt markiert.`][i]]
+  [/^✓ Tu sesión está guardada en este dispositivo\. (\d+) serie\(s\) tenían datos pero no quedaron marcadas como completadas\.$/, (m, i) => [`✓ Your session is saved on this device. ${m[1]} set(s) had data but weren’t marked as done.`, `✓ Sua sessão está salva neste dispositivo. ${m[1]} série(s) tinham dados mas não foram marcadas como concluídas.`, `✓ Ta séance est enregistrée sur cet appareil. ${m[1]} série(s) avaient des données mais n’ont pas été cochées.`, `✓ La tua sessione è salvata su questo dispositivo. ${m[1]} serie avevano dati ma non sono state segnate come fatte.`, `✓ Deine Einheit ist auf diesem Gerät gespeichert. ${m[1]} Satz/Sätze hatten Daten, wurden aber nicht als erledigt markiert.`][i]],
+[/^Ahora: (.+)$/, (m, i, t) => `${['Now', 'Agora', 'Actuel', 'Ora', 'Aktuell'][i]}: ${t(m[1])}`],
+  [/^(Lunes|Martes|Miércoles|Jueves|Viernes|Sábado|Domingo): (.+?)( \(hoy\))?( · entrenaste)?$/, (m, i, t) => `${t(m[1])}: ${t(m[2])}${m[3] ? ' (' + ['today', 'hoje', 'aujourd’hui', 'oggi', 'heute'][i] + ')' : ''}${m[4] ? ' · ' + ['trained', 'treinou', 'entraîné', 'allenato', 'trainiert'][i] : ''}`]
 ].concat(window.FittFormaI18nDynamic || []);

@@ -3638,26 +3638,43 @@ function findCatalogExercise(name){
     for(const x of state.sessions||[])if(x&&x.status!=='cancelled'&&x.date>=monday&&x.date<=today)done.add(FittFormaTraining.weekdayOf(x.date));return done;
   }
   function todayRecommendation(){return FittFormaTraining.recommendToday(state.profile||{},state.sessions||[],weekDays(),dateKey());}
+  // v59: mini dibujo de los músculos de cada día (frente o espalda según dónde está la mayoría).
+  const WP_GROUP_MUSCLES={legs_quads:['cuadriceps','aductores'],legs_post:['isquiotibiales','gluteos'],chest:['pectorales'],back:['dorsales','espalda_media','trapecio'],shoulders:['deltoides_anterior','deltoides_lateral'],rear_delts:['deltoides_posterior'],biceps:['biceps'],triceps:['triceps'],calves:['gemelos'],core:['abdominales','oblicuos']};
+  const WP_ICON_REST='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>';
+  const WP_ICON_ADD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg>';
+  const WP_SHORT={push:'Empuje',pull:'Tracción',legs:'Piernas',upper:'Torso',lower:'Tren inferior',chest_triceps:'Pecho tríceps',back_biceps:'Espalda bíceps',shoulders_core:'Hombros core',chest_back:'Pecho espalda',arms:'Brazos',full:'Todo el cuerpo',glutes:'Glúteos isquios'};
+  function weekDayShort(day){const T=FittFormaTraining;if(!day)return 'Elegir';if(day.kind==='rest')return 'Descanso';if(day.kind==='focus')return WP_SHORT[day.key]||weekDayLabel(day);if(day.kind==='groups')return day.groups.slice(0,2).map(g=>(T.MUSCLE_GROUPS[g]?.label||'').split(/ y | /)[0]).filter(Boolean).join(' ');return weekDayLabel(day);}
+  function weekDayGroups(day){const T=FittFormaTraining;return day?.kind==='focus'?(T.FOCUS[day.key]?.groups||[]):day?.kind==='groups'?day.groups:[];}
+  function weekDayFigure(groups,opts={}){
+    const A=window.FittFormaAnatomy;if(!A?.muscleMapSvg||!groups.length)return '';
+    const ids=[...new Set(groups.flatMap(g=>WP_GROUP_MUSCLES[g]||[]))],sideOf=id=>A.SHAPES?.find(m=>m.id===id)?.side;
+    const front=ids.filter(id=>sideOf(id)==='front').length,back=ids.filter(id=>sideOf(id)==='back').length;
+    return A.muscleMapSvg(ids,[],{size:'xs',sides:opts.sides||(back>front?'back':'front'),label:opts.label||'Músculos de este día'});
+  }
   function weekPlanMarkup(){
     const T=FittFormaTraining;if(!T.WEEKDAYS)return '';
     const days=weekDays(),today=T.weekdayOf(dateKey()),done=weekDoneDays(),rec=todayRecommendation(),hasPlan=Object.keys(days).length>0;
-    const chips=T.WEEKDAYS.map((n,i)=>{const d=i+1,day=days[d],editing=weekEditDay===d;return `<button type="button" class="wp-day${d===today?' is-today':''}${day?.kind==='rest'?' is-rest':''}${!day?' is-empty':''}${done.has(d)?' is-done':''}${editing?' is-editing':''}" data-wp-day="${d}" aria-expanded="${editing}"><span class="wp-day-name">${esc(n)}${d===today?' <em>Hoy</em>':''}</span><span class="wp-day-what">${esc(day?weekDayLabel(day):'Sin asignar')}</span>${done.has(d)?'<i aria-label="entrenaste">✓</i>':''}<span class="wp-day-edit" aria-hidden="true">${editing?'▴':'›'}</span></button>${editing?`<div id="wpEditor">${weekEditorMarkup()}</div>`:''}`;}).join('');
-    const todayDay=rec.day,todayTitle=weekDayLabel(todayDay);
-    const todayBox=rec.source==='week'?(todayDay.kind==='rest'?`<p class="wp-today-text"><small>Hoy (${esc(T.WEEKDAYS[today-1].toLowerCase())})</small><strong>Descanso</strong><span class="muted small">Si igual querés entrenar, elegí abajo qué hacer.</span></p>`:`<p class="wp-today-text"><small>Hoy toca (${esc(T.WEEKDAYS[today-1].toLowerCase())})</small><strong>${esc(todayTitle)}</strong><span class="muted small">Según tu semana.</span></p><button type="button" class="btn" id="wpStartToday">Ver la sesión</button>`)
-      :`<p class="wp-today-text"><small>${hasPlan?'Hoy no tiene nada asignado · Te recomendamos':'Te recomendamos para hoy'}</small><strong>${esc(todayTitle)}</strong><span class="muted small">${esc(rec.reason||'')}</span></p><button type="button" class="btn" id="wpStartToday">Ver la sesión</button>`;
-    return `<div class="week-plan" id="weekPlan"><div class="wp-head"><div><strong>Mi semana</strong><small class="muted">${hasPlan?'Tocá un día para cambiar qué entrenás.':'Elegí qué querés entrenar cada día, o usá una rutina lista.'}</small></div><button type="button" class="btn secondary btn-sm wp-programs-btn" id="wpProgramsToggle" aria-expanded="false">Rutinas listas</button></div>
+    const chips=T.WEEKDAYS.map((n,i)=>{const d=i+1,day=days[d],editing=weekEditDay===d,label=day?weekDayLabel(day):'Sin asignar',groups=weekDayGroups(day);
+      const pic=day?.kind==='rest'?`<span class="wp-pic is-icon">${WP_ICON_REST}</span>`:!day?`<span class="wp-pic is-icon is-add">${WP_ICON_ADD}</span>`:day.kind==='routine'?`<span class="wp-pic is-icon is-routine">${esc(label.slice(0,2).toUpperCase())}</span>`:`<span class="wp-pic">${weekDayFigure(groups,{label})}</span>`;
+      return `<button type="button" class="wp-day${d===today?' is-today':''}${day?.kind==='rest'?' is-rest':''}${!day?' is-empty':''}${done.has(d)?' is-done':''}${editing?' is-editing':''}" data-wp-day="${d}" aria-haspopup="dialog" aria-expanded="${editing}" aria-label="${esc(n)}: ${esc(label)}${d===today?' (hoy)':''}${done.has(d)?' · entrenaste':''}"><span class="wp-day-name">${esc(n.slice(0,3))}</span>${pic}<span class="wp-day-what" aria-hidden="true">${day?.kind==='groups'?weekDayShort(day).split(' ').map(w=>`<span>${esc(w)}</span>`).join(' '):esc(weekDayShort(day))}</span>${done.has(d)?'<i class="wp-done" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>':''}</button>`;}).join('');
+    const todayDay=rec.day,todayTitle=weekDayLabel(todayDay),todayFig=todayDay&&todayDay.kind!=='rest'?weekDayFigure(weekDayGroups(todayDay),{sides:'both',label:todayTitle}):'';
+    const todayBox=rec.source==='week'?(todayDay.kind==='rest'?`<p class="wp-today-text"><small>Hoy (${esc(T.WEEKDAYS[today-1].toLowerCase())})</small><strong>Descanso</strong><span class="muted small">Si igual querés entrenar, elegí abajo qué hacer.</span></p>`:`${todayFig?`<span class="wp-today-fig">${todayFig}</span>`:''}<p class="wp-today-text"><small>Hoy toca (${esc(T.WEEKDAYS[today-1].toLowerCase())})</small><strong>${esc(todayTitle)}</strong><span class="muted small">Según tu semana.</span></p><button type="button" class="btn" id="wpStartToday">Ver la sesión</button>`)
+      :`${todayFig?`<span class="wp-today-fig">${todayFig}</span>`:''}<p class="wp-today-text"><small>${hasPlan?'Hoy no tiene nada asignado · Te recomendamos':'Te recomendamos para hoy'}</small><strong>${esc(todayTitle)}</strong><span class="muted small">${esc(rec.reason||'')}</span></p><button type="button" class="btn" id="wpStartToday">Ver la sesión</button>`;
+    return `<div class="week-plan" id="weekPlan"><div class="wp-head"><div><strong>Mi semana</strong><small class="muted">${hasPlan?'Tocá un día para cambiarlo.':'Tocá un día para elegir qué entrenar, o usá una rutina lista.'}</small></div><button type="button" class="btn secondary btn-sm wp-programs-btn" id="wpProgramsToggle" aria-expanded="false">Rutinas listas</button></div>
       <div class="wp-days" role="group" aria-label="Días de la semana">${chips}</div>
       <div class="wp-today">${todayBox}</div>
-      <div id="wpPrograms" hidden></div></div>`;
+      <div id="wpPrograms" hidden></div>
+      <dialog class="wp-sheet" id="wpSheet" aria-labelledby="wpSheetTitle"><div id="wpEditor">${weekEditorMarkup()}</div></dialog></div>`;
   }
   function weekEditorMarkup(){
     const T=FittFormaTraining,d=weekEditDay;if(!d)return '';const cur=weekDays()[d],is=(k,v)=>cur&&cur.kind===k&&(v==null||cur.key===v||cur.id===v);
-    const focusChips=Object.entries(T.FOCUS).map(([k,f])=>`<button type="button" class="ff-chip${is('focus',k)?' active':''}" data-wp-set="focus:${k}">${esc(f.title)}</button>`).join('');
+    const tiles=Object.entries(T.FOCUS).map(([k,f])=>`<button type="button" class="wp-opt${is('focus',k)?' active':''}" data-wp-set="focus:${k}" aria-pressed="${is('focus',k)}"><span class="wp-opt-fig">${weekDayFigure(f.groups||[],{label:f.title})}</span><span class="wp-opt-text"><b>${esc(f.title)}</b><small>${esc((f.groups||[]).map(g=>T.MUSCLE_GROUPS[g]?.label).filter(Boolean).join(' · '))}</small></span></button>`).join('');
     const routineChips=(state.routines||[]).slice(0,12).map(r=>`<button type="button" class="ff-chip${is('routine',String(r.id))?' active':''}" data-wp-set="routine:${esc(String(r.id))}">${esc(r.name)}</button>`).join('');
     const groupsSel=cur?.kind==='groups'?cur.groups:[];
-    return `<div class="wp-editor"><div class="wp-editor-head"><strong>${esc(T.WEEKDAYS[d-1])}: ¿qué querés entrenar?</strong><button type="button" class="link-btn" data-wp-close>Listo</button></div>
-      <div class="ff-chips">${focusChips}<button type="button" class="ff-chip${is('rest')?' active':''}" data-wp-set="rest">Descanso</button><button type="button" class="ff-chip" data-wp-set="none">Sin asignar</button></div>
-      ${routineChips?`<small class="muted">Mis rutinas</small><div class="ff-chips">${routineChips}</div>`:''}
+    return `<div class="wp-editor"><div class="wp-sheet-grip" aria-hidden="true"></div><div class="wp-editor-head"><div>${cur?`<small class="muted">Ahora: ${esc(weekDayLabel(cur))}</small>`:''}<strong id="wpSheetTitle">${esc(T.WEEKDAYS[d-1])}: ¿qué querés entrenar?</strong></div><button type="button" class="wp-sheet-close" data-wp-close aria-label="Listo, cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div class="wp-opts">${tiles}</div>
+      <div class="wp-opts wp-opts-row"><button type="button" class="wp-opt is-plain${is('rest')?' active':''}" data-wp-set="rest" aria-pressed="${!!is('rest')}"><span class="wp-opt-fig is-icon">${WP_ICON_REST}</span><span class="wp-opt-text"><b>Descanso</b><small>Recuperación</small></span></button><button type="button" class="wp-opt is-plain" data-wp-set="none"><span class="wp-opt-fig is-icon">${WP_ICON_ADD}</span><span class="wp-opt-text"><b>Sin asignar</b><small>Lo decido ese día</small></span></button></div>
+      ${routineChips?`<small class="muted wp-sub">Mis rutinas</small><div class="ff-chips">${routineChips}</div>`:''}
       <details class="wp-groups"${weekGroupsOpen||cur?.kind==='groups'?' open':''}><summary>Elegir grupos a mano</summary><div class="focus-groups">${Object.entries(T.MUSCLE_GROUPS).map(([k,g])=>`<label class="focus-group"><input type="checkbox" data-wp-group="${k}"${groupsSel.includes(k)?' checked':''}><span>${esc(g.label)}</span></label>`).join('')}</div><button type="button" class="btn secondary btn-sm" data-wp-groups-save>Guardar estos grupos</button></details></div>`;
   }
   function programsMarkup(){
@@ -3684,10 +3701,15 @@ function findCatalogExercise(name){
   function bindWeekPlan(root){
     const box=root.querySelector('#weekPlan');if(!box)return;
     const rerender=()=>{renderTrain();};
+    // v59: el editor del día es una hoja que sube desde abajo (no estira la lista).
+    const sheet=box.querySelector('#wpSheet');
+    if(sheet){if(weekEditDay&&!sheet.open){try{sheet.showModal();}catch{sheet.setAttribute('open','');}}
+      sheet.addEventListener('close',()=>{if(weekEditDay){weekEditDay=0;weekGroupsOpen=false;rerender();}});
+      sheet.addEventListener('click',e=>{if(e.target===sheet)sheet.close();});}
     box.onclick=e=>{
       const t=e.target.closest('button');if(!t)return;
       if(t.dataset.wpDay){const d=Number(t.dataset.wpDay);weekEditDay=weekEditDay===d?0:d;weekGroupsOpen=false;rerender();return;}
-      if(t.hasAttribute('data-wp-close')){weekEditDay=0;rerender();return;}
+      if(t.hasAttribute('data-wp-close')){weekEditDay=0;sheet?.close();rerender();return;}
       if(t.dataset.wpSet){const [k,v]=t.dataset.wpSet.split(/:(.*)/s);setWeekDay(weekEditDay,k==='none'?null:k==='rest'?{kind:'rest'}:k==='focus'?{kind:'focus',key:v}:{kind:'routine',id:v});toast(`${FittFormaTraining.WEEKDAYS[weekEditDay-1]}: ${weekDayLabel(weekDays()[weekEditDay])}.`);weekEditDay=0;rerender();return;}
       if(t.hasAttribute('data-wp-groups-save')){const g=[...box.querySelectorAll('[data-wp-group]:checked')].map(x=>x.dataset.wpGroup);if(!g.length){toast('Elegí al menos un grupo muscular.');return;}setWeekDay(weekEditDay,{kind:'groups',groups:g});weekEditDay=0;rerender();return;}
       if(t.id==='wpStartToday'){startWeekDay(todayRecommendation().day);return;}
