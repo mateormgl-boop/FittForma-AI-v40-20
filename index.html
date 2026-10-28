@@ -1799,11 +1799,16 @@
           <button class="library-mode" type="button" data-library-mode="bodyweight">Sin equipo</button>
         </div>
         <div class="library-filters">
-          <div class="field"><label for="exerciseSearch">Buscar ejercicio</label><input id="exerciseSearch" type="search" placeholder="Ej. sentadilla, espalda, pecho…" autocomplete="off"></div>
+          <div class="field"><label for="exerciseSearch">Buscar ejercicio</label><input id="exerciseSearch" type="search" placeholder="Ej. sentadilla, glúteos, banda…" autocomplete="off"></div>
           <div class="library-chips" id="libraryChips" role="group" aria-label="Filtrar por grupo muscular"></div>
           <div class="field library-group-field"><label for="exerciseGroupFilter">Grupo muscular</label><select id="exerciseGroupFilter"><option value="all">Todos los grupos</option><option>Piernas</option><option>Pecho</option><option>Espalda</option><option>Hombros</option><option>Brazos</option><option>Core</option><option>Glúteos</option><option>Cardio</option></select></div>
         </div>
-        <div class="btn-row library-extra-filters"><button class="btn ghost" id="exerciseFavoritesOnly" type="button" aria-pressed="false">Mostrar favoritos</button><span id="exerciseResultCount" class="muted small" aria-live="polite"></span></div>
+        <div class="library-tools">
+          <div class="field"><label for="exerciseLevelFilter">Nivel</label><select id="exerciseLevelFilter"><option value="all">Todos</option><option value="1">Principiante</option><option value="2">Intermedio</option><option value="3">Avanzado</option></select></div>
+          <div class="field"><label for="exerciseKindFilter">Tipo</label><select id="exerciseKindFilter"><option value="all">Todos</option><option value="strength">Fuerza</option><option value="cardio">Cardio</option><option value="mobility">Movilidad</option></select></div>
+          <div class="field"><label for="exerciseSort">Ordenar</label><select id="exerciseSort"><option value="default">Recomendado</option><option value="az">A–Z</option><option value="done">Más hechos</option><option value="recent">Hechos hace poco</option><option value="new">Nuevos primero</option></select></div>
+        </div>
+        <div class="btn-row library-extra-filters"><button class="btn ghost" id="exerciseFavoritesOnly" type="button" aria-pressed="false">Mostrar favoritos</button><span class="library-view-toggle" role="group" aria-label="Vista de la biblioteca"><button type="button" data-library-view="grid" aria-pressed="true">Cuadrícula</button><button type="button" data-library-view="list" aria-pressed="false">Lista</button></span><span id="exerciseResultCount" class="muted small" aria-live="polite"></span></div>
         <aside class="ad-slot ad-slot-inline" id="adSlotExplore" aria-label="Publicidad"><span class="ad-slot-label">Publicidad</span><div class="ad-slot-content" id="adContentExplore"></div></aside>
         <div id="exerciseLibraryResults" class="exercise-library-grid" aria-live="polite"></div>
         <p class="muted small exercise-credit">Todas las tarjetas usan ilustraciones locales con el mismo estilo visual. Cada ejercicio muestra una referencia asociada al movimiento o grupo muscular; las ilustraciones orientan y no sustituyen una demostración técnica detallada.</p>
@@ -2458,6 +2463,8 @@
     <div class="exercise-sheet-chips" id="exerciseModalChips"></div>
     <section class="ex-rank" id="exerciseModalRank" aria-label="Tu rango en este ejercicio" hidden></section>
     <section class="ex-quicklog" id="exerciseQuickLog" aria-label="Registrar este ejercicio"></section>
+    <section class="ex-history card" id="exerciseModalHistory" aria-label="Tu historial con este ejercicio" hidden></section>
+    <section class="ex-addroutine" id="exerciseModalAddRoutine" aria-label="Agregar a una rutina"></section>
     <div class="exercise-sheet-start" id="exerciseModalStart" hidden></div>
     <section class="exercise-progression" aria-label="Ejecución paso a paso"><h3>Ejecución paso a paso</h3><div id="exerciseModalProgression" class="exercise-progression-grid"></div></section>
     <div class="exercise-sheet-columns"><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">⇄</span>Respiración</h3><p id="exerciseModalBreathing" class="muted small"></p></div><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">!</span>Errores comunes</h3><ul id="exerciseModalErrors"></ul></div><div class="exercise-detail-block"><h3><span class="sheet-ico" aria-hidden="true">✓</span>Recomendaciones</h3><ul id="exerciseModalTips"></ul></div></div>
@@ -3100,6 +3107,66 @@ function findCatalogExercise(name){
     renderAll();renderQuickLog(name,group,kind);{const box=$('exerciseModalRank');if(box&&kind!=='cardio'){box.innerHTML=exerciseRankMarkup(name,false);box.hidden=!box.innerHTML;}}
     toast(`${name}: registrado en tu historial.`);celebrateBadges(badgeDelta.newlyUnlocked);
   }
+  // v56: «Tu historial» en la ficha: series registradas, mejor marca y fuerza máxima estimada (orientativa).
+  const e1rm=(w,r)=>w>0&&r>=1&&r<=12?w*(1+r/30):0; // Epley; solo de 1 a 12 repeticiones
+  function exerciseHistoryData(name){
+    const key=normalizeExerciseName(FittFormaTraining.canonicalName(name)),timed=TIMED_EXERCISE_RE.test(name),rows=[];
+    for(const s of state.sessions||[]){
+      const ex=(s.exercises||[]).find(e=>normalizeExerciseName(FittFormaTraining.canonicalName(e.name))===key);if(!ex)continue;
+      const sets=(ex.entries||[]).filter(x=>x&&x.done!==false).map(x=>({r:Number(String(x.reps??'').replace(',','.')),w:Number(String(x.weight??'').replace(',','.'))})).filter(x=>Number.isFinite(x.r)&&x.r>0);
+      if(!sets.length)continue;
+      const weighted=sets.filter(x=>Number.isFinite(x.w)&&x.w>0);
+      const best=weighted.length?weighted.slice().sort((a,b)=>b.w-a.w||b.r-a.r)[0]:sets.slice().sort((a,b)=>b.r-a.r)[0];
+      const est=weighted.length?Math.max(...weighted.map(x=>e1rm(x.w,x.r))):0;
+      rows.push({date:String(s.date||''),sets,best,est,weighted:weighted.length>0,volume:weighted.reduce((n,x)=>n+x.w*x.r,0)});
+    }
+    rows.sort((a,b)=>a.date.localeCompare(b.date));
+    return {rows,timed};
+  }
+  function sparkline(values,label){
+    if(values.length<2)return '';
+    const W=260,H=60,min=Math.min(...values),max=Math.max(...values),span=max-min||1;
+    const pts=values.map((v,i)=>`${Math.round(i/(values.length-1)*(W-8)+4)},${Math.round(H-6-(v-min)/span*(H-14))}`);
+    return `<svg class="ex-spark" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}"><polyline points="${pts.join(' ')}" fill="none"/>${pts.map(p=>`<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="3"/>`).join('')}</svg>`;
+  }
+  function renderExerciseHistory(name,kind){
+    const box=$('exerciseModalHistory');if(!box)return;
+    if(kind==='cardio'){box.hidden=true;box.innerHTML='';return;}
+    const {rows,timed}=exerciseHistoryData(name),fmt=n=>Number(n).toLocaleString(uiLocale(),{maximumFractionDigits:1}),unit=timed?'s':'reps';
+    box.hidden=false;
+    if(!rows.length){box.innerHTML='<h3>Tu historial</h3><p class="muted small">Todavía no registraste este ejercicio. Cuando lo hagas (en una sesión o con «Lo hice») vas a ver acá tus series, tu mejor marca y cómo evoluciona.</p>';return;}
+    const anyWeight=rows.some(r=>r.weighted);
+    const top=anyWeight?rows.filter(r=>r.weighted).reduce((a,b)=>b.best.w>a.best.w||(b.best.w===a.best.w&&b.best.r>a.best.r)?b:a):rows.reduce((a,b)=>b.best.r>a.best.r?b:a);
+    const bestEst=Math.max(0,...rows.map(r=>r.est));
+    const series=anyWeight&&bestEst?rows.filter(r=>r.est).slice(-10).map(r=>r.est):rows.slice(-10).map(r=>r.best.r);
+    const chartLabel=anyWeight&&bestEst?'Fuerza máxima estimada por sesión':(timed?'Mejor tiempo por sesión':'Mejores repeticiones por sesión');
+    const last=rows.slice(-5).reverse();
+    box.innerHTML=`<h3>Tu historial</h3>
+      <div class="ex-history-stats"><div><small>Veces registrado</small><b>${rows.length}</b></div><div><small>Mejor marca</small><b>${anyWeight?`${fmt(top.best.w)} kg × ${fmt(top.best.r)}`:`${fmt(top.best.r)} ${unit}`}</b><small>${esc(prettyDate(top.date))}</small></div>${bestEst?`<div><small>Fuerza máxima estimada</small><b>${fmt(Math.round(bestEst*2)/2)} kg</b><small>Estimación (Epley)</small></div>`:''}</div>
+      ${series.length>=2?`<figure class="ex-spark-wrap">${sparkline(series,chartLabel)}<figcaption class="muted small">${esc(chartLabel)} · últimas ${series.length} sesiones</figcaption></figure>`:''}
+      <ul class="ex-history-list">${last.map(r=>`<li><span>${esc(prettyDate(r.date))}</span><span>${r.sets.map(x=>x.w>0?`${fmt(x.w)}×${fmt(x.r)}`:`${fmt(x.r)} ${unit}`).join(' · ')}</span></li>`).join('')}</ul>
+      ${bestEst?'<p class="muted small">La fuerza máxima estimada se calcula con series de 1 a 12 repeticiones (fórmula de Epley). Es orientativa: no hace falta probar tu máximo real.</p>':''}`;
+  }
+  // v56: agregar el ejercicio a una rutina propia (o crear una nueva) desde la ficha.
+  function renderAddToRoutine(name,group,kind){
+    const box=$('exerciseModalAddRoutine');if(!box)return;
+    const routines=Array.isArray(state.routines)?state.routines:[];
+    box.innerHTML=`<div class="ex-addroutine-row"><label for="exAddRoutineSel" class="sr-only">Rutina</label><select id="exAddRoutineSel">${routines.map(r=>`<option value="${esc(String(r.id))}">${esc(r.name)}</option>`).join('')}<option value="__new">+ Nueva rutina con este ejercicio</option></select><button type="button" class="btn secondary" id="exAddRoutineBtn">Agregar a la rutina</button></div><p class="community-status" id="exAddRoutineStatus" role="status" aria-live="polite"></p>`;
+    $('exAddRoutineBtn').onclick=()=>{
+      const entry=FittFormaTraining.libraryEntry(FittFormaTraining.canonicalName(name)),status=$('exAddRoutineStatus');
+      const item={name:String(name).slice(0,72),group:group||entry?.group||'',kind:kind||entry?.kind||'strength',sets:Number(entry?.sets)||3,reps:String(entry?.reps||(kind==='cardio'?'10 min':'10')).slice(0,12),weight:'',rest:kind==='cardio'?0:90};
+      const sel=$('exAddRoutineSel').value,now=new Date().toISOString();state.routines=Array.isArray(state.routines)?state.routines:[];
+      let r;
+      if(sel==='__new'){r={id:'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name).slice(0,ROUTINE_LIMITS.name),notes:'',exercises:[],createdAt:now,updatedAt:now};state.routines.unshift(r);}
+      else r=state.routines.find(x=>String(x.id)===sel);
+      if(!r){status.textContent='No encontramos esa rutina.';return;}
+      if(r.exercises.some(e=>normalizeExerciseName(e.name)===normalizeExerciseName(item.name))){status.textContent=`Ya está en «${r.name}».`;return;}
+      if(r.exercises.length>=(ROUTINE_LIMITS.exercises||30)){status.textContent='Esa rutina ya tiene el máximo de ejercicios.';return;}
+      r.exercises.push(item);r.updatedAt=now;
+      if(!save()){status.textContent='No se pudo guardar en este dispositivo.';return;}
+      renderRoutines?.();renderAddToRoutine(name,group,kind);$('exAddRoutineStatus').textContent=`Agregado a «${r.name}».`;toast(`${name}: agregado a «${r.name}».`);
+    };
+  }
   function openExerciseDetails(name,group,kind,equipmentMode=''){
     const modal=$('exerciseModal');if(!modal)return;
     $('exerciseModalTitle').textContent=name;
@@ -3107,6 +3174,7 @@ function findCatalogExercise(name){
     $('exerciseModalGroup').textContent=group||'';
     {const box=$('exerciseModalRank');if(box){const html=kind==='cardio'?'':exerciseRankMarkup(name,false);box.innerHTML=html;box.hidden=!html;}}
     renderQuickLog(name,group,kind);
+    renderExerciseHistory(name,kind);renderAddToRoutine(name,group,kind);
     const inPlan=(state.plan?.days||[]).flatMap(d=>d.exercises).find(e=>normalizeExerciseName(e.name)===normalizeExerciseName(FittFormaTraining.canonicalName(name)));
     const prescription=inPlan||findExercisePrescription(FittFormaTraining.canonicalName(name)),guide=exerciseGuide(name);
     const muscles=exerciseMuscleTexts(name,group);
@@ -3123,7 +3191,7 @@ function findCatalogExercise(name){
     $('exerciseModalStats').innerHTML=`${guideStatusMarkup}<span class="exercise-detail-stat">Descanso: ${esc(restText)}</span>${guide?.level?`<span class="exercise-detail-stat">Nivel orientativo: ${esc(guide.level)}</span>`:''}`;
     const alternativeData=exerciseAlternatives(name,group,kind,equipmentMode);
     const alternativesRoot=$('exerciseModalAlternatives');
-    if(alternativesRoot){alternativesRoot.innerHTML=alternativeData.items.length?`<p class="muted small">Disponibles en ${esc(({gym:'gimnasio',home:'casa con equipo básico',bodyweight:'peso corporal'})[alternativeData.mode]||'la modalidad seleccionada')}; ${esc(alternativeData.basis)}. Confirmá que el equipo y el rango te resulten adecuados.</p><ul>${alternativeData.items.map(item=>`<li>${esc(item.name)} <span class="muted small">· ${esc(item.group)}</span></li>`).join('')}</ul>`:`<p class="muted small">No hay una alternativa suficientemente clara en esta modalidad. Revisá el objetivo y el equipo antes de sustituirlo.</p>`;}
+    if(alternativesRoot){alternativesRoot.innerHTML=alternativeData.items.length?`<p class="muted small">Disponibles en ${esc(({gym:'gimnasio',home:'casa con equipo básico',bodyweight:'peso corporal'})[alternativeData.mode]||'la modalidad seleccionada')}; ${esc(alternativeData.basis)}. Confirmá que el equipo y el rango te resulten adecuados.</p><ul class="ex-alt-list">${alternativeData.items.map(item=>`<li><button type="button" class="ex-alt" data-exercise-detail="${esc(item.name)}" data-exercise-group="${esc(item.group)}" data-exercise-kind="${esc(item.kind||'strength')}" data-equipment-mode="${esc(alternativeData.mode)}"><span>${esc(item.name)}</span><small class="muted">${esc(item.group)} · ver ficha</small></button></li>`).join('')}</ul>`:`<p class="muted small">No hay una alternativa suficientemente clara en esta modalidad. Revisá el objetivo y el equipo antes de sustituirlo.</p>`;}
     const steps=exerciseSteps(name,group,kind);
     const progressionLabels=steps.length===3?['Preparación','Ejecución','Regreso y control']:steps.map((_,i)=>i===0?'Preparación':i===steps.length-1?'Regreso y control':'Ejecución');
     $('exerciseModalProgression').innerHTML=steps.map((step,i)=>`<article class="exercise-progression-step"><span class="step-number">${i+1}</span><div><strong>${progressionLabels[i]||`Paso ${i+1}`}</strong><p>${esc(step)}</p></div></article>`).join('');
@@ -3176,17 +3244,62 @@ function findCatalogExercise(name){
     }
     box.querySelectorAll('.chip').forEach(b=>{const on=b.dataset.group===sel.value;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});
   }
+  // v56: biblioteca con filtros de nivel y tipo, orden, vista en lista, músculos y uso propio en cada ejercicio.
+  const NEW_EXERCISES_V56=new Set(['Sentadilla trasera con barra','Sentadilla búlgara con mancuernas','Zancadas hacia adelante con mancuernas','Zancadas caminando sin peso','Peso muerto sumo con barra','Peso muerto rumano con barra','Sentadilla sumo con mancuerna','Elevación de talones en prensa','Press inclinado con barra','Fondos en paralelas','Aperturas en máquina','Remo en barra T','Remo invertido en barra','Pullover con mancuerna en banco','Remo renegado con pesas rusas','Press militar con barra de pie','Encogimientos con barra','Curl con barra','Curl inclinado con mancuernas','Curl martillo con cuerda en polea','Press de banca agarre cerrado','Rueda abdominal','Elevación de piernas colgado','Leñador en polea','Swing con pesa rusa a una mano','Saltar la cuerda','Escaladores','Sentadilla con salto','Aducción de cadera con banda','Elevaciones laterales con banda','Subida a escalón con elevación de rodilla']);
+  const LIBRARY_VIEW_KEY='fittforma-library-view';
+  let libraryView=(()=>{try{return localStorage.getItem(LIBRARY_VIEW_KEY)==='list'?'list':'grid';}catch{return 'grid';}})();
+  // Cuántas sesiones incluyen el ejercicio con al menos una serie registrada, y la fecha de la última.
+  function exerciseUsage(){
+    const out=new Map();
+    for(const s of state.sessions||[]){
+      const seen=new Set();
+      for(const e of s.exercises||[]){
+        if(!(e.entries||[]).some(x=>x&&x.done!==false&&(String(x.reps??'').trim()||String(x.weight??'').trim())))continue;
+        const k=normalizeExerciseName(FittFormaTraining.canonicalName(e.name));if(seen.has(k))continue;seen.add(k);
+        const u=out.get(k)||{count:0,last:''};u.count++;if(String(s.date||'')>u.last)u.last=String(s.date||'');out.set(k,u);
+      }
+    }
+    return out;
+  }
+  function exerciseMuscleLabels(name,group){const m=musclesOfExercise(name,group),L=window.FittFormaAnatomy?.MUSCLES||{};return {primary:m.primary.map(id=>L[id]||id),secondary:m.secondary.map(id=>L[id]||id)};}
+  const LEVEL_NAMES=['','Principiante','Intermedio','Avanzado'];
+  function exerciseLevelLabel(e){if(e.kind!=='strength')return 'Todos los niveles';const [a,b]=e.level||[1,3];return a===b?LEVEL_NAMES[a]:`${LEVEL_NAMES[a]} a ${LEVEL_NAMES[b].toLowerCase()}`;}
   function renderExerciseLibrary(){
     const root=$('exerciseLibraryResults');if(!root)return;syncLibraryChips();
     const items=library[libraryMode]||library.home;
     const q=normalizeExerciseName($('exerciseSearch')?.value||'');
-    const g=$('exerciseGroupFilter')?.value||'all';
-    const favorites=readExerciseFavorites();
-    const filtered=items.filter(e=>(g==='all'||e.group===g)&&(!exerciseFavoritesOnly||favorites.has(exerciseFavoriteKey(e.name,libraryMode)))&&(!q||normalizeExerciseName(e.name+' '+e.group+' '+exerciseCue(e.name,e.group,e.kind)+' '+exerciseEquipment(e.name,libraryMode)+' '+e.kind).includes(q)));
-    root.innerHTML=filtered.length?filtered.map(e=>{const favorite=favorites.has(exerciseFavoriteKey(e.name,libraryMode));return `<article class="exercise-library-item">${exercisePhoto(e.name,e.group,false,e.kind)}<div class="exercise-library-copy"><strong>${esc(e.name)}</strong><span class="tag">${esc(e.group)} · ${e.kind==='cardio'?'Cardio':'Fuerza'}</span><p class="muted">${esc(e.sets)} series · ${esc(e.reps)} · ${esc(exerciseEquipment(e.name,libraryMode))}</p><div class="exercise-progress-cue" aria-label="Progresión orientativa: técnica, control y avance gradual"><span>Técnica</span><span>Control</span><span>Progresión</span></div><div class="exercise-card-actions"><button class="btn secondary" type="button" data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${libraryMode}">Ver técnica</button><button class="btn ghost favorite-toggle" type="button" data-exercise-favorite="${esc(e.name)}" data-favorite-mode="${libraryMode}" aria-label="${favorite?'Quitar':'Agregar'} ${esc(e.name)} ${favorite?'de':'a'} favoritos" aria-pressed="${favorite}"><svg class="ff-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></button></div></div></article>`;}).join(''):`<div class="empty" style="grid-column:1/-1"><strong>${exerciseFavoritesOnly?'Todavía no hay favoritos en esta modalidad':'No encontramos ejercicios'}</strong><p>${exerciseFavoritesOnly?'Marcá ejercicios con la estrella para tenerlos a mano.':'Probá otra búsqueda o elegí otro grupo muscular.'}</p></div>`;
+    const g=$('exerciseGroupFilter')?.value||'all',lv=$('exerciseLevelFilter')?.value||'all',kind=$('exerciseKindFilter')?.value||'all',sort=$('exerciseSort')?.value||'default';
+    const favorites=readExerciseFavorites(),usage=exerciseUsage(),useOf=e=>usage.get(normalizeExerciseName(e.name))||{count:0,last:''};
+    let filtered=items.filter(e=>{
+      if(g!=='all'&&e.group!==g)return false;
+      if(kind!=='all'&&e.kind!==kind)return false;
+      if(lv!=='all'&&!(e.kind!=='strength'||(e.level[0]<=Number(lv)&&Number(lv)<=e.level[1])))return false;
+      if(exerciseFavoritesOnly&&!favorites.has(exerciseFavoriteKey(e.name,libraryMode)))return false;
+      if(!q)return true;
+      const ml=exerciseMuscleLabels(e.name,e.group);
+      return normalizeExerciseName([e.name,e.group,exerciseCue(e.name,e.group,e.kind),exerciseEquipment(e.name,libraryMode),e.kind,...ml.primary,...ml.secondary].join(' ')).includes(q);
+    });
+    const byName=(a,b)=>a.name.localeCompare(b.name,'es');
+    if(sort==='az')filtered=filtered.slice().sort(byName);
+    else if(sort==='done')filtered=filtered.slice().sort((a,b)=>useOf(b).count-useOf(a).count||byName(a,b));
+    else if(sort==='recent')filtered=filtered.slice().sort((a,b)=>useOf(b).last.localeCompare(useOf(a).last)||byName(a,b));
+    else if(sort==='new')filtered=filtered.slice().sort((a,b)=>Number(NEW_EXERCISES_V56.has(b.name))-Number(NEW_EXERCISES_V56.has(a.name)));
+    const kindLabel=k=>k==='cardio'?'Cardio':k==='mobility'?'Movilidad':'Fuerza';
+    const card=e=>{
+      const favorite=favorites.has(exerciseFavoriteKey(e.name,libraryMode)),u=useOf(e),ml=exerciseMuscleLabels(e.name,e.group),isNew=NEW_EXERCISES_V56.has(e.name);
+      const newTag=isNew?' <em class="ex-new">Nuevo</em>':'';
+      const used=u.count?`Lo hiciste ${u.count} ${u.count===1?'vez':'veces'} · última: ${prettyDate(u.last)}`:'';
+      const detail=`data-exercise-detail="${esc(e.name)}" data-exercise-group="${esc(e.group)}" data-exercise-kind="${esc(e.kind)}" data-equipment-mode="${libraryMode}"`;
+      const fav=`<button class="btn ghost favorite-toggle" type="button" data-exercise-favorite="${esc(e.name)}" data-favorite-mode="${libraryMode}" aria-label="${favorite?'Quitar':'Agregar'} ${esc(e.name)} ${favorite?'de':'a'} favoritos" aria-pressed="${favorite}"><svg class="ff-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></button>`;
+      if(libraryView==='list')return `<article class="exercise-list-row"><button type="button" class="exercise-list-main" ${detail} aria-label="Ver la ficha de ${esc(e.name)}">${exercisePhoto(e.name,e.group,true,e.kind)}<span class="exercise-list-copy"><strong>${esc(e.name)}${newTag}</strong><small>${esc(ml.primary.slice(0,3).join(' · ')||e.group)}</small><small class="muted">${esc(String(e.sets))} × ${esc(e.reps)} · ${esc(exerciseLevelLabel(e))}</small>${used?`<small class="ex-used">${esc(used)}</small>`:''}</span></button>${fav}</article>`;
+      return `<article class="exercise-library-item">${exercisePhoto(e.name,e.group,false,e.kind)}<div class="exercise-library-copy"><strong>${esc(e.name)}${newTag}</strong><span class="tag">${esc(e.group)} · ${kindLabel(e.kind)}</span>${ml.primary.length?`<p class="ex-muscles"><b>${esc(ml.primary.slice(0,3).join(' · '))}</b>${ml.secondary.length?` <span>+ ${esc(ml.secondary.slice(0,2).join(', '))}</span>`:''}</p>`:''}<p class="muted">${esc(String(e.sets))} series · ${esc(e.reps)} · ${esc(exerciseLevelLabel(e))}</p>${used?`<p class="ex-used">${esc(used)}</p>`:''}<div class="exercise-card-actions"><button class="btn secondary" type="button" ${detail}>Ver técnica</button>${fav}</div></div></article>`;
+    };
+    root.classList.toggle('is-list',libraryView==='list');
+    root.innerHTML=filtered.length?filtered.map(card).join(''):`<div class="empty" style="grid-column:1/-1"><strong>${exerciseFavoritesOnly?'Todavía no hay favoritos en esta modalidad':'No encontramos ejercicios'}</strong><p>${exerciseFavoritesOnly?'Marcá ejercicios con la estrella para tenerlos a mano.':'Probá otra búsqueda, otro nivel u otro grupo muscular.'}</p></div>`;
     const count=$('exerciseResultCount');if(count)count.textContent=`${filtered.length} ejercicio${filtered.length===1?'':'s'}`;
     const favoriteButton=$('exerciseFavoritesOnly');if(favoriteButton){favoriteButton.setAttribute('aria-pressed',String(exerciseFavoritesOnly));favoriteButton.textContent=exerciseFavoritesOnly?'Ver todos los ejercicios':'Mostrar favoritos';}
     document.querySelectorAll('[data-library-mode]').forEach(b=>b.classList.toggle('active',b.dataset.libraryMode===libraryMode));
+    document.querySelectorAll('[data-library-view]').forEach(b=>{const on=b.dataset.libraryView===libraryView;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});
   }
   function renderRunningPlan(){
     const planId=runningPlans[state.runningPlan]?state.runningPlan:'starter';
@@ -6133,7 +6246,7 @@ function findCatalogExercise(name){
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('exerciseModal').hidden){$('exerciseModal').hidden=true;document.body.style.overflow='';}if(e.key==='Escape'&&!$('mobileMoreMenu').hidden){$('mobileMoreMenu').hidden=true;$('mobileMoreToggle').setAttribute('aria-expanded','false');}});
   document.querySelectorAll('[data-library-mode]').forEach(b=>b.addEventListener('click',()=>{libraryMode=b.dataset.libraryMode;renderExerciseLibrary();}));
   document.querySelectorAll('.addMealIdea').forEach(b=>b.addEventListener('click',()=>{switchView('nutrition');$('mealName').value=b.dataset.name;$('mealCalories').value=b.dataset.cal;$('mealProtein').value=b.dataset.pro;$('mealCarbs').value=b.dataset.carbs||'';$('mealFat').value=b.dataset.fat||'';$('mealType').value='Almuerzo';$('mealName').focus();}));
-  $('exerciseSearch').addEventListener('input',renderExerciseLibrary);$('exerciseGroupFilter').addEventListener('change',renderExerciseLibrary);$('exerciseFavoritesOnly').addEventListener('click',()=>{exerciseFavoritesOnly=!exerciseFavoritesOnly;renderExerciseLibrary();});
+  $('exerciseSearch').addEventListener('input',renderExerciseLibrary);$('exerciseGroupFilter').addEventListener('change',renderExerciseLibrary);for(const id of ['exerciseLevelFilter','exerciseKindFilter','exerciseSort'])$(id)?.addEventListener('change',renderExerciseLibrary);document.querySelectorAll('[data-library-view]').forEach(b=>b.addEventListener('click',()=>{libraryView=b.dataset.libraryView==='list'?'list':'grid';try{localStorage.setItem(LIBRARY_VIEW_KEY,libraryView);}catch{}renderExerciseLibrary();}));$('exerciseFavoritesOnly').addEventListener('click',()=>{exerciseFavoritesOnly=!exerciseFavoritesOnly;renderExerciseLibrary();});
   // v48: hora del servidor para el entrenamiento diario y pantalla de logro.
   syncServerTime().then(ok=>{if(ok&&!activeSession)renderTrain();});setInterval(()=>{syncServerTime();},10*60*1000);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncServerTime().then(()=>{if(!activeSession)renderTrain();});});
