@@ -2629,6 +2629,7 @@
     out.profile=isPlainObj(st.profile)?{...st.profile}:{...defaults.profile};
     for(const k of Object.keys(defaults.profile))if(out.profile[k]!==undefined&&typeof out.profile[k]!=='string'&&typeof out.profile[k]!=='number')out.profile[k]=defaults.profile[k];
     if(out.profile.avatar!==undefined&&!validAvatar(out.profile.avatar))delete out.profile.avatar;
+    out.weekPlan=sanitizeWeekPlan(st.weekPlan);
     out.sessions=objList(st.sessions,5000).map(x=>({...x,exercises:objList(x.exercises,40).map(e=>({...e,entries:objList(e.entries,40)}))}));
     for(const [k,max] of [['meals',10000],['weights',3000],['activities',5000],['plannedActivities',500],['mealFavorites',200],['customFoods',300],['badgeRecords',500],['bodyMeasures',1000],['notifications',200]])out[k]=objList(st[k],max);
     out.foodFavorites=Array.isArray(st.foodFavorites)?st.foodFavorites.filter(x=>typeof x==='string').slice(-60):[];
@@ -3560,7 +3561,7 @@ function findCatalogExercise(name){
     const T=FittFormaTraining;if(!T.FOCUS)return '';
     const bySplit={};for(const [k,f] of Object.entries(T.FOCUS))(bySplit[f.split]=bySplit[f.split]||[]).push([k,f]);
     const splitKey=T.SPLIT_PLANS?.[state.profile?.splitPlan]?state.profile.splitPlan:'',nx=splitKey?T.nextFocusInSplit(splitKey,state.sessions):null;
-    const splitBox=T.SPLIT_PLANS?`<div class="focus-plan"><div class="field"><label for="focusSplitPlan">Mi división semanal</label><select id="focusSplitPlan"><option value="">Sin división (elijo cada día)</option>${Object.entries(T.SPLIT_PLANS).map(([k,p])=>`<option value="${k}"${k===splitKey?' selected':''}>${esc(p.title)} · ${esc(p.days)}</option>`).join('')}</select></div>${nx?`<div class="focus-today"><div><small>Hoy toca</small><strong>${esc(T.FOCUS[nx.key].title)}</strong><span class="muted small">${nx.last?`La última fue ${esc(T.FOCUS[nx.last].title)} (${esc(prettyDate(nx.lastDate))}).`:'Empezás por la primera de la división.'}</span></div><button type="button" class="btn" data-focus="${nx.key}">Ver la sesión</button></div>`:''}</div>`:'';
+    const splitBox=T.SPLIT_PLANS&&!Object.keys(state.weekPlan?.days||{}).length?`<div class="focus-plan"><div class="field"><label for="focusSplitPlan">Mi división semanal</label><select id="focusSplitPlan"><option value="">Sin división (elijo cada día)</option>${Object.entries(T.SPLIT_PLANS).map(([k,p])=>`<option value="${k}"${k===splitKey?' selected':''}>${esc(p.title)} · ${esc(p.days)}</option>`).join('')}</select></div>${nx?`<div class="focus-today"><div><small>Hoy toca</small><strong>${esc(T.FOCUS[nx.key].title)}</strong><span class="muted small">${nx.last?`La última fue ${esc(T.FOCUS[nx.last].title)} (${esc(prettyDate(nx.lastDate))}).`:'Empezás por la primera de la división.'}</span></div><button type="button" class="btn" data-focus="${nx.key}">Ver la sesión</button></div>`:''}</div>`:'';
     return `<div class="focus-picker" id="focusPicker"><div class="focus-head"><strong>Entrenar por grupos musculares</strong><small class="muted">Combinaciones que se suelen entrenar juntas, o elegí vos los grupos. Se arma con tu equipamiento y tu nivel.</small></div>${splitBox}
       ${Object.entries(bySplit).map(([split,items])=>`<div class="focus-split"><small>${esc(split)}</small><div class="ff-chips">${items.map(([k,f])=>`<button type="button" class="ff-chip${focusDraft?.key===k?' active':''}" data-focus="${k}" aria-pressed="${focusDraft?.key===k}">${esc(f.title)}</button>`).join('')}</div></div>`).join('')}
       <details class="focus-custom"${focusDraft?.key==='custom'?' open':''}><summary>Elegí vos los grupos</summary><div class="focus-groups">${Object.entries(T.MUSCLE_GROUPS).map(([k,g])=>`<label class="focus-group"><input type="checkbox" data-focus-group="${k}"${focusDraft?.key==='custom'&&focusDraft.groups.includes(k)?' checked':''}><span>${esc(g.label)}</span></label>`).join('')}</div><button type="button" class="btn secondary btn-sm" id="focusBuildCustom">Armar sesión con estos grupos</button></details>
@@ -3590,9 +3591,90 @@ function findCatalogExercise(name){
     if($('focusBuildCustom'))$('focusBuildCustom').onclick=()=>{const groups=[...root.querySelectorAll('[data-focus-group]:checked')].map(x=>x.dataset.focusGroup);if(!groups.length){toast('Elegí al menos un grupo muscular.');return;}setFocusDraft(FittFormaTraining.buildGroupsDay(groups,focusProfile()));};
     bindFocusPreview();
   }
+  // ---------- v58: Mi semana (qué entrenar cada día), rutinas listas y recomendada ----------
+  let weekEditDay=0,weekGroupsOpen=false;
+  function sanitizeWeekPlan(w){
+    const T=window.FittFormaTraining;if(!T?.FOCUS||!isPlainObj(w)||!isPlainObj(w.days))return null;const days={};
+    for(let d=1;d<=7;d++){const x=w.days[d];if(!isPlainObj(x))continue;
+      if(x.kind==='rest')days[d]={kind:'rest'};else if(x.kind==='focus'&&T.FOCUS[x.key])days[d]={kind:'focus',key:x.key};
+      else if(x.kind==='groups'&&Array.isArray(x.groups)){const g=[...new Set(x.groups.filter(k=>T.MUSCLE_GROUPS[k]))].slice(0,10);if(g.length)days[d]={kind:'groups',groups:g};}
+      else if(x.kind==='routine'&&typeof x.id==='string'&&x.id)days[d]={kind:'routine',id:x.id.slice(0,60)};}
+    return {days,programId:T.PROGRAMS?.[w.programId]?w.programId:'',updatedAt:String(w.updatedAt||'').slice(0,30)};
+  }
+  const weekDays=()=>state.weekPlan?.days||{};
+  function weekDayLabel(day){
+    const T=FittFormaTraining;if(!day)return 'Libre';
+    if(day.kind==='rest')return 'Descanso';if(day.kind==='focus')return T.FOCUS[day.key]?.title||'Libre';
+    if(day.kind==='groups')return day.groups.map(g=>T.MUSCLE_GROUPS[g]?.label).filter(Boolean).map((l,i)=>i?l.toLowerCase():l).join(' y ');
+    if(day.kind==='routine')return (state.routines||[]).find(r=>String(r.id)===day.id)?.name||'Rutina borrada';return 'Libre';
+  }
+  function weekDoneDays(){
+    const today=dateKey(),wd=FittFormaTraining.weekdayOf(today),monday=dateKey(new Date(new Date(today+'T12:00:00').getTime()-(wd-1)*864e5)),done=new Set();
+    for(const x of state.sessions||[])if(x&&x.status!=='cancelled'&&x.date>=monday&&x.date<=today)done.add(FittFormaTraining.weekdayOf(x.date));return done;
+  }
+  function todayRecommendation(){return FittFormaTraining.recommendToday(state.profile||{},state.sessions||[],weekDays(),dateKey());}
+  function weekPlanMarkup(){
+    const T=FittFormaTraining;if(!T.WEEKDAYS)return '';
+    const days=weekDays(),today=T.weekdayOf(dateKey()),done=weekDoneDays(),rec=todayRecommendation(),hasPlan=Object.keys(days).length>0;
+    const chips=T.WEEKDAYS.map((n,i)=>{const d=i+1,day=days[d],editing=weekEditDay===d;return `<button type="button" class="wp-day${d===today?' is-today':''}${day?.kind==='rest'?' is-rest':''}${!day?' is-empty':''}${done.has(d)?' is-done':''}${editing?' is-editing':''}" data-wp-day="${d}" aria-expanded="${editing}"><span class="wp-day-name">${esc(n)}${d===today?' <em>Hoy</em>':''}</span><span class="wp-day-what">${esc(day?weekDayLabel(day):'Sin asignar')}</span>${done.has(d)?'<i aria-label="entrenaste">✓</i>':''}<span class="wp-day-edit" aria-hidden="true">${editing?'▴':'›'}</span></button>${editing?`<div id="wpEditor">${weekEditorMarkup()}</div>`:''}`;}).join('');
+    const todayDay=rec.day,todayTitle=weekDayLabel(todayDay);
+    const todayBox=rec.source==='week'?(todayDay.kind==='rest'?`<p class="wp-today-text"><small>Hoy (${esc(T.WEEKDAYS[today-1].toLowerCase())})</small><strong>Descanso</strong><span class="muted small">Si igual querés entrenar, elegí abajo qué hacer.</span></p>`:`<p class="wp-today-text"><small>Hoy toca (${esc(T.WEEKDAYS[today-1].toLowerCase())})</small><strong>${esc(todayTitle)}</strong><span class="muted small">Según tu semana.</span></p><button type="button" class="btn" id="wpStartToday">Ver la sesión</button>`)
+      :`<p class="wp-today-text"><small>${hasPlan?'Hoy no tiene nada asignado · Te recomendamos':'Te recomendamos para hoy'}</small><strong>${esc(todayTitle)}</strong><span class="muted small">${esc(rec.reason||'')}</span></p><button type="button" class="btn" id="wpStartToday">Ver la sesión</button>`;
+    return `<div class="week-plan" id="weekPlan"><div class="wp-head"><div><strong>Mi semana</strong><small class="muted">${hasPlan?'Tocá un día para cambiar qué entrenás.':'Elegí qué querés entrenar cada día, o usá una rutina lista.'}</small></div><button type="button" class="btn secondary btn-sm wp-programs-btn" id="wpProgramsToggle" aria-expanded="false">Rutinas listas</button></div>
+      <div class="wp-days" role="group" aria-label="Días de la semana">${chips}</div>
+      <div class="wp-today">${todayBox}</div>
+      <div id="wpPrograms" hidden></div></div>`;
+  }
+  function weekEditorMarkup(){
+    const T=FittFormaTraining,d=weekEditDay;if(!d)return '';const cur=weekDays()[d],is=(k,v)=>cur&&cur.kind===k&&(v==null||cur.key===v||cur.id===v);
+    const focusChips=Object.entries(T.FOCUS).map(([k,f])=>`<button type="button" class="ff-chip${is('focus',k)?' active':''}" data-wp-set="focus:${k}">${esc(f.title)}</button>`).join('');
+    const routineChips=(state.routines||[]).slice(0,12).map(r=>`<button type="button" class="ff-chip${is('routine',String(r.id))?' active':''}" data-wp-set="routine:${esc(String(r.id))}">${esc(r.name)}</button>`).join('');
+    const groupsSel=cur?.kind==='groups'?cur.groups:[];
+    return `<div class="wp-editor"><div class="wp-editor-head"><strong>${esc(T.WEEKDAYS[d-1])}: ¿qué querés entrenar?</strong><button type="button" class="link-btn" data-wp-close>Listo</button></div>
+      <div class="ff-chips">${focusChips}<button type="button" class="ff-chip${is('rest')?' active':''}" data-wp-set="rest">Descanso</button><button type="button" class="ff-chip" data-wp-set="none">Sin asignar</button></div>
+      ${routineChips?`<small class="muted">Mis rutinas</small><div class="ff-chips">${routineChips}</div>`:''}
+      <details class="wp-groups"${weekGroupsOpen||cur?.kind==='groups'?' open':''}><summary>Elegir grupos a mano</summary><div class="focus-groups">${Object.entries(T.MUSCLE_GROUPS).map(([k,g])=>`<label class="focus-group"><input type="checkbox" data-wp-group="${k}"${groupsSel.includes(k)?' checked':''}><span>${esc(g.label)}</span></label>`).join('')}</div><button type="button" class="btn secondary btn-sm" data-wp-groups-save>Guardar estos grupos</button></details></div>`;
+  }
+  function programsMarkup(){
+    const T=FittFormaTraining,p=state.profile||{},list=T.recommendPrograms(p,state.sessions||[],dateKey()),days=Math.max(2,Math.min(6,Number(p.days)||3));
+    const top=list.find(r=>r.fits&&r.score>0);
+    return `<div class="wp-programs"><div class="wp-days-per-week"><span>¿Cuántos días por semana podés entrenar?</span><div class="ff-chips">${[2,3,4,5,6].map(n=>`<button type="button" class="ff-chip${n===days?' active':''}" data-wp-perweek="${n}" aria-pressed="${n===days}">${n}</button>`).join('')}</div></div>
+      ${list.filter(r=>r.fits).map(r=>{const w=T.programWeek(r.id),rec=top&&r.id===top.id;return `<article class="wp-program${rec?' is-recommended':''}${state.weekPlan?.programId===r.id?' is-current':''}">${rec?'<span class="wp-rec-badge">Recomendada para vos</span>':''}<h4>${esc(r.title)}</h4><p class="muted small">${esc(r.desc)}</p>
+        <ul class="wp-program-days">${T.WEEKDAYS.map((n,i)=>{const day=w[i+1];return day.kind==='rest'?'':`<li><small>${esc(n)}</small><span>${esc(T.FOCUS[day.key].title)}</span></li>`;}).join('')}</ul>
+        ${rec&&r.reasons.length?`<ul class="wp-reasons">${r.reasons.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+        <button type="button" class="btn ${rec?'':'secondary'} btn-sm" data-wp-program="${r.id}">${state.weekPlan?.programId===r.id?'Usándola':'Usar esta'}</button></article>`;}).join('')}
+      <p class="muted small">Al usar una rutina se completa tu semana; después podés cambiar cualquier día. Las sesiones se arman con tu equipamiento, nivel y objetivo.</p></div>`;
+  }
+  function setWeekDay(d,value){
+    const days={...weekDays()};if(value==null)delete days[d];else days[d]=value;
+    state.weekPlan=sanitizeWeekPlan({days,programId:'',updatedAt:new Date().toISOString()});save();
+  }
+  function startWeekDay(day){
+    const T=FittFormaTraining;if(!day)return;
+    if(day.kind==='routine'){startRoutine(day.id);return;}
+    const d=day.kind==='focus'?T.buildFocusDay(day.key,focusProfile()):day.kind==='groups'?T.buildGroupsDay(day.groups,focusProfile(),{title:weekDayLabel(day),split:'Mi semana'}):null;
+    if(!d){toast('Hoy es descanso. Si igual querés entrenar, elegí una combinación abajo.');return;}
+    setFocusDraft(d);$('focusPreview')?.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  function bindWeekPlan(root){
+    const box=root.querySelector('#weekPlan');if(!box)return;
+    const rerender=()=>{renderTrain();};
+    box.onclick=e=>{
+      const t=e.target.closest('button');if(!t)return;
+      if(t.dataset.wpDay){const d=Number(t.dataset.wpDay);weekEditDay=weekEditDay===d?0:d;weekGroupsOpen=false;rerender();return;}
+      if(t.hasAttribute('data-wp-close')){weekEditDay=0;rerender();return;}
+      if(t.dataset.wpSet){const [k,v]=t.dataset.wpSet.split(/:(.*)/s);setWeekDay(weekEditDay,k==='none'?null:k==='rest'?{kind:'rest'}:k==='focus'?{kind:'focus',key:v}:{kind:'routine',id:v});toast(`${FittFormaTraining.WEEKDAYS[weekEditDay-1]}: ${weekDayLabel(weekDays()[weekEditDay])}.`);weekEditDay=0;rerender();return;}
+      if(t.hasAttribute('data-wp-groups-save')){const g=[...box.querySelectorAll('[data-wp-group]:checked')].map(x=>x.dataset.wpGroup);if(!g.length){toast('Elegí al menos un grupo muscular.');return;}setWeekDay(weekEditDay,{kind:'groups',groups:g});weekEditDay=0;rerender();return;}
+      if(t.id==='wpStartToday'){startWeekDay(todayRecommendation().day);return;}
+      if(t.id==='wpProgramsToggle'){const host=$('wpPrograms'),open=host.hidden;host.hidden=!open;t.setAttribute('aria-expanded',String(open));if(open)host.innerHTML=programsMarkup();return;}
+      if(t.dataset.wpPerweek){state.profile={...state.profile,days:String(t.dataset.wpPerweek)};save();$('wpPrograms').innerHTML=programsMarkup();return;}
+      if(t.dataset.wpProgram){const id=t.dataset.wpProgram,prog=FittFormaTraining.PROGRAMS[id];if(Object.keys(weekDays()).length&&state.weekPlan?.programId!==id&&!confirm(`¿Reemplazar tu semana por «${prog.title}»?`))return;
+        state.weekPlan=sanitizeWeekPlan({days:FittFormaTraining.programWeek(id),programId:id,updatedAt:new Date().toISOString()});state.profile={...state.profile,days:String(Object.keys(prog.days).length)};weekEditDay=0;if(save())toast(`Tu semana ahora sigue «${prog.title}». Podés cambiar cualquier día.`);rerender();}
+    };
+  }
   function trainLauncherMarkup(){
     const routines=(state.routines||[]).slice(0,6),days=state.plan?.days||[];
-    return `<div class="card train-launch"><div class="eyebrow">Empezar a entrenar</div><h3>¿Qué vas a entrenar hoy?</h3>`+dailyCardMarkup()+focusPickerMarkup()+
+    return `<div class="card train-launch"><div class="eyebrow">Empezar a entrenar</div><h3>¿Qué vas a entrenar hoy?</h3>`+weekPlanMarkup()+dailyCardMarkup()+focusPickerMarkup()+
       (days.length?`<details class="train-extra"><summary>Hacer un día del plan como rutina adicional</summary><div class="train-launch-list">${days.map((d,i)=>`<button type="button" class="ff-list-row train-launch-row" data-start-plan-extra="${i}"><span><b>${esc(d.title)}</b><small>${d.exercises.length} ejercicios · no cambia la progresión diaria</small></span><span class="link-btn">Iniciar</span></button>`).join('')}</div></details>`:'')+
       (routines.length?`<div class="train-launch-list"><strong>Mis rutinas</strong>${routines.map(r=>`<button type="button" class="ff-list-row train-launch-row" data-start-routine="${esc(String(r.id))}"><span><b>${esc(r.name)}</b><small>${r.exercises.length} ejercicios</small></span><span class="link-btn">Iniciar</span></button>`).join('')}</div>`:'')+
       `<div class="btn-row"><button type="button" class="btn ${days.length||routines.length?'secondary':''}" id="startFreeWorkout">Entrenamiento libre</button><button type="button" class="btn ghost" id="openManualLog">Registrar uno ya hecho</button><button type="button" class="btn ghost" id="goPlan">${state.plan||routines.length?'Rutinas y plan':'Crear una rutina'}</button></div>`+
@@ -3611,7 +3693,7 @@ function findCatalogExercise(name){
     root.querySelectorAll('[data-start-routine]').forEach(b=>b.onclick=()=>startRoutine(b.dataset.startRoutine));
     if($('startFreeWorkout'))$('startFreeWorkout').onclick=startFreeWorkout;
     if($('openManualLog'))$('openManualLog').onclick=openManualLog;
-    bindFocusPicker(root);
+    bindFocusPicker(root);bindWeekPlan(root);
     if($('goPlan'))$('goPlan').onclick=()=>switchView('routines');
     clearInterval(dailyCountdownTimer);dailyCountdownTimer=$('dailyCountdown')?setInterval(tickDailyCountdown,1000):null;
   }

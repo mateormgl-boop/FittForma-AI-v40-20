@@ -434,6 +434,7 @@
     calves: { label: 'Gemelos', slots: [['calf']] },
     core: { label: 'Core', slots: [['core_ae'], ['core_rot', 'core_flex'], ['core_flex', 'core_rot']] }
   };
+  const SLOT_GROUP = { hpush: 'chest', chest_iso: 'chest', vpull: 'back', hpull: 'back', pull_iso: 'back', vpush: 'shoulders', lat_raise: 'shoulders', front_raise: 'shoulders', rear_delt: 'shoulders', scap: 'shoulders', biceps: 'biceps', triceps: 'triceps', squat: 'legs_quads', quad_iso: 'legs_quads', lunge: 'legs_quads', hinge: 'legs_post', glute: 'legs_post', ham_iso: 'legs_post', abduct: 'legs_post', calf: 'calves', core_ae: 'core', core_rot: 'core', core_flex: 'core' };
   const GROUP_ORDER = ['legs_quads', 'legs_post', 'chest', 'back', 'shoulders', 'rear_delts', 'triceps', 'biceps', 'calves', 'core'];
   const FOCUS = {
     push: { title: 'Empuje', split: 'Empuje · Tracción · Piernas', groups: ['chest', 'shoulders', 'triceps'] },
@@ -446,7 +447,8 @@
     shoulders_core: { title: 'Hombros y core', split: 'Pares clásicos', groups: ['shoulders', 'core'] },
     chest_back: { title: 'Pecho y espalda', split: 'Músculos opuestos', groups: ['chest', 'back'] },
     arms: { title: 'Brazos', split: 'Músculos opuestos', groups: ['biceps', 'triceps'] },
-    full: { title: 'Cuerpo completo', split: 'Cuerpo completo', groups: ['legs_quads', 'chest', 'back', 'legs_post', 'shoulders', 'core'] }
+    full: { title: 'Cuerpo completo', split: 'Cuerpo completo', groups: ['legs_quads', 'chest', 'back', 'legs_post', 'shoulders', 'core'] },
+    glutes: { title: 'Glúteos e isquios', split: 'Glúteos y piernas', groups: ['legs_post', 'core', 'calves'] }
   };
   // Sesión con los grupos elegidos: reparte los ejercicios entre los grupos (uno por grupo y, si hay lugar, más),
   // con los grupos grandes primero. La cantidad sale de la duración y el nivel, como en el plan.
@@ -471,7 +473,7 @@
       }
     }
     // Grupos sin ningún ejercicio posible con este equipamiento (por ejemplo, bíceps solo con peso corporal).
-    const groupOf = { hpush: 'chest', chest_iso: 'chest', vpull: 'back', hpull: 'back', pull_iso: 'back', vpush: 'shoulders', lat_raise: 'shoulders', front_raise: 'shoulders', rear_delt: 'shoulders', scap: 'shoulders', biceps: 'biceps', triceps: 'triceps', squat: 'legs_quads', quad_iso: 'legs_quads', lunge: 'legs_quads', hinge: 'legs_post', glute: 'legs_post', ham_iso: 'legs_post', abduct: 'legs_post', calf: 'calves', core_ae: 'core', core_rot: 'core', core_flex: 'core' };
+    const groupOf = SLOT_GROUP;
     for (const g of groups) {
       const own = g === 'rear_delts' ? ['rear_delt', 'scap'] : Object.keys(groupOf).filter(k => groupOf[k] === g);
       if (!exercises.some(e => own.includes(e.slot))) missing.push(MUSCLE_GROUPS[g].label);
@@ -653,7 +655,91 @@
     return { kind: 'repeat', weight: w, reps: lo, unit: 'reps' };
   }
 
-  const api = { SPLIT_PLANS, nextFocusInSplit, suggestProgression, norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
+  // ---------- v58: Mi semana, rutinas listas y recomendaciones ----------
+  // Días: 1 = lunes … 7 = domingo. Cada día del plan es { kind: 'focus', key } | { kind: 'groups', groups } |
+  // { kind: 'routine', id } | { kind: 'rest' }. Las recomendaciones solo usan lo que la persona registró y su perfil.
+  const WEEKDAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  function weekdayOf(dateStr) { const d = new Date(String(dateStr || '').slice(0, 10) + 'T12:00:00'); if (Number.isNaN(d.getTime())) return 0; return d.getDay() || 7; }
+  const PROGRAMS = {
+    full2: { title: 'Cuerpo completo 2 días', days: { 2: 'full', 5: 'full' }, levels: ['beginner'], goals: ['fitness', 'lose', 'maintain', 'muscle', 'strength', 'endurance'], equipment: ['gym', 'home', 'bodyweight'], desc: 'Para empezar o con poco tiempo: todo el cuerpo dos veces por semana.' },
+    full3: { title: 'Cuerpo completo 3 días', days: { 1: 'full', 3: 'full', 5: 'full' }, levels: ['beginner', 'intermediate'], goals: ['fitness', 'lose', 'maintain', 'muscle', 'strength'], equipment: ['gym', 'home', 'bodyweight'], desc: 'Cada músculo tres veces por semana con pocas series por sesión. Ideal para empezar.' },
+    home3: { title: 'En casa: cuerpo completo', days: { 1: 'full', 3: 'full', 5: 'full' }, levels: ['beginner', 'intermediate'], goals: ['fitness', 'lose', 'maintain', 'muscle'], equipment: ['home', 'bodyweight'], desc: 'Pensada para entrenar en casa con poco o ningún equipo.' },
+    antag3: { title: 'Músculos opuestos 3 días', days: { 1: 'chest_back', 3: 'legs', 5: 'arms' }, levels: ['beginner', 'intermediate'], goals: ['fitness', 'muscle', 'maintain'], equipment: ['gym', 'home'], desc: 'Pecho con espalda, piernas y brazos: sesiones cortas y equilibradas.' },
+    ppl3: { title: 'Empuje · Tracción · Piernas (3 días)', days: { 1: 'push', 3: 'pull', 5: 'legs' }, levels: ['intermediate', 'advanced'], goals: ['muscle', 'strength', 'fitness'], equipment: ['gym', 'home'], desc: 'La división más usada en el gimnasio, una vez por semana cada combinación.' },
+    strength3: { title: 'Fuerza básica 3 días', days: { 1: 'lower', 3: 'upper', 5: 'full' }, levels: ['beginner', 'intermediate', 'advanced'], goals: ['strength'], equipment: ['gym'], desc: 'Ejercicios grandes (sentadilla, press, remo, peso muerto) con más descanso entre series.' },
+    upper_lower4: { title: 'Torso · Tren inferior 4 días', days: { 1: 'upper', 2: 'lower', 4: 'upper', 5: 'lower' }, levels: ['intermediate', 'advanced'], goals: ['muscle', 'strength', 'fitness', 'lose'], equipment: ['gym', 'home'], desc: 'Cada músculo dos veces por semana. Muy buena para ganar músculo y fuerza.' },
+    pairs4: { title: 'Pares clásicos 4 días', days: { 1: 'chest_triceps', 2: 'back_biceps', 4: 'legs', 5: 'shoulders_core' }, levels: ['intermediate', 'advanced'], goals: ['muscle', 'fitness'], equipment: ['gym'], desc: 'Pecho y tríceps, espalda y bíceps, piernas, hombros y core.' },
+    glutes4: { title: 'Glúteos y piernas 4 días', days: { 1: 'glutes', 2: 'upper', 4: 'legs', 6: 'glutes' }, levels: ['beginner', 'intermediate', 'advanced'], goals: ['muscle', 'fitness', 'lose'], equipment: ['gym', 'home'], desc: 'Más volumen para glúteos e isquios, sin dejar de lado el torso.' },
+    bro5: { title: 'Pares clásicos 5 días', days: { 1: 'chest_triceps', 2: 'back_biceps', 3: 'legs', 4: 'shoulders_core', 5: 'arms' }, levels: ['intermediate', 'advanced'], goals: ['muscle'], equipment: ['gym'], desc: 'Un día por zona, con un día extra para brazos.' },
+    ppl6: { title: 'Empuje · Tracción · Piernas (6 días)', days: { 1: 'push', 2: 'pull', 3: 'legs', 4: 'push', 5: 'pull', 6: 'legs' }, levels: ['advanced'], goals: ['muscle', 'strength'], equipment: ['gym'], desc: 'Cada combinación dos veces por semana. Exigente: solo si podés recuperarte bien.' }
+  };
+  function programWeek(id) {
+    const p = PROGRAMS[id]; if (!p) return null;
+    const days = {}; for (let d = 1; d <= 7; d++) days[d] = p.days[d] ? { kind: 'focus', key: p.days[d] } : { kind: 'rest' };
+    return days;
+  }
+  // Grupo muscular de un ejercicio registrado: primero por la biblioteca; si es un nombre propio, por su nombre o su grupo.
+  function groupsOfExercise(ex) {
+    const e = libraryEntry(ex && ex.name); if (e && SLOT_GROUP[e.slot]) return [SLOT_GROUP[e.slot]];
+    const n = norm(ex && ex.name), g = norm(ex && ex.group);
+    if (/curl|biceps/.test(n)) return ['biceps']; if (/tricep|frances|fondos/.test(n)) return ['triceps'];
+    if (/gemel|pantorr|talones/.test(n)) return ['calves']; if (/glute|hip thrust|isquio|femoral|peso muerto/.test(n)) return ['legs_post'];
+    const byGroup = { pecho: ['chest'], espalda: ['back'], hombros: ['shoulders'], piernas: ['legs_quads', 'legs_post'], core: ['core'], abdomen: ['core'], brazos: ['biceps', 'triceps'] };
+    return byGroup[g] || [];
+  }
+  // Por grupo: fecha de la última vez y series hechas en los últimos `days` días (solo series marcadas como hechas).
+  function groupHistory(sessions, today, days = 14) {
+    const out = Object.fromEntries(GROUP_ORDER.map(g => [g, { last: '', sets: 0 }]));
+    const t = new Date(String(today).slice(0, 10) + 'T12:00:00').getTime(), from = t - days * 864e5;
+    for (const s of sessions || []) {
+      if (!s || s.status === 'cancelled') continue; const ds = String(s.date || '').slice(0, 10), ts = new Date(ds + 'T12:00:00').getTime(); if (!Number.isFinite(ts) || ts > t) continue;
+      for (const ex of s.exercises || []) {
+        const done = (ex.entries || []).filter(x => x && x.done).length; if (!done) continue;
+        for (const g of groupsOfExercise(ex)) { const o = out[g]; if (!o) continue; if (ds > o.last) o.last = ds; if (ts >= from) o.sets += done; }
+      }
+    }
+    return out;
+  }
+  const SHORT_GROUP = { legs_quads: 'piernas', legs_post: 'glúteos', chest: 'pecho', back: 'espalda', shoulders: 'hombros', rear_delts: 'hombros', biceps: 'bíceps', triceps: 'tríceps', calves: 'gemelos', core: 'core' };
+  const listEs = a => a.length < 2 ? (a[0] || '') : `${a.slice(0, -1).join(', ')} y ${a[a.length - 1]}`;
+  const daysBetween = (a, b) => Math.round((new Date(String(b).slice(0, 10) + 'T12:00:00') - new Date(String(a).slice(0, 10) + 'T12:00:00')) / 864e5);
+  // Rutinas recomendadas: perfil (objetivo, nivel, equipamiento, días por semana) y lo que vino haciendo (combinaciones que
+  // ya usa y grupos que quedaron sin entrenar). Devuelve todas, ordenadas, cada una con sus motivos.
+  function recommendPrograms(profileInput = {}, sessions = [], today = new Date().toISOString().slice(0, 10)) {
+    const p = { goal: 'fitness', level: 'beginner', equipment: 'gym', days: 3, ...profileInput };
+    const wantDays = Math.max(2, Math.min(6, Number(p.days) || 3));
+    const hist = groupHistory(sessions, today, 21), recentTitles = new Set((sessions || []).filter(s => s && daysBetween(s.date, today) <= 28).map(s => norm(s.title)));
+    const undertrained = GROUP_ORDER.filter(g => ['chest', 'back', 'shoulders', 'legs_quads', 'legs_post'].includes(g) && hist[g].sets === 0);
+    const anyHistory = GROUP_ORDER.some(g => hist[g].sets > 0);
+    const goalLabel = { lose: 'bajar grasa', muscle: 'ganar músculo', strength: 'ganar fuerza', endurance: 'mejorar la resistencia', maintain: 'mantenerte', fitness: 'mejorar tu forma física' }[p.goal] || 'tu objetivo';
+    return Object.entries(PROGRAMS).map(([id, prog]) => {
+      const n = Object.keys(prog.days).length, reasons = []; let score = 0;
+      if (!prog.equipment.includes(p.equipment)) score -= 50; else score += 1;
+      if (prog.goals.includes(p.goal)) { score += 3; reasons.push(`Sirve para ${goalLabel}.`); }
+      if (prog.levels.includes(p.level)) { score += 2; reasons.push({ beginner: 'Va con tu nivel principiante.', intermediate: 'Va con tu nivel intermedio.', advanced: 'Va con tu nivel avanzado.' }[p.level] || 'Va con tu nivel.'); }
+      const diff = Math.abs(n - wantDays); score -= diff * 2; if (!diff) reasons.push(`Son ${n} días, los que dijiste que podés entrenar.`);
+      const focus = [...new Set(Object.values(prog.days))], groups = new Set(focus.flatMap(k => FOCUS[k].groups));
+      const used = focus.filter(k => recentTitles.has(norm(FOCUS[k].title)));
+      if (used.length) { score += Math.min(3, used.length); reasons.push(`Se parece a lo que venís haciendo (${used.map(k => FOCUS[k].title).join(', ')}).`); }
+      const covers = undertrained.filter(g => groups.has(g));
+      if (anyHistory && covers.length) { score += 1; reasons.push(`Incluye ${listEs([...new Set(covers.map(g => SHORT_GROUP[g]))])}, que no entrenaste en las últimas 3 semanas.`); }
+      return { id, title: prog.title, desc: prog.desc, daysPerWeek: n, score, reasons, fits: prog.equipment.includes(p.equipment) };
+    }).sort((a, b) => b.score - a.score || a.daysPerWeek - b.daysPerWeek);
+  }
+  // Qué entrenar hoy: si el día tiene algo en «Mi semana», eso; si no, la combinación cuyos grupos hace más que no entrenás.
+  function recommendToday(profileInput = {}, sessions = [], week = null, today = new Date().toISOString().slice(0, 10)) {
+    const wd = weekdayOf(today), planned = week && week[wd];
+    if (planned && planned.kind && planned.kind !== 'none') return { source: 'week', weekday: wd, day: planned };
+    const hist = groupHistory(sessions, today, 14), candidates = ['chest_triceps', 'back_biceps', 'legs', 'shoulders_core', 'glutes'];
+    const since = g => hist[g].last ? daysBetween(hist[g].last, today) : 99;
+    const scored = candidates.map(k => { const gs = FOCUS[k].groups.filter(g => g !== 'core' && g !== 'calves'); return { k, gs, d: Math.min(...gs.map(since)), sets: gs.reduce((a, g) => a + hist[g].sets, 0) }; })
+      .sort((a, b) => b.d - a.d || a.sets - b.sets);
+    const best = scored[0]; if (!GROUP_ORDER.some(g => hist[g].last)) return { source: 'none', weekday: wd, day: { kind: 'focus', key: (profileInput.level || 'beginner') === 'beginner' ? 'full' : 'push' }, reason: 'Todavía no registraste entrenamientos: empezá por acá.' };
+    const lbl = SHORT_GROUP[best.gs[0]];
+    return { source: 'history', weekday: wd, day: { kind: 'focus', key: best.k }, reason: best.d >= 99 ? `En las últimas 2 semanas no registraste ${lbl}.` : `Hace ${best.d} ${best.d === 1 ? 'día' : 'días'} que no entrenás ${lbl}.` };
+  }
+
+  const api = { WEEKDAYS, weekdayOf, PROGRAMS, programWeek, groupsOfExercise, groupHistory, recommendPrograms, recommendToday, SPLIT_PLANS, nextFocusInSplit, suggestProgression, norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaTraining = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);
