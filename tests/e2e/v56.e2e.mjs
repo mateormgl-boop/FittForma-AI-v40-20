@@ -61,11 +61,14 @@ step('Vista en lista', (await page.$$('#exerciseLibraryResults .exercise-list-ro
 await page.click('#exerciseLibraryResults .exercise-list-main'); await page.waitForTimeout(400);
 const hist = await page.textContent('#exerciseModalHistory');
 step('Ficha: «Tu historial» con mejor marca y fuerza estimada', /Veces registrado\s*2/.test(hist) && /24 kg × 12/.test(hist) && /Fuerza máxima estimada/.test(hist), hist.replace(/\s+/g, ' ').slice(0, 140));
+// v57: historial y «Agregar a la rutina» están en la pestaña «Mi progreso»; las alternativas, en «Cómo se hace».
+await page.click('#exTabMineBtn'); await page.waitForTimeout(100);
 await page.selectOption('#exAddRoutineSel', 'r1'); await page.click('#exAddRoutineBtn'); await page.waitForTimeout(200);
 let s = await st();
 step('«Agregar a la rutina» lo suma a la rutina elegida', s.routines[0].exercises.some(e => e.name === 'Press de banca con mancuernas'), await page.textContent('#exAddRoutineStatus'));
 await page.click('#exAddRoutineBtn'); await page.waitForTimeout(150);
 step('No lo agrega dos veces', /Ya está en/.test(await page.textContent('#exAddRoutineStatus')));
+await page.click('#exTabHowBtn'); await page.waitForTimeout(100);
 const altName = await page.getAttribute('#exerciseModalAlternatives .ex-alt', 'data-exercise-detail');
 await page.click('#exerciseModalAlternatives .ex-alt'); await page.waitForTimeout(300);
 step('Las alternativas abren su propia ficha', (await page.textContent('#exerciseModalTitle')) === altName, altName);
