@@ -1,7 +1,17 @@
-# Despliegue de FittForma AI v55.0
+# Despliegue de FittForma AI v56.0
 
-Esta guía es la lista de pasos para publicar v55.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v56.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
+
+## Qué cambia en v56.0
+
+- **No hay migraciones nuevas.**
+- **Archivos nuevos:**
+  - 31 animaciones en `assets/exercises/gif/`.
+  - 62 fotos en `assets/exercises/lib/`.
+- **Archivos que se actualizan:** `exercise-gifs.js`, `exercise-media.js`, `exercise-guides.js` y `training-core.js`.
+- El service worker cambia a `fittforma-ai-static-v56-0`, así que los teléfonos descargan la versión nueva al abrir la app.
+- Siguen pendientes en producción las migraciones de v49 a v54 indicadas abajo, si todavía no se aplicaron.
 
 ## Qué cambia en v55.0
 

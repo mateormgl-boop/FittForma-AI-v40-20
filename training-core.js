@@ -609,7 +609,51 @@
     return out;
   }
 
-  const api = { norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
+  // v56: división semanal. «Hoy toca» = la combinación que sigue a la última que hiciste de esa división
+  // (se reconoce por el título de la sesión). Si no hiciste ninguna, empieza por la primera.
+  const SPLIT_PLANS = {
+    ppl: { title: 'Empuje · Tracción · Piernas', days: '3 o 6 días', focus: ['push', 'pull', 'legs'] },
+    upper_lower: { title: 'Torso · Tren inferior', days: '2 o 4 días', focus: ['upper', 'lower'] },
+    pairs: { title: 'Pares clásicos + piernas', days: '4 días', focus: ['chest_triceps', 'back_biceps', 'legs', 'shoulders_core'] },
+    antagonists: { title: 'Músculos opuestos + piernas', days: '3 días', focus: ['chest_back', 'legs', 'arms'] },
+    full: { title: 'Cuerpo completo', days: '2 o 3 días', focus: ['full'] }
+  };
+  function nextFocusInSplit(splitKey, sessions) {
+    const plan = SPLIT_PLANS[splitKey]; if (!plan) return null;
+    const titleOf = Object.fromEntries(plan.focus.map(k => [norm(FOCUS[k].title), k]));
+    const done = (sessions || []).filter(x => x && titleOf[norm(x.title)]).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    if (!done.length) return { key: plan.focus[0], last: null, lastDate: '' };
+    const lastKey = titleOf[norm(done[0].title)], i = plan.focus.indexOf(lastKey);
+    return { key: plan.focus[(i + 1) % plan.focus.length], last: lastKey, lastDate: String(done[0].date || '') };
+  }
+
+  // v56: progresión doble con números a partir de la última vez (primero repeticiones, después carga).
+  // prev = series registradas [{reps, weight, done}], spec = prescripción ('8–12', '10', '30–45 seg').
+  // Devuelve { kind, weight, reps, unit } o null si no hay datos suficientes. Nunca inventa una carga que no registraste.
+  const num = v => { const n = Number(String(v == null ? '' : v).replace(',', '.')); return Number.isFinite(n) ? n : NaN; };
+  function loadStep(w) { return w < 10 ? 1 : w < 40 ? 2 : 2.5; }
+  function suggestProgression(prev, spec, measure = 'reps') {
+    const sets = (prev || []).filter(x => x && x.done !== false).map(x => ({ r: num(x.reps), w: num(x.weight) })).filter(x => x.r > 0);
+    if (!sets.length) return null;
+    const m = String(spec || '').match(/(\d+)\s*[–-]\s*(\d+)/), one = String(spec || '').match(/\d+/);
+    const lo = m ? Number(m[1]) : one ? Number(one[0]) : Math.min(...sets.map(x => x.r));
+    const hi = m ? Number(m[2]) : lo;
+    const allDone = (prev || []).length > 0 && (prev || []).every(x => x && x.done === true);
+    const minR = Math.min(...sets.map(x => x.r));
+    const weights = sets.map(x => x.w).filter(w => w > 0), w = weights.length === sets.length ? Math.max(...weights) : 0;
+    if (measure === 'seconds') {
+      if (allDone && minR >= hi) return { kind: 'time', weight: w || 0, reps: minR + 5, unit: 's' };
+      return { kind: 'repeat', weight: w || 0, reps: Math.max(minR, lo), unit: 's' };
+    }
+    if (allDone && minR >= hi) {
+      if (w > 0) return { kind: 'load', weight: Math.round((w + loadStep(w)) * 2) / 2, reps: lo, unit: 'reps' };
+      return { kind: 'reps', weight: 0, reps: hi + 1, unit: 'reps' };
+    }
+    if (allDone && minR >= lo) return { kind: 'reps', weight: w, reps: Math.min(hi, minR + 1), unit: 'reps' };
+    return { kind: 'repeat', weight: w, reps: lo, unit: 'reps' };
+  }
+
+  const api = { SPLIT_PLANS, nextFocusInSplit, suggestProgression, norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaTraining = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);
