@@ -43,7 +43,8 @@ async function open({ welcome = false, google = false, locale = 'es-UY', viewpor
   page.on('console', m => { if (m.type() === 'error' && !/leaflet|ERR_FAILED|unpkg|status of (40[0-9]|429)/i.test(m.text())) errors.push(m.text()); });
   page.on('dialog', d => d.accept());
   await page.route(/unpkg\.com/, r => r.abort());
-  await page.addInitScript(([w, loc]) => { if (!w) localStorage.setItem('fittforma-welcome-v1', '1'); if (loc !== 'es-UY') localStorage.setItem('fittforma-language-v1', loc.slice(0, 2)); setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50); }, [welcome, locale]);
+  // v68: el recorrido inicial (aparece después de la bienvenida) lo prueba v68.e2e.mjs; acá se da por visto.
+  await page.addInitScript(([w, loc]) => { localStorage.setItem('fittforma-tour-v68', '1'); if (!w) localStorage.setItem('fittforma-welcome-v1', '1'); if (loc !== 'es-UY') localStorage.setItem('fittforma-language-v1', loc.slice(0, 2)); setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50); }, [welcome, locale]);
   await page.route(/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js/, r => r.fulfill({ contentType: 'text/javascript', headers: { 'access-control-allow-origin': '*' }, body: fs.readFileSync(process.env.SUPABASE_UMD) }));
   await page.route('**/api/public-config', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ version: APP_VERSION, supabase: { configured: true, url: SUPA, anonKey: ANON, keyType: 'legacy_anon' }, missing: [], issue: null }) }));
   await page.route(`${SUPA}/rest/v1/**`, async route => {

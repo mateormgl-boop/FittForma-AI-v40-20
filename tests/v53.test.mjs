@@ -138,7 +138,7 @@ test('v53: archivos publicados, traducciones y versión', () => {
   assert.match(server, /'\/i18n-v53\.js'/); assert.match(readFileSync('i18n.js', 'utf8'), /'\.\/i18n-v53\.js'\]/);
   for (const s of ['Todos', 'Ranking', 'Amigos', 'Todavía no tenés amigos en tu comunidad', 'Sin datos disponibles', 'Tu progreso']) assert.ok(i18n.includes(`["${s}"`), s);
   for (const row of i18n.matchAll(/^\s*\[("[^\n]*")\],?$/gm)) assert.equal(JSON.parse(`[${row[1]}]`).length, 6, row[1].slice(0, 40));
-  assert.match(sw, /fittforma-ai-static-v67-0/);
+  assert.match(sw, /fittforma-ai-static-v68-0/);
 });
 
 test('v53.1: rango por músculo validado (sin datos corporales) y misma regla en SQL', () => {

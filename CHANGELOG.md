@@ -1,5 +1,16 @@
 # FittForma AI — Registro de cambios
 
+## v68.0 — «Cómo usar la app» y recorrido inicial (29 de octubre de 2026)
+
+Pedido de usuarios de prueba: «les cuesta entender la app».
+
+- **«Cómo usar la app»:** una guía corta de cada sección (Inicio, Entrenar, Rutinas y plan, Nutrición, Correr, Progreso, Comunidad, FittAI y Perfil).
+  - Cada sección dice qué tocar, con los nombres reales de los botones, y tiene «Ir a…».
+  - Se abre desde «Más», desde Perfil → Ayuda y privacidad, y desde un aviso en Inicio para quien recién empieza (se oculta con la ×, o solo después de 3 entrenamientos).
+- **Recorrido inicial:** al cerrar la bienvenida la primera vez, 6 pasos que resaltan los botones de abajo y explican para qué sirve cada uno.
+  - Se puede saltar (también con Escape) y no vuelve a aparecer. Se puede volver a ver desde la guía o desde Perfil.
+- Traducido a los seis idiomas. Sin migraciones nuevas.
+
 ## v67.0 — Más rápida en español y más segura (29 de octubre de 2026)
 
 - **Carga más rápida.** En español la app ya no descarga las traducciones a otros idiomas (unos 1,8 MB que antes bajaba siempre).

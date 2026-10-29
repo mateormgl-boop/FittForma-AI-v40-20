@@ -9,6 +9,12 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v68
+
+- `tests/v68.test.mjs` (4 pruebas): la guía tiene 9 secciones con «Ir a…»; se abre desde Más, Perfil e Inicio; el recorrido apunta a botones que existen, una sola vez y después de la bienvenida, con Escape y movimiento reducido; traducciones.
+- E2E `v68` (22 pasos): bienvenida → recorrido de 6 pasos con el botón resaltado; no vuelve a aparecer; aviso de Inicio que abre la guía y se oculta; «Ir a Entrenar»; desde Más y Perfil; volver a ver el recorrido; Escape; 320 px; inglés.
+- `tests/e2e/v63.e2e.mjs` da el recorrido por visto (lo prueba v68).
+
 ### v67
 
 - `tests/v67.test.mjs` (3 pruebas): `index.html` no carga las traducciones; `i18n.js` las carga en orden solo para otro idioma; el service worker no las guarda de antemano; la migración solo cambia permisos de las tres funciones y no toca las que se usan sin sesión.
