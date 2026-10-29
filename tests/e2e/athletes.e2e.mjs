@@ -108,7 +108,7 @@ sql(`delete from community_physique where user_id='${A}'; delete from community_
 await page.goto(APP + '/'); await page.waitForTimeout(800);
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(1200);
 step('1. Comunidad abre en «Todos»', (await page.getAttribute('#communityTabWorld', 'aria-selected')) === 'true' && await page.isVisible('#communityPanelWorld'));
-step('2. Tres apartados y ningún feed ni «Para vos»', (await page.$$eval('.cm-tabs [role=tab]', t => t.map(x => x.textContent.trim()).join('|'))) === 'Todos|Ranking|Amigos' && !(await page.$('#communityFeed')) && !(await page.$('[data-feed-mode]')) && !/Para vos/.test(await page.textContent('#view-community')));
+step('2. Cuatro apartados (v66: «Muro» solo de amigos) y ningún feed general ni «Para vos»', (await page.$$eval('.cm-tabs [role=tab]', t => t.map(x => x.textContent.trim()).join('|'))) === 'Todos|Muro|Ranking|Amigos' && !(await page.$('#communityFeed')) && !(await page.$('[data-feed-mode]')) && !/Para vos/.test(await page.textContent('#view-community')));
 let people = await page.textContent('#communityPeople');
 step('3. Sin sesión: perfiles públicos con nivel y rango', /Bruno Fit/.test(people) && /Avanzado/.test(people) && /Plata/.test(people) && !/carla_priv53/.test(people), people.replace(/\s+/g, ' ').slice(0, 160));
 step('3. Las estadísticas ocultas no aparecen', !/Leyenda/.test(people));

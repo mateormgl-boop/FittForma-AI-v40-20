@@ -12,6 +12,7 @@
   let schemaV41=(()=>{try{return sessionStorage.getItem(SCHEMA_KEY)==='0'?false:null;}catch{return null;}})(),ownVisibility='private',postKind='text';
   // v49: columnas y funciones nuevas (guardadas, destacadas, entrenamiento vinculado). false = migración v49 sin aplicar.
   let schemaV49=null,savedEnabled=true;
+  let schemaV66=null; // v66: columna community_posts.activity (muro y actividades compartidas)
   const markLegacySchema=()=>{schemaV41=false;try{sessionStorage.setItem(SCHEMA_KEY,'0');}catch{}};
   const V41_COLS=',post_kind,image_path,achievement,updated_at';
   const MIGRATION_HINT='Para publicar texto o logros, aplicá en Supabase supabase/migrations/2026-10-17_v41_posts_achievements_unread.sql.';
@@ -176,7 +177,7 @@
     const byUser=new Map((r.error?[]:r.data||[]).map(x=>[x.user_id,x]));
     return posts.filter(p=>byUser.has(p.user_id)).map(p=>({...p,community_profiles:byUser.get(p.user_id)}));
   }
-  function postSelect(){const extra=schemaV41===false?'':V41_COLS;return 'id,user_id,description,exercises_text,nutrition_text,running_text,start_date,end_date,before_path,after_path,visibility,created_at'+extra+(schemaV49===false?'':',linked_session');}
+  function postSelect(){const extra=schemaV41===false?'':V41_COLS;return 'id,user_id,description,exercises_text,nutrition_text,running_text,start_date,end_date,before_path,after_path,visibility,created_at'+extra+(schemaV49===false?'':',linked_session')+(schemaV66===true&&schemaV41!==false?',activity':'');}
   function profileCols(){return 'user_id,display_name,username,bio,visibility,avatar_path'+(schemaV49===false?'':',featured_badges');}
   async function myFollowing(){if(!authReady())return new Map();const {data,error}=await client.from('community_follows').select('following_id,status').eq('follower_id',user.id);return new Map((error?[]:data||[]).map(x=>[x.following_id,x.status]));}
   // Me gusta, comentarios, seguimiento, guardadas e imágenes de un conjunto de publicaciones (todo bajo RLS).
@@ -207,7 +208,7 @@
     const countBy={};likes.forEach(x=>countBy[x.post_id]=(countBy[x.post_id]||0)+1);
     return {likedSet,countBy,comments,followStatus,saved,urlOf};
   }
-  const ICON={heart:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',comment:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v11H10l-5 3v-3H4z"/></svg>',share:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></svg>',save:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg>',more:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>'};
+  const ICON={clap:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11.5 6.3 8.8a1.4 1.4 0 0 1 2-2l4.2 4.2M11 9.5 8.4 6.9a1.4 1.4 0 0 1 2-2l4.6 4.6M13 7.4l-1-1a1.4 1.4 0 0 1 2-2l3.2 3.2a6 6 0 0 1 0 8.5l-.6.6a6 6 0 0 1-8.5 0L4.4 13a1.4 1.4 0 0 1 2-2l2.9 2.9"/><path d="M18 3.5l.8-1.5M20.5 6l1.5-.6M15.5 2.5 15.3 1"/></svg>',heart:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',comment:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v11H10l-5 3v-3H4z"/></svg>',share:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></svg>',save:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg>',more:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>'};
   function linkedSessionHtml(s){if(!s||typeof s!=='object')return '';const bits=[s.minutes?`${s.minutes} min`:'',Array.isArray(s.exercises)&&s.exercises.length?`${s.exercises.length} ejercicio(s)`:'',s.sets?`${s.sets} series`:''].filter(Boolean);return `<div class="community-linked-session"><span class="community-linked-icon" aria-hidden="true">${s.type==='run'?'🏃':''}</span><div><small>${s.type==='run'?'Actividad':'Entrenamiento'} · ${esc(dateLabel(s.date))}</small><strong>${esc(s.title)}</strong>${bits.length?`<span>${esc(bits.join(' · '))}</span>`:''}${Array.isArray(s.exercises)&&s.exercises.length?`<span class="muted small">${esc(s.exercises.slice(0,4).join(' · '))}${s.exercises.length>4?'…':''}</span>`:''}</div></div>`;}
   function renderPostCard(p,ctx,rankByPost={}){
     const profile=Array.isArray(p.community_profiles)?p.community_profiles[0]:p.community_profiles;
@@ -218,16 +219,16 @@
     const owner=user?.id===p.user_id;
     const followState=ctx.followStatus.get(p.user_id)||'';const isFollowing=followState==='accepted',isPending=followState==='pending';
     const when=kind==='transformation'&&p.start_date&&p.end_date?`${dateLabel(p.start_date)} – ${dateLabel(p.end_date)}`:timeAgo(p.created_at)+(p.updated_at?' · editado':'');
-    const kindLabel=kind==='achievement'?'Logro':kind==='transformation'?'Transformación':'';
+    const kindLabel=kind==='achievement'?'Logro':kind==='transformation'?'Transformación':kind==='activity'?({run:'Carrera',challenge:'Desafío'})[p.activity?.type]||'Entrenamiento':'';
     const missing="this.closest('.community-photo,.community-single-photo')?.classList.add('is-missing');this.remove()";
     const media=kind==='transformation'?`<div class="community-photos">${before?`<div class="community-photo"><img loading="lazy" onerror="${missing}" src="${esc(before)}" alt="Foto de antes de ${esc(profileName)}"><span>ANTES</span></div>`:'<div class="community-photo"><span>ANTES · imagen no disponible</span></div>'}${after?`<div class="community-photo"><img loading="lazy" onerror="${missing}" src="${esc(after)}" alt="Foto de después de ${esc(profileName)}"><span>DESPUÉS</span></div>`:'<div class="community-photo"><span>DESPUÉS · imagen no disponible</span></div>'}</div>`:(single?`<div class="community-single-photo"><img loading="lazy" onerror="${missing}" src="${esc(single)}" alt="Foto compartida por ${esc(profileName)}"></div>`:'');
-    const achievementHtml=kind==='achievement'&&p.achievement?achievementCard(p.achievement):'';
+    const achievementHtml=kind==='achievement'&&p.achievement?achievementCard(p.achievement):kind==='activity'&&p.activity?activityCard(p.activity):'';
     const tags=[p.exercises_text?`Rutina: ${p.exercises_text}`:'',p.nutrition_text?`Alimentación: ${p.nutrition_text}`:'',p.running_text?`Actividad: ${p.running_text}`:''].filter(Boolean);
     const commentHtml=postComments.map((c,i)=>{const cp=Array.isArray(c.community_profiles)?c.community_profiles[0]:c.community_profiles;return `<div class="community-comment"${i<postComments.length-2?' data-older-comment hidden':''}>${avatarHtml(cp||{display_name:'Usuario'},ctx.urlOf,'xs')}<strong>${esc(cp?.display_name||cp?.username||'Usuario')}</strong> ${esc(c.body)}${user?.id===c.user_id?` <button class="btn ghost btn-sm" type="button" data-community-delete-comment="${esc(c.id)}">Borrar</button>`:''}</div>`;}).join('');
     const rank=rankByPost[p.id]||{isPro:false,followerCount:0,activityScore:0};
     const liked=ctx.likedSet.has(p.id),saved=ctx.saved.has(p.id),likes=ctx.countBy[p.id]||0;
     const menu=`<details class="community-post-menu"><summary aria-label="Más opciones de la publicación">${ICON.more}</summary><div class="community-menu" role="menu">${owner?'':`<button class="btn ghost" type="button" data-community-report="${esc(p.id)}">Denunciar</button>${user?`<button class="btn ghost" type="button" data-community-block="${esc(p.user_id)}">Bloquear</button>`:''}`}${owner&&schemaV41?`<button class="btn ghost" type="button" data-community-edit-post="${esc(p.id)}" data-kind="${esc(kind)}">Editar texto</button>`:''}${owner?`<button class="btn ghost" type="button" data-community-delete-post="${esc(p.id)}">Eliminar</button>`:''}</div></details>`;
-    const actions=`<div class="community-actions" role="group" aria-label="Acciones"><button class="community-action${liked?' is-on':''}" type="button" data-community-like="${esc(p.id)}" aria-pressed="${liked}" aria-label="${liked?'Quitar me gusta':'Me gusta'}">${ICON.heart}<span data-like-count>${likes}</span></button><button class="community-action" type="button" data-community-focus-comment="${esc(p.id)}" aria-label="Comentar">${ICON.comment}<span>${postComments.length}</span></button><button class="community-action" type="button" data-community-share="${esc(p.id)}" aria-label="Compartir">${ICON.share}</button>${user&&savedEnabled&&schemaV49!==false?`<button class="community-action community-save${saved?' is-on':''}" type="button" data-community-save="${esc(p.id)}" aria-pressed="${saved}" aria-label="${saved?'Quitar de guardadas':'Guardar'}">${ICON.save}</button>`:''}</div>`;
+    const actions=`<div class="community-actions" role="group" aria-label="Acciones"><button class="community-action${liked?' is-on':''}" type="button" data-community-like="${esc(p.id)}" aria-pressed="${liked}" aria-label="${liked?'Quitar el aplauso':'Aplaudir'}" title="Aplausos">${ICON.clap}<span data-like-count>${likes}</span></button><button class="community-action" type="button" data-community-focus-comment="${esc(p.id)}" aria-label="Comentar">${ICON.comment}<span>${postComments.length}</span></button><button class="community-action" type="button" data-community-share="${esc(p.id)}" aria-label="Compartir">${ICON.share}</button>${user&&savedEnabled&&schemaV49!==false?`<button class="community-action community-save${saved?' is-on':''}" type="button" data-community-save="${esc(p.id)}" aria-pressed="${saved}" aria-label="${saved?'Quitar de guardadas':'Guardar'}">${ICON.save}</button>`:''}</div>`;
     const bodyHtml=`<div class="community-post-body">${kindLabel?`<span class="community-kind">${kindLabel}</span>`:''}${achievementHtml}${p.description?`<p data-community-post-text>${richText(p.description)}</p>`:''}${linkedSessionHtml(p.linked_session)}${tags.length?`<div class="community-tags">${tags.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}<p class="muted small community-disclaimer">Información compartida por el usuario; no está verificada automáticamente por FittForma.</p></div>`;
     // Con foto: foto, acciones y texto. Sin foto: el texto va primero y las acciones debajo.
     const content=media?`${media}${actions}${bodyHtml}`:`${bodyHtml}${actions}`;
@@ -330,7 +331,7 @@
     const on=!data;document.querySelectorAll(`[data-community-like="${CSS.escape(postId)}"]`).forEach(b=>{b.classList.toggle('is-on',on);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',tr(on?'Quitar me gusta':'Me gusta'));const c=b.querySelector('[data-like-count]');if(c)c.textContent=String(Math.max(0,(Number(c.textContent)||0)+(on?1:-1)));});if(!button)await refreshPosts();}
   async function toggleSave(postId){if(!authReady())return alert(tr(authHint()));const on=!document.querySelector(`[data-community-save="${CSS.escape(postId)}"]`)?.classList.contains('is-on');const result=on?await client.from('community_saved_posts').insert({user_id:user.id,post_id:postId}):await client.from('community_saved_posts').delete().eq('user_id',user.id).eq('post_id',postId);if(result.error){status(friendlySupabaseError(result.error,'guardar la publicación'));return;}document.querySelectorAll(`[data-community-save="${CSS.escape(postId)}"]`).forEach(b=>{b.classList.toggle('is-on',on);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',tr(on?'Quitar de guardadas':'Guardar'));});toast(on?'Publicación guardada.':'Publicación quitada de guardadas.');if(currentSubView==='profile'&&ownTab==='saved')renderOwnGrid();}
   async function sharePost(postId){const article=document.querySelector(`[data-community-post="${CSS.escape(postId)}"]`),author=article?.querySelector('.community-author small')?.textContent?.split('·')[0]?.trim()||'',text=(article?.querySelector('[data-community-post-text]')?.textContent||'').slice(0,140);const url=location.origin+location.pathname;const data={title:'FittForma AI · Comunidad',text:`${author?`${author} en FittForma AI`:'Una publicación en FittForma AI'}${text?`: «${text}»`:''}`,url};try{if(navigator.share){await navigator.share(data);return;}await navigator.clipboard.writeText(`${data.text} ${url}`);toast('Texto y enlace copiados para compartir.');}catch(error){if(error?.name!=='AbortError')toast('No se pudo compartir desde este navegador.');}}
-  async function addComment(postId,body){if(!authReady())return alert(tr(authHint()));const text=String(body||'').trim();if(!text||text.length>500)return;const {error}=await client.from('community_comments').insert({post_id:postId,user_id:user.id,body:text});if(error)status(`No se pudo comentar: ${error.message}`);else await refreshPosts();}
+  async function addComment(postId,body){if(!authReady())return alert(tr(authHint()));const text=String(body||'').trim();if(!text||text.length>500)return;const {error}=await client.from('community_comments').insert({post_id:postId,user_id:user.id,body:text});if(error)status(`No se pudo comentar: ${error.message}`);else if(currentSubView==='wall')await loadWall(true);else await refreshPosts();}
   async function toggleFollow(target,button){if(!authReady())return alert(tr(authHint()));if(target===user.id)return;const {data,error}=await client.from('community_follows').select('follower_id,following_id,status').eq('follower_id',user.id).eq('following_id',target).maybeSingle();if(error){status(error.message);return;}let result;if(data)result=await client.from('community_follows').delete().eq('follower_id',user.id).eq('following_id',target);else{
       // La base de datos decide si el seguimiento queda aceptado o pendiente según la privacidad.
       result=await client.from('community_follows').insert({follower_id:user.id,following_id:target,status:'pending'}).select('status').single();
@@ -371,6 +372,20 @@
   async function deletePost(id){if(!confirm(tr('¿Eliminar esta publicación? También se borran sus fotos, me gusta y comentarios.')))return;const {data,error}=await client.from('community_posts').select('before_path,after_path'+(schemaV41?',image_path':'')).eq('id',id).eq('user_id',user.id).maybeSingle();if(error||!data){status(error?.message||'No se encontró la publicación.');return;}const {error:delError}=await client.from('community_posts').delete().eq('id',id).eq('user_id',user.id);if(delError){status(delError.message);return;}const paths=[data.before_path,data.after_path,data.image_path].filter(Boolean);if(paths.length)await client.storage.from(bucket).remove(paths);$('communityPostDialog')?.close?.();await refreshPosts();refreshOwnCounts();}
   async function reportPost(id){if(!authReady())return alert(tr(authHint()));const reason=String(prompt(tr('Motivo de la denuncia (spam, acoso, contenido inapropiado, otro):'))??'').trim();if(!reason)return;const {error}=await client.from('community_reports').insert({reporter_id:user.id,post_id:id,reason:reason.trim().slice(0,300)});if(error)status(error.code==='23505'?'Ya enviaste una denuncia por esta publicación.':`No se pudo enviar la denuncia: ${error.message}`);else status('Denuncia enviada. Gracias por ayudar a cuidar la comunidad.');}
   async function deleteComment(id){if(!confirm(tr('¿Borrar tu comentario?')))return;const {error}=await client.from('community_comments').delete().eq('id',id).eq('user_id',user.id);if(error)status(error.message);else await refreshPosts();}
+  // v66: actividad compartida desde la app (entrenamiento, carrera sin mapa o desafío cumplido). Números registrados en la
+  // app por la persona; no están verificados por terceros.
+  const MONTHS=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const CHALLENGE_LABEL={workouts:'entrenamientos',active_days:'días activos',run_km:'km corriendo'};
+  function activityCard(a){
+    if(!a||typeof a!=='object')return '';const n=v=>Number(v)||0,fmt=v=>Number(v).toLocaleString(undefined,{maximumFractionDigits:1});
+    if(a.type==='challenge'){const m=Number(String(a.month||'').split('-')[1]);const mes=MONTHS[(m||1)-1]||'';
+      return `<div class="cm-activity is-challenge"><div class="cm-activity-head"><strong>Desafío de ${esc(mes)} cumplido</strong><span class="cm-activity-badge">${fmt(a.value)} / ${fmt(a.goal)}</span></div><p>${fmt(a.value)} ${esc(CHALLENGE_LABEL[a.challenge]||'')} en el mes.</p></div>`;}
+    const pace=a.type==='run'&&n(a.minutes)&&n(a.distance_km)?(()=>{const t=n(a.minutes)/n(a.distance_km),mm=Math.floor(t),ss=Math.round((t-mm)*60);return `${ss===60?mm+1:mm}:${String(ss===60?0:ss).padStart(2,'0')} /km`;})():'';
+    const chips=a.type==='run'
+      ?[`${fmt(a.distance_km)} km`,a.minutes?`${fmt(a.minutes)} min`:'',pace,a.kcal?`≈${fmt(a.kcal)} kcal`:'']
+      :[a.minutes?`${fmt(a.minutes)} min`:'',a.exercises?`${fmt(a.exercises)} ejercicios`:'',a.sets?`${fmt(a.sets)} series`:'',a.volume_kg?`${fmt(a.volume_kg)} kg levantados`:'',a.kcal?`≈${fmt(a.kcal)} kcal`:''];
+    return `<div class="cm-activity is-${a.type==='run'?'run':'workout'}"><div class="cm-activity-head"><strong>${esc(a.type==='run'?'Salió a correr':(a.title||'Entrenamiento'))}</strong>${a.date?`<small class="muted">${esc(dateLabel(a.date))}</small>`:''}</div><ul class="cm-activity-chips">${chips.filter(Boolean).map(c=>`<li>${esc(c)}</li>`).join('')}</ul><small class="muted">Registrado en la app</small></div>`;
+  }
   function achievementCard(a){
     const E=window.FittFormaBadgeEngine,level=Math.min(15,Math.max(1,Number(a?.level)||1));
     const rank=E?E.rankForLevel(level-1):{label:String(a?.rank||''),key:String(a?.rank||'bronze'),numeral:''};
@@ -804,7 +819,7 @@
   // Columnas que el proyecto todavía no tiene (migraciones v53.1 o v54 sin aplicar): se quitan y se reintenta.
   const droppedStatCols=new Set();
   function statsPayload(row){const out={...row};if(extrasEnabled===false)droppedStatCols.add('muscle_ranks');droppedStatCols.forEach(c=>delete out[c]);return out;}
-  function noteMissingColumn(error){const m=String(error?.message||'').match(/'([a-z_0-9]+)' column|column [a-z_."]*?"?([a-z_0-9]+)"? does not exist/);const col=m&&(m[1]||m[2]);if(col&&!droppedStatCols.has(col)&&/^(muscle_ranks|show_muscles|week_start|active_days_week|workouts_week|run_km_week)$/.test(col)){droppedStatCols.add(col);return true;}return false;}
+  function noteMissingColumn(error){const m=String(error?.message||'').match(/'([a-z_0-9]+)' column|column [a-z_."]*?"?([a-z_0-9]+)"? does not exist/);const col=m&&(m[1]||m[2]);if(col&&!droppedStatCols.has(col)&&/^(muscle_ranks|show_muscles|week_start|active_days_week|workouts_week|run_km_week|workouts_month|active_days_month|run_km_month)$/.test(col)){droppedStatCols.add(col);return true;}return false;}
   async function upsertStats(payload){
     for(let i=0;i<7;i++){const r=await client.from('community_athlete_stats').upsert(statsPayload(payload)).select('stats_public,stats_date,updated_at').maybeSingle();if(!r.error||!noteMissingColumn(r.error))return r;}
     return client.from('community_athlete_stats').upsert(statsPayload(payload)).select('stats_public,stats_date,updated_at').maybeSingle();
@@ -1124,6 +1139,74 @@
   const noteV54=error=>{if(isMissingFunction(error)||/community_notifications|community_physique_history|community_week|community_weekly/.test(String(error?.message||''))){v54Enabled=false;return true;}return false;};
   function daysLeftInWeek(){const d=new Date().getDay();return d===0?0:7-d;}
   // Reto de la semana entre amigos: más días activos de lunes a domingo. Lo ordena el servidor.
+  // ---------- v66: muro de amigos ----------
+  // Lo que publican las personas que seguís (aceptadas) y lo tuyo, con aplausos y comentarios. No es un feed general.
+  let wallBefore=null,wallBusy=false;
+  async function loadWall(reset=true){
+    const root=$('communityWall'),more=$('communityWallMore');if(!root)return;
+    if(!client){root.innerHTML='';setStatus('communityWallStatus',authHint());return;}
+    if(!user){root.innerHTML='<div class="empty cm-empty"><strong>Tu muro te espera</strong><p>Iniciá sesión para ver lo que comparten tus amigos y compartir tus entrenamientos.</p><button class="btn" type="button" data-auth-open="login">Iniciar sesión</button></div>';if(more)more.hidden=true;setStatus('communityWallStatus','');return;}
+    if(schemaV66===null)await probeSchema();
+    if(schemaV66===false){root.innerHTML=`<div class="empty"><p>${esc(V54_HINT)}</p></div>`;if(more)more.hidden=true;return;}
+    if(wallBusy)return;wallBusy=true;
+    if(reset){wallBefore=null;root.innerHTML='<div class="cm-skeleton" aria-hidden="true"><i></i><i></i></div>';}
+    try{
+      const r=await client.rpc('community_wall_ids',{p_before:wallBefore,p_limit:15});
+      if(r.error){if(isMissingFunction(r.error)){schemaV66=false;root.innerHTML=`<div class="empty"><p>${esc(V54_HINT)}</p></div>`;}else setStatus('communityWallStatus',friendlySupabaseError(r.error,'cargar tu muro'));return;}
+      const ids=(r.data||[]).map(x=>x.id);
+      if(reset)root.innerHTML='';
+      if(!ids.length&&reset){root.innerHTML='<div class="empty cm-empty"><strong>Todavía no hay nada en tu muro</strong><p>Seguí a tus amigos desde «Todos» y, cuando termines un entrenamiento o una carrera, tocá «Compartir con mis amigos».</p><button class="btn ghost" type="button" data-community-go="world">Buscar amigos</button></div>';bindGo(root);if(more)more.hidden=true;setStatus('communityWallStatus','');return;}
+      const {data,error}=await client.from('community_posts').select(postSelect()).in('id',ids);
+      if(error){setStatus('communityWallStatus',friendlySupabaseError(error,'cargar tu muro'));return;}
+      const posts=(await withAuthors(data||[])).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));
+      const ctx=await bundle(posts);
+      root.insertAdjacentHTML('beforeend',posts.map(x=>renderPostCard(x,ctx)).join(''));bindFeedActions(root);bindPeople(root);
+      wallBefore=r.data[r.data.length-1]?.created_at||null;if(more)more.hidden=ids.length<15;setStatus('communityWallStatus','');
+    }catch(e){setStatus('communityWallStatus',friendlySupabaseError(e,'cargar tu muro'));}
+    finally{wallBusy=false;}
+  }
+  // Compartir con amigos una actividad registrada en la app. Solo si la persona lo elige; la ven sus seguidores aceptados.
+  function canShareActivity(){return authReady()&&schemaV66!==false;}
+  async function shareActivity(activity,description=''){
+    if(!authReady())return {ok:false,message:authHint()};
+    if(schemaV66===null)await probeSchema();
+    if(schemaV66===false)return {ok:false,message:V54_HINT};
+    await ensureProfile().catch(()=>null);
+    const clean=Object.fromEntries(Object.entries(activity||{}).filter(([,v])=>v!==null&&v!==undefined&&v!==''&&!(typeof v==='number'&&!Number.isFinite(v))));
+    const {error}=await client.from('community_posts').insert({user_id:user.id,post_kind:'activity',description:String(description||'').trim().slice(0,600),activity:clean,visibility:'followers'});
+    if(error)return {ok:false,message:friendlySupabaseError(error,'compartir con tus amigos')};
+    if(currentSubView==='wall')loadWall(true);
+    return {ok:true};
+  }
+  // ---------- v66: desafíos del mes ----------
+  const MONTH_GOALS=[{key:'workouts',col:'workouts_month',goal:12,title:'12 entrenamientos'},{key:'active_days',col:'active_days_month',goal:15,title:'15 días activos'},{key:'run_km',col:'run_km_month',goal:30,title:'30 km corriendo'}];
+  async function loadMonth(){
+    const box=$('communityMonth');if(!box)return;
+    const now=new Date(),mes=MONTHS[now.getMonth()],left=new Date(now.getFullYear(),now.getMonth()+1,0).getDate()-now.getDate();
+    const mine=window.FittFormaAthleteStatsNow?.()||{};
+    let rows=[];
+    if(authReady()&&schemaV66!==false){const r=await client.rpc('community_month_board');if(r.error){if(isMissingFunction(r.error))schemaV66=false;}else rows=r.data||[];}
+    const urlOf=await signedMany(rows.map(x=>x.avatar_path));
+    const fmt=v=>Number(v).toLocaleString(undefined,{maximumFractionDigits:1});
+    const cards=MONTH_GOALS.map(g=>{
+      const val=Number(mine[g.col])||0,pct=Math.min(100,Math.round(val/g.goal*100)),done=val>=g.goal;
+      const others=rows.filter(x=>!x.is_self).map(x=>({...x,v:Number(x[g.col])||0})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,5);
+      return `<li class="cm-month-goal${done?' is-done':''}" data-month-goal="${g.key}"><div class="cm-month-top"><strong>${esc(g.title)}</strong><span>${fmt(val)} / ${g.goal}</span></div><span class="cm-month-bar" aria-hidden="true"><i style="width:${pct}%"></i></span>
+        ${done?`<div class="cm-month-done"><span>¡Desafío cumplido!</span>${canShareActivity()?`<button type="button" class="btn btn-sm" data-month-share="${g.key}" data-month-value="${val}">Compartir con mis amigos</button>`:''}</div>`:''}
+        ${others.length?`<ul class="cm-month-friends">${others.map(x=>`<li><button type="button" data-community-open-user="${esc(x.user_id)}">${avatarHtml(x,urlOf,'xs')}<span>${esc(x.display_name||x.username)}</span><b>${fmt(x.v)}</b></button></li>`).join('')}</ul>`:''}</li>`;
+    }).join('');
+    box.hidden=false;
+    box.innerHTML=`<div class="cm-ch-head"><div><small class="muted">Desafíos del mes</small><h4>${esc(mes.charAt(0).toUpperCase()+mes.slice(1))}</h4></div><span class="cm-ch-left">${left?`Quedan ${left} ${left===1?'día':'días'}`:'Último día'}</span></div>
+      <ul class="cm-month-list">${cards}</ul>
+      <p class="muted small cm-footnote">Tu avance sale de lo que registrás en la app este mes. Al lado, las personas que seguís que muestran sus estadísticas.</p>`;
+    bindPeople(box);
+    box.querySelectorAll('[data-month-share]').forEach(b=>b.addEventListener('click',async()=>{
+      const g=MONTH_GOALS.find(x=>x.key===b.dataset.monthShare);b.disabled=true;
+      const m=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`,value=Math.round(Number(b.dataset.monthValue)*10)/10;
+      const res=await shareActivity({type:'challenge',challenge:g.key,goal:g.goal,value,month:m});
+      toast(res.ok?'Compartido en el muro de tus amigos.':res.message);if(!res.ok)b.disabled=false;else b.textContent=tr('Compartido');
+    }));
+  }
   async function loadChallenge(){
     const box=$('communityChallenge');if(!box)return;
     if(!authReady()||v54Enabled===false){box.hidden=true;return;}
@@ -1164,7 +1247,7 @@
     if(r.error){noteV54(r.error);badge.hidden=true;if(v54Enabled===false&&$('communityTabAlerts'))$('communityTabAlerts').hidden=true;return;}
     v54Enabled=true;const n=Number(r.count)||0;badge.hidden=!n;badge.textContent=n>9?'9+':String(n);
   }
-  const ALERT_TEXT={follow:'empezó a seguirte',follow_request:'quiere seguirte',follow_accepted:'aceptó tu solicitud',message:'te escribió',rank_passed:'te superó en el rango general'};
+  const ALERT_TEXT={follow:'empezó a seguirte',follow_request:'quiere seguirte',follow_accepted:'aceptó tu solicitud',message:'te escribió',rank_passed:'te superó en el rango general',applause:'aplaudió tu publicación',comment:'comentó tu publicación'};
   async function loadAlerts(){
     const root=$('communityAlerts');if(!root)return;
     if(!authReady()){root.innerHTML='<div class="empty"><p>Iniciá sesión para ver tus avisos.</p></div>';return;}
@@ -1176,6 +1259,7 @@
     root.querySelectorAll('[data-alert-kind]').forEach(b=>b.addEventListener('click',async()=>{
       const kind=b.dataset.alertKind,actor=b.dataset.alertActor;
       if(kind==='message'){showCommunitySubView('messages');await loadChatContacts();openChat(actor);}
+      else if(kind==='applause'||kind==='comment')showCommunitySubView('wall');
       else if(kind==='follow_request'){showCommunitySubView('profile');$('communityFollowRequests')?.scrollIntoView({behavior:'smooth',block:'center'});}
       else openUser(actor);
     }));
@@ -1319,11 +1403,13 @@
     if(r.error&&isMissingColumn(r.error)&&schemaV41!==false){markLegacySchema();updateKindAvailability();return;}
     if(r.error){connectionStatus(friendlySupabaseError(r.error,'consultar las publicaciones'));return;}
     if(schemaV41===null){schemaV41=true;updateKindAvailability();}
+    if(schemaV66===null){const a=await client.from('community_posts').select('activity').limit(1);schemaV66=!a.error;}
   }
   function loadCurrentView(){
     if(currentSubView==='world'){loadSuggested();return loadDirectory(true);}
     if(currentSubView==='ranking')return loadRanking();
-    if(currentSubView==='friends'){loadChallenge();return loadFriends(true);}
+    if(currentSubView==='wall')return loadWall(true);
+    if(currentSubView==='friends'){loadChallenge();loadMonth();return loadFriends(true);}
     if(currentSubView==='alerts')return loadAlerts();
     if(currentSubView==='profile'){if(authReady()){loadOwnExtras();loadOwnPhysique();loadOwnBody();}return renderOwnGrid();}
     if(currentSubView==='user'&&viewedUser)return openUser(viewedUser,{asOthers:viewedUser===user?.id});
@@ -1363,8 +1449,8 @@
     }catch(error){return {ok:false,stage:'network',message:friendlySupabaseError(error,'comprobar la conexión con Supabase')};}
   }
   function setSession(supabase,userSession){client=supabase||client;const wasId=user?.id;user=userSession||null;if(user&&user.id!==wasId){ownStats=null;ownStatsLoaded=false;statsSig='';setTimeout(()=>{syncStats().catch?.(()=>{});syncBody();},1500);ownBody=null;ownBodyLoaded=false;}if(!user){ownProfile=null;stopChatPoll();['communityChatMessages','communityReportsList'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});if($('communityChatText'))$('communityChatText').value='';if($('communityModerationCard'))$('communityModerationCard').hidden=true;if($('communityDisplayName'))$('communityDisplayName').value='';if($('communityUsername'))$('communityUsername').value='';if($('communityBio'))$('communityBio').value='';if($('communityVisibility'))$('communityVisibility').value='private';if($('communityOwnName'))$('communityOwnName').textContent='Tu perfil';if($('communityOwnAvatar'))$('communityOwnAvatar').innerHTML='<span aria-hidden="true">FF</span>';if($('communityOwnHandle'))$('communityOwnHandle').textContent='';if($('communityOwnBio'))$('communityOwnBio').textContent='';if($('communityOwnFeatured'))$('communityOwnFeatured').innerHTML='';if($('communityOwnStats'))$('communityOwnStats').innerHTML=statsHtml(0,0,0);if($('communityConversations'))$('communityConversations').innerHTML='';if($('communityFollowRequests'))$('communityFollowRequests').textContent='Iniciá sesión para administrar solicitudes.';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communityBlockedList'))$('communityBlockedList').textContent='Iniciá sesión para administrar los bloqueos.';}setControls();updateKindAvailability();ownStats=null;ownStatsLoaded=false;statsSig='';friendPositions=new Map();ownPhysique={pair:null,single:null};if($('communityAlertsBadge'))$('communityAlertsBadge').hidden=true;if($('communityChallenge'))$('communityChallenge').hidden=true;if($('communityOwnFlag'))$('communityOwnFlag').innerHTML='';if($('communityPhysiqueEdit'))$('communityPhysiqueEdit').innerHTML='';reflectStatsToggles();renderStatsNotice();if(client)Promise.resolve().then(()=>refresh());else loadCurrentView();}
-  const communityViews=['world','ranking','friends','publish','messages','profile','user','compare','alerts'];
-  const MAIN_TABS=['world','ranking','friends'];
+  const communityViews=['world','wall','ranking','friends','publish','messages','profile','user','compare','alerts'];
+  const MAIN_TABS=['world','wall','ranking','friends'];
   function showCommunitySubView(name,focusTab=false){
     if(name==='feed'||name==='explore')name='world';
     if(!communityViews.includes(name))name='world';
@@ -1383,7 +1469,8 @@
     renderStatsNotice();
     if(name==='world'&&previous!=='world'&&client){loadDirectory(true);loadSuggested();}
     else if(name==='ranking'&&client)loadRanking();
-    else if(name==='friends'&&client){loadFriends(true);loadChallenge();}
+    else if(name==='wall'&&client)loadWall(true);
+    else if(name==='friends'&&client){loadFriends(true);loadChallenge();loadMonth();}
     else if(name==='alerts'&&client)loadAlerts();
     else if(name==='messages'&&client){loadChatContacts();}
     else if(name==='profile'){renderOwnGrid();fillCountryOptions();if(authReady()){loadFollowRequests();loadBlockedUsers();loadModeration();refreshOwnCounts();syncFeaturedBadges();syncStats();loadOwnExtras();loadOwnPhysique();loadOwnBody().then(syncBody);}}
@@ -1408,7 +1495,7 @@
     document.querySelector('[data-community-home]')?.addEventListener('click',()=>showCommunitySubView('world'));
     $('communityUserBack')?.addEventListener('click',()=>showCommunitySubView(lastTab||'world'));$('communityCompareBack')?.addEventListener('click',()=>viewedUser&&viewedUser===compareUser?openUser(viewedUser):showCommunitySubView(lastTab||'world'));
     document.querySelectorAll('[data-ranking-scope]').forEach(b=>b.addEventListener('click',()=>{rankScope=b.dataset.rankingScope;document.querySelectorAll('[data-ranking-scope]').forEach(x=>{const on=x===b;x.classList.toggle('active',on);x.setAttribute('aria-pressed',String(on));});loadRanking();}));
-    $('communityFriendsMore')?.addEventListener('click',()=>loadFriends(false));
+    $('communityFriendsMore')?.addEventListener('click',()=>loadFriends(false));$('communityWallMore')?.addEventListener('click',()=>loadWall(false));
     document.querySelectorAll('[data-ranking-period]').forEach(b=>b.addEventListener('click',()=>{rankPeriod=b.dataset.rankingPeriod;loadRanking();}));
     document.querySelectorAll('#view-community [data-community-go]').forEach(b=>b.addEventListener('click',()=>showCommunitySubView(b.dataset.communityGo)));
     $('communityViewOwnPublic')?.addEventListener('click',()=>{if(authReady())openUser(user.id,{asOthers:true});else toast(authHint());});
@@ -1435,5 +1522,5 @@
     const today=localDateKey();if($('communityEndDate'))$('communityEndDate').value=today;if($('communityStartDate'))$('communityStartDate').value=today;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
-  window.FittFormaCommunity={init,setSession,refresh,loadChatContacts,loadMessages,loadBlockedUsers,testConnection,syncStats,setStatsPublic,show:name=>showCommunitySubView(name),openProfile:uid=>openUser(uid),syncBody:()=>syncBody(),setAvatar:changeAvatar};
+  window.FittFormaCommunity={init,setSession,refresh,loadChatContacts,loadMessages,loadBlockedUsers,testConnection,syncStats,setStatsPublic,show:name=>showCommunitySubView(name),openProfile:uid=>openUser(uid),shareActivity:(a,d)=>shareActivity(a,d),canShareActivity:()=>canShareActivity(),syncBody:()=>syncBody(),setAvatar:changeAvatar};
 })();

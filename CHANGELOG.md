@@ -1,5 +1,27 @@
 # FittForma AI — Registro de cambios
 
+## v66.0 — Comunidad propia: muro de amigos, aplausos y desafíos del mes (29 de octubre de 2026)
+
+Pedido de un usuario de prueba: «que no sea igual a Strava; me gusta el muro con amigos, los aplausos y los desafíos».
+
+- **Muro** (nueva pestaña de Comunidad, entre Todos y Ranking):
+  - Muestra solo lo tuyo y lo de las personas que seguís (seguimiento aceptado). No es un feed general: lo de desconocidos no aparece.
+  - Nunca muestra a alguien bloqueado. Sin sesión invita a iniciarla.
+- **Compartir con tus amigos, solo si lo elegís:**
+  - Al terminar un entrenamiento: nombre, tiempo, ejercicios, series, kilos y calorías estimadas.
+  - Al guardar una carrera (a mano o con GPS): distancia, tiempo y ritmo. **Nunca el mapa ni la ruta.**
+  - Se puede agregar un comentario o tocar «Ahora no». Por defecto lo ven solo tus seguidores aceptados.
+  - Los números son los que registraste en la app; la tarjeta lo aclara («Registrado en la app»).
+- **Aplausos:** el «me gusta» ahora es «Aplaudir». Aplaudir o comentar avisa a quien publicó, en la campanita. Tocar el aviso abre el muro.
+- **Desafíos del mes** (en Amigos): 12 entrenamientos, 15 días activos y 30 km corriendo.
+  - Tu avance sale de lo que registrás en la app este mes.
+  - Al lado, las personas que seguís que muestran sus estadísticas.
+  - Al cumplir uno, podés compartirlo en el muro.
+- **Migración nueva:** `supabase/migrations/2026-11-02_v66_wall_challenges.sql`, aditiva, con RLS (incluida en `APLICAR_MIGRACIONES.sql`).
+  - Agrega la columna `activity`, el tipo de publicación «actividad», los avisos de aplausos y comentarios, y los números del mes.
+  - Las dos reglas que se amplían aceptan todo lo anterior.
+  - Sin la migración, la app sigue andando y el muro avisa que Comunidad se está actualizando.
+
 ## v65.0 — Recordatorios de agua que sí llegan y «Enviar una sugerencia» (29 de octubre de 2026)
 
 - **Recordatorios para tomar agua, a la vista** en Hidratación (antes estaban escondidos y solo avisaban con la app abierta en pantalla).

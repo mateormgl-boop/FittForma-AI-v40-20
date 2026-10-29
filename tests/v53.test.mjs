@@ -100,7 +100,8 @@ test('comparación: misma métrica y unidad; lo que falta queda como «Sin datos
 test('Comunidad: abre en Todos, sin feed, y el mismo perfil completo desde las tres pestañas', () => {
   const view = html.slice(html.indexOf('id="view-community"'), html.indexOf('id="view-profile"'));
   const tabs = [...view.matchAll(/role="tab" data-community-tab="([a-z]+)"/g)].map(m => m[1]);
-  assert.deepEqual(tabs, ['world', 'ranking', 'friends']);
+  // v66: se suma «Muro» (solo amigos aceptados; no es un feed general).
+  assert.deepEqual(tabs, ['world', 'wall', 'ranking', 'friends']);
   assert.match(view, /id="communityTabWorld"[^>]*aria-selected="true"/);
   assert.match(community, /showCommunitySubView\('world'\);\n  \}/, 'vista inicial');
   assert.doesNotMatch(view, /communityFeed"|data-feed-mode|communityStories|Para vos/);
@@ -135,7 +136,7 @@ test('v53: archivos publicados, traducciones y versión', () => {
   for (const f of ['athlete-stats.js', 'i18n-v53.js']) { assert.match(sw, new RegExp(`"\\./${f.replace('.', '\\.')}"`)); assert.match(server, new RegExp(`'/${f.replace('.', '\\.')}'`)); assert.match(html, new RegExp(`src="\\./${f.replace('.', '\\.')}"`)); }
   for (const s of ['Todos', 'Ranking', 'Amigos', 'Todavía no tenés amigos en tu comunidad', 'Sin datos disponibles', 'Tu progreso']) assert.ok(i18n.includes(`["${s}"`), s);
   for (const row of i18n.matchAll(/^\s*\[("[^\n]*")\],?$/gm)) assert.equal(JSON.parse(`[${row[1]}]`).length, 6, row[1].slice(0, 40));
-  assert.match(sw, /fittforma-ai-static-v65-0/);
+  assert.match(sw, /fittforma-ai-static-v66-0/);
 });
 
 test('v53.1: rango por músculo validado (sin datos corporales) y misma regla en SQL', () => {

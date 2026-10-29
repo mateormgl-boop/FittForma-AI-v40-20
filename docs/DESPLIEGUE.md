@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v65.0
+# Despliegue de FittForma AI v66.0
 
-Esta guía es la lista de pasos para publicar v65.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v66.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -12,11 +12,22 @@ Si Comunidad dice «Comunidad se está actualizando…» o «Could not find the 
 3. Recargá la app.
 
 Detalles del archivo:
-- Tiene las 15 migraciones (v41 a v65), en orden.
+- Tiene las 16 migraciones (v41 a v66), en orden.
 - Cada una va en su propia transacción y se puede ejecutar más de una vez: no borra datos ni desactiva RLS.
 - Al final recarga la caché de la API de Supabase.
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
+
+## Qué cambia en v66.0
+
+- **Migración nueva:** `supabase/migrations/2026-11-02_v66_wall_challenges.sql`.
+  - Columna `community_posts.activity` y tipo de publicación «actividad» (entrenamiento, carrera sin ruta o desafío cumplido), con validación de claves y rangos en el servidor.
+  - Funciones `community_wall_ids` (muro: lo propio y los seguimientos aceptados, sin bloqueos) y `community_month_board` (desafíos del mes), solo con sesión.
+  - Avisos `applause` y `comment` (disparadores sobre `community_likes` y `community_comments`).
+  - Números del mes en `community_athlete_stats`; el mes lo fija el servidor.
+  - Aditiva y re-ejecutable, con RLS. Si ya aplicaste las anteriores, alcanza con pegar este archivo y `notify pgrst, 'reload schema';`.
+- **Archivos que se actualizan:** `community.js`, `athlete-stats.js`, `index.html`, `design.css` e `i18n-v53.js`.
+- El service worker cambia a `fittforma-ai-static-v66-0`.
 
 ## Qué cambia en v65.0
 

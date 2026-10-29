@@ -9,6 +9,18 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v66
+
+- `tests/v66.test.mjs` (6 pruebas): migración aditiva; actividad sin ruta ni datos corporales y solo para seguidores; muro solo de amigos y «Aplaudir»; desafíos del mes; números del mes calculados desde la app; traducciones y estilos.
+- `supabase/tests/rls_v66_test.sql` (27 comprobaciones): validación de la actividad, muro (aceptados, sin pendientes, sin bloqueos, sin sesión no), avisos de aplausos y comentarios, números del mes y tablero.
+- E2E `v66` (26 pasos):
+  - sin sesión el muro invita a iniciarla;
+  - el muro muestra a quien seguís y no a desconocidos;
+  - aplaudir y comentar avisan;
+  - desafíos del mes con amigos y compartir uno cumplido;
+  - compartir una carrera sin la ruta; «Ahora no» al terminar un entrenamiento no publica nada;
+  - avisos que abren el muro; 320 px; inglés.
+
 ### v65
 
 - `tests/v65.test.mjs` (4 pruebas): tarjeta del agua, calendario diario, el aviso de la app ya no exige la pantalla encendida; sugerencias solo con cuenta; migración; traducciones.
