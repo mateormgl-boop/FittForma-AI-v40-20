@@ -9,6 +9,58 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v68
+
+- `tests/v68.test.mjs` (4 pruebas): la guía tiene 9 secciones con «Ir a…»; se abre desde Más, Perfil e Inicio; el recorrido apunta a botones que existen, una sola vez y después de la bienvenida, con Escape y movimiento reducido; traducciones.
+- E2E `v68` (22 pasos): bienvenida → recorrido de 6 pasos con el botón resaltado; no vuelve a aparecer; aviso de Inicio que abre la guía y se oculta; «Ir a Entrenar»; desde Más y Perfil; volver a ver el recorrido; Escape; 320 px; inglés.
+- `tests/e2e/v63.e2e.mjs` da el recorrido por visto (lo prueba v68).
+
+### v67
+
+- `tests/v67.test.mjs` (3 pruebas): `index.html` no carga las traducciones; `i18n.js` las carga en orden solo para otro idioma; el service worker no las guarda de antemano; la migración solo cambia permisos de las tres funciones y no toca las que se usan sin sesión.
+- `supabase/tests/rls_v67_test.sql` (10 comprobaciones): sin sesión las tres funciones se rechazan; con sesión funcionan; sin sesión se siguen viendo perfiles y publicaciones públicas.
+- E2E `v67` (10 pasos): en español no se descarga ninguna traducción; al elegir inglés se descargan las seis partes una sola vez y la app se traduce (también las reglas con números); portugués sin volver a descargar; volver a español; abrir ya en alemán.
+
+### v66
+
+- `tests/v66.test.mjs` (6 pruebas): migración aditiva; actividad sin ruta ni datos corporales y solo para seguidores; muro solo de amigos y «Aplaudir»; desafíos del mes; números del mes calculados desde la app; traducciones y estilos.
+- `supabase/tests/rls_v66_test.sql` (27 comprobaciones): validación de la actividad, muro (aceptados, sin pendientes, sin bloqueos, sin sesión no), avisos de aplausos y comentarios, números del mes y tablero.
+- E2E `v66` (26 pasos):
+  - sin sesión el muro invita a iniciarla;
+  - el muro muestra a quien seguís y no a desconocidos;
+  - aplaudir y comentar avisan;
+  - desafíos del mes con amigos y compartir uno cumplido;
+  - compartir una carrera sin la ruta; «Ahora no» al terminar un entrenamiento no publica nada;
+  - avisos que abren el muro; 320 px; inglés.
+
+### v65
+
+- `tests/v65.test.mjs` (4 pruebas): tarjeta del agua, calendario diario, el aviso de la app ya no exige la pantalla encendida; sugerencias solo con cuenta; migración; traducciones.
+- `supabase/tests/rls_v65_test.sql` (15 comprobaciones): escritura propia, validaciones, nadie lee, no se edita ni se borra, límite de 5 por día, sin sesión no se manda.
+- E2E `v65` (17 pasos):
+  - agua: a la vista, 2/3/4 por día, calendario con aviso diario, avisos en la app que se prenden y se apagan;
+  - sugerencias: desde «Más» y desde Perfil; sin sesión lleva a iniciarla y vuelve con el texto;
+  - se guarda con categoría y versión; límite diario; nadie la lee;
+  - inglés.
+
+### v64
+
+- `tests/v64.test.mjs` (7 pruebas):
+  - pecho y después tríceps, principales primero, en todos los niveles y equipamientos;
+  - «Empuje» en orden;
+  - trapecio y antebrazos, incluido el aviso cuando no hay ejercicio;
+  - tiempos de 30, 60 y 90 minutos;
+  - calculadora de RM (Epley);
+  - aviso de salud;
+  - traducciones.
+- E2E `v64` (23 pasos, solo la app):
+  - duraciones nuevas, «Cómo la armamos» y tiempo estimado por día;
+  - trapecio y antebrazos; orden pecho → tríceps en la vista previa;
+  - calculadora desde Entrenar, desde la sesión y desde «Mi progreso» (con la mejor marca);
+  - aviso de salud la primera vez, y que no vuelve a aparecer;
+  - aviso en la ficha;
+  - 320 px, inglés y sin errores de JavaScript.
+
 ### v63
 
 - `tests/v63.test.mjs` (6 pruebas): una sola pantalla de cuenta abierta desde toda la app; sin formularios escondidos ni textos técnicos; errores claros, recuperar contraseña, reenviar y Google solo si está activado; aviso al entrar; ayudas del celular; traducciones.

@@ -1,8 +1,34 @@
-# FittForma AI — v63.1
+# FittForma AI — v68.0
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v68.0
+
+- «Cómo usar la app» (desde Más, Perfil e Inicio) y un recorrido inicial de 6 pasos después de la bienvenida.
+- Sin migraciones nuevas.
+
+## Novedades v67.0
+
+- Más rápida en español: las traducciones a otros idiomas se descargan solo si elegís otro idioma.
+- Seguridad: tres funciones de la base solo con sesión. Migración nueva: `supabase/migrations/2026-11-03_v67_security.sql`.
+
+## Novedades v66.0
+
+- Comunidad propia: «Muro» con lo de tus amigos, aplausos y comentarios con aviso, compartir un entrenamiento o una carrera (sin el mapa) solo si lo elegís, y desafíos del mes.
+- Migración nueva: `supabase/migrations/2026-11-02_v66_wall_challenges.sql` (incluida en `APLICAR_MIGRACIONES.sql`).
+
+## Novedades v65.0
+
+- Recordatorios de agua visibles: 2, 3 o 4 por día, con calendario que avisa con la app cerrada.
+- «Enviar una sugerencia» (solo con cuenta; las leés en Supabase).
+- Migración nueva: `supabase/migrations/2026-11-01_v65_feedback.sql` (incluida en `APLICAR_MIGRACIONES.sql`).
+
+## Novedades v64.0
+
+- Entrenamiento: orden real de los ejercicios, trapecio y antebrazos, sesiones de 75, 90 y más de 90 minutos con tiempo estimado, calculadora de RM, aviso de salud visible y «Cómo la armamos».
+- Sin migraciones nuevas.
 
 ## Novedades v63.0
 

@@ -115,10 +115,13 @@
     const activities = (Array.isArray(o.activities) ? o.activities : []).filter(a => a && validDate(a.date));
     // v54: semana actual, de lunes a hoy (la misma semana que fija el servidor con date_trunc('week')).
     const wStart = weekStart(today), inWeek = d => inWindow(d) && String(d).slice(0, 10) >= wStart;
-    const days = new Set(), wDays = new Set(); let w30 = 0, wCount = 0, wKm = 0;
-    for (const s of sessions) if (inWindow(s.date)) { w30++; days.add(String(s.date).slice(0, 10)); if (inWeek(s.date)) { wCount++; wDays.add(String(s.date).slice(0, 10)); } }
+    // v66: mes en curso, del día 1 a hoy (el mismo mes que fija el servidor con date_trunc('month')).
+    const mStart = today.slice(0, 8) + '01', inMonth = d => validDate(d) && String(d).slice(0, 10) >= mStart && String(d).slice(0, 10) <= today;
+    const days = new Set(), wDays = new Set(), mDays = new Set(); let w30 = 0, wCount = 0, wKm = 0, mCount = 0, mKm = 0;
+    for (const s of sessions) { if (inMonth(s.date)) { mCount++; mDays.add(String(s.date).slice(0, 10)); } if (inWindow(s.date)) { w30++; days.add(String(s.date).slice(0, 10)); if (inWeek(s.date)) { wCount++; wDays.add(String(s.date).slice(0, 10)); } } }
     let runs = 0, km = 0, minutes = 0;
     for (const a of activities) {
+      if (inMonth(a.date)) { mCount++; mDays.add(String(a.date).slice(0, 10)); if (RUN_RE.test(String(a.type || '')) && plausibleRun(a)) mKm += num(a.distance); }
       if (!inWindow(a.date)) continue;
       w30++; days.add(String(a.date).slice(0, 10));
       const week = inWeek(a.date); if (week) { wCount++; wDays.add(String(a.date).slice(0, 10)); }
@@ -154,6 +157,7 @@
       best_pushups: best.pushups, best_pullups: best.pullups, best_air_squats: best.squats, best_plank_seconds: best.plank,
       muscle_ranks: muscleRanks(o.muscle && o.muscle.byMuscle),
       ...weekFields(),
+      workouts_month: Math.min(mCount, 200), active_days_month: Math.min(mDays.size, 31, mCount), run_km_month: Math.min(Math.round(mKm * 100) / 100, 3000),
       stats_date: today
     };
     function weekFields() {

@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v63.0
+# Despliegue de FittForma AI v68.0
 
-Esta guía es la lista de pasos para publicar v63.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v68.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -12,11 +12,61 @@ Si Comunidad dice «Comunidad se está actualizando…» o «Could not find the 
 3. Recargá la app.
 
 Detalles del archivo:
-- Tiene las 14 migraciones (v41 a v62), en orden.
+- Tiene las 17 migraciones (v41 a v67), en orden.
 - Cada una va en su propia transacción y se puede ejecutar más de una vez: no borra datos ni desactiva RLS.
 - Al final recarga la caché de la API de Supabase.
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
+
+## Qué cambia en v68.0
+
+- **No hay migraciones nuevas.**
+- **Archivos que se actualizan:** `index.html`, `design.css` e `i18n-v53.js`.
+- El service worker cambia a `fittforma-ai-static-v68-0`.
+
+## Qué cambia en v67.0
+
+- **Migración nueva:** `supabase/migrations/2026-11-03_v67_security.sql` (solo permisos; no cambia datos).
+  - Quita el uso sin sesión de `community_are_mutual_follows`, `community_is_moderator` y `community_suggested_profiles`. Con sesión siguen igual.
+  - Si ya aplicaste las anteriores, alcanza con pegar este archivo y `notify pgrst, 'reload schema';`.
+- **Traducciones:** `index.html` ya no carga `i18n-extra.js` ni `i18n-v48.js` … `i18n-v53.js`; las carga `i18n.js` solo si el idioma no es español. Los archivos siguen publicados igual.
+- El service worker cambia a `fittforma-ai-static-v67-0`.
+
+### Ajustes de Supabase que se hacen en el panel (no se pueden hacer con SQL)
+
+1. **Protección de contraseñas filtradas** (aviso «Leaked Password Protection Disabled»):
+   Supabase → **Authentication** → **Sign In / Providers** (o **Policies**, según la versión del panel) → **Email** → activá **Prevent use of leaked passwords**.
+   Rechaza contraseñas que aparecieron en filtraciones públicas (HaveIBeenPwned). Puede requerir un plan pago de Supabase; si no aparece la opción, el plan actual no la incluye.
+2. **Correo propio (SMTP)**, recomendado si vuelven a activar «Confirm email» o usan «Olvidé mi contraseña» con muchas personas:
+   el correo de prueba de Supabase tiene un límite muy bajo por hora (fue el error «se llegó al límite de correos por hora»).
+   Supabase → **Authentication** → **Emails** → **SMTP Settings** → **Enable custom SMTP**, con los datos de un servicio de correo (por ejemplo Resend, Brevo o el de tu dominio).
+   Las claves del servicio de correo se cargan solo en ese panel; nunca en la app ni en el repositorio.
+
+## Qué cambia en v66.0
+
+- **Migración nueva:** `supabase/migrations/2026-11-02_v66_wall_challenges.sql`.
+  - Columna `community_posts.activity` y tipo de publicación «actividad» (entrenamiento, carrera sin ruta o desafío cumplido), con validación de claves y rangos en el servidor.
+  - Funciones `community_wall_ids` (muro: lo propio y los seguimientos aceptados, sin bloqueos) y `community_month_board` (desafíos del mes), solo con sesión.
+  - Avisos `applause` y `comment` (disparadores sobre `community_likes` y `community_comments`).
+  - Números del mes en `community_athlete_stats`; el mes lo fija el servidor.
+  - Aditiva y re-ejecutable, con RLS. Si ya aplicaste las anteriores, alcanza con pegar este archivo y `notify pgrst, 'reload schema';`.
+- **Archivos que se actualizan:** `community.js`, `athlete-stats.js`, `index.html`, `design.css` e `i18n-v53.js`.
+- El service worker cambia a `fittforma-ai-static-v66-0`.
+
+## Qué cambia en v65.0
+
+- **Migración nueva:** `supabase/migrations/2026-11-01_v65_feedback.sql` (tabla `app_feedback`).
+  - Aditiva y re-ejecutable, con RLS: solo se puede escribir a nombre propio y con sesión; nadie la lee desde la app.
+  - Si ya aplicaste las anteriores, alcanza con pegar este archivo y `notify pgrst, 'reload schema';`.
+  - Sin la migración, la app sigue andando y «Enviar una sugerencia» avisa que se está actualizando.
+- **Cómo leer las sugerencias:** Supabase → Table Editor → `app_feedback`.
+- El service worker cambia a `fittforma-ai-static-v65-0`.
+
+## Qué cambia en v64.0
+
+- **No hay migraciones nuevas.**
+- **Archivos que se actualizan:** `training-core.js`, `index.html`, `design.css`, `i18n-v53.js` y `backend/server.mjs` (acepta propuestas de FittAI de 75, 90 y 120 minutos).
+- El service worker cambia a `fittforma-ai-static-v64-0`.
 
 ## Qué cambia en v63.0
 

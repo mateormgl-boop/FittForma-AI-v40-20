@@ -1881,3 +1881,86 @@ html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 .home-account-x{width:32px;height:32px;border:0;border-radius:50%;background:none;color:inherit;font-size:1.3rem;line-height:1;opacity:.6;cursor:pointer}
 .more-account[hidden]{display:none}
 .more-account-last{margin-bottom:6px;box-shadow:0 1px 0 var(--ff-border)}
+/* v64: cómo se armó la rutina, calculadora de RM y aviso de salud */
+.plan-why{margin:6px 0 12px;line-height:1.45}
+.rm-fields{grid-template-columns:1fr 1fr minmax(76px,.7fr)}
+.rm-one{display:flex;flex-direction:column;align-items:center;gap:2px;margin:8px 0 10px;padding:12px;border-radius:16px;background:linear-gradient(135deg,rgba(91,108,255,.16),rgba(34,201,147,.1));text-align:center}
+.rm-one strong{font-size:1.8rem;line-height:1.1}
+.rm-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.rm-grid div{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:7px 10px;border-radius:10px;background:var(--ff-panel-2);font-size:.88rem}
+.rm-grid small{opacity:.7;font-weight:700;font-size:.72rem;white-space:nowrap}
+.rm-grid b{white-space:nowrap}
+.rm-sub{margin:12px 0 6px;font-size:.9rem}
+.rm-ask{display:flex;flex-direction:column;gap:6px;margin:12px 0 4px}
+.rm-ask label{font-weight:700;font-size:.88rem}
+.rm-ask input{min-height:44px}
+.rm-answer{margin:0;font-weight:700;color:#5b6cff}
+.rm-answer:empty{display:none}
+@media (max-width:380px){.rm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.rm-fields{grid-template-columns:1fr 1fr}}
+.health-notice{border:1px solid rgba(245,158,11,.45);background:rgba(245,158,11,.1)}
+.health-notice p{margin:4px 0 10px;font-size:.9rem;line-height:1.45}
+.ex-health{margin:0 0 10px;padding:9px 12px;border-radius:12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);font-size:.84rem;line-height:1.4}
+.plan-why ul{margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:2px}
+.plan-why p{margin:4px 0 0}
+.est-min{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--ff-panel-2);font-size:.75rem;font-weight:800;white-space:nowrap}
+/* v65: recordatorios de agua visibles y «Enviar una sugerencia» */
+.hydro-remind{margin:12px 0;padding:14px;border-radius:16px;border:1px solid rgba(34,170,230,.35);background:rgba(34,170,230,.08)}
+.hydro-remind-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px}
+.hydro-remind-state{font-size:.78rem;font-weight:800;color:#16a37a}
+.hydro-remind-count{display:flex;gap:6px;margin:8px 0 6px;flex-wrap:wrap}
+.hydro-remind-count button{flex:1 1 0;min-height:40px;padding:6px 10px;border-radius:12px;border:1px solid var(--ff-border);background:var(--ff-panel-2);color:inherit;font:inherit;font-weight:700;cursor:pointer;white-space:nowrap}
+.hydro-remind-count button.active{border-color:#22aae6;background:rgba(34,170,230,.18);color:inherit}
+.hydro-remind-times{margin:0 0 8px;font-weight:700;font-size:.88rem}
+.feedback-kinds{grid-template-columns:repeat(3,1fr)}
+.feedback-kinds button[aria-checked="true"]{background:var(--ff-surface,var(--ff-panel));box-shadow:0 1px 4px rgba(0,0,0,.18);color:#5b6cff}
+.feedback-sheet textarea{width:100%;min-height:120px;font-size:16px}
+/* v66: muro de amigos, actividades compartidas, aplausos y desafíos del mes */
+.cm-wall{display:flex;flex-direction:column;gap:12px}
+.cm-activity{display:flex;flex-direction:column;gap:6px;margin:4px 0 8px;padding:12px 14px;border-radius:16px;border:1px solid var(--ff-border);background:linear-gradient(135deg,rgba(91,108,255,.12),rgba(34,201,147,.06))}
+.cm-activity.is-run{background:linear-gradient(135deg,rgba(34,170,230,.14),rgba(34,201,147,.06))}
+.cm-activity.is-challenge{background:linear-gradient(135deg,rgba(245,180,40,.18),rgba(91,108,255,.06))}
+.cm-activity p{margin:0}
+.cm-activity-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px}
+.cm-activity-head strong{font-size:1rem}
+.cm-activity-badge{padding:2px 10px;border-radius:999px;background:rgba(245,180,40,.25);font-weight:800;font-size:.8rem}
+.cm-activity-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.cm-activity-chips li{padding:4px 10px;border-radius:999px;background:var(--ff-panel-2);font-weight:700;font-size:.84rem}
+.community-action svg path{stroke-linejoin:round}
+.cm-month-list{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.cm-month-goal{padding:10px 12px;border-radius:14px;background:var(--ff-panel-2)}
+.cm-month-goal.is-done{background:rgba(34,201,147,.12);border:1px solid rgba(34,201,147,.35)}
+.cm-month-top{display:flex;justify-content:space-between;gap:8px;font-size:.9rem}
+.cm-month-top span{font-weight:800}
+.cm-month-bar{display:block;height:8px;margin:6px 0 4px;border-radius:999px;background:rgba(127,127,127,.2);overflow:hidden}
+.cm-month-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#5b6cff,#22c993)}
+.cm-month-done{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;font-weight:800;color:#16a37a}
+.cm-month-friends{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.cm-month-friends button{display:flex;align-items:center;gap:8px;width:100%;padding:4px 2px;border:0;background:none;color:inherit;font:inherit;font-size:.84rem;text-align:left;cursor:pointer}
+.cm-month-friends b{margin-left:auto}
+.share-friends{display:flex;flex-direction:column;gap:6px;margin-top:12px;padding:12px 14px;border-radius:16px;border:1px solid rgba(91,108,255,.4);background:rgba(91,108,255,.08)}
+.share-friends p{margin:0}
+.share-friends input{min-height:44px;font-size:16px}
+.share-friends.is-done{border-color:rgba(34,201,147,.45);background:rgba(34,201,147,.1)}
+.share-friends-slot:empty{display:none}
+.share-friends-slot{margin-bottom:12px}
+
+/* v68: «Cómo usar la app» y recorrido inicial */
+.guide-list{display:flex;flex-direction:column;gap:8px}
+.guide-item{border:1px solid var(--ff-border);border-radius:14px;background:var(--ff-panel-2);padding:0 14px}
+.guide-item summary{display:flex;flex-direction:column;gap:2px;padding:12px 0;cursor:pointer;list-style:none}
+.guide-item summary::-webkit-details-marker{display:none}
+.guide-item summary small{color:var(--text-3);font-size:.85rem}
+.guide-item[open] summary{border-bottom:1px solid var(--ff-border)}
+.guide-item ul{margin:10px 0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.guide-item .btn{margin:0 0 12px}
+.tour{position:fixed;inset:0;z-index:2000}
+.tour[hidden]{display:none}
+.tour.no-target::before{content:"";position:absolute;inset:0;background:rgba(5,8,18,.6)}
+.tour-ring{position:fixed;border-radius:16px;box-shadow:0 0 0 3px #fff,0 0 0 9999px rgba(5,8,18,.6);pointer-events:none;transition:all .2s ease}
+.tour-ring[hidden]{display:none}
+.tour-card{position:fixed;padding:16px;border-radius:18px;border:1px solid var(--ff-border);background:var(--ff-surface,var(--ff-panel));color:inherit;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.tour-card h3{margin:2px 0 6px}
+.tour-card p{margin:0 0 12px;font-size:.95rem}
+.tour-count{color:var(--text-3);font-size:.8rem}
+.tour-card .btn-row{justify-content:flex-end}
+@media (prefers-reduced-motion:reduce){.tour-ring{transition:none}}

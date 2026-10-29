@@ -1,5 +1,88 @@
 # FittForma AI — Registro de cambios
 
+## v68.0 — «Cómo usar la app» y recorrido inicial (29 de octubre de 2026)
+
+Pedido de usuarios de prueba: «les cuesta entender la app».
+
+- **«Cómo usar la app»:** una guía corta de cada sección (Inicio, Entrenar, Rutinas y plan, Nutrición, Correr, Progreso, Comunidad, FittAI y Perfil).
+  - Cada sección dice qué tocar, con los nombres reales de los botones, y tiene «Ir a…».
+  - Se abre desde «Más», desde Perfil → Ayuda y privacidad, y desde un aviso en Inicio para quien recién empieza (se oculta con la ×, o solo después de 3 entrenamientos).
+- **Recorrido inicial:** al cerrar la bienvenida la primera vez, 6 pasos que resaltan los botones de abajo y explican para qué sirve cada uno.
+  - Se puede saltar (también con Escape) y no vuelve a aparecer. Se puede volver a ver desde la guía o desde Perfil.
+- Traducido a los seis idiomas. Sin migraciones nuevas.
+
+## v67.0 — Más rápida en español y más segura (29 de octubre de 2026)
+
+- **Carga más rápida.** En español la app ya no descarga las traducciones a otros idiomas (unos 1,8 MB que antes bajaba siempre).
+  - Si elegís otro idioma, se descargan una sola vez y la app se traduce sola; al volver a abrirla en ese idioma, se traduce al cargar.
+  - El service worker ya no las guarda de antemano: las guarda la primera vez que se piden.
+- **Seguridad en la base** (aviso de Supabase «Public Can Execute SECURITY DEFINER Function»):
+  - Se revisaron las 19 funciones del aviso. Tres que solo sirven con sesión dejan de poder usarse sin sesión: `community_are_mutual_follows`, `community_is_moderator` y `community_suggested_profiles`.
+  - Las demás quedan igual a propósito: sin sesión se ven los perfiles y publicaciones públicas, y las reglas de lectura las necesitan.
+  - Migración nueva: `supabase/migrations/2026-11-03_v67_security.sql`, solo permisos (incluida en `APLICAR_MIGRACIONES.sql`).
+- **Guía nueva** en `docs/DESPLIEGUE.md` para activar la protección de contraseñas filtradas y un correo propio (SMTP) en Supabase.
+
+## v66.0 — Comunidad propia: muro de amigos, aplausos y desafíos del mes (29 de octubre de 2026)
+
+Pedido de un usuario de prueba: «que no sea igual a Strava; me gusta el muro con amigos, los aplausos y los desafíos».
+
+- **Muro** (nueva pestaña de Comunidad, entre Todos y Ranking):
+  - Muestra solo lo tuyo y lo de las personas que seguís (seguimiento aceptado). No es un feed general: lo de desconocidos no aparece.
+  - Nunca muestra a alguien bloqueado. Sin sesión invita a iniciarla.
+- **Compartir con tus amigos, solo si lo elegís:**
+  - Al terminar un entrenamiento: nombre, tiempo, ejercicios, series, kilos y calorías estimadas.
+  - Al guardar una carrera (a mano o con GPS): distancia, tiempo y ritmo. **Nunca el mapa ni la ruta.**
+  - Se puede agregar un comentario o tocar «Ahora no». Por defecto lo ven solo tus seguidores aceptados.
+  - Los números son los que registraste en la app; la tarjeta lo aclara («Registrado en la app»).
+- **Aplausos:** el «me gusta» ahora es «Aplaudir». Aplaudir o comentar avisa a quien publicó, en la campanita. Tocar el aviso abre el muro.
+- **Desafíos del mes** (en Amigos): 12 entrenamientos, 15 días activos y 30 km corriendo.
+  - Tu avance sale de lo que registrás en la app este mes.
+  - Al lado, las personas que seguís que muestran sus estadísticas.
+  - Al cumplir uno, podés compartirlo en el muro.
+- **Migración nueva:** `supabase/migrations/2026-11-02_v66_wall_challenges.sql`, aditiva, con RLS (incluida en `APLICAR_MIGRACIONES.sql`).
+  - Agrega la columna `activity`, el tipo de publicación «actividad», los avisos de aplausos y comentarios, y los números del mes.
+  - Las dos reglas que se amplían aceptan todo lo anterior.
+  - Sin la migración, la app sigue andando y el muro avisa que Comunidad se está actualizando.
+
+## v65.0 — Recordatorios de agua que sí llegan y «Enviar una sugerencia» (29 de octubre de 2026)
+
+- **Recordatorios para tomar agua, a la vista** en Hidratación (antes estaban escondidos y solo avisaban con la app abierta en pantalla).
+  - 2, 3 o 4 por día, en horarios fijos.
+  - **«Agregar a mi calendario»:** descarga los avisos diarios, que el calendario del celular muestra **aunque la app esté cerrada**.
+  - **«Avisarme también en la app»:** pide permiso y avisa solo si vas atrasado con el agua, también con la app en segundo plano. Se apaga con un toque.
+- **«Enviar una sugerencia»** en el menú «Más» y en Perfil (Ayuda y privacidad):
+  - Idea, Algo no funciona u Otro.
+  - Solo con cuenta: si no hay sesión, pide iniciarla y después vuelve con el texto escrito.
+  - Máximo 5 por día. Nadie las lee desde la app: las ve la persona dueña en Supabase (Table Editor → `app_feedback`).
+- **Migración nueva:** `supabase/migrations/2026-11-01_v65_feedback.sql`, aditiva, con RLS, solo escritura propia (incluida en `APLICAR_MIGRACIONES.sql`).
+
+## v64.0 — Entrenamiento: orden real, trapecio y antebrazos, sesiones largas, calculadora de RM y aviso de salud (29 de octubre de 2026)
+
+Recomendaciones de un usuario de prueba más una revisión propia.
+
+- **Orden real de los ejercicios.** Antes alternaba músculos (pecho, tríceps, pecho…) y dejaba el press más pesado para el final.
+  - Ahora termina un grupo antes de pasar al siguiente, empezando por los grandes.
+  - Dentro de cada grupo, primero los ejercicios principales (presses, sentadillas) y al final los de aislamiento.
+  - Los ejercicios elegidos son los mismos; solo cambia el orden. Las superseries siguen disponibles.
+- **Trapecio y antebrazos** en «Elegí vos los grupos» y en «Mi semana».
+  - Usan ejercicios que ya tienen ficha y animación: encogimientos, caminata del granjero, curl martillo y curl inverso.
+  - En casa se suman los encogimientos con mancuernas.
+  - Sin equipamiento no hay ejercicio de antebrazos y la app lo avisa, en vez de inventar uno.
+- **Sesiones de 75, 90 y «más de 90» minutos.**
+  - Con más tiempo hay más ejercicios y más series; con menos, se recortan.
+  - Cada rutina muestra su **tiempo estimado real** (series × trabajo + descanso + entrada en calor).
+- **Calculadora de RM** (fórmula de Epley):
+  - 1RM estimado, tabla de 2RM a 15RM y porcentajes;
+  - «Con X kg harías, en teoría, unas Z repeticiones»;
+  - en kg o lb;
+  - se abre desde Entrenar, desde cada ejercicio con peso en la sesión (con tu mejor serie) y desde «Mi progreso» de la ficha;
+  - aclara que es una estimación.
+- **Aviso de salud visible:** «Si tenés molestias o dolor en alguna articulación o músculo, consultá con un profesional…».
+  - Aparece en la ficha de cada ejercicio.
+  - También la primera vez que alguien entrena, con «Entendido».
+- **«Cómo la armamos»:** al crear la rutina se explica qué cambia según el objetivo, el equipamiento y los minutos.
+- Sin migraciones nuevas.
+
 ## v63.1 — Mensaje correcto cuando Supabase no puede mandar el correo (29 de octubre de 2026)
 
 - Al crear una cuenta, si Supabase llegó a su límite de correos por hora («email rate limit exceeded»), la app decía «Probaste muchas veces seguidas», y no era cierto.
