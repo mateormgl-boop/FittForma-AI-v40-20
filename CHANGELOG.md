@@ -1,5 +1,17 @@
 # FittForma AI — Registro de cambios
 
+## v65.0 — Recordatorios de agua que sí llegan y «Enviar una sugerencia» (29 de octubre de 2026)
+
+- **Recordatorios para tomar agua, a la vista** en Hidratación (antes estaban escondidos y solo avisaban con la app abierta en pantalla).
+  - 2, 3 o 4 por día, en horarios fijos.
+  - **«Agregar a mi calendario»:** descarga los avisos diarios, que el calendario del celular muestra **aunque la app esté cerrada**.
+  - **«Avisarme también en la app»:** pide permiso y avisa solo si vas atrasado con el agua, también con la app en segundo plano. Se apaga con un toque.
+- **«Enviar una sugerencia»** en el menú «Más» y en Perfil (Ayuda y privacidad):
+  - Idea, Algo no funciona u Otro.
+  - Solo con cuenta: si no hay sesión, pide iniciarla y después vuelve con el texto escrito.
+  - Máximo 5 por día. Nadie las lee desde la app: las ve la persona dueña en Supabase (Table Editor → `app_feedback`).
+- **Migración nueva:** `supabase/migrations/2026-11-01_v65_feedback.sql`, aditiva, con RLS, solo escritura propia (incluida en `APLICAR_MIGRACIONES.sql`).
+
 ## v64.0 — Entrenamiento: orden real, trapecio y antebrazos, sesiones largas, calculadora de RM y aviso de salud (29 de octubre de 2026)
 
 Recomendaciones de un usuario de prueba más una revisión propia.

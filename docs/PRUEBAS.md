@@ -9,6 +9,16 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v65
+
+- `tests/v65.test.mjs` (4 pruebas): tarjeta del agua, calendario diario, el aviso de la app ya no exige la pantalla encendida; sugerencias solo con cuenta; migración; traducciones.
+- `supabase/tests/rls_v65_test.sql` (15 comprobaciones): escritura propia, validaciones, nadie lee, no se edita ni se borra, límite de 5 por día, sin sesión no se manda.
+- E2E `v65` (17 pasos):
+  - agua: a la vista, 2/3/4 por día, calendario con aviso diario, avisos en la app que se prenden y se apagan;
+  - sugerencias: desde «Más» y desde Perfil; sin sesión lleva a iniciarla y vuelve con el texto;
+  - se guarda con categoría y versión; límite diario; nadie la lee;
+  - inglés.
+
 ### v64
 
 - `tests/v64.test.mjs` (7 pruebas):

@@ -1,8 +1,14 @@
-# FittForma AI — v64.0
+# FittForma AI — v65.0
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v65.0
+
+- Recordatorios de agua visibles: 2, 3 o 4 por día, con calendario que avisa con la app cerrada.
+- «Enviar una sugerencia» (solo con cuenta; las leés en Supabase).
+- Migración nueva: `supabase/migrations/2026-11-01_v65_feedback.sql` (incluida en `APLICAR_MIGRACIONES.sql`).
 
 ## Novedades v64.0
 

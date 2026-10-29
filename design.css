@@ -1903,3 +1903,14 @@ html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 .plan-why ul{margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:2px}
 .plan-why p{margin:4px 0 0}
 .est-min{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--ff-panel-2);font-size:.75rem;font-weight:800;white-space:nowrap}
+/* v65: recordatorios de agua visibles y «Enviar una sugerencia» */
+.hydro-remind{margin:12px 0;padding:14px;border-radius:16px;border:1px solid rgba(34,170,230,.35);background:rgba(34,170,230,.08)}
+.hydro-remind-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px}
+.hydro-remind-state{font-size:.78rem;font-weight:800;color:#16a37a}
+.hydro-remind-count{display:flex;gap:6px;margin:8px 0 6px;flex-wrap:wrap}
+.hydro-remind-count button{flex:1 1 0;min-height:40px;padding:6px 10px;border-radius:12px;border:1px solid var(--ff-border);background:var(--ff-panel-2);color:inherit;font:inherit;font-weight:700;cursor:pointer;white-space:nowrap}
+.hydro-remind-count button.active{border-color:#22aae6;background:rgba(34,170,230,.18);color:inherit}
+.hydro-remind-times{margin:0 0 8px;font-weight:700;font-size:.88rem}
+.feedback-kinds{grid-template-columns:repeat(3,1fr)}
+.feedback-kinds button[aria-checked="true"]{background:var(--ff-surface,var(--ff-panel));box-shadow:0 1px 4px rgba(0,0,0,.18);color:#5b6cff}
+.feedback-sheet textarea{width:100%;min-height:120px;font-size:16px}

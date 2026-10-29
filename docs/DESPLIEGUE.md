@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v64.0
+# Despliegue de FittForma AI v65.0
 
-Esta guía es la lista de pasos para publicar v64.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v65.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -12,11 +12,20 @@ Si Comunidad dice «Comunidad se está actualizando…» o «Could not find the 
 3. Recargá la app.
 
 Detalles del archivo:
-- Tiene las 14 migraciones (v41 a v62), en orden.
+- Tiene las 15 migraciones (v41 a v65), en orden.
 - Cada una va en su propia transacción y se puede ejecutar más de una vez: no borra datos ni desactiva RLS.
 - Al final recarga la caché de la API de Supabase.
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
+
+## Qué cambia en v65.0
+
+- **Migración nueva:** `supabase/migrations/2026-11-01_v65_feedback.sql` (tabla `app_feedback`).
+  - Aditiva y re-ejecutable, con RLS: solo se puede escribir a nombre propio y con sesión; nadie la lee desde la app.
+  - Si ya aplicaste las anteriores, alcanza con pegar este archivo y `notify pgrst, 'reload schema';`.
+  - Sin la migración, la app sigue andando y «Enviar una sugerencia» avisa que se está actualizando.
+- **Cómo leer las sugerencias:** Supabase → Table Editor → `app_feedback`.
+- El service worker cambia a `fittforma-ai-static-v65-0`.
 
 ## Qué cambia en v64.0
 
