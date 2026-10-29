@@ -1,4 +1,4 @@
-# FittForma AI — v63.0
+# FittForma AI — v63.1
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
