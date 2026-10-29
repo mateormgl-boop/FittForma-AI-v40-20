@@ -18,9 +18,10 @@ test('v45: i18n-extra.js define filas válidas de seis idiomas', () => {
   for (const k of ['Agua', 'Plan y recetas', 'Moderación', 'Eliminar mi cuenta en la nube', 'Tu plan actual']) assert.ok(byKey.has(k), `falta «${k}»`);
 });
 
-test('v45: el archivo se carga antes que i18n.js, se precachea y el servidor lo publica', () => {
-  assert.ok(html.indexOf('src="./i18n-extra.js"') > 0 && html.indexOf('src="./i18n-extra.js"') < html.indexOf('src="./i18n.js"'));
-  assert.match(sw, /"\.\/i18n-extra\.js"/);
+test('v45: el archivo lo carga i18n.js (antes que los demás) y el servidor lo publica', () => {
+  // v67: i18n.js lo carga (primero de la lista) solo si el idioma no es español; el service worker lo guarda al pedirse.
+  assert.match(i18n, /const PACKS=\['\.\/i18n-extra\.js',/);
+  assert.ok(!html.includes('src="./i18n-extra.js"') && html.includes('src="./i18n.js"'));
   assert.match(server, /'\/i18n-extra\.js'/);
   assert.match(i18n, /window\.FittFormaI18nExtra/);
 });

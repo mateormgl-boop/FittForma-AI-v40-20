@@ -9,6 +9,12 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v67
+
+- `tests/v67.test.mjs` (3 pruebas): `index.html` no carga las traducciones; `i18n.js` las carga en orden solo para otro idioma; el service worker no las guarda de antemano; la migración solo cambia permisos de las tres funciones y no toca las que se usan sin sesión.
+- `supabase/tests/rls_v67_test.sql` (10 comprobaciones): sin sesión las tres funciones se rechazan; con sesión funcionan; sin sesión se siguen viendo perfiles y publicaciones públicas.
+- E2E `v67` (10 pasos): en español no se descarga ninguna traducción; al elegir inglés se descargan las seis partes una sola vez y la app se traduce (también las reglas con números); portugués sin volver a descargar; volver a español; abrir ya en alemán.
+
 ### v66
 
 - `tests/v66.test.mjs` (6 pruebas): migración aditiva; actividad sin ruta ni datos corporales y solo para seguidores; muro solo de amigos y «Aplaudir»; desafíos del mes; números del mes calculados desde la app; traducciones y estilos.

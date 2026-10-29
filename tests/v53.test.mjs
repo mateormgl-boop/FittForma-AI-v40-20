@@ -133,10 +133,12 @@ test('mensajes solo con seguimiento mutuo; seguir y bloquear siguen disponibles 
 
 test('v53: archivos publicados, traducciones y versión', () => {
   const sw = readFileSync('sw.js', 'utf8'), server = readFileSync('backend/server.mjs', 'utf8'), i18n = readFileSync('i18n-v53.js', 'utf8');
-  for (const f of ['athlete-stats.js', 'i18n-v53.js']) { assert.match(sw, new RegExp(`"\\./${f.replace('.', '\\.')}"`)); assert.match(server, new RegExp(`'/${f.replace('.', '\\.')}'`)); assert.match(html, new RegExp(`src="\\./${f.replace('.', '\\.')}"`)); }
+  for (const f of ['athlete-stats.js']) { assert.match(sw, new RegExp(`"\\./${f.replace('.', '\\.')}"`)); assert.match(server, new RegExp(`'/${f.replace('.', '\\.')}'`)); assert.match(html, new RegExp(`src="\\./${f.replace('.', '\\.')}"`)); }
+  // v67: i18n-v53.js lo carga i18n.js solo si el idioma no es español.
+  assert.match(server, /'\/i18n-v53\.js'/); assert.match(readFileSync('i18n.js', 'utf8'), /'\.\/i18n-v53\.js'\]/);
   for (const s of ['Todos', 'Ranking', 'Amigos', 'Todavía no tenés amigos en tu comunidad', 'Sin datos disponibles', 'Tu progreso']) assert.ok(i18n.includes(`["${s}"`), s);
   for (const row of i18n.matchAll(/^\s*\[("[^\n]*")\],?$/gm)) assert.equal(JSON.parse(`[${row[1]}]`).length, 6, row[1].slice(0, 40));
-  assert.match(sw, /fittforma-ai-static-v66-0/);
+  assert.match(sw, /fittforma-ai-static-v67-0/);
 });
 
 test('v53.1: rango por músculo validado (sin datos corporales) y misma regla en SQL', () => {

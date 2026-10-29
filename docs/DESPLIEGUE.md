@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v66.0
+# Despliegue de FittForma AI v67.0
 
-Esta guía es la lista de pasos para publicar v66.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v67.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -12,11 +12,29 @@ Si Comunidad dice «Comunidad se está actualizando…» o «Could not find the 
 3. Recargá la app.
 
 Detalles del archivo:
-- Tiene las 16 migraciones (v41 a v66), en orden.
+- Tiene las 17 migraciones (v41 a v67), en orden.
 - Cada una va en su propia transacción y se puede ejecutar más de una vez: no borra datos ni desactiva RLS.
 - Al final recarga la caché de la API de Supabase.
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
+
+## Qué cambia en v67.0
+
+- **Migración nueva:** `supabase/migrations/2026-11-03_v67_security.sql` (solo permisos; no cambia datos).
+  - Quita el uso sin sesión de `community_are_mutual_follows`, `community_is_moderator` y `community_suggested_profiles`. Con sesión siguen igual.
+  - Si ya aplicaste las anteriores, alcanza con pegar este archivo y `notify pgrst, 'reload schema';`.
+- **Traducciones:** `index.html` ya no carga `i18n-extra.js` ni `i18n-v48.js` … `i18n-v53.js`; las carga `i18n.js` solo si el idioma no es español. Los archivos siguen publicados igual.
+- El service worker cambia a `fittforma-ai-static-v67-0`.
+
+### Ajustes de Supabase que se hacen en el panel (no se pueden hacer con SQL)
+
+1. **Protección de contraseñas filtradas** (aviso «Leaked Password Protection Disabled»):
+   Supabase → **Authentication** → **Sign In / Providers** (o **Policies**, según la versión del panel) → **Email** → activá **Prevent use of leaked passwords**.
+   Rechaza contraseñas que aparecieron en filtraciones públicas (HaveIBeenPwned). Puede requerir un plan pago de Supabase; si no aparece la opción, el plan actual no la incluye.
+2. **Correo propio (SMTP)**, recomendado si vuelven a activar «Confirm email» o usan «Olvidé mi contraseña» con muchas personas:
+   el correo de prueba de Supabase tiene un límite muy bajo por hora (fue el error «se llegó al límite de correos por hora»).
+   Supabase → **Authentication** → **Emails** → **SMTP Settings** → **Enable custom SMTP**, con los datos de un servicio de correo (por ejemplo Resend, Brevo o el de tu dominio).
+   Las claves del servicio de correo se cargan solo en ese panel; nunca en la app ni en el repositorio.
 
 ## Qué cambia en v66.0
 

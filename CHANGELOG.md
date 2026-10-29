@@ -1,5 +1,16 @@
 # FittForma AI — Registro de cambios
 
+## v67.0 — Más rápida en español y más segura (29 de octubre de 2026)
+
+- **Carga más rápida.** En español la app ya no descarga las traducciones a otros idiomas (unos 1,8 MB que antes bajaba siempre).
+  - Si elegís otro idioma, se descargan una sola vez y la app se traduce sola; al volver a abrirla en ese idioma, se traduce al cargar.
+  - El service worker ya no las guarda de antemano: las guarda la primera vez que se piden.
+- **Seguridad en la base** (aviso de Supabase «Public Can Execute SECURITY DEFINER Function»):
+  - Se revisaron las 19 funciones del aviso. Tres que solo sirven con sesión dejan de poder usarse sin sesión: `community_are_mutual_follows`, `community_is_moderator` y `community_suggested_profiles`.
+  - Las demás quedan igual a propósito: sin sesión se ven los perfiles y publicaciones públicas, y las reglas de lectura las necesitan.
+  - Migración nueva: `supabase/migrations/2026-11-03_v67_security.sql`, solo permisos (incluida en `APLICAR_MIGRACIONES.sql`).
+- **Guía nueva** en `docs/DESPLIEGUE.md` para activar la protección de contraseñas filtradas y un correo propio (SMTP) en Supabase.
+
 ## v66.0 — Comunidad propia: muro de amigos, aplausos y desafíos del mes (29 de octubre de 2026)
 
 Pedido de un usuario de prueba: «que no sea igual a Strava; me gusta el muro con amigos, los aplausos y los desafíos».
