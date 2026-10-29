@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v62.0
+# Despliegue de FittForma AI v63.0
 
-Esta guía es la lista de pasos para publicar v62.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v63.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -17,6 +17,16 @@ Detalles del archivo:
 - Al final recarga la caché de la API de Supabase.
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
+
+## Qué cambia en v63.0
+
+- **No hay migraciones nuevas.**
+- **Archivos que se actualizan:** `index.html`, `community.js`, `design.css` e `i18n-v53.js`.
+- El service worker cambia a `fittforma-ai-static-v63-0`.
+- **Ajustes de Supabase (Authentication), los hace la persona dueña:**
+  - **Confirm email** (Sign In / Providers → Email). Apagado: la cuenta queda lista al instante. Prendido: la app explica que hay que confirmar y ofrece reenviar el correo.
+  - **URL Configuration → Site URL:** la dirección pública de la app en Render. Sirve para que el enlace de «¿Olvidaste tu contraseña?» vuelva a la app. Si hay más de una dirección, agregalas en **Redirect URLs**.
+  - **Google (opcional):** si se activa en Sign In / Providers, la app muestra «Continuar con Google» sola.
 
 ## Qué cambia en v62.0
 

@@ -68,6 +68,8 @@ await page.route(`${SUPA}/auth/v1/**`, async route => {
     return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ access_token: tokenFor(email), token_type: 'bearer', expires_in: 3600, expires_at: exp, refresh_token: 'r-' + email, user: userObj(email) }) });
   }
   if (url.pathname.endsWith('/user')) { const tok = (req.headers().authorization || '').split(' ')[1]; const sub = tok && JSON.parse(Buffer.from(tok.split('.')[1], 'base64url')).sub; const email = Object.keys(USERS).find(e => USERS[e] === sub); return email ? route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify(userObj(email)) }) : route.fulfill({ status: 401, headers: cors, body: '{}' }); }
+  // v63: la app pregunta qué proveedores tiene el proyecto (Google se muestra solo si está activado), como en Supabase.
+  if (url.pathname.endsWith('/settings')) return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ external: { email: true, google: false } }) });
   if (url.pathname.endsWith('/logout')) return route.fulfill({ status: 204, headers: cors });
   return route.fulfill({ status: 404, headers: cors, body: '{}' });
 });
@@ -91,9 +93,9 @@ const openBrunoPost = async () => { await page.click('#communityTabWorld'); awai
 const POST_B = '#communityPostDialog [data-community-post="b0000000-0000-0000-0000-0000000000b1"]';
 
 await page.click('#communityTabProfile');
-await page.fill('#communityEmail', 'alice@example.test'); await page.fill('#communityPassword', 'clave-segura-123');
-await page.click('#communityEmailLogin'); await page.waitForTimeout(1500);
-step('Inicio de sesión', /Sesión iniciada|Sesión online/.test(await page.textContent('#communityEmailStatus') + await page.textContent('#communityProfileStatus')));
+await page.click('#communityAuthBanner [data-auth-open="login"]'); await page.fill('#authEmail', 'alice@example.test'); await page.fill('#authPassword', 'clave-segura-123');
+await page.click('#authSubmit'); await page.waitForTimeout(1500);
+step('Inicio de sesión (con el aviso «¡Listo! Ya iniciaste sesión»)', /Ya iniciaste sesión/.test(await page.textContent('#authDone')) && await page.isHidden('#communityAuthBanner'));
 step('Indicador de 1 mensaje sin leer', await page.isVisible('#communityUnreadBadge') && (await page.textContent('#communityUnreadBadge')).trim() === '1');
 
 // Publicación de texto con foto, vista previa y consentimiento

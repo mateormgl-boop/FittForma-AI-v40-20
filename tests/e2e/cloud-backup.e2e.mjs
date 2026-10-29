@@ -43,6 +43,8 @@ await page.route(`${SUPA}/auth/v1/**`, async route => {
   if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { ...cors, 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' } });
   if (url.pathname.endsWith('/token')) return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ access_token: jwt({ sub: UID, role: 'authenticated', aud: 'authenticated', email: EMAIL, exp }), token_type: 'bearer', expires_in: 3600, expires_at: exp, refresh_token: 'r-c', user: userObj() }) });
   if (url.pathname.endsWith('/user')) return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify(userObj()) });
+  // v63: la app pregunta qué proveedores tiene el proyecto (Google se muestra solo si está activado), como en Supabase.
+  if (url.pathname.endsWith('/settings')) return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ external: { email: true, google: false } }) });
   if (url.pathname.endsWith('/logout')) return route.fulfill({ status: 204, headers: cors });
   return route.fulfill({ status: 404, headers: cors, body: '{}' });
 });
@@ -68,7 +70,7 @@ await page.goto(APP + '/'); await page.waitForTimeout(1200);
 await page.click('.mobile-nav-item[data-mobile-view="profile"]'); await page.waitForTimeout(400);
 await page.evaluate(() => { const d = document.getElementById('cloudAccountCard')?.closest('details'); if (d) d.open = true; });
 step('Sin sesión no se muestra la copia automática', !(await page.isVisible('#cloudAutoRow')));
-await page.fill('#cloudEmail', EMAIL); await page.fill('#cloudPassword', 'clave-segura-123'); await page.click('#cloudLogin');
+await page.click('#cloudLogin'); await page.fill('#authEmail', EMAIL); await page.fill('#authPassword', 'clave-segura-123'); await page.click('#authSubmit');
 await page.waitForTimeout(4500);
 step('Al iniciar sesión se ofrece la copia automática, prendida', await page.isVisible('#cloudAutoRow') && await page.isChecked('#cloudAutoToggle'));
 step('Primera copia: se sube sola (no había copia en la nube)', cloudSessions() === '1', cloudSessions());

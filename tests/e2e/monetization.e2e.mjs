@@ -101,6 +101,8 @@ async function newPage({ clock = false, blockEntitlements = false } = {}) {
       return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ access_token: tokenFor(email), token_type: 'bearer', expires_in: 3600, expires_at: exp, refresh_token: 'r-' + email, user: userObj(email) }) });
     }
     if (url.pathname.endsWith('/user')) { const claims = verify((req.headers().authorization || '').split(' ')[1]); const email = claims && Object.keys(USERS).find(e => USERS[e] === claims.sub); return email ? route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify(userObj(email)) }) : route.fulfill({ status: 401, headers: cors, body: '{}' }); }
+    // v63: la app pregunta qué proveedores tiene el proyecto (Google se muestra solo si está activado), como en Supabase.
+    if (url.pathname.endsWith('/settings')) return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ external: { email: true, google: false } }) });
     if (url.pathname.endsWith('/logout')) return route.fulfill({ status: 204, headers: cors });
     return route.fulfill({ status: 404, headers: cors, body: '{}' });
   });
@@ -116,8 +118,8 @@ async function newPage({ clock = false, blockEntitlements = false } = {}) {
   page.ent = () => page.evaluate(async () => { const h = await window.FittFormaAuthHeader?.() || {}; return (await fetch('/api/entitlements', { headers: h })).json(); });
   page.login = async email => {
     await page.go('community'); await page.click('#communityTabProfile');
-    await page.fill('#communityEmail', email); await page.fill('#communityPassword', 'clave-segura-123');
-    await page.click('#communityEmailLogin'); await page.waitForTimeout(1500);
+    await page.click('#communityAuthBanner [data-auth-open="login"]'); await page.fill('#authEmail', email); await page.fill('#authPassword', 'clave-segura-123');
+    await page.click('#authSubmit'); await page.waitForTimeout(1500);
     await page.evaluate(() => window.FittFormaAds.refresh(true)); await page.waitForTimeout(300);
   };
   await page.goto(APP + '/'); await page.waitForTimeout(800);

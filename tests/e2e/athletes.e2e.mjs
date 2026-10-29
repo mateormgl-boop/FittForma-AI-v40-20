@@ -74,6 +74,8 @@ await page.route(`${SUPA}/auth/v1/**`, async route => {
     return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ access_token: tokenFor(email), token_type: 'bearer', expires_in: 3600, expires_at: exp, refresh_token: 'r-' + email, user: userObj(email) }) });
   }
   if (url.pathname.endsWith('/user')) { const tok = (req.headers().authorization || '').split(' ')[1]; const sub = tok && JSON.parse(Buffer.from(tok.split('.')[1], 'base64url')).sub; const email = Object.keys(USERS).find(e => USERS[e] === sub); return email ? route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify(userObj(email)) }) : route.fulfill({ status: 401, headers: cors, body: '{}' }); }
+  // v63: la app pregunta qué proveedores tiene el proyecto (Google se muestra solo si está activado), como en Supabase.
+  if (url.pathname.endsWith('/settings')) return route.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ external: { email: true, google: false } }) });
   if (url.pathname.endsWith('/logout')) return route.fulfill({ status: 204, headers: cors });
   return route.fulfill({ status: 404, headers: cors, body: '{}' });
 });
@@ -112,8 +114,8 @@ step('3. Sin sesión: perfiles públicos con nivel y rango', /Bruno Fit/.test(pe
 step('3. Las estadísticas ocultas no aparecen', !/Leyenda/.test(people));
 
 await page.click('#communityTabProfile');
-await page.fill('#communityEmail', 'alice@example.test'); await page.fill('#communityPassword', 'clave-segura-123');
-await page.click('#communityEmailLogin'); await page.waitForTimeout(1800);
+await page.click('#communityAuthBanner [data-auth-open="login"]'); await page.fill('#authEmail', 'alice@example.test'); await page.fill('#authPassword', 'clave-segura-123');
+await page.click('#authSubmit'); await page.waitForTimeout(1800);
 // v61: públicas desde el inicio (pedido de la persona dueña): se publican al iniciar sesión, sin esperar el aviso.
 for (let i = 0; i < 20 && sql(`select count(*) from community_athlete_stats where user_id='${A}'`) === '0'; i++) await page.waitForTimeout(250);
 step('Al iniciar sesión se publican las estadísticas sin esperar el aviso', sql(`select count(*) from community_athlete_stats where user_id='${A}'`) === '1');
