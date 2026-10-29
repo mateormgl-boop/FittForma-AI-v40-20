@@ -163,6 +163,7 @@
       S('Pull-apart con banda', 'Hombros', 2, '12–20', 'rear_delt', 'iso', 1, 3),
       S('Curl de bíceps con mancuernas', 'Brazos', 2, '10–15', 'biceps', 'iso', 1, 3, true),
       S('Curl martillo', 'Brazos', 2, '10–15', 'biceps', 'iso', 1, 3, true),
+      S('Encogimientos con mancuernas', 'Trapecio', 2, '10–15', 'shrug', 'iso', 1, 3, true),
       S('Curl de bíceps alternado sentado', 'Brazos', 2, '10–15 por lado', 'biceps', 'iso', 1, 3, true),
       S('Curl de bíceps con banda', 'Brazos', 2, '10–15', 'biceps', 'iso', 1, 2),
       S('Extensión de tríceps por encima de la cabeza con mancuerna', 'Brazos', 2, '10–15', 'triceps', 'iso', 1, 3, true),
@@ -341,11 +342,59 @@
     core_ae: ['core_rot', 'core_flex'], core_rot: ['core_ae', 'core_flex'], core_flex: ['core_ae', 'core_rot']
   };
   const LOADED_TERMS = /seg|min|\bm\b|pasos/;
+  const TIER_RANK = { main: 0, secondary: 1, iso: 2 };
+  // v64: tiempo estimado de una rutina: series × (trabajo + descanso) + 5 min de entrada en calor. Orientativo.
+  function estimateMinutes(exercises) {
+    let sec = 0;
+    for (const e of exercises || []) {
+      const reps = String(e && e.reps || ''), sets = Math.max(1, Number(e && e.sets) || 1), rest = Math.max(0, Number(e && e.rest) || 0);
+      const mins = reps.match(/(\d+)(?:\s*[–-]\s*(\d+))?\s*min/), secs = reps.match(/(\d+)(?:\s*[–-]\s*(\d+))?\s*seg/), nums = reps.match(/(\d+)(?:\s*[–-]\s*(\d+))?/);
+      const avg = m => m ? (Number(m[1]) + Number(m[2] || m[1])) / 2 : 0;
+      if (e && e.kind === 'cardio' || mins) { sec += (avg(mins) || 20) * 60; continue; }
+      const work = secs ? avg(secs) : Math.max(20, avg(nums) * 3.5) * (/por lado/.test(reps) ? 2 : 1);
+      sec += sets * work + Math.max(0, sets - 1) * rest + 45; // + cambio de ejercicio y preparación
+    }
+    return sec ? Math.max(10, Math.round((sec / 60 + 5) / 5) * 5) : 0;
+  }
+  // v64: calculadora de RM (repeticiones máximas) con la fórmula de Epley: 1RM = peso × (1 + reps / 30).
+  // Es una estimación: es más confiable con series de 1 a 12 repeticiones.
+  function oneRepMax(weight, reps) {
+    const w = Number(weight), r = Math.round(Number(reps));
+    if (!(w > 0) || !(r >= 1) || r > 30) return 0;
+    return r === 1 ? w : w * (1 + r / 30);
+  }
+  function weightForReps(oneRm, reps) {
+    const r = Math.round(Number(reps));
+    if (!(oneRm > 0) || !(r >= 1)) return 0;
+    return r === 1 ? oneRm : oneRm / (1 + r / 30);
+  }
+  // Con ese peso, ¿cuántas repeticiones saldrían «en teoría»? 0 si el peso supera el 1RM estimado.
+  function repsAtWeight(oneRm, weight) {
+    const w = Number(weight);
+    if (!(oneRm > 0) || !(w > 0) || w > oneRm * 1.0001) return 0;
+    return Math.max(1, Math.floor(30 * (oneRm / w - 1) + 1e-9));
+  }
+  // v64: ajusta las series para que la rutina se acerque al tiempo elegido. Si sobra tiempo, suma primero en los
+  // ejercicios principales; si falta, quita primero en los de aislamiento. Nunca baja de 2 series ni pasa de 5
+  // (3 para principiantes). «Más de 90 minutos» apunta a unos 105.
+  function fitToTime(exercises, minutes, levelNum) {
+    const target = Number(minutes) || 0, list = (exercises || []).filter(e => e && e.kind === 'strength');
+    if (!target || !list.length) return exercises;
+    const goalMin = target > 90 ? 105 : target, maxSets = levelNum === 1 ? 3 : 5;
+    const rank = e => TIER_RANK[(libraryEntry(e.name) || {}).tier] ?? 2;
+    for (let i = 0; i < 60 && estimateMinutes(exercises) > goalMin * 1.1; i++) {
+      const c = list.filter(e => e.sets > 2).sort((a, b) => rank(b) - rank(a) || b.sets - a.sets)[0]; if (!c) break; c.sets--;
+    }
+    for (let i = 0; i < 60 && estimateMinutes(exercises) < goalMin * 0.85; i++) {
+      const c = list.filter(e => e.sets < maxSets).sort((a, b) => rank(a) - rank(b) || a.sets - b.sets)[0]; if (!c) break; c.sets++;
+    }
+    return exercises;
+  }
 
   function exerciseCountFor(profile) {
     const minutes = Number(profile.duration) || 30;
-    let count = minutes <= 20 ? 4 : minutes <= 30 ? 5 : minutes <= 45 ? 6 : 7;
-    if (profile.level === 'beginner') count = Math.min(count, 5);
+    let count = minutes <= 20 ? 4 : minutes <= 30 ? 5 : minutes <= 45 ? 6 : minutes <= 60 ? 7 : minutes <= 75 ? 8 : minutes <= 90 ? 9 : 10;
+    if (profile.level === 'beginner') count = Math.min(count, minutes >= 75 ? 6 : 5);
     if (profile.goal === 'habit') count = Math.max(3, count - 1);
     return count;
   }
@@ -370,9 +419,12 @@
     const rest = timed ? 45 : scheme.rest[tier];
     return { sets, reps, rest };
   }
+  // v64: ejercicios de la biblioteca que también sirven para otro grupo (los antebrazos no tienen ejercicios propios:
+  // se usan los curls con agarre neutro o en pronación y la caminata del granjero, que ya tienen ficha y animación).
+  const ALSO_SLOTS = { 'Curl inverso con barra': ['forearm'], 'Curl martillo': ['forearm'], 'Curl martillo con cuerda en polea': ['forearm'] };
   function pickFor(slot, pool, ctx) {
     const lv = ctx.levelNum;
-    const fits = e => e.kind === 'strength' && e.slot === slot && !ctx.dayNames.has(norm(e.name));
+    const fits = e => e.kind === 'strength' && (e.slot === slot || (ALSO_SLOTS[e.name] || []).includes(slot)) && !ctx.dayNames.has(norm(e.name));
     let candidates = pool.filter(e => fits(e) && e.level[0] <= lv && lv <= e.level[1]);
     if (!candidates.length) {
       // Sin opción del nivel exacto: la más cercana por debajo (más segura) y, si no hay, la más cercana por encima.
@@ -414,6 +466,7 @@
       };
       for (const slots of mainSlots) { if (exercises.length >= limit) break; tryAdd(slots); }
       if (wantCore) tryAdd(coreSlot);
+      fitToTime(exercises, profile.duration, levelNum);
       return { title: tpl.title, focus: tpl.focus, template: key, exercises };
     });
     return { createdAt: new Date().toISOString(), version: 48, goal: profile.goal, level: profile.level, equipment: profile.equipment, note: SPLIT_NOTES[dayCount], days };
@@ -429,13 +482,15 @@
     back: { label: 'Espalda', slots: [['vpull', 'hpull'], ['hpull'], ['pull_iso', 'hpull']] },
     shoulders: { label: 'Hombros', slots: [['vpush'], ['lat_raise'], ['rear_delt', 'scap']] },
     rear_delts: { label: 'Deltoides posterior', slots: [['rear_delt', 'scap']] },
+    traps: { label: 'Trapecio', slots: [['shrug'], ['carry', 'shrug']] },
     biceps: { label: 'Bíceps', slots: [['biceps'], ['biceps']] },
     triceps: { label: 'Tríceps', slots: [['triceps'], ['triceps']] },
+    forearms: { label: 'Antebrazos', slots: [['forearm'], ['carry', 'forearm']] },
     calves: { label: 'Gemelos', slots: [['calf']] },
     core: { label: 'Core', slots: [['core_ae'], ['core_rot', 'core_flex'], ['core_flex', 'core_rot']] }
   };
-  const SLOT_GROUP = { hpush: 'chest', chest_iso: 'chest', vpull: 'back', hpull: 'back', pull_iso: 'back', vpush: 'shoulders', lat_raise: 'shoulders', front_raise: 'shoulders', rear_delt: 'shoulders', scap: 'shoulders', biceps: 'biceps', triceps: 'triceps', squat: 'legs_quads', quad_iso: 'legs_quads', lunge: 'legs_quads', hinge: 'legs_post', glute: 'legs_post', ham_iso: 'legs_post', abduct: 'legs_post', calf: 'calves', core_ae: 'core', core_rot: 'core', core_flex: 'core' };
-  const GROUP_ORDER = ['legs_quads', 'legs_post', 'chest', 'back', 'shoulders', 'rear_delts', 'triceps', 'biceps', 'calves', 'core'];
+  const SLOT_GROUP = { hpush: 'chest', chest_iso: 'chest', vpull: 'back', hpull: 'back', pull_iso: 'back', vpush: 'shoulders', lat_raise: 'shoulders', front_raise: 'shoulders', rear_delt: 'shoulders', scap: 'shoulders', biceps: 'biceps', triceps: 'triceps', shrug: 'traps', squat: 'legs_quads', quad_iso: 'legs_quads', lunge: 'legs_quads', hinge: 'legs_post', glute: 'legs_post', ham_iso: 'legs_post', abduct: 'legs_post', calf: 'calves', core_ae: 'core', core_rot: 'core', core_flex: 'core' };
+  const GROUP_ORDER = ['legs_quads', 'legs_post', 'chest', 'back', 'shoulders', 'rear_delts', 'traps', 'triceps', 'biceps', 'forearms', 'calves', 'core'];
   const FOCUS = {
     push: { title: 'Empuje', split: 'Empuje · Tracción · Piernas', groups: ['chest', 'shoulders', 'triceps'] },
     pull: { title: 'Tracción', split: 'Empuje · Tracción · Piernas', groups: ['back', 'rear_delts', 'biceps'] },
@@ -458,7 +513,7 @@
     const profile = { goal: 'fitness', level: 'beginner', equipment: 'gym', duration: '45', ...profileInput };
     const goal = SCHEMES[profile.goal] ? profile.goal : 'fitness';
     const levelNum = LEVEL[profile.level] || 1, pool = LIBRARY[profile.equipment] || LIBRARY.gym;
-    const limit = Math.min(8, Math.max(groups.length, 4, exerciseCountFor({ ...profile, goal })));
+    const limit = Math.min(10, Math.max(groups.length, 4, exerciseCountFor({ ...profile, goal })));
     const dayNames = new Set(), seen = new Set(), exercises = [], usage = new Map(), missing = [];
     for (let round = 0; round < 3 && exercises.length < limit; round++) {
       for (const g of groups) {
@@ -467,17 +522,19 @@
         outer: for (const slot of slots) {
           for (const s of [slot, ...(round === 0 ? (FALLBACK[slot] || []) : [])]) {
             const e = pickFor(s, pool, { levelNum, goal, usage, dayNames, firstOfPattern: !seen.has(s), firstOfDay: exercises.length === 0 });
-            if (e) { dayNames.add(norm(e.name)); seen.add(s); exercises.push({ name: e.name, group: e.group, kind: 'strength', slot: e.slot, ...prescription(e, goal, levelNum) }); break outer; }
+            if (e) { dayNames.add(norm(e.name)); seen.add(s); exercises.push({ name: e.name, group: e.group, kind: 'strength', slot: e.slot, ...prescription(e, goal, levelNum), _g: g, _t: TIER_RANK[e.tier] ?? 2, _i: exercises.length }); break outer; }
           }
         }
       }
     }
     // Grupos sin ningún ejercicio posible con este equipamiento (por ejemplo, bíceps solo con peso corporal).
-    const groupOf = SLOT_GROUP;
-    for (const g of groups) {
-      const own = g === 'rear_delts' ? ['rear_delt', 'scap'] : Object.keys(groupOf).filter(k => groupOf[k] === g);
-      if (!exercises.some(e => own.includes(e.slot))) missing.push(MUSCLE_GROUPS[g].label);
-    }
+    for (const g of groups) if (!exercises.some(e => e._g === g)) missing.push(MUSCLE_GROUPS[g].label);
+    // v64: como en el gimnasio, se termina un grupo antes de pasar al siguiente (grandes primero: pecho y después
+    // tríceps) y, dentro de cada grupo, primero los ejercicios principales (presses, sentadillas) y al final los de
+    // aislamiento. La elección de ejercicios no cambia; solo el orden. Las superseries siguen disponibles en la sesión.
+    exercises.sort((a, b) => groups.indexOf(a._g) - groups.indexOf(b._g) || a._t - b._t || a._i - b._i);
+    for (const e of exercises) { delete e._g; delete e._t; delete e._i; }
+    fitToTime(exercises, profile.duration, levelNum);
     return { key: meta.key || 'custom', title: meta.title || groups.map(g => MUSCLE_GROUPS[g].label).join(', '), split: meta.split || 'Elegido por vos',
       groups, groupLabels: groups.map(g => MUSCLE_GROUPS[g].label), equipment: profile.equipment, exercises, missing };
   }
@@ -682,6 +739,7 @@
   function groupsOfExercise(ex) {
     const e = libraryEntry(ex && ex.name); if (e && SLOT_GROUP[e.slot]) return [SLOT_GROUP[e.slot]];
     const n = norm(ex && ex.name), g = norm(ex && ex.group);
+    if (/muneca|antebrazo/.test(n)) return ['forearms']; if (/encogimiento|trapecio/.test(n)) return ['traps'];
     if (/curl|biceps/.test(n)) return ['biceps']; if (/tricep|frances|fondos/.test(n)) return ['triceps'];
     if (/gemel|pantorr|talones/.test(n)) return ['calves']; if (/glute|hip thrust|isquio|femoral|peso muerto/.test(n)) return ['legs_post'];
     const byGroup = { pecho: ['chest'], espalda: ['back'], hombros: ['shoulders'], piernas: ['legs_quads', 'legs_post'], core: ['core'], abdomen: ['core'], brazos: ['biceps', 'triceps'] };
@@ -769,7 +827,7 @@
     return set >= 0 ? { rest: false, next, set } : { rest: true };
   }
 
-  const api = { PLATES_KG, platesPerSide, supersetGroup, supersetNext, WEEKDAYS, weekdayOf, PROGRAMS, programWeek, groupsOfExercise, groupHistory, recommendPrograms, recommendToday, SPLIT_PLANS, nextFocusInSplit, suggestProgression, norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
+  const api = { oneRepMax, weightForReps, repsAtWeight, fitToTime, estimateMinutes, SCHEMES, PLATES_KG, platesPerSide, supersetGroup, supersetNext, WEEKDAYS, weekdayOf, PROGRAMS, programWeek, groupsOfExercise, groupHistory, recommendPrograms, recommendToday, SPLIT_PLANS, nextFocusInSplit, suggestProgression, norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaTraining = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);

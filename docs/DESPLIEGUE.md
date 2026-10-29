@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v63.0
+# Despliegue de FittForma AI v64.0
 
-Esta guía es la lista de pasos para publicar v63.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v64.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -17,6 +17,12 @@ Detalles del archivo:
 - Al final recarga la caché de la API de Supabase.
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
+
+## Qué cambia en v64.0
+
+- **No hay migraciones nuevas.**
+- **Archivos que se actualizan:** `training-core.js`, `index.html`, `design.css`, `i18n-v53.js` y `backend/server.mjs` (acepta propuestas de FittAI de 75, 90 y 120 minutos).
+- El service worker cambia a `fittforma-ai-static-v64-0`.
 
 ## Qué cambia en v63.0
 

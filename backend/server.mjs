@@ -19,7 +19,7 @@ const root=rootCandidates.find(candidate=>existsSync(path.join(candidate,'index.
 const rawPort=String(process.env.PORT||'8787');
 const port=Number(rawPort);
 if(!Number.isInteger(port)||port<0||port>65535)throw new Error(`PORT debe ser un entero entre 0 y 65535; se recibió ${JSON.stringify(rawPort)}.`);
-const appVersion='0.63.1';
+const appVersion='0.64.0';
 const apiKey=String(process.env.GEMINI_API_KEY||'').trim(), model=String(process.env.GEMINI_MODEL||'gemini-3.8-flash').trim()||'gemini-3.8-flash';
 const trustRenderClientIp=String(process.env.TRUST_RENDER_CLIENT_IP||'').toLowerCase()==='true';
 // If the primary model temporarily returns 503, try a lighter official model automatically.
@@ -226,7 +226,7 @@ const APP_GUIDE=`GUÍA DE FITTFORMA AI (usala para explicar dónde está cada co
 - Perfil [profile]: foto de perfil, nivel y XP, objetivos y datos físicos [profile:goals], recordatorios [profile:reminders], cuenta y sincronización en la nube [profile:account], privacidad, membresía, versión.
 Cuando la persona pregunte dónde o cómo hacer algo, explicalo en una o dos frases e incluí hasta 3 acciones con los destinos exactos entre corchetes. No inventes funciones que no estén en esta guía.`;
 function sanitizeActions(list){return Array.isArray(list)?list.filter(a=>a&&APP_TARGETS.has(String(a.target))).slice(0,3).map(a=>({target:String(a.target),label:cleanText(a.label,40)||'Ir'})):[];}
-function sanitizeProposal(x){if(!x||typeof x!=='object')return null;const kinds=['routine','nutrition','recovery','general'],days=Number(x.days),duration=Number(x.duration);return {title:String(x.title||'Propuesta del entrenador').slice(0,100),description:String(x.description||'Revisá esta propuesta antes de aplicarla.').slice(0,1200),kind:kinds.includes(x.kind)?x.kind:'general',...( [2,3,4,5].includes(days)?{days}:{} ),...( [20,30,45,60].includes(duration)?{duration}:{} )};}
+function sanitizeProposal(x){if(!x||typeof x!=='object')return null;const kinds=['routine','nutrition','recovery','general'],days=Number(x.days),duration=Number(x.duration);return {title:String(x.title||'Propuesta del entrenador').slice(0,100),description:String(x.description||'Revisá esta propuesta antes de aplicarla.').slice(0,1200),kind:kinds.includes(x.kind)?x.kind:'general',...( [2,3,4,5].includes(days)?{days}:{} ),...( [20,30,45,60,75,90,120].includes(duration)?{duration}:{} )};}
 function cleanText(value,max=100){return typeof value==='string'?value.replace(/[<>]/g,'').trim().slice(0,max):'';}
 function sanitizeTrainingContext(body){
   const sessions=Array.isArray(body.sessions)?body.sessions.slice(0,5).map(s=>({date:cleanText(s?.date,10),title:cleanText(s?.title,80),minutes:Math.max(0,Math.min(600,Number(s?.minutes)||0)),notes:cleanText(s?.notes,180),exercises:Array.isArray(s?.exercises)?s.exercises.slice(0,8).map(e=>({name:cleanText(e?.name,70),entries:Array.isArray(e?.entries)?e.entries.slice(0,6).map(x=>({reps:cleanText(String(x?.reps??''),8),weight:cleanText(String(x?.weight??''),10),done:Boolean(x?.done)})):[]})):[]})):[];

@@ -1,5 +1,32 @@
 # FittForma AI — Registro de cambios
 
+## v64.0 — Entrenamiento: orden real, trapecio y antebrazos, sesiones largas, calculadora de RM y aviso de salud (29 de octubre de 2026)
+
+Recomendaciones de un usuario de prueba más una revisión propia.
+
+- **Orden real de los ejercicios.** Antes alternaba músculos (pecho, tríceps, pecho…) y dejaba el press más pesado para el final.
+  - Ahora termina un grupo antes de pasar al siguiente, empezando por los grandes.
+  - Dentro de cada grupo, primero los ejercicios principales (presses, sentadillas) y al final los de aislamiento.
+  - Los ejercicios elegidos son los mismos; solo cambia el orden. Las superseries siguen disponibles.
+- **Trapecio y antebrazos** en «Elegí vos los grupos» y en «Mi semana».
+  - Usan ejercicios que ya tienen ficha y animación: encogimientos, caminata del granjero, curl martillo y curl inverso.
+  - En casa se suman los encogimientos con mancuernas.
+  - Sin equipamiento no hay ejercicio de antebrazos y la app lo avisa, en vez de inventar uno.
+- **Sesiones de 75, 90 y «más de 90» minutos.**
+  - Con más tiempo hay más ejercicios y más series; con menos, se recortan.
+  - Cada rutina muestra su **tiempo estimado real** (series × trabajo + descanso + entrada en calor).
+- **Calculadora de RM** (fórmula de Epley):
+  - 1RM estimado, tabla de 2RM a 15RM y porcentajes;
+  - «Con X kg harías, en teoría, unas Z repeticiones»;
+  - en kg o lb;
+  - se abre desde Entrenar, desde cada ejercicio con peso en la sesión (con tu mejor serie) y desde «Mi progreso» de la ficha;
+  - aclara que es una estimación.
+- **Aviso de salud visible:** «Si tenés molestias o dolor en alguna articulación o músculo, consultá con un profesional…».
+  - Aparece en la ficha de cada ejercicio.
+  - También la primera vez que alguien entrena, con «Entendido».
+- **«Cómo la armamos»:** al crear la rutina se explica qué cambia según el objetivo, el equipamiento y los minutos.
+- Sin migraciones nuevas.
+
 ## v63.1 — Mensaje correcto cuando Supabase no puede mandar el correo (29 de octubre de 2026)
 
 - Al crear una cuenta, si Supabase llegó a su límite de correos por hora («email rate limit exceeded»), la app decía «Probaste muchas veces seguidas», y no era cierto.

@@ -9,6 +9,24 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v64
+
+- `tests/v64.test.mjs` (7 pruebas):
+  - pecho y después tríceps, principales primero, en todos los niveles y equipamientos;
+  - «Empuje» en orden;
+  - trapecio y antebrazos, incluido el aviso cuando no hay ejercicio;
+  - tiempos de 30, 60 y 90 minutos;
+  - calculadora de RM (Epley);
+  - aviso de salud;
+  - traducciones.
+- E2E `v64` (23 pasos, solo la app):
+  - duraciones nuevas, «Cómo la armamos» y tiempo estimado por día;
+  - trapecio y antebrazos; orden pecho → tríceps en la vista previa;
+  - calculadora desde Entrenar, desde la sesión y desde «Mi progreso» (con la mejor marca);
+  - aviso de salud la primera vez, y que no vuelve a aparecer;
+  - aviso en la ficha;
+  - 320 px, inglés y sin errores de JavaScript.
+
 ### v63
 
 - `tests/v63.test.mjs` (6 pruebas): una sola pantalla de cuenta abierta desde toda la app; sin formularios escondidos ni textos técnicos; errores claros, recuperar contraseña, reenviar y Google solo si está activado; aviso al entrar; ayudas del celular; traducciones.

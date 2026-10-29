@@ -1881,3 +1881,25 @@ html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 .home-account-x{width:32px;height:32px;border:0;border-radius:50%;background:none;color:inherit;font-size:1.3rem;line-height:1;opacity:.6;cursor:pointer}
 .more-account[hidden]{display:none}
 .more-account-last{margin-bottom:6px;box-shadow:0 1px 0 var(--ff-border)}
+/* v64: cómo se armó la rutina, calculadora de RM y aviso de salud */
+.plan-why{margin:6px 0 12px;line-height:1.45}
+.rm-fields{grid-template-columns:1fr 1fr minmax(76px,.7fr)}
+.rm-one{display:flex;flex-direction:column;align-items:center;gap:2px;margin:8px 0 10px;padding:12px;border-radius:16px;background:linear-gradient(135deg,rgba(91,108,255,.16),rgba(34,201,147,.1));text-align:center}
+.rm-one strong{font-size:1.8rem;line-height:1.1}
+.rm-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.rm-grid div{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:7px 10px;border-radius:10px;background:var(--ff-panel-2);font-size:.88rem}
+.rm-grid small{opacity:.7;font-weight:700;font-size:.72rem;white-space:nowrap}
+.rm-grid b{white-space:nowrap}
+.rm-sub{margin:12px 0 6px;font-size:.9rem}
+.rm-ask{display:flex;flex-direction:column;gap:6px;margin:12px 0 4px}
+.rm-ask label{font-weight:700;font-size:.88rem}
+.rm-ask input{min-height:44px}
+.rm-answer{margin:0;font-weight:700;color:#5b6cff}
+.rm-answer:empty{display:none}
+@media (max-width:380px){.rm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.rm-fields{grid-template-columns:1fr 1fr}}
+.health-notice{border:1px solid rgba(245,158,11,.45);background:rgba(245,158,11,.1)}
+.health-notice p{margin:4px 0 10px;font-size:.9rem;line-height:1.45}
+.ex-health{margin:0 0 10px;padding:9px 12px;border-radius:12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);font-size:.84rem;line-height:1.4}
+.plan-why ul{margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:2px}
+.plan-why p{margin:4px 0 0}
+.est-min{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--ff-panel-2);font-size:.75rem;font-weight:800;white-space:nowrap}
