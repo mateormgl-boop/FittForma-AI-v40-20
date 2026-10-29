@@ -40,7 +40,7 @@ async function open({ welcome = false, google = false, locale = 'es-UY', viewpor
   const ctx = await browser.newContext({ viewport, locale });
   const page = await ctx.newPage();
   page.on('pageerror', e => errors.push('PAGEERR ' + e.message));
-  page.on('console', m => { if (m.type() === 'error' && !/leaflet|ERR_FAILED|unpkg|status of 40[0-9]/i.test(m.text())) errors.push(m.text()); });
+  page.on('console', m => { if (m.type() === 'error' && !/leaflet|ERR_FAILED|unpkg|status of (40[0-9]|429)/i.test(m.text())) errors.push(m.text()); });
   page.on('dialog', d => d.accept());
   await page.route(/unpkg\.com/, r => r.abort());
   await page.addInitScript(([w, loc]) => { if (!w) localStorage.setItem('fittforma-welcome-v1', '1'); if (loc !== 'es-UY') localStorage.setItem('fittforma-language-v1', loc.slice(0, 2)); setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50); }, [welcome, locale]);
@@ -64,6 +64,7 @@ async function open({ welcome = false, google = false, locale = 'es-UY', viewpor
     if (path === '/signup') {
       if (body.email === NEW) { if (registered.has(NEW)) return json(userObj(NEW_ID, NEW, [])); registered.add(NEW); return json(session(NEW_ID, NEW)); }
       if (body.email === PEND) return json(userObj(PEND_ID, PEND));
+      if (body.email === 'limite63@example.test') return route.fulfill({ status: 429, headers: cors, contentType: 'application/json', body: JSON.stringify({ code: 429, error_code: 'over_email_send_rate_limit', msg: 'email rate limit exceeded' }) });
       return route.fulfill({ ...fail(422, 'weak_password', 'Password should be at least 8 characters.'), headers: cors });
     }
     if (path === '/token') {
@@ -140,6 +141,8 @@ await page.click('#authSheet [data-auth-close].auth-skip'); await page.waitForTi
 step('«Seguir sin cuenta» cierra la pantalla', !(await page.isVisible('#authSheet')));
 // 4) Cuenta que pide confirmar el correo (si en Supabase sigue activado «Confirm email»)
 await page.click('#cloudRegister'); await page.waitForTimeout(300);
+await page.fill('#authEmail', 'limite63@example.test'); await page.fill('#authPassword', PASS); await page.click('#authSubmit'); await page.waitForTimeout(800);
+step('Límite de correos de Supabase: no culpa a la persona («probaste muchas veces»), explica que es por hora', /se llegó al límite de correos por hora/.test(await status(page)) && !/Probaste muchas veces/.test(await status(page)));
 await page.fill('#authEmail', PEND); await page.fill('#authPassword', PASS); await page.click('#authSubmit'); await page.waitForTimeout(900);
 step('Si Supabase pide confirmar el correo, lo dice claro y ofrece reenviar', /Te mandamos un correo para confirmarla/.test(await status(page)) && await page.isVisible('#authResend'));
 await page.click('#authResend'); await page.waitForTimeout(600);

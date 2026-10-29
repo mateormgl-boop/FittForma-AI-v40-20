@@ -1,5 +1,13 @@
 # FittForma AI — Registro de cambios
 
+## v63.1 — Mensaje correcto cuando Supabase no puede mandar el correo (29 de octubre de 2026)
+
+- Al crear una cuenta, si Supabase llegó a su límite de correos por hora («email rate limit exceeded»), la app decía «Probaste muchas veces seguidas», y no era cierto.
+- Ahora explica que no se pudo mandar el correo de confirmación por el límite de correos por hora y que hay que probar en un rato.
+- La causa de fondo se arregla en Supabase:
+  - apagar «Confirm email»: no se manda ningún correo y la cuenta queda lista al instante;
+  - o configurar un servidor de correo propio (SMTP), con un límite mucho mayor.
+
 ## v63.0 — Crear cuenta e iniciar sesión, fácil (28 de octubre de 2026)
 
 - **Al abrir la app por primera vez:** «Crear cuenta», «Iniciar sesión» o «Seguir sin cuenta».

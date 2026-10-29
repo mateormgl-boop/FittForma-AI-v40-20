@@ -25,7 +25,7 @@ test('sin formularios escondidos: Perfil y Comunidad ya no tienen su propio form
 });
 
 test('errores claros, recuperar contraseña, reenviar confirmación y Google solo si está activado', () => {
-  for (const s of ['El correo o la contraseña no coinciden', 'Tu cuenta todavía no está confirmada', 'Ya hay una cuenta con ese correo', 'Probaste muchas veces seguidas', 'No hay conexión'])
+  for (const s of ['se llegó al límite de correos por hora', 'El correo o la contraseña no coinciden', 'Tu cuenta todavía no está confirmada', 'Ya hay una cuenta con ese correo', 'Probaste muchas veces seguidas', 'No hay conexión'])
     assert.ok(html.includes(s), s);
   assert.match(html, /supabaseClient\.auth\.resetPasswordForEmail\(email,\{redirectTo:/);
   assert.match(html, /if\(_event==='PASSWORD_RECOVERY'\)setTimeout\(\(\)=>openAuth\('reset'\),200\)/);
