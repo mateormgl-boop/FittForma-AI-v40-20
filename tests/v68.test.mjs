@@ -5,10 +5,10 @@ import { readFileSync } from 'node:fs';
 
 const html = readFileSync('index.html', 'utf8'), css = readFileSync('design.css', 'utf8'), i18n = readFileSync('i18n-v53.js', 'utf8');
 
-test('guía: hoja con 9 secciones, cada una con pasos y «Ir a…»', () => {
+test('guía: hoja con 10 secciones (v69 suma Ajustes), cada una con pasos y «Ir a…»', () => {
   const sheet = html.slice(html.indexOf('<dialog class="auth-sheet guide-sheet" id="guideSheet"'), html.indexOf('<div class="tour" id="tour"'));
-  assert.equal((sheet.match(/<details class="guide-item">/g) || []).length, 9);
-  for (const v of ['plan', 'train', 'routines', 'nutrition', 'running', 'progress', 'community', 'coach', 'profile']) assert.match(sheet, new RegExp(`data-guide-go="${v}"`), v);
+  assert.equal((sheet.match(/<details class="guide-item">/g) || []).length, 10);
+  for (const v of ['plan', 'train', 'routines', 'nutrition', 'running', 'progress', 'community', 'coach', 'profile', 'settings']) assert.match(sheet, new RegExp(`data-guide-go="${v}"`), v);
   assert.match(sheet, /data-tour-start>Ver el recorrido por la app</);
   assert.match(sheet, /no reemplazan a un profesional de la salud/);
 });
@@ -21,10 +21,10 @@ test('se abre desde «Más», Perfil e Inicio', () => {
   assert.match(html, /initFeedbackUi\(\);initGuideUi\(\);/);
 });
 
-test('recorrido: 6 pasos sobre los botones reales, una sola vez, después de la bienvenida', () => {
+test('recorrido: 7 pasos (v69 suma Ajustes) sobre los botones reales, una sola vez, después de la bienvenida', () => {
   const tour = html.slice(html.indexOf('const TOUR=['), html.indexOf('];', html.indexOf('const TOUR=[')));
-  assert.equal((tour.match(/\{sel:/g) || []).length, 6);
-  for (const sel of ['.mobile-nav-item[data-mobile-view="plan"]', '.mobile-nav-item[data-mobile-view="train"]', '#mobileMoreToggle']) {
+  assert.equal((tour.match(/\{sel:/g) || []).length, 7);
+  for (const sel of ['.mobile-nav-item[data-mobile-view="plan"]', '.mobile-nav-item[data-mobile-view="train"]', '#settingsToggle', '#mobileMoreToggle']) {
     assert.ok(tour.includes(sel), sel);
     const target = sel.startsWith('#') ? `id="${sel.slice(1)}"` : sel.match(/\[(.+)\]/)[1];
     assert.ok(html.includes(target), `existe ${target}`);

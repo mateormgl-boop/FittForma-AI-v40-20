@@ -78,7 +78,7 @@ test('biblioteca y ficha: filtros, orden, lista, historial, agregar a rutina, al
 test('Progreso, Nutrición, Perfil e Hidratación', () => {
   assert.match(html, /id="monthCalendarCard"/); assert.match(html, /id="muscleWeekCard"/);
   assert.match(html, /function repeatMealsFrom\(/); assert.match(html, /have\.has\(`\$\{m\.type\}\|\$\{m\.name\}`\)/, 'no duplica comidas ya registradas hoy');
-  assert.match(html, /id="bodyEditDetails"/); assert.match(html, /class="settings-title">Ajustes/);
+  assert.match(html, /id="bodyEditDetails"/); assert.match(html, /id="view-settings"[^]*?<h2>Ajustes<\/h2>/, 'v69: los ajustes tienen su propia sección');
   assert.doesNotMatch(html, />\+1 vaso de agua</, 'el acceso se llama Hidratación');
   assert.match(html, /<b>Hidratación<\/b>/);
 });

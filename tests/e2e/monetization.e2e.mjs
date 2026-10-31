@@ -246,8 +246,8 @@ try {
   step('Plus: ningún intersticial', !d.shown);
   const plusReward = await p4.evaluate(async () => { const h = await window.FittFormaAuthHeader(); return (await fetch('/api/rewards/start', { method: 'POST', headers: { ...h, 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'ai' }) })).status; });
   step('Plus: el servidor no ofrece videos', plusReward === 409, String(plusReward));
-  await p4.go('profile'); await p4.waitForTimeout(300);
-  step('Perfil muestra «FittForma AI Plus · verificado»', /Plus/.test(await p4.textContent('#membershipStatus')) && /verificado/.test(await p4.textContent('#membershipStatus')));
+  await p4.evaluate(() => window.FittFormaGo('settings:membership')); await p4.waitForTimeout(300);
+  step('Ajustes › Membresía muestra «FittForma AI Plus · verificado»', /Plus/.test(await p4.textContent('#membershipStatus')) && /verificado/.test(await p4.textContent('#membershipStatus')));
   step('Sin errores de página (Plus)', p4.errors.length === 0, p4.errors.join(' | '));
   await p4.close();
 

@@ -83,7 +83,10 @@ let { ctx, page } = await open();
 await page.goto(APP + '/'); await page.waitForTimeout(1500);
 await page.click('.mobile-nav-item[data-mobile-view="nutrition"]'); await page.waitForTimeout(400);
 await page.evaluate(() => window.FittFormaGo('hydration')); await page.waitForTimeout(600);
-step('Hidratación muestra «Recordatorios para tomar agua» a la vista (no escondido)', await page.isVisible('#hydroRemind'));
+// v69: los recordatorios se configuran en Ajustes › Agua; Hidratación muestra el resumen y el acceso.
+step('Hidratación muestra los recordatorios de agua y el acceso a sus ajustes', await page.isVisible('#hydroSettingsLink') && /Recordatorios de agua: 3 por día/.test(await page.textContent('#hydroSettingsLink')));
+await page.click('#hydroSettingsLink [data-go]'); await page.waitForTimeout(700);
+step('Ajustes › Agua abre con «Recordatorios para tomar agua» a la vista', await page.isVisible('#view-settings') && await page.isVisible('#hydroRemind'));
 step('Por defecto, 3 por día: 11:00 · 15:00 · 19:00', (await page.getAttribute('[data-water-count="3"]', 'aria-checked')) === 'true' && /11:00 · 15:00 · 19:00/.test(await page.textContent('#hydroRemindTimes')));
 await page.click('[data-water-count="2"]'); await page.waitForTimeout(150);
 step('Se puede elegir 2 por día', /11:00 · 16:00/.test(await page.textContent('#hydroRemindTimes')) && (await page.evaluate(() => JSON.parse(localStorage.getItem('fittforma-ai-v4')).hydration.reminder.perDay)) === 2);
@@ -112,18 +115,17 @@ step('Confirma «¡Gracias! Recibimos tu mensaje.»', /Gracias! Recibimos tu men
 await page.waitForTimeout(2000);
 step('La hoja se cierra sola', !(await page.isVisible('#feedbackSheet')));
 sql(`set request.jwt.claim.sub='${NEW_ID}'; insert into app_feedback(user_id,message) select '${NEW_ID}','relleno '||g from generate_series(1,4) g`);
-await page.click('.mobile-nav-item[data-mobile-view="profile"]'); await page.waitForTimeout(300);
-await page.evaluate(() => document.getElementById('feedbackCard')?.closest('details')?.setAttribute('open', ''));
+await page.evaluate(() => window.FittFormaGo('settings:help')); await page.waitForTimeout(500);
 await page.click('#feedbackCard [data-feedback-open]'); await page.waitForTimeout(300);
 await page.fill('#feedbackText', 'Otra idea más'); await page.click('#feedbackSubmit'); await page.waitForTimeout(1000);
-step('Desde Perfil también se abre, y hay un límite de 5 por día', /máximo de 5 sugerencias por día/.test(await page.textContent('#feedbackStatus')) && sql(`select count(*) from app_feedback where user_id='${NEW_ID}'`) === '5');
+step('Desde Ajustes › Ayuda también se abre, y hay un límite de 5 por día', /máximo de 5 sugerencias por día/.test(await page.textContent('#feedbackStatus')) && sql(`select count(*) from app_feedback where user_id='${NEW_ID}'`) === '5');
 step('Desde la app nadie puede leer las sugerencias (ni la propia cuenta)', sql(`select has_table_privilege('authenticated','public.app_feedback','select')::text||has_table_privilege('anon','public.app_feedback','select')::text`) === 'falsefalse');
 await ctx.close();
 
 // 3) Inglés
 ({ ctx, page } = await open({ locale: 'en-US' }));
 await page.goto(APP + '/'); await page.waitForTimeout(1500);
-await page.evaluate(() => window.FittFormaGo('hydration')); await page.waitForTimeout(600);
+await page.evaluate(() => window.FittFormaGo('settings:water')); await page.waitForTimeout(600);
 step('En inglés, la tarjeta del agua está traducida', /Water reminders/.test(await page.textContent('#hydroRemind')) && /Add to my calendar/.test(await page.textContent('#waterCalendar')));
 await ctx.close();
 

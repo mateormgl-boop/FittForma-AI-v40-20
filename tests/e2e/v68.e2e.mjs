@@ -23,13 +23,13 @@ const ringOn = page => page.evaluate(sel => { const r = document.getElementById(
 let { ctx, page } = await open({ welcome: true });
 step('La bienvenida aparece la primera vez', await page.isVisible('#welcomeScreen'));
 await page.click('#welcomeStart'); await page.waitForTimeout(300); await page.click('#welcomeSkip'); await page.waitForTimeout(900);
-step('Al cerrar la bienvenida empieza el recorrido', await page.isVisible('#tour') && /Paso 1 de 6/.test(await page.textContent('#tourCount')) && (await page.textContent('#tourTitle')) === 'Inicio');
+step('Al cerrar la bienvenida empieza el recorrido (7 pasos)', await page.isVisible('#tour') && /Paso 1 de 7/.test(await page.textContent('#tourCount')) && (await page.textContent('#tourTitle')) === 'Inicio');
 await page.click('#tourNext'); await page.waitForTimeout(300);
 step('Paso 2: Entrenar, con el botón de abajo resaltado', (await page.textContent('#tourTitle')) === 'Entrenar' && await ringOn(page));
 step('El texto explica qué tocar', /Empezar ahora/.test(await page.textContent('#tourText')));
 step('La tarjeta del recorrido entra en la pantalla', await page.evaluate(() => { const r = document.getElementById('tourCard').getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight; }));
-for (let i = 0; i < 4; i++) { await page.click('#tourNext'); await page.waitForTimeout(250); }
-step('Paso 6: «Más», y el botón dice «Listo»', (await page.textContent('#tourTitle')) === 'Más' && (await page.textContent('#tourNext')) === 'Listo');
+for (let i = 0; i < 5; i++) { await page.click('#tourNext'); await page.waitForTimeout(250); }
+step('Paso 7: «Más», y el botón dice «Listo»', (await page.textContent('#tourTitle')) === 'Más' && (await page.textContent('#tourNext')) === 'Listo');
 await page.click('#tourNext'); await page.waitForTimeout(400);
 step('Al terminar se cierra y avisa dónde está la guía', !(await page.isVisible('#tour')) && /Cómo usar la app/.test(await page.textContent('#toast')));
 await page.reload(); await page.waitForTimeout(1300);
@@ -38,7 +38,7 @@ step('No vuelve a aparecer al abrir la app de nuevo', !(await page.isVisible('#t
 // 2) Inicio: aviso para quien recién empieza → abre la guía.
 step('Inicio muestra «¿Primera vez en FittForma?»', await page.isVisible('#guideHint'));
 await page.click('#guideHint [data-guide-open]'); await page.waitForTimeout(300);
-step('Abre «Cómo usar la app» con las 9 secciones', await page.isVisible('#guideSheet') && (await page.$$('#guideSheet .guide-item')).length === 9);
+step('Abre «Cómo usar la app» con las 10 secciones (v69 suma Ajustes)', await page.isVisible('#guideSheet') && (await page.$$('#guideSheet .guide-item')).length === 10);
 await page.click('#guideSheet .guide-item:nth-child(2) summary'); await page.waitForTimeout(200);
 step('Cada sección explica cómo se usa', /marcá cada serie al terminarla/.test(await page.textContent('#guideSheet .guide-item:nth-child(2)')));
 await page.click('#guideSheet [data-guide-go="train"]'); await page.waitForTimeout(500);
@@ -57,8 +57,8 @@ await page.click('#guideSheet [data-tour-start]'); await page.waitForTimeout(400
 step('«Ver el recorrido por la app» lo vuelve a mostrar', await page.isVisible('#tour') && !(await page.isVisible('#guideSheet')));
 await page.keyboard.press('Escape'); await page.waitForTimeout(200);
 step('Escape cierra el recorrido', !(await page.isVisible('#tour')));
-await page.click('.mobile-nav-item[data-mobile-view="profile"]'); await page.waitForTimeout(400);
-step('Perfil → Ayuda tiene «Cómo usar la app»', await page.$('#guideCard [data-guide-open]') !== null && await page.$('#guideCard [data-tour-start]') !== null);
+await page.evaluate(() => window.FittFormaGo('settings:help')); await page.waitForTimeout(400);
+step('Ajustes → Ayuda tiene «Cómo usar la app»', await page.$('#guideCard [data-guide-open]') !== null && await page.$('#guideCard [data-tour-start]') !== null);
 await ctx.close();
 
 // 4) A 320 px y en inglés.
@@ -69,7 +69,7 @@ await ctx.close();
 ({ ctx, page } = await open({ lang: 'en' }));
 await page.waitForTimeout(800);
 await page.evaluate(() => document.querySelector('[data-tour-start]').click()); await page.waitForTimeout(500);
-step('En inglés el recorrido está traducido', (await page.textContent('#tourCount')).trim() === 'Step 1 of 6' && (await page.textContent('#tourTitle')).trim() === 'Home' && (await page.textContent('#tourNext')).trim() === 'Next', `${await page.textContent('#tourCount')} | ${await page.textContent('#tourTitle')}`);
+step('En inglés el recorrido está traducido', (await page.textContent('#tourCount')).trim() === 'Step 1 of 7' && (await page.textContent('#tourTitle')).trim() === 'Home' && (await page.textContent('#tourNext')).trim() === 'Next', `${await page.textContent('#tourCount')} | ${await page.textContent('#tourTitle')}`);
 await page.keyboard.press('Escape');
 await page.evaluate(() => document.querySelector('[data-guide-open]').click()); await page.waitForTimeout(400);
 step('…y la guía también', (await page.textContent('#guideTitle')).trim() === 'How to use the app' && /Train with friends\./.test(await page.textContent('#guideSheet')));

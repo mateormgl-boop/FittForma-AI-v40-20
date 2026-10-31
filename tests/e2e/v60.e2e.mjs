@@ -82,9 +82,8 @@ step('La pestaña del navegador dice la sección', (await page.title()) === 'Nut
 await page.click('.mobile-nav-item[data-mobile-view="train"]'); await page.waitForTimeout(250);
 step('Al cambiar de sección cambia el título; la dirección queda limpia (recargar abre Inicio)', (await page.title()) === 'Entrenar · FittForma AI' && !page.url().includes('#'));
 step('Vista previa al compartir con imagen', (await page.getAttribute('meta[property="og:image"]', 'content')) === '/og-image.png');
-await page.click('.mobile-nav-item[data-mobile-view="profile"]'); await page.waitForTimeout(300);
-await page.evaluate(() => document.getElementById('faqCard').closest('details').open = true);
-step('Perfil tiene 7 preguntas frecuentes y el enlace a la política', (await page.$$('#faqCard .faq-item')).length === 7 && await page.isVisible('#privacyPolicyLink'));
+await page.evaluate(() => window.FittFormaGo('settings:help')); await page.waitForTimeout(400);
+step('Ajustes › Ayuda tiene 7 preguntas frecuentes y el enlace a la política', (await page.$$('#faqCard .faq-item')).length === 7 && await page.isVisible('#privacyPolicyLink'));
 await page.goto(APP + '/privacidad.html'); await page.waitForTimeout(400);
 step('La política no inventa responsable ni correo', /todavía no publicado/.test(await page.textContent('#ownerName')) && /todavía no completó/.test(await page.textContent('#legalOwner')));
 await page.goto(APP + '/no-existe/ruta'); await page.waitForTimeout(300);

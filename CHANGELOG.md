@@ -1,5 +1,19 @@
 # FittForma AI — Registro de cambios
 
+## v69.0 — Ajustes en un solo lugar, el Muro dentro de Amigos y Perfil con «Este mes» (31 de octubre de 2026)
+
+Pedido de la persona dueña: «que el muro aparezca en Amigos» y «una sección de ajustes con todo lo que está en otras secciones».
+
+- **Ajustes:** un engranaje arriba a la derecha, al lado de «Más» (no adentro). Reemplaza al botón de modo claro/oscuro, que pasa a Ajustes.
+  - 10 grupos: Cuenta y sincronización, Preferencias de entrenamiento, Apariencia e idioma, Recordatorios, Agua, Inicio, Privacidad en Comunidad, Ayuda y privacidad, Membresía y Versión.
+  - **Buscador:** «agua», «idioma», «contraseña»… (sin importar tildes ni mayúsculas; también en otros idiomas).
+  - Donde estaba cada cosa queda un acceso: «Ajustes del agua» en Hidratación (con el resumen «Recordatorios de agua: 3 por día»), «Abrir privacidad» en Comunidad › Mi perfil y «Personalizar inicio» en Inicio.
+  - No cambia ningún dato guardado: solo se movieron los controles.
+- **Amigos con tres partes:** Muro (abre primero), Desafíos (reto de la semana y desafíos del mes) y Mis amigos. Comunidad vuelve a tener tres pestañas: Todos, Ranking y Amigos. Los avisos de aplausos y comentarios llevan a Amigos › Muro.
+- **Perfil:** lo tuyo (foto, nombre, medidas e insignias), «Este mes» (racha, entrenamientos, días activos y km; cada número lleva a su sección) y un acceso a Ajustes.
+- La guía «Cómo usar la app» suma Ajustes (10 secciones) y el recorrido inicial un paso (7).
+- Traducido a los seis idiomas. Sin migraciones nuevas.
+
 ## v68.0 — «Cómo usar la app» y recorrido inicial (29 de octubre de 2026)
 
 Pedido de usuarios de prueba: «les cuesta entender la app».

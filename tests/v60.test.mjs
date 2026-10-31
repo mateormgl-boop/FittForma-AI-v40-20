@@ -96,7 +96,7 @@ test('política de privacidad según el código, sin responsable ni correo inven
 
 test('ayuda: preguntas frecuentes en Perfil y textos nuevos traducidos', () => {
   assert.equal((html.match(/class="faq-item"/g) || []).length, 7);
-  assert.equal((html.match(/<details class="ff-group"/g) || []).length, 7, 'la ayuda va dentro de un grupo existente');
+  assert.equal((html.match(/<details class="ff-group"/g) || []).length, 10, 'la ayuda va dentro de un grupo existente (v69: Ajustes suma Agua, Inicio y Privacidad)');
   for (const s of ['Ayuda y privacidad', '¿Mis datos se guardan en la nube?', '¿Cómo borro mis datos?', 'Que te avise', 'Agregar al calendario', 'Superserie con el siguiente', '¿Qué discos pongo?', 'Sonido', 'Vibración'])
     assert.ok(i18n.includes(JSON.stringify(s) + ','), s);
   assert.match(css, /\.pc-plate\{/); assert.match(css, /\.ss-badge\{/); assert.match(css, /\.wp-remind\{/);

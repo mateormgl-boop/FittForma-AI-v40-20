@@ -121,7 +121,7 @@ step('No las duplica si ya están', (await st()).meals.length === 4);
 
 // Perfil
 await page.click('.mobile-nav-item[data-mobile-view="profile"]'); await page.waitForTimeout(300);
-step('Perfil: el formulario de datos queda plegado si ya están completos', !(await page.evaluate(() => document.getElementById('bodyEditDetails').open)) && await page.isVisible('.settings-title'));
+step('Perfil: el formulario de datos queda plegado si ya están completos', !(await page.evaluate(() => document.getElementById('bodyEditDetails').open)) && await page.isVisible('.profile-settings-link')); // v69: los ajustes pasaron a su propia sección
 
 // 320 px
 await page.setViewportSize({ width: 320, height: 720 }); await page.waitForTimeout(200);

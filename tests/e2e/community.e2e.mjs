@@ -232,8 +232,8 @@ await page.click(`#communityReportsList [data-report-remove="${achId}"]`); await
 step('Moderador elimina la publicación denunciada', sql(`select count(*) from community_posts where id='${achId}'`) === '0');
 
 // Copia en la nube (user_app_data real vía PostgREST): guardar, borrar local y volver a cargar.
-await page.click('.mobile-nav-item[data-mobile-view="profile"]'); await page.waitForTimeout(600);
-await page.evaluate(() => { const d = document.getElementById('cloudAccountCard')?.closest('details'); if (d) d.open = true; });
+// v69: la cuenta y la copia en la nube están en Ajustes.
+await page.evaluate(() => window.FittFormaGo('settings:account')); await page.waitForTimeout(600);
 const localBadges = () => page.evaluate(() => (JSON.parse(localStorage.getItem('fittforma-ai-v4') || '{}').badgeRecords || []).length);
 await page.click('#cloudUpload'); await page.waitForTimeout(1200);
 step('Guardar en la nube crea la copia de A', sql(`select jsonb_array_length(data->'badgeRecords') from user_app_data where user_id='aaaaaaaa-0000-0000-0000-000000000001'`) === '1');

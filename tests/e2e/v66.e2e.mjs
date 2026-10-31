@@ -112,8 +112,9 @@ const open = async (lang = '', withSeed = true) => {
 let { ctx, page } = await open('', false);
 await page.goto(APP + '/'); await page.waitForTimeout(900);
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(900);
-step('Comunidad tiene «Muro» entre Todos y Ranking', (await page.$$eval('.cm-tabs [role=tab]', t => t.map(x => x.textContent.trim()).join('|'))) === 'Todos|Muro|Ranking|Amigos');
-await page.click('#communityTabWall'); await page.waitForTimeout(900);
+// v69: el Muro es la primera parte de Amigos.
+step('Comunidad: Todos, Ranking y Amigos; el Muro abre primero en Amigos', (await page.$$eval('.cm-tabs [role=tab]', t => t.map(x => x.textContent.trim()).join('|'))) === 'Todos|Ranking|Amigos' && (await page.textContent('[data-friends-part="wall"]')).trim() === 'Muro');
+await page.click('#communityTabFriends'); await page.waitForTimeout(500); await page.click('[data-friends-part="wall"]'); await page.waitForTimeout(900);
 const wallOut = await page.textContent('#communityWall');
 step('Sin sesión: «Tu muro te espera» con Iniciar sesión y ninguna publicación', /Tu muro te espera/.test(wallOut) && !/Piernas|Franco/.test(wallOut) && !!(await page.$('#communityWall [data-auth-open="login"]')));
 await ctx.close();
@@ -132,7 +133,7 @@ step('Al iniciar sesión se guardan los números del mes', month === `${inMonth 
 await page.click('#communityStatsNoticeOk').catch(() => {});
 
 // 2) Muro: lo de Bruno (seguido), no lo de Franco (desconocido).
-await page.click('#communityTabWall'); await page.waitForTimeout(1500);
+await page.click('#communityTabFriends'); await page.waitForTimeout(500); await page.click('[data-friends-part="wall"]'); await page.waitForTimeout(1500);
 let wall = (await page.textContent('#communityWall')).replace(/\s+/g, ' ');
 step('El muro muestra el entrenamiento que compartió Bruno con sus números', /Bruno Fit/.test(wall) && /Piernas/.test(wall) && /52 min/.test(wall) && /18 series/.test(wall), wall.slice(0, 200));
 step('El muro NO muestra a quien Alicia no sigue', !/Franco/.test(wall));
@@ -147,7 +148,7 @@ await page.fill(`${post} [data-community-comment-form] input[name=body]`, '¡Qu�
 step('Comentar también avisa a Bruno', sql(`select count(*) from community_notifications where user_id='${B}' and actor_id='${A}' and kind='comment'`) === '1' && /Qué sesión/.test(await page.textContent(post)));
 
 // 4) Desafíos del mes (en Amigos): avance propio, amigos al lado y compartir un desafío cumplido.
-await page.click('#communityTabFriends'); await page.waitForTimeout(1500);
+await page.click('#communityTabFriends'); await page.waitForTimeout(500); await page.click('[data-friends-part="challenges"]'); await page.waitForTimeout(1500);
 const mBox = (await page.textContent('#communityMonth')).replace(/\s+/g, ' ');
 step('«Desafíos del mes» con las tres metas', await page.isVisible('#communityMonth') && /12 entrenamientos/.test(mBox) && /15 días activos/.test(mBox) && /30 km corriendo/.test(mBox), mBox.slice(0, 160));
 step('Muestra a Bruno con sus 9 entrenamientos del mes', /Bruno Fit\s*9/.test(mBox));
@@ -182,7 +183,7 @@ step('«Ahora no» lo cierra y no publica nada', await share.count() === 0 && sq
 
 // 7) El muro muestra lo propio y la carrera con el ritmo.
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(600);
-await page.click('#communityTabWall'); await page.waitForTimeout(1500);
+await page.click('#communityTabFriends'); await page.waitForTimeout(500); await page.click('[data-friends-part="wall"]'); await page.waitForTimeout(1500);
 wall = (await page.textContent('#communityWall')).replace(/\s+/g, ' ');
 step('Mi carrera aparece en el muro con distancia, tiempo y ritmo', /Salió a correr/.test(wall) && /6,2 km|6\.2 km/.test(wall) && /5:29 \/km/.test(wall), wall.slice(0, 220));
 
@@ -191,7 +192,7 @@ sql(`insert into community_notifications(user_id,kind,actor_id) values('${A}','a
 await page.click('#communityTabAlerts'); await page.waitForTimeout(1200);
 step('Avisos: «Bruno Fit aplaudió tu publicación»', /Bruno Fit\s*aplaudió tu publicación/.test(await page.textContent('#communityPanelAlerts')));
 await page.click('#communityPanelAlerts [data-alert-kind="applause"]'); await page.waitForTimeout(900);
-step('Tocar el aviso abre el muro', (await page.getAttribute('#communityTabWall', 'aria-selected')) === 'true');
+step('Tocar el aviso abre el muro (Amigos › Muro)', (await page.getAttribute('#communityTabFriends', 'aria-selected')) === 'true' && (await page.getAttribute('[data-friends-part="wall"]', 'aria-pressed')) === 'true' && await page.isVisible('#communityWall'));
 await page.setViewportSize({ width: 320, height: 720 }); await page.waitForTimeout(300);
 step('A 320 px el muro no se desborda', await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
 await ctx.close();
@@ -200,7 +201,7 @@ await ctx.close();
 ({ ctx, page } = await open('en', false));
 await page.goto(APP + '/'); await page.waitForTimeout(1500);
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(800);
-step('En inglés la pestaña se llama «Wall»', (await page.textContent('#communityTabWall')).trim() === 'Wall');
+step('En inglés la parte se llama «Wall»', (await page.textContent('[data-friends-part="wall"]')).trim() === 'Wall');
 await ctx.close();
 
 step('Sin errores de página ni de consola', errors.length === 0, errors.slice(0, 4).join(' || '));

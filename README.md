@@ -1,8 +1,14 @@
-# FittForma AI — v68.0
+# FittForma AI — v69.0
 
 Aplicación fitness web instalable como PWA: frontend móvil en `index.html` (HTML/CSS/JS sin
 compilación), backend Node.js sin dependencias (`backend/server.mjs`), IA con Gemini desde el
 servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub (`render.yaml`).
+
+## Novedades v69.0
+
+- Ajustes en un solo lugar (engranaje al lado de «Más»), con buscador.
+- El Muro va dentro de Amigos (Muro · Desafíos · Mis amigos).
+- Perfil con «Este mes» y acceso a Ajustes. Sin migraciones nuevas.
 
 ## Novedades v68.0
 

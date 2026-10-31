@@ -34,8 +34,9 @@ test('actividad compartida: solo números registrados, carreras sin mapa, visibl
 
 test('muro: pestaña propia, solo amigos y aplausos en lugar de «me gusta»', () => {
   const view = html.slice(html.indexOf('id="view-community"'), html.indexOf('id="view-profile"'));
-  assert.match(view, /id="communityTabWall"[^>]*data-community-tab="wall"[^>]*>Muro<\/button>/);
-  for (const id of ['communityPanelWall', 'communityWall', 'communityWallStatus', 'communityWallMore', 'communityMonth']) assert.match(view, new RegExp(`id="${id}"`), id);
+  // v69: el muro es la primera parte de Amigos (Muro · Desafíos · Mis amigos).
+  assert.match(view, /data-friends-part="wall" aria-pressed="true">Muro<\/button>/);
+  for (const id of ['communityFriendsWall', 'communityWall', 'communityWallStatus', 'communityWallMore', 'communityMonth']) assert.match(view, new RegExp(`id="${id}"`), id);
   assert.match(community, /client\.rpc\('community_wall_ids',\{p_before:wallBefore,p_limit:15\}\)/);
   assert.ok(community.includes(`'Aplaudir'}" title="Aplausos">\${ICON.clap}`), 'botón «Aplaudir» con el ícono de aplausos');
   assert.match(community, /applause:'aplaudió tu publicación',comment:'comentó tu publicación'/);
