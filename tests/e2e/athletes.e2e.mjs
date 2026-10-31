@@ -108,7 +108,7 @@ sql(`delete from community_physique where user_id='${A}'; delete from community_
 await page.goto(APP + '/'); await page.waitForTimeout(800);
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(1200);
 step('1. Comunidad abre en «Todos»', (await page.getAttribute('#communityTabWorld', 'aria-selected')) === 'true' && await page.isVisible('#communityPanelWorld'));
-step('2. Cuatro apartados (v66: «Muro» solo de amigos) y ningún feed general ni «Para vos»', (await page.$$eval('.cm-tabs [role=tab]', t => t.map(x => x.textContent.trim()).join('|'))) === 'Todos|Muro|Ranking|Amigos' && !(await page.$('#communityFeed')) && !(await page.$('[data-feed-mode]')) && !/Para vos/.test(await page.textContent('#view-community')));
+step('2. Tres apartados (v69: el «Muro» de amigos va dentro de Amigos) y ningún feed general ni «Para vos»', (await page.$$eval('.cm-tabs [role=tab]', t => t.map(x => x.textContent.trim()).join('|'))) === 'Todos|Ranking|Amigos' && !(await page.$('#communityFeed')) && !(await page.$('[data-feed-mode]')) && !/Para vos/.test(await page.textContent('#view-community')));
 let people = await page.textContent('#communityPeople');
 step('3. Sin sesión: perfiles públicos con nivel y rango', /Bruno Fit/.test(people) && /Avanzado/.test(people) && /Plata/.test(people) && !/carla_priv53/.test(people), people.replace(/\s+/g, ' ').slice(0, 160));
 step('3. Las estadísticas ocultas no aparecen', !/Leyenda/.test(people));
@@ -160,7 +160,8 @@ step('8. Ranking de amigos: solo vos y quienes seguís', /Bruno Fit/.test(board)
 await page.click('#rankingPodium [data-community-open-user]'); await page.waitForTimeout(1200);
 step('7. El ranking abre el mismo perfil completo', /Rango principal/.test(await page.textContent('#communityUserProfile')));
 
-await page.click('#communityTabFriends'); await page.waitForTimeout(1500);
+// v69: Amigos abre en el Muro; la lista está en «Mis amigos».
+await page.click('#communityTabFriends'); await page.waitForTimeout(800); await page.click('[data-friends-part="list"]'); await page.waitForTimeout(1200);
 let friends = await page.textContent('#communityFriends');
 step('9. Amigos refleja el seguimiento aceptado', /Bruno Fit/.test(friends) && !/Diego/.test(friends) && /Comparar/.test(friends) && /en rango/.test(friends), friends.replace(/\s+/g, ' ').slice(0, 160));
 await page.click('#communityTabWorld'); await page.waitForTimeout(900);
@@ -181,10 +182,12 @@ step('12. Perfil privado: sin bio ni estadísticas', /Este perfil es privado/.te
 step('12. La tabla no se puede leer directamente', sql(`set role authenticated; set request.jwt.claim.sub='${A}'; select count(*) from community_athlete_stats`) === 'SET\nSET\n1');
 
 // Ocultar las propias estadísticas.
-await page.click('#communityTabProfile'); await page.waitForTimeout(900);
-step('Mi perfil: interruptor de estadísticas activado por defecto', await page.isChecked('#communityStatsPublic'));
+// v69: la privacidad de Comunidad se eligió mover a Ajustes.
+await page.evaluate(() => window.FittFormaGo('settings:privacy')); await page.waitForTimeout(1500);
+step('Ajustes › Privacidad: interruptor de estadísticas activado por defecto', await page.isChecked('#communityStatsPublic'));
 await page.uncheck('#communityStatsPublic'); await page.waitForTimeout(1200);
 step('Ocultar se guarda en la base', sql(`select stats_public from community_athlete_stats where user_id='${A}'`) === 'f');
+await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(800);
 await page.click('#communityTabRanking'); await page.waitForTimeout(1200);
 step('Con estadísticas ocultas no aparece en el ranking', !(await page.$$eval('#communityPanelRanking [data-community-open-user]', b => b.map(x => x.getAttribute('aria-label')).join('|'))).includes(': Vos,'));
 // Mapa de avances (Progreso › Músculos) usa la misma preferencia.
@@ -249,12 +252,13 @@ await page.click('#communityViewOwnPublic'); await page.waitForTimeout(1800);
 const asOthers = await page.textContent('#communityUserProfile');
 if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/asothers.png`, fullPage: true });
 step('v53.1 «Ver cómo me ven» abre el perfil con «Mi físico», mapa de músculos y bandera', /Así ven tu perfil/.test(asOthers) && /Mi físico/.test(asOthers) && /Mapa de músculos/.test(asOthers) && /🇺🇾/.test(asOthers), asOthers.replace(/\s+/g, ' ').slice(0, 160));
-await page.click('#communityTabProfile'); await page.waitForTimeout(900);
+await page.evaluate(() => window.FittFormaGo('settings:privacy')); await page.waitForTimeout(1500);
 await page.uncheck('#communityShowMuscles'); await page.waitForTimeout(1300);
 step('v53.1 Ocultar el mapa de músculos', sql(`select show_muscles from community_athlete_stats where user_id='${A}'`) === 'f');
+await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(800); await page.click('#communityTabProfile'); await page.waitForTimeout(600);
 await page.click('#communityViewOwnPublic'); await page.waitForTimeout(1500);
 step('v53.1 Con el mapa oculto, el perfil propio lo sigue mostrando solo a vos', /Mapa de músculos/.test(await page.textContent('#communityUserProfile')));
-await page.click('#communityTabProfile'); await page.waitForTimeout(600); await page.check('#communityShowMuscles'); await page.waitForTimeout(1000);
+await page.evaluate(() => window.FittFormaGo('settings:privacy')); await page.waitForTimeout(1500); await page.check('#communityShowMuscles'); await page.waitForTimeout(1000);
 await page.click('.mobile-nav-item[data-mobile-view="plan"]'); await page.waitForTimeout(600);
 await page.click('[data-home-muscles]'); await page.waitForTimeout(1200);
 step('v53.1 Inicio tiene acceso directo a Músculos', await page.isVisible('#progressPanelMuscles'));
@@ -273,9 +277,10 @@ await page.click('[data-ranking-period="week"]'); await page.waitForTimeout(1200
 const weekBoard = await page.$$eval('#communityPanelRanking [data-community-open-user]', b => b.map(x => x.getAttribute('aria-label')).join('|'));
 step('v54 Ranking de esta semana ordenado por el servidor', /Bruno Fit, 4 días/.test(weekBoard) && /Esta semana/.test(await page.textContent('#rankingExplain')), weekBoard);
 await page.click('[data-ranking-period="30d"]'); await page.waitForTimeout(300);
-await page.click('#communityTabFriends'); await page.waitForTimeout(1600);
+await page.click('#communityTabFriends'); await page.waitForTimeout(800); await page.click('[data-friends-part="challenges"]'); await page.waitForTimeout(1600);
 const ch = await page.textContent('#communityChallenge');
 step('v54 Reto de la semana entre amigos, con quién ganó la semana pasada', await page.isVisible('#communityChallenge') && /Más días activos/.test(ch) && /4 de 7/.test(ch) && /Semana pasada: Bruno Fit con 5 días activos/.test(ch), ch.replace(/\s+/g, ' ').slice(0, 200));
+await page.click('[data-friends-part="list"]'); await page.waitForTimeout(1200);
 await page.click(`#communityFriends [data-community-compare="${B}"]`); await page.waitForTimeout(1800);
 const evo = await page.textContent('#communityCompare');
 step('v61 La comparación incluye músculo por músculo (mapas de los dos y quién va adelante)', /Músculos/.test(evo) && (await page.$$('#communityCompare .cm-mvs-maps svg')).length === 2 && (await page.$$('#communityCompare .cm-mvs-row:not(.cm-mvs-head)')).length >= 3 && /a tu favor/.test(evo), evo.replace(/\s+/g, ' ').slice(0, 200));
@@ -305,7 +310,7 @@ await page.click('#communityUserProfile [data-user-message]'); await page.waitFo
 step('v62 La cabecera del chat dice «Ver perfil»', await page.isVisible('#communityChatWho') && /Bruno Fit/.test(await page.textContent('#communityChatWho')));
 await page.click('#communityChatWho'); await page.waitForTimeout(1500);
 step('v62 Tocar el nombre o la foto en el chat abre su perfil', await page.isVisible('#communityPanelUser') && /@bruno_fit/.test(await page.textContent('#communityUserProfile')));
-await page.click('#communityTabProfile'); await page.waitForTimeout(1500);
+await page.evaluate(() => window.FittFormaGo('settings:privacy')); await page.waitForTimeout(1500);
 step('v62 Mis datos físicos: todo apagado por defecto y nada en la nube', !(await page.$$eval('#communityBodyCard input[type=checkbox]', l => l.some(x => x.checked))) && sql(`select count(*) from community_body where user_id='${A}'`) === '0');
 await page.click('#communityBodyWeight'); await page.waitForTimeout(800);
 step('v62 Sin peso cargado no se activa y explica dónde cargarlo', !(await page.isChecked('#communityBodyWeight')) && /Primero cargá tu peso actual en Perfil/.test(await page.textContent('#communityBodyStatus')) && sql(`select count(*) from community_body where user_id='${A}'`) === '0');
@@ -316,6 +321,7 @@ await page.check('#communityBodyWeight'); await page.waitForTimeout(1200);
 step('v62 Al activarlo se guarda solo el peso (la altura sigue privada)', sql(`select weight_kg::text||'|'||coalesce(height_cm::text,'-')||'|'||coalesce(goal,'-') from community_body where user_id='${A}'`) === '68.0|-|-' && /68 kg/.test(await page.textContent('#communityBodyWeightVal')));
 await setWeight('70'); await page.waitForTimeout(4000);
 step('v62 Si cambia el peso en Perfil, se actualiza solo lo activado', sql(`select weight_kg::text||'|'||coalesce(height_cm::text,'-') from community_body where user_id='${A}'`) === '70.0|-');
+await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(800); await page.click('#communityTabProfile'); await page.waitForTimeout(600);
 await page.click('#communityViewOwnPublic'); await page.waitForTimeout(1500);
 bp = await page.textContent('#communityUserProfile');
 step('v62 «Ver cómo me ven» muestra el peso elegido y nada más', /Datos físicos/.test(bp) && /70 kg/.test(bp) && !/170 cm/.test(bp));
@@ -326,9 +332,10 @@ if (ownBadge) { await ownBadge.click(); await page.waitForTimeout(500);
   step('v62 «Ver en mis insignias» abre Progreso › Insignias', await page.evaluate(() => document.getElementById('view-progress').classList.contains('active') && document.querySelector('[data-progress-tab="badges"]').getAttribute('aria-selected') === 'true'));
   await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(800);
 } else step('v62 Una insignia propia ofrece «Ver en mis insignias»', false, 'el perfil propio no tiene insignias');
-await page.click('#communityTabProfile'); await page.waitForTimeout(1500);
+await page.evaluate(() => window.FittFormaGo('settings:privacy')); await page.waitForTimeout(1500);
 await page.uncheck('#communityBodyWeight'); await page.waitForTimeout(1200);
 step('v62 Al apagarlo, el peso se quita de la nube', sql(`select coalesce(weight_kg::text,'null') from community_body where user_id='${A}'`) === 'null' && /volvió a ser privado/.test(await page.textContent('#communityBodyStatus')));
+await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(800);
 await page.evaluate(id => window.FittFormaCommunity.openProfile(id), B); await page.waitForTimeout(1300);
 // Historial privado de «Mi físico»: con el plazo cumplido, cambiar una foto guarda la anterior.
 sql(`alter table community_physique disable trigger community_physique_guard; update community_physique set changed_at=now()-interval '40 days' where user_id='${A}'; alter table community_physique enable trigger community_physique_guard`);

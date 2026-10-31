@@ -9,6 +9,12 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v69
+
+- `npm test`: se actualizaron las pruebas que contaban los grupos de Perfil (ahora 10 grupos en Ajustes) y las pestañas de Comunidad (vuelven a ser tres).
+- E2E `v69` (30 pasos): engranaje al lado de «Más» (no adentro); 10 grupos; buscador (sin tildes, sin mayúsculas, sin resultados, en inglés); tema desde Ajustes; agua desde Hidratación y de vuelta; «Personalizar inicio»; privacidad de Comunidad (datos físicos apagados por defecto) y su acceso desde Mi perfil; Amigos con Muro, Desafíos y Mis amigos; Perfil con «Este mes» y acceso a Ajustes; 320 px.
+- Se adaptaron `athletes`, `cloud-backup`, `monetization`, `v60`, `v63`, `v65`, `v66`, `v67` y `v68` a los lugares nuevos (mismas comprobaciones).
+
 ### v68
 
 - `tests/v68.test.mjs` (4 pruebas): la guía tiene 9 secciones con «Ir a…»; se abre desde Más, Perfil e Inicio; el recorrido apunta a botones que existen, una sola vez y después de la bienvenida, con Escape y movimiento reducido; traducciones.

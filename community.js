@@ -331,7 +331,7 @@
     const on=!data;document.querySelectorAll(`[data-community-like="${CSS.escape(postId)}"]`).forEach(b=>{b.classList.toggle('is-on',on);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',tr(on?'Quitar me gusta':'Me gusta'));const c=b.querySelector('[data-like-count]');if(c)c.textContent=String(Math.max(0,(Number(c.textContent)||0)+(on?1:-1)));});if(!button)await refreshPosts();}
   async function toggleSave(postId){if(!authReady())return alert(tr(authHint()));const on=!document.querySelector(`[data-community-save="${CSS.escape(postId)}"]`)?.classList.contains('is-on');const result=on?await client.from('community_saved_posts').insert({user_id:user.id,post_id:postId}):await client.from('community_saved_posts').delete().eq('user_id',user.id).eq('post_id',postId);if(result.error){status(friendlySupabaseError(result.error,'guardar la publicación'));return;}document.querySelectorAll(`[data-community-save="${CSS.escape(postId)}"]`).forEach(b=>{b.classList.toggle('is-on',on);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',tr(on?'Quitar de guardadas':'Guardar'));});toast(on?'Publicación guardada.':'Publicación quitada de guardadas.');if(currentSubView==='profile'&&ownTab==='saved')renderOwnGrid();}
   async function sharePost(postId){const article=document.querySelector(`[data-community-post="${CSS.escape(postId)}"]`),author=article?.querySelector('.community-author small')?.textContent?.split('·')[0]?.trim()||'',text=(article?.querySelector('[data-community-post-text]')?.textContent||'').slice(0,140);const url=location.origin+location.pathname;const data={title:'FittForma AI · Comunidad',text:`${author?`${author} en FittForma AI`:'Una publicación en FittForma AI'}${text?`: «${text}»`:''}`,url};try{if(navigator.share){await navigator.share(data);return;}await navigator.clipboard.writeText(`${data.text} ${url}`);toast('Texto y enlace copiados para compartir.');}catch(error){if(error?.name!=='AbortError')toast('No se pudo compartir desde este navegador.');}}
-  async function addComment(postId,body){if(!authReady())return alert(tr(authHint()));const text=String(body||'').trim();if(!text||text.length>500)return;const {error}=await client.from('community_comments').insert({post_id:postId,user_id:user.id,body:text});if(error)status(`No se pudo comentar: ${error.message}`);else if(currentSubView==='wall')await loadWall(true);else await refreshPosts();}
+  async function addComment(postId,body){if(!authReady())return alert(tr(authHint()));const text=String(body||'').trim();if(!text||text.length>500)return;const {error}=await client.from('community_comments').insert({post_id:postId,user_id:user.id,body:text});if(error)status(`No se pudo comentar: ${error.message}`);else if(currentSubView==='friends'&&friendsPart==='wall')await loadWall(true);else await refreshPosts();}
   async function toggleFollow(target,button){if(!authReady())return alert(tr(authHint()));if(target===user.id)return;const {data,error}=await client.from('community_follows').select('follower_id,following_id,status').eq('follower_id',user.id).eq('following_id',target).maybeSingle();if(error){status(error.message);return;}let result;if(data)result=await client.from('community_follows').delete().eq('follower_id',user.id).eq('following_id',target);else{
       // La base de datos decide si el seguimiento queda aceptado o pendiente según la privacidad.
       result=await client.from('community_follows').insert({follower_id:user.id,following_id:target,status:'pending'}).select('status').single();
@@ -1175,7 +1175,7 @@
     const clean=Object.fromEntries(Object.entries(activity||{}).filter(([,v])=>v!==null&&v!==undefined&&v!==''&&!(typeof v==='number'&&!Number.isFinite(v))));
     const {error}=await client.from('community_posts').insert({user_id:user.id,post_kind:'activity',description:String(description||'').trim().slice(0,600),activity:clean,visibility:'followers'});
     if(error)return {ok:false,message:friendlySupabaseError(error,'compartir con tus amigos')};
-    if(currentSubView==='wall')loadWall(true);
+    if(currentSubView==='friends'&&friendsPart==='wall')loadWall(true);
     return {ok:true};
   }
   // ---------- v66: desafíos del mes ----------
@@ -1408,8 +1408,7 @@
   function loadCurrentView(){
     if(currentSubView==='world'){loadSuggested();return loadDirectory(true);}
     if(currentSubView==='ranking')return loadRanking();
-    if(currentSubView==='wall')return loadWall(true);
-    if(currentSubView==='friends'){loadChallenge();loadMonth();return loadFriends(true);}
+    if(currentSubView==='friends')return loadFriendsPart();
     if(currentSubView==='alerts')return loadAlerts();
     if(currentSubView==='profile'){if(authReady()){loadOwnExtras();loadOwnPhysique();loadOwnBody();}return renderOwnGrid();}
     if(currentSubView==='user'&&viewedUser)return openUser(viewedUser,{asOthers:viewedUser===user?.id});
@@ -1449,10 +1448,25 @@
     }catch(error){return {ok:false,stage:'network',message:friendlySupabaseError(error,'comprobar la conexión con Supabase')};}
   }
   function setSession(supabase,userSession){client=supabase||client;const wasId=user?.id;user=userSession||null;if(user&&user.id!==wasId){ownStats=null;ownStatsLoaded=false;statsSig='';setTimeout(()=>{syncStats().catch?.(()=>{});syncBody();},1500);ownBody=null;ownBodyLoaded=false;}if(!user){ownProfile=null;stopChatPoll();['communityChatMessages','communityReportsList'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});if($('communityChatText'))$('communityChatText').value='';if($('communityModerationCard'))$('communityModerationCard').hidden=true;if($('communityDisplayName'))$('communityDisplayName').value='';if($('communityUsername'))$('communityUsername').value='';if($('communityBio'))$('communityBio').value='';if($('communityVisibility'))$('communityVisibility').value='private';if($('communityOwnName'))$('communityOwnName').textContent='Tu perfil';if($('communityOwnAvatar'))$('communityOwnAvatar').innerHTML='<span aria-hidden="true">FF</span>';if($('communityOwnHandle'))$('communityOwnHandle').textContent='';if($('communityOwnBio'))$('communityOwnBio').textContent='';if($('communityOwnFeatured'))$('communityOwnFeatured').innerHTML='';if($('communityOwnStats'))$('communityOwnStats').innerHTML=statsHtml(0,0,0);if($('communityConversations'))$('communityConversations').innerHTML='';if($('communityFollowRequests'))$('communityFollowRequests').textContent='Iniciá sesión para administrar solicitudes.';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communityBlockedList'))$('communityBlockedList').textContent='Iniciá sesión para administrar los bloqueos.';}setControls();updateKindAvailability();ownStats=null;ownStatsLoaded=false;statsSig='';friendPositions=new Map();ownPhysique={pair:null,single:null};if($('communityAlertsBadge'))$('communityAlertsBadge').hidden=true;if($('communityChallenge'))$('communityChallenge').hidden=true;if($('communityOwnFlag'))$('communityOwnFlag').innerHTML='';if($('communityPhysiqueEdit'))$('communityPhysiqueEdit').innerHTML='';reflectStatsToggles();renderStatsNotice();if(client)Promise.resolve().then(()=>refresh());else loadCurrentView();}
-  const communityViews=['world','wall','ranking','friends','publish','messages','profile','user','compare','alerts'];
-  const MAIN_TABS=['world','wall','ranking','friends'];
+  const communityViews=['world','ranking','friends','publish','messages','profile','user','compare','alerts'];
+  const MAIN_TABS=['world','ranking','friends'];
+  // v69: Amigos tiene tres partes: Muro (por defecto), Desafíos y Mis amigos. «wall» sigue sirviendo para abrir el muro.
+  let friendsPart='wall';
+  const FRIENDS_PARTS=['wall','challenges','list'];
+  function showFriendsPart(part){
+    friendsPart=FRIENDS_PARTS.includes(part)?part:'wall';
+    document.querySelectorAll('[data-friends-part]').forEach(b=>{const on=b.dataset.friendsPart===friendsPart;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});
+    document.querySelectorAll('[data-friends-section]').forEach(sec=>{sec.hidden=sec.dataset.friendsSection!==friendsPart;});
+  }
+  function loadFriendsPart(){
+    if(!client)return;
+    if(friendsPart==='wall')return loadWall(true);
+    if(friendsPart==='challenges'){loadChallenge();return loadMonth();}
+    return loadFriends(true);
+  }
   function showCommunitySubView(name,focusTab=false){
     if(name==='feed'||name==='explore')name='world';
+    if(name==='wall'){friendsPart='wall';name='friends';}
     if(!communityViews.includes(name))name='world';
     const previous=currentSubView;currentSubView=name;setTimeout(renderAvatarOffer,0);if(!['user','compare'].includes(name))lastTab=name;
     if(name!=='messages')stopChatPoll();
@@ -1469,8 +1483,7 @@
     renderStatsNotice();
     if(name==='world'&&previous!=='world'&&client){loadDirectory(true);loadSuggested();}
     else if(name==='ranking'&&client)loadRanking();
-    else if(name==='wall'&&client)loadWall(true);
-    else if(name==='friends'&&client){loadFriends(true);loadChallenge();loadMonth();}
+    else if(name==='friends'){showFriendsPart(friendsPart);loadFriendsPart();}
     else if(name==='alerts'&&client)loadAlerts();
     else if(name==='messages'&&client){loadChatContacts();}
     else if(name==='profile'){renderOwnGrid();fillCountryOptions();if(authReady()){loadFollowRequests();loadBlockedUsers();loadModeration();refreshOwnCounts();syncFeaturedBadges();syncStats();loadOwnExtras();loadOwnPhysique();loadOwnBody().then(syncBody);}}
@@ -1496,6 +1509,7 @@
     $('communityUserBack')?.addEventListener('click',()=>showCommunitySubView(lastTab||'world'));$('communityCompareBack')?.addEventListener('click',()=>viewedUser&&viewedUser===compareUser?openUser(viewedUser):showCommunitySubView(lastTab||'world'));
     document.querySelectorAll('[data-ranking-scope]').forEach(b=>b.addEventListener('click',()=>{rankScope=b.dataset.rankingScope;document.querySelectorAll('[data-ranking-scope]').forEach(x=>{const on=x===b;x.classList.toggle('active',on);x.setAttribute('aria-pressed',String(on));});loadRanking();}));
     $('communityFriendsMore')?.addEventListener('click',()=>loadFriends(false));$('communityWallMore')?.addEventListener('click',()=>loadWall(false));
+    document.querySelectorAll('[data-friends-part]').forEach(b=>b.addEventListener('click',()=>{showFriendsPart(b.dataset.friendsPart);loadFriendsPart();}));
     document.querySelectorAll('[data-ranking-period]').forEach(b=>b.addEventListener('click',()=>{rankPeriod=b.dataset.rankingPeriod;loadRanking();}));
     document.querySelectorAll('#view-community [data-community-go]').forEach(b=>b.addEventListener('click',()=>showCommunitySubView(b.dataset.communityGo)));
     $('communityViewOwnPublic')?.addEventListener('click',()=>{if(authReady())openUser(user.id,{asOthers:true});else toast(authHint());});
@@ -1522,5 +1536,8 @@
     const today=localDateKey();if($('communityEndDate'))$('communityEndDate').value=today;if($('communityStartDate'))$('communityStartDate').value=today;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
+  // v69: la privacidad de Comunidad se elige en Ajustes; se carga al abrirlo.
+  async function loadPrivacy(){reflectStatsToggles();reflectBody();if(!authReady())return;await Promise.allSettled([syncStats(),loadOwnExtras(),loadOwnBody()]);reflectStatsToggles();}
   window.FittFormaCommunity={init,setSession,refresh,loadChatContacts,loadMessages,loadBlockedUsers,testConnection,syncStats,setStatsPublic,show:name=>showCommunitySubView(name),openProfile:uid=>openUser(uid),shareActivity:(a,d)=>shareActivity(a,d),canShareActivity:()=>canShareActivity(),syncBody:()=>syncBody(),setAvatar:changeAvatar};
+  window.FittFormaCommunity.loadPrivacy=loadPrivacy;
 })();

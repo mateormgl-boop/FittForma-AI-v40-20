@@ -1964,3 +1964,26 @@ html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 .tour-count{color:var(--text-3);font-size:.8rem}
 .tour-card .btn-row{justify-content:flex-end}
 @media (prefers-reduced-motion:reduce){.tour-ring{transition:none}}
+
+/* v69: Ajustes en un solo lugar; Amigos con Muro, Desafíos y Mis amigos; Perfil con el mes */
+header .language-picker{display:none!important}
+.settings-toggle.active{border-color:var(--ff-accent,#5b6cff);color:var(--ff-accent,#5b6cff)}
+.settings-search{margin:0 0 12px}
+.settings-search input{width:100%;min-height:46px;padding:10px 14px;border-radius:14px;border:1px solid var(--ff-border);background:var(--ff-panel);color:inherit;font-size:16px}
+.settings-empty{margin:0 0 12px}
+.settings-note{margin:0 0 10px}
+.settings-water-card .hydro-remind{margin-top:0}
+.hydro-settings-link{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:12px 0;padding:12px 14px;border-radius:14px;border:1px solid rgba(34,170,230,.35);background:rgba(34,170,230,.08);font-weight:700;font-size:.9rem}
+.profile-month{margin:12px 0 0}
+.profile-month h4{margin:0 0 8px}
+.profile-month-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.profile-month-grid>div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px;border-radius:14px;background:var(--ff-panel-2);text-align:center;cursor:pointer}
+.profile-month-grid strong{font-size:1.15rem}
+.profile-month-grid small{font-size:.72rem;color:var(--text-3);line-height:1.2}
+.profile-settings-link{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;color:inherit;font:inherit}
+.profile-settings-link>span:nth-child(2){display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.profile-settings-link small{color:var(--text-3)}
+.profile-settings-icon svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.cm-friends-parts{margin:0 0 12px}
+.cm-privacy-link .btn{margin-top:4px}
+@media (max-width:360px){.profile-month-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}

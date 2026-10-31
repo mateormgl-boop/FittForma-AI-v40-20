@@ -67,8 +67,8 @@ const leaveApp = async () => {
 const autoStatus = () => page.evaluate(() => { const e = document.getElementById('cloudAutoStatus'); return { state: e?.dataset.state || '', text: e?.textContent || '' }; });
 
 await page.goto(APP + '/'); await page.waitForTimeout(1200);
-await page.click('.mobile-nav-item[data-mobile-view="profile"]'); await page.waitForTimeout(400);
-await page.evaluate(() => { const d = document.getElementById('cloudAccountCard')?.closest('details'); if (d) d.open = true; });
+// v69: la cuenta está en Ajustes.
+await page.evaluate(() => window.FittFormaGo('settings:account')); await page.waitForTimeout(500);
 step('Sin sesión no se muestra la copia automática', !(await page.isVisible('#cloudAutoRow')));
 await page.click('#cloudLogin'); await page.fill('#authEmail', EMAIL); await page.fill('#authPassword', 'clave-segura-123'); await page.click('#authSubmit');
 await page.waitForTimeout(4500);

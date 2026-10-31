@@ -100,12 +100,14 @@ test('comparación: misma métrica y unidad; lo que falta queda como «Sin datos
 test('Comunidad: abre en Todos, sin feed, y el mismo perfil completo desde las tres pestañas', () => {
   const view = html.slice(html.indexOf('id="view-community"'), html.indexOf('id="view-profile"'));
   const tabs = [...view.matchAll(/role="tab" data-community-tab="([a-z]+)"/g)].map(m => m[1]);
-  // v66: se suma «Muro» (solo amigos aceptados; no es un feed general).
-  assert.deepEqual(tabs, ['world', 'wall', 'ranking', 'friends']);
+  // v69: el «Muro» (solo amigos aceptados; no es un feed general) vive dentro de Amigos.
+  assert.deepEqual(tabs, ['world', 'ranking', 'friends']);
   assert.match(view, /id="communityTabWorld"[^>]*aria-selected="true"/);
   assert.match(community, /showCommunitySubView\('world'\);\n  \}/, 'vista inicial');
   assert.doesNotMatch(view, /communityFeed"|data-feed-mode|communityStories|Para vos/);
-  for (const id of ['communityPeople', 'rankingList', 'rankingPodium', 'communityFriends', 'communityUserProfile', 'communityCompare', 'communityStatsPublic', 'communityOpenPublish']) assert.match(view, new RegExp(`id="${id}"`), id);
+  for (const id of ['communityPeople', 'rankingList', 'rankingPodium', 'communityFriends', 'communityUserProfile', 'communityCompare', 'communityOpenPublish']) assert.match(view, new RegExp(`id="${id}"`), id);
+  // v69: «Mostrar mis estadísticas» se eligió mover a Ajustes → Privacidad en Comunidad.
+  assert.match(html.slice(html.indexOf('id="view-settings"')), /id="communityStatsPublic"/);
   assert.match(community, /function athleteCard\(/);
   assert.equal((community.match(/data-community-open-user="\$\{uid\}"/g) || []).length >= 3, true, 'tarjetas, podio y filas abren el perfil');
   assert.match(community, /\[data-community-open-user\]'\)\.forEach\(b=>b\.addEventListener\('click',\(\)=>openUser\(/);
@@ -138,7 +140,7 @@ test('v53: archivos publicados, traducciones y versión', () => {
   assert.match(server, /'\/i18n-v53\.js'/); assert.match(readFileSync('i18n.js', 'utf8'), /'\.\/i18n-v53\.js'\]/);
   for (const s of ['Todos', 'Ranking', 'Amigos', 'Todavía no tenés amigos en tu comunidad', 'Sin datos disponibles', 'Tu progreso']) assert.ok(i18n.includes(`["${s}"`), s);
   for (const row of i18n.matchAll(/^\s*\[("[^\n]*")\],?$/gm)) assert.equal(JSON.parse(`[${row[1]}]`).length, 6, row[1].slice(0, 40));
-  assert.match(sw, /fittforma-ai-static-v68-0/);
+  assert.match(sw, /fittforma-ai-static-v69-0/);
 });
 
 test('v53.1: rango por músculo validado (sin datos corporales) y misma regla en SQL', () => {

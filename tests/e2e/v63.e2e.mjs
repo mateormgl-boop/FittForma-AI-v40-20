@@ -102,9 +102,8 @@ step('Después de crear la cuenta sigue «Contanos un poco»', await page.isVisi
 await page.fill('#welcomeName', 'Nueva'); await page.click('#welcomeSubmit'); await page.waitForTimeout(500);
 step('La bienvenida termina y queda en la app', !(await page.isVisible('#welcomeScreen')));
 step('Inicio no muestra la invitación a crear cuenta con la sesión iniciada', !(await page.isVisible('#homeAccountCard')));
-await page.click('.mobile-nav-item[data-mobile-view="profile"]'); await page.waitForTimeout(400);
-await page.evaluate(() => { const d = document.getElementById('cloudAccountCard')?.closest('details'); if (d) d.open = true; });
-step('Perfil muestra la cuenta iniciada y «Cerrar sesión»', /Sesión iniciada: nuevo63@example\.test/.test(await page.textContent('#cloudStatus')) && await page.isVisible('#cloudLogout') && !(await page.isVisible('#cloudLogin')));
+await page.evaluate(() => window.FittFormaGo('settings:account')); await page.waitForTimeout(500);
+step('Ajustes › Cuenta muestra la cuenta iniciada y «Cerrar sesión»', /Sesión iniciada: nuevo63@example\.test/.test(await page.textContent('#cloudStatus')) && await page.isVisible('#cloudLogout') && !(await page.isVisible('#cloudLogin')));
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(1200);
 step('Comunidad no pide iniciar sesión', !(await page.isVisible('#communityAuthBanner')));
 await page.click('#mobileMoreToggle'); await page.waitForTimeout(250);
@@ -112,9 +111,9 @@ step('Con la sesión iniciada, «Más» no ofrece crear cuenta', !(await page.is
 await page.click('#mobileMoreToggle'); await page.waitForTimeout(150);
 step('Se creó su perfil de Comunidad (lo hace la base, sin pasos extra)', sql(`select count(*) from community_profiles where user_id='${NEW_ID}'`) === '1');
 // 2) Cerrar sesión y volver a entrar
-await page.click('.mobile-nav-item[data-mobile-view="profile"]'); await page.waitForTimeout(300);
+await page.evaluate(() => window.FittFormaGo('settings:account')); await page.waitForTimeout(500);
 await page.click('#cloudLogout'); await page.waitForTimeout(1000);
-step('Sin sesión, Perfil muestra «Iniciar sesión» y «Crear cuenta»', await page.isVisible('#cloudLogin') && await page.isVisible('#cloudRegister') && /Todavía no iniciaste sesión/.test(await page.textContent('#cloudStatus')));
+step('Sin sesión, Ajustes › Cuenta muestra «Iniciar sesión» y «Crear cuenta»', await page.isVisible('#cloudLogin') && await page.isVisible('#cloudRegister') && /Todavía no iniciaste sesión/.test(await page.textContent('#cloudStatus')));
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(800);
 step('Sin sesión, Comunidad muestra «Entrá a Comunidad» arriba de todo', await page.isVisible('#communityAuthBanner'));
 await page.click('#mobileMoreToggle'); await page.waitForTimeout(250);
@@ -134,7 +133,7 @@ await page.click('#authBack'); await page.waitForTimeout(200);
 await page.fill('#authPassword', PASS); await page.press('#authPassword', 'Enter'); await page.waitForTimeout(1500);
 step('Con Enter también entra, y avisa «¡Listo! Ya iniciaste sesión»', /¡Listo! Ya iniciaste sesión\./.test(await page.textContent('#authDone')) && !(await page.isVisible('#communityAuthBanner')));
 // 3) Volver a registrarse con un correo que ya tiene cuenta
-await page.click('.mobile-nav-item[data-mobile-view="profile"]'); await page.waitForTimeout(300); await page.click('#cloudLogout'); await page.waitForTimeout(900);
+await page.evaluate(() => window.FittFormaGo('settings:account')); await page.waitForTimeout(500); await page.click('#cloudLogout'); await page.waitForTimeout(900);
 await page.click('#cloudRegister'); await page.waitForTimeout(300);
 await page.fill('#authEmail', NEW); await page.fill('#authPassword', PASS); await page.click('#authSubmit'); await page.waitForTimeout(900);
 step('Si el correo ya tiene cuenta, pasa a «Iniciar sesión» y lo explica', (await page.getAttribute('#authTabLogin', 'aria-selected')) === 'true' && /Ya hay una cuenta con ese correo/.test(await status(page)) && (await page.inputValue('#authEmail')) === NEW);
