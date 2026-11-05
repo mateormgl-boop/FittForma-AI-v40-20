@@ -1,8 +1,8 @@
 {
   "name": "fittforma-ai-mobile",
   "private": true,
-  "version": "0.54.0",
-  "description": "App Android de FittForma AI (Capacitor): la misma app web con GPS en segundo plano.",
+  "version": "0.72.0",
+  "description": "App Android de FittForma AI (Capacitor): la misma app web con GPS en segundo plano y recordatorios nativos.",
   "type": "module",
   "scripts": {
     "copy-web": "node scripts/copy-web.mjs",
@@ -12,7 +12,8 @@
   "dependencies": {
     "@capacitor-community/background-geolocation": "1.2.26",
     "@capacitor/android": "8.5.3",
-    "@capacitor/core": "8.5.3"
+    "@capacitor/core": "8.5.3",
+    "@capacitor/local-notifications": "8.3.1"
   },
   "devDependencies": {
     "@capacitor/cli": "8.5.3"

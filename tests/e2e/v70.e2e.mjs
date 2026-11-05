@@ -67,6 +67,7 @@ const step = (name, ok, detail = '') => { console.log(`${ok ? 'PASA' : 'FALLA'} 
 // Usuarios: Alicia (Plus, eligió mostrar la insignia) y Bruno (Plus, no eligió). Nadie más se marca.
 const A = 'aaaaaaaa-0000-0000-0000-000000000001', B = 'bbbbbbbb-0000-0000-0000-000000000002';
 sql(`insert into auth.users(id,email) values('${A}','alice@example.test'),('${B}','bob@example.test') on conflict do nothing`);
+sql(`insert into community_rules_acceptance(user_id,rules_version) select id,1 from auth.users on conflict (user_id) do nothing`); // v72: estas cuentas ya aceptaron las normas de la comunidad (el diálogo se prueba en v72.e2e.mjs)
 sql(`insert into community_profiles(user_id,username,display_name,visibility) values('${A}','alicia_fit','Alicia','public'),('${B}','bruno_fit','Bruno Fit','public') on conflict (user_id) do update set username=excluded.username, display_name=excluded.display_name, visibility='public'`);
 sql(`select public.monetization_set_membership('${A}','active',now()+interval '20 days','google_play','e2e-tok-a','fittforma_plus_monthly')`);
 sql(`select public.monetization_set_membership('${B}','active',now()+interval '20 days','google_play','e2e-tok-b','fittforma_plus_monthly')`);

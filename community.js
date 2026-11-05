@@ -37,6 +37,62 @@
   // Los textos de confirm/prompt/alert/avisos no pasan por el DOM: se traducen acá al idioma elegido.
   const tr=text=>{try{return window.FittFormaI18n?.translate?.(text)||text;}catch{return text;}};
   const toast=msg=>{try{window.toast?.(tr(msg));}catch{}};
+  // v72: normas de la comunidad. Antes de publicar, comentar, mandar mensajes o editar el perfil público hay que
+  // aceptarlas (Google Play lo pide). Se recuerda por cuenta en el dispositivo y, si existe la tabla (migración v72),
+  // también en la base, así no se vuelve a pedir en otro teléfono. Si cambia la versión de las normas, se piden de nuevo.
+  const RULES_VERSION=1,RULES_KEY='fittforma-community-rules-v1';
+  let rulesServer=null; // null: sin consultar · número: versión aceptada en la base (0 = ninguna) · -1: falta la migración
+  function localRules(){try{const v=JSON.parse(localStorage.getItem(RULES_KEY)||'{}');return v&&typeof v==='object'?v:{};}catch{return {};}}
+  function localRulesFor(id){const v=id?localRules()[id]:null;return v&&Number(v.v)>=RULES_VERSION?v:null;}
+  function rememberRules(at){if(!user)return;try{const all=localRules();all[user.id]={v:RULES_VERSION,at:at||new Date().toISOString()};localStorage.setItem(RULES_KEY,JSON.stringify(all));}catch{}}
+  const missingTable=error=>/PGRST20[25]|42P01/.test(String(error?.code||''))||/could not find the table|does not exist|schema cache/i.test(String(error?.message||''));
+  async function syncRules(){
+    if(!authReady()||rulesServer===-1)return false;
+    const {error}=await client.from('community_rules_acceptance').upsert({user_id:user.id,rules_version:RULES_VERSION},{onConflict:'user_id'});
+    if(error){if(missingTable(error))rulesServer=-1;return false;}
+    rulesServer=RULES_VERSION;return true;
+  }
+  async function loadRulesStatus(){
+    if(!authReady())return null;
+    const {data,error}=await client.from('community_rules_acceptance').select('rules_version,accepted_at').eq('user_id',user.id).maybeSingle();
+    if(error){rulesServer=missingTable(error)?-1:null;return null;}
+    rulesServer=Number(data?.rules_version)||0;
+    if(rulesServer>=RULES_VERSION)rememberRules(data.accepted_at);
+    else if(localRulesFor(user.id))await syncRules();
+    return data||null;
+  }
+  function rulesAccepted(){return !!user&&(rulesServer>=RULES_VERSION||!!localRulesFor(user.id));}
+  // mode 'accept': pide aceptarlas y devuelve true si la persona acepta. mode 'read': solo para leerlas.
+  function openRules(mode='read'){
+    const dlg=$('communityRulesDialog');if(!dlg||typeof dlg.showModal!=='function')return Promise.resolve(false);
+    const check=$('communityRulesCheck'),accept=$('communityRulesAccept'),cancel=$('communityRulesCancel'),row=$('communityRulesCheckRow'),info=$('communityRulesAccepted');
+    const local=user?localRulesFor(user.id):null,accepted=rulesAccepted(),asking=mode==='accept';
+    row.hidden=!asking;accept.hidden=!asking;check.checked=false;accept.disabled=true;cancel.textContent=tr(asking?'Ahora no':'Cerrar');
+    info.hidden=!accepted;
+    if(accepted){const when=local?.at?new Date(local.at):null;info.textContent=when&&Number.isFinite(when.getTime())?`${tr('Las aceptaste el')} ${when.toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})}.`:tr('Ya aceptaste estas normas.');}
+    return new Promise(resolve=>{
+      let done=false;
+      const finish=value=>{if(done)return;done=true;check.onchange=null;accept.onclick=null;cancel.onclick=null;dlg.querySelectorAll('[data-rules-close]').forEach(b=>{b.onclick=null;});dlg.removeEventListener('close',onClose);if(dlg.open)dlg.close();resolve(value);};
+      const onClose=()=>finish(false);
+      check.onchange=()=>{accept.disabled=!check.checked;};
+      accept.onclick=()=>{if(check.checked)finish(true);};
+      cancel.onclick=()=>finish(false);
+      dlg.querySelectorAll('[data-rules-close]').forEach(b=>{b.onclick=()=>finish(false);});
+      dlg.addEventListener('close',onClose);
+      dlg.showModal();const body=dlg.querySelector('.auth-body');if(body)body.scrollTop=0;dlg.scrollTop=0;
+    });
+  }
+  // Antes de cualquier contenido propio. Devuelve true si se puede seguir.
+  async function requireRules(statusId){
+    if(!authReady())return false;
+    if(rulesServer===null)await loadRulesStatus().catch(()=>null);
+    if(rulesAccepted()){if(rulesServer!==null&&rulesServer>=0&&rulesServer<RULES_VERSION)syncRules().catch(()=>false);return true;}
+    const ok=await openRules('accept');
+    if(!ok){const msg='Para publicar, comentar o mandar mensajes tenés que aceptar las normas de la comunidad.';if(statusId)setStatus(statusId,tr(msg));else toast(msg);return false;}
+    rememberRules();await syncRules().catch(()=>false);toast('Gracias. Ya podés participar en Comunidad.');
+    return true;
+  }
+  document.addEventListener('click',e=>{const b=e.target.closest?.('[data-open-community-rules]');if(!b)return;e.preventDefault();openRules('read');});
   function setControls(){
     const ready=!!client,logged=!!user;
     ['communityProfileForm','communityPostForm'].forEach(id=>{const form=$(id);if(form)form.querySelectorAll('input,textarea,select,button').forEach(el=>{if(id==='communityPostForm'&&el.id==='communityPublish')el.disabled=!logged;});});
@@ -244,6 +300,7 @@
   }
 
   async function saveProfile(e){e.preventDefault();if(!authReady()){setStatus('communityProfileStatus',authHint());return;}
+    if(!(await requireRules('communityProfileStatus')))return;
     const display=$('communityDisplayName').value.trim(),username=$('communityUsername').value.trim().toLowerCase(),bio=$('communityBio').value.trim(),visibility=$('communityVisibility').value;
     if(display.length<1||!/^[a-z0-9_.-]{3,24}$/.test(username)){setStatus('communityProfileStatus','Revisá el nombre y el usuario (3–24 caracteres permitidos).');return;}
     setStatus('communityProfileStatus','Guardando perfil…');
@@ -279,7 +336,7 @@
   }
   // v49: foto de perfil propia (cuadrada, 512 px, sin metadatos), en la carpeta de la cuenta.
   async function changeAvatar(file){
-    if(!authReady()||!file)return;if(schemaV49===false){setStatus('communityProfileStatus','Para usar foto de perfil, aplicá la migración v49 de Comunidad en Supabase.');return;}
+    if(!authReady()||!file)return;if(!(await requireRules('communityAvatarStatus')))return;if(schemaV49===false){setStatus('communityProfileStatus','Para usar foto de perfil, aplicá la migración v49 de Comunidad en Supabase.');return;}
     setStatus('communityProfileStatus','Subiendo foto de perfil…');setStatus('communityAvatarStatus','Subiendo foto de perfil…');
     const path=`${user.id}/avatar/${Date.now().toString(36)}.jpg`,previous=ownProfile?.avatar_path||'';
     try{
@@ -314,6 +371,7 @@
   let photoUnlocked=false;
   const photoLimitError=error=>/photo_daily_limit/.test(String(error?.message||''));
   async function createPost(e){e.preventDefault();if(!authReady()){setStatus('communityPostStatus',authHint());return;}
+    if(!(await requireRules('communityPostStatus')))return;
     const beforeFile=$('communityBeforePhoto').files?.[0],afterFile=$('communityAfterPhoto').files?.[0],start=$('communityStartDate').value,end=$('communityEndDate').value;
     if(!beforeFile||!afterFile){setStatus('communityPostStatus','Elegí una foto de antes y una de después.');return;}
     if(!start||!end||end<start||end>localDateKey()){setStatus('communityPostStatus','Revisá las fechas: la final debe ser igual o posterior a la inicial y no futura.');return;}
@@ -332,7 +390,7 @@
     const on=!data;document.querySelectorAll(`[data-community-like="${CSS.escape(postId)}"]`).forEach(b=>{b.classList.toggle('is-on',on);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',tr(on?'Quitar me gusta':'Me gusta'));const c=b.querySelector('[data-like-count]');if(c)c.textContent=String(Math.max(0,(Number(c.textContent)||0)+(on?1:-1)));});if(!button)await refreshPosts();}
   async function toggleSave(postId){if(!authReady())return alert(tr(authHint()));const on=!document.querySelector(`[data-community-save="${CSS.escape(postId)}"]`)?.classList.contains('is-on');const result=on?await client.from('community_saved_posts').insert({user_id:user.id,post_id:postId}):await client.from('community_saved_posts').delete().eq('user_id',user.id).eq('post_id',postId);if(result.error){status(friendlySupabaseError(result.error,'guardar la publicación'));return;}document.querySelectorAll(`[data-community-save="${CSS.escape(postId)}"]`).forEach(b=>{b.classList.toggle('is-on',on);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',tr(on?'Quitar de guardadas':'Guardar'));});toast(on?'Publicación guardada.':'Publicación quitada de guardadas.');if(currentSubView==='profile'&&ownTab==='saved')renderOwnGrid();}
   async function sharePost(postId){const article=document.querySelector(`[data-community-post="${CSS.escape(postId)}"]`),author=article?.querySelector('.community-author small')?.textContent?.split('·')[0]?.trim()||'',text=(article?.querySelector('[data-community-post-text]')?.textContent||'').slice(0,140);const url=location.origin+location.pathname;const data={title:'FittForma AI · Comunidad',text:`${author?`${author} en FittForma AI`:'Una publicación en FittForma AI'}${text?`: «${text}»`:''}`,url};try{if(navigator.share){await navigator.share(data);return;}await navigator.clipboard.writeText(`${data.text} ${url}`);toast('Texto y enlace copiados para compartir.');}catch(error){if(error?.name!=='AbortError')toast('No se pudo compartir desde este navegador.');}}
-  async function addComment(postId,body){if(!authReady())return alert(tr(authHint()));const text=String(body||'').trim();if(!text||text.length>500)return;const {error}=await client.from('community_comments').insert({post_id:postId,user_id:user.id,body:text});if(error)status(`No se pudo comentar: ${error.message}`);else if(currentSubView==='friends'&&friendsPart==='wall')await loadWall(true);else await refreshPosts();}
+  async function addComment(postId,body){if(!authReady())return alert(tr(authHint()));const text=String(body||'').trim();if(!text||text.length>500)return;if(!(await requireRules()))return;const {error}=await client.from('community_comments').insert({post_id:postId,user_id:user.id,body:text});if(error)status(`No se pudo comentar: ${error.message}`);else if(currentSubView==='friends'&&friendsPart==='wall')await loadWall(true);else await refreshPosts();}
   async function toggleFollow(target,button){if(!authReady())return alert(tr(authHint()));if(target===user.id)return;const {data,error}=await client.from('community_follows').select('follower_id,following_id,status').eq('follower_id',user.id).eq('following_id',target).maybeSingle();if(error){status(error.message);return;}let result;if(data)result=await client.from('community_follows').delete().eq('follower_id',user.id).eq('following_id',target);else{
       // La base de datos decide si el seguimiento queda aceptado o pendiente según la privacidad.
       result=await client.from('community_follows').insert({follower_id:user.id,following_id:target,status:'pending'}).select('status').single();
@@ -460,6 +518,7 @@
     e.preventDefault();
     if(!authReady()){setStatus('communityComposeStatus',authHint());return;}
     if(schemaV41===false){setStatus('communityComposeStatus',MIGRATION_HINT);return;}
+    if(!(await requireRules('communityComposeStatus')))return;
     const button=postKind==='text'?$('communityTextPublish'):$('communityAchievementPublish');
     // El id se genera una sola vez por intento: un reintento del mismo insert choca con la clave primaria.
     const postId=crypto.randomUUID();let imagePath=null;
@@ -616,6 +675,7 @@
     e.preventDefault();if(!authReady()){setStatus('communityChatStatus',authHint());return;}
     const target=$('communityChatContact').value,body=$('communityChatText').value.trim();if(!target||!body)return;if(body.length>2000){setStatus('communityChatStatus','El mensaje no puede superar los 2000 caracteres.');return;}
     const now=Date.now();while(messageAttempts.length&&now-messageAttempts[0]>60000)messageAttempts.shift();if(messageAttempts.length>=10){setStatus('communityChatStatus','Límite de seguridad: esperá un minuto antes de enviar más mensajes.');return;}
+    if(!(await requireRules('communityChatStatus')))return;
     const btn=$('communityChatSend');btn.disabled=true;
     const {error}=await client.from('community_messages').insert({sender_id:user.id,recipient_id:target,body});
     btn.disabled=false;
@@ -1197,6 +1257,7 @@
   function canShareActivity(){return authReady()&&schemaV66!==false;}
   async function shareActivity(activity,description=''){
     if(!authReady())return {ok:false,message:authHint()};
+    if(!(await requireRules()))return {ok:false,message:tr('Para compartir tenés que aceptar las normas de la comunidad.')};
     if(schemaV66===null)await probeSchema();
     if(schemaV66===false)return {ok:false,message:V54_HINT};
     await ensureProfile().catch(()=>null);
@@ -1443,7 +1504,7 @@
     if(currentSubView==='compare'&&compareUser)return openCompare(compareUser);
   }
   async function refresh(){if(!client){setControls();return;}if(user){try{await ensureProfile();await loadFollowRequests();}catch(e){setStatus('communityProfileStatus',`No se pudo preparar el perfil: ${e.message}`);}}setControls();await probeSchema();await loadCurrentView();renderStatsNotice();loadAlertCount();startAlertPoll();syncStats().then(()=>{if(currentSubView==='ranking')loadRanking();}).catch(()=>{});await loadChatContacts();await loadBlockedUsers();updateKindAvailability();renderPostPreview();await loadModeration();if(currentSubView==='profile')renderOwnGrid();}
-  function init(supabase,userSession,diagnostic=''){client=supabase||null;user=userSession||null;connectionMessage=client?'':String(diagnostic||connectionMessage||'');if(client)connectionStatus('Cliente de Supabase inicializado. Comprobando tablas y permisos de Comunidad…');else configIssueStatus(diagnostic||'Supabase todavía no está conectado.');setControls();if(client)return refresh();return loadCurrentView();}
+  function init(supabase,userSession,diagnostic=''){client=supabase||null;user=userSession||null;rulesServer=null;connectionMessage=client?'':String(diagnostic||connectionMessage||'');if(client)connectionStatus('Cliente de Supabase inicializado. Comprobando tablas y permisos de Comunidad…');else configIssueStatus(diagnostic||'Supabase todavía no está conectado.');setControls();if(client)return refresh();return loadCurrentView();}
   async function testConnection(){
     if(!client)return {ok:false,stage:'config',message:authHint()};
     const coreChecks=[['community_profiles','user_id'],['community_posts','id'],['community_follows','follower_id'],['community_likes','post_id'],['community_comments','id']];
@@ -1475,7 +1536,7 @@
       return {ok:true,stage:'database',message:coreMessage+(authReady()?' También se comprobaron chat, bloqueos y sincronización de la cuenta.':' Iniciá sesión para comprobar además chat, bloqueos y sincronización de la cuenta.')};
     }catch(error){return {ok:false,stage:'network',message:friendlySupabaseError(error,'comprobar la conexión con Supabase')};}
   }
-  function setSession(supabase,userSession){client=supabase||client;const wasId=user?.id;user=userSession||null;if(user&&user.id!==wasId){ownStats=null;ownStatsLoaded=false;statsSig='';setTimeout(()=>{syncStats().catch?.(()=>{});syncBody();},1500);ownBody=null;ownBodyLoaded=false;}if(!user){ownProfile=null;stopChatPoll();['communityChatMessages','communityReportsList'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});if($('communityChatText'))$('communityChatText').value='';if($('communityModerationCard'))$('communityModerationCard').hidden=true;if($('communityDisplayName'))$('communityDisplayName').value='';if($('communityUsername'))$('communityUsername').value='';if($('communityBio'))$('communityBio').value='';if($('communityVisibility'))$('communityVisibility').value='private';if($('communityOwnName'))$('communityOwnName').textContent='Tu perfil';if($('communityOwnAvatar'))$('communityOwnAvatar').innerHTML='<span aria-hidden="true">FF</span>';if($('communityOwnHandle'))$('communityOwnHandle').textContent='';if($('communityOwnBio'))$('communityOwnBio').textContent='';if($('communityOwnFeatured'))$('communityOwnFeatured').innerHTML='';if($('communityOwnStats'))$('communityOwnStats').innerHTML=statsHtml(0,0,0);if($('communityConversations'))$('communityConversations').innerHTML='';if($('communityFollowRequests'))$('communityFollowRequests').textContent='Iniciá sesión para administrar solicitudes.';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communityBlockedList'))$('communityBlockedList').textContent='Iniciá sesión para administrar los bloqueos.';}setControls();updateKindAvailability();ownStats=null;ownStatsLoaded=false;statsSig='';friendPositions=new Map();ownPhysique={pair:null,single:null};if($('communityAlertsBadge'))$('communityAlertsBadge').hidden=true;if($('communityChallenge'))$('communityChallenge').hidden=true;if($('communityOwnFlag'))$('communityOwnFlag').innerHTML='';if($('communityPhysiqueEdit'))$('communityPhysiqueEdit').innerHTML='';reflectStatsToggles();renderStatsNotice();if(client)Promise.resolve().then(()=>refresh());else loadCurrentView();}
+  function setSession(supabase,userSession){client=supabase||client;const wasId=user?.id;user=userSession||null;if(user?.id!==wasId)rulesServer=null;if(user&&user.id!==wasId){ownStats=null;ownStatsLoaded=false;statsSig='';setTimeout(()=>{syncStats().catch?.(()=>{});syncBody();},1500);ownBody=null;ownBodyLoaded=false;}if(!user){ownProfile=null;stopChatPoll();['communityChatMessages','communityReportsList'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});if($('communityChatText'))$('communityChatText').value='';if($('communityModerationCard'))$('communityModerationCard').hidden=true;if($('communityDisplayName'))$('communityDisplayName').value='';if($('communityUsername'))$('communityUsername').value='';if($('communityBio'))$('communityBio').value='';if($('communityVisibility'))$('communityVisibility').value='private';if($('communityOwnName'))$('communityOwnName').textContent='Tu perfil';if($('communityOwnAvatar'))$('communityOwnAvatar').innerHTML='<span aria-hidden="true">FF</span>';if($('communityOwnHandle'))$('communityOwnHandle').textContent='';if($('communityOwnBio'))$('communityOwnBio').textContent='';if($('communityOwnFeatured'))$('communityOwnFeatured').innerHTML='';if($('communityOwnStats'))$('communityOwnStats').innerHTML=statsHtml(0,0,0);if($('communityConversations'))$('communityConversations').innerHTML='';if($('communityFollowRequests'))$('communityFollowRequests').textContent='Iniciá sesión para administrar solicitudes.';if($('communitySearchResults'))$('communitySearchResults').innerHTML='';if($('communityBlockedList'))$('communityBlockedList').textContent='Iniciá sesión para administrar los bloqueos.';}setControls();updateKindAvailability();ownStats=null;ownStatsLoaded=false;statsSig='';friendPositions=new Map();ownPhysique={pair:null,single:null};if($('communityAlertsBadge'))$('communityAlertsBadge').hidden=true;if($('communityChallenge'))$('communityChallenge').hidden=true;if($('communityOwnFlag'))$('communityOwnFlag').innerHTML='';if($('communityPhysiqueEdit'))$('communityPhysiqueEdit').innerHTML='';reflectStatsToggles();renderStatsNotice();if(client)Promise.resolve().then(()=>refresh());else loadCurrentView();}
   const communityViews=['world','ranking','friends','publish','messages','profile','user','compare','alerts'];
   const MAIN_TABS=['world','ranking','friends'];
   // v69: Amigos tiene tres partes: Muro (por defecto), Desafíos y Mis amigos. «wall» sigue sirviendo para abrir el muro.

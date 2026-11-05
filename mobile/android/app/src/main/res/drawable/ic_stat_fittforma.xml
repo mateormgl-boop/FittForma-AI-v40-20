@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FittForma AI v72: ícono de notificación (silueta blanca del logo; Android lo pinta con iconColor). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="900"
+    android:viewportHeight="900">
+    <group
+        android:translateX="-190"
+        android:translateY="-150">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M348,640C362,540 410,430 470,360C510,312 560,282 640,274L1062,268C1022,330 975,372 905,380L620,380C540,384 480,420 438,480C405,528 375,585 348,640Z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M615,565C650,512 690,470 760,462L1012,458C982,510 940,548 880,560C850,566 820,567 790,567Z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M494,476a68,68 0,1 0,136 0a68,68 0,1 0,-136 0Z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M238,990C290,860 360,680 470,600C560,540 690,560 760,640L830,730C770,712 712,700 655,698C590,700 548,728 508,790C450,878 350,962 238,990Z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M515,850L600,752C640,712 700,702 830,730C780,800 700,848 600,850Z" />
+    </group>
+</vector>

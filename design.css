@@ -2058,3 +2058,21 @@ header .language-picker{display:none!important}
 .weight-chart .wc-trend{stroke:var(--t-amber);stroke-width:2.5;stroke-dasharray:7 6;stroke-linecap:round}
 .wc-trend-note{display:flex;align-items:center;gap:8px;margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.35}
 .wc-trend-note i{flex:none;width:22px;height:0;border-top:2.5px dashed var(--t-amber)}
+
+/* v72: normas de la comunidad y estado de los recordatorios del teléfono. */
+.rules-sheet h2{margin:0 36px 0 0;font-size:1.25rem}
+.rules-sheet .auth-lead{text-align:left;margin:0}
+.rules-block{display:grid;gap:6px;padding:12px 14px;border:1px solid var(--ff-border);border-radius:16px;background:var(--ff-panel,transparent)}
+.rules-block h3{margin:0;font-size:.95rem}
+.rules-block p{margin:0;font-size:.9rem;line-height:1.45}
+.rules-list{margin:0;padding-left:18px;display:grid;gap:4px;font-size:.9rem;line-height:1.4}
+.rules-more{margin:0;font-size:.9rem}
+.rules-accepted{margin:0;padding:8px 12px;border-radius:12px;background:color-mix(in srgb,var(--t-green) 14%,transparent);font-size:.88rem;font-weight:650}
+.rules-accepted[hidden],.rules-check[hidden],.rules-actions [hidden]{display:none!important}
+.rules-actions{display:grid;gap:8px}
+.rules-check{align-items:center;margin:2px 0;padding:10px 12px;border:1px solid var(--ff-border);border-radius:14px;font-weight:650;cursor:pointer}
+.auth-body .rules-check input{min-height:0;width:22px;height:22px;margin:0;flex:0 0 22px}
+.cm-rules-note{margin:8px 0 0}
+.cm-rules-open{margin:4px 0 10px}
+.native-reminder-status{margin:6px 0 0}
+.native-reminder-status[hidden]{display:none!important}

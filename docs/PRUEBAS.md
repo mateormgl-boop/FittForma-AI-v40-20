@@ -9,6 +9,16 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v72
+
+- `npm test` (383): `tests/v72.test.mjs` prueba el puente de notificaciones (en el navegador no hace nada; prepara solo avisos futuros, ordenados y dentro de su rango; en Android reemplaza solo su grupo y respeta el permiso), que la app no duplica avisos web en Android, el proyecto de Android (plugin, ícono, gradle), que las siete acciones de Comunidad piden las normas, la migración y `normas.html`.
+- RLS `rls_v72_test.sql` (17 comprobaciones): cada persona acepta y lee solo la suya, la fecha la pone la base y no se toca a mano, no se baja de versión, nadie borra aceptaciones, sin sesión no se lee nada y al eliminar la cuenta se borra. Total: 452.
+- E2E `v72` (30 pasos):
+  - Normas, con la base local: aparecen en la primera publicación; sin aceptar no se publica nada y el texto queda; aceptadas, se publica y queda en la base; se leen desde Ajustes con la fecha; en otro dispositivo no se vuelven a pedir; sin la migración igual funcionan; `/normas.html` se publica.
+  - Android, con un plugin simulado con la misma API: permiso, 14 días de avisos de entrenamiento a las horas elegidas, ícono, estado en Ajustes, sin avisos para hoy si ya entrenaste, agua en sus horarios, aviso de prueba y permiso negado.
+- Las pruebas E2E que publican, comentan o mandan mensajes (athletes, community, monetization, rank-board, v63, v65, v66 y v70) dan por aceptadas las normas de sus cuentas de prueba. El diálogo se prueba en v72.
+- **No probado:** la app de Android en un teléfono real. Acá no hay SDK de Android y `dl.google.com` está bloqueado.
+
 ### v71
 
 - `npm test` (376): `tests/v71.test.mjs` prueba la coronita (sin «Gratis», solo corona en 320 px), la próxima serie (progresión doble, no sube la carga si la serie anterior quedó corta, respeta la carga de hoy, sin datos devuelve nada), el récord anunciado una vez por serie, «Lo de siempre» (mismo momento del día, al menos 2 días, últimas 4 semanas, no repite lo de hoy) y la tendencia del peso (suaviza y calcula el ritmo semanal).

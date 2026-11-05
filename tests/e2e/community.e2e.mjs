@@ -32,6 +32,7 @@ const APP_VERSION = (await (await fetch(APP + '/api/public-config')).json()).ver
 // Datos externos: B publica un texto y le escribe a A (con auth.uid() de B para pasar el trigger anti-spam).
 // Fixture propio (el último paso elimina la cuenta de A, así que se recrea en cada ejecución).
 sql(`insert into auth.users(id,email) values('aaaaaaaa-0000-0000-0000-000000000001','alice@example.test'),('bbbbbbbb-0000-0000-0000-000000000002','bob@example.test') on conflict do nothing`);
+sql(`insert into community_rules_acceptance(user_id,rules_version) select id,1 from auth.users on conflict (user_id) do nothing`); // v72: estas cuentas ya aceptaron las normas de la comunidad (el diálogo se prueba en v72.e2e.mjs)
 sql(`insert into community_profiles(user_id,username,display_name,visibility) values('aaaaaaaa-0000-0000-0000-000000000001','alicia_fit','Alicia','public'),('bbbbbbbb-0000-0000-0000-000000000002','bruno_fit','Bruno Fit','public') on conflict (user_id) do update set visibility='public'`);
 sql(`insert into community_follows(follower_id,following_id,status) values('aaaaaaaa-0000-0000-0000-000000000001','bbbbbbbb-0000-0000-0000-000000000002','accepted'),('bbbbbbbb-0000-0000-0000-000000000002','aaaaaaaa-0000-0000-0000-000000000001','accepted') on conflict do nothing`);
 sql(`delete from user_app_data where user_id='aaaaaaaa-0000-0000-0000-000000000001'; delete from community_messages; delete from community_reports; delete from community_posts; delete from community_moderators;`);
@@ -180,6 +181,7 @@ step('Mensaje enviado y persistido', sql(`select count(*) from community_message
 // v50: perfiles nuevos públicos, directorio de usuarios reales, privado con datos básicos y foto de perfil.
 sql(`delete from community_follows where following_id='cccccccc-0000-0000-0000-0000000000c5'; delete from community_profiles where user_id in ('cccccccc-0000-0000-0000-0000000000c5','dddddddd-0000-0000-0000-0000000000d5'); delete from auth.users where id in ('cccccccc-0000-0000-0000-0000000000c5','dddddddd-0000-0000-0000-0000000000d5')`);
 sql(`insert into auth.users(id,email,raw_user_meta_data) values('cccccccc-0000-0000-0000-0000000000c5','carla@example.test','{"full_name":"Carla"}'),('dddddddd-0000-0000-0000-0000000000d5','diego@example.test','{"full_name":"Diego"}')`);
+sql(`insert into community_rules_acceptance(user_id,rules_version) select id,1 from auth.users on conflict (user_id) do nothing`); // v72: estas cuentas ya aceptaron las normas de la comunidad (el diálogo se prueba en v72.e2e.mjs)
 step('Un perfil nuevo empieza público', sql(`select visibility from community_profiles where user_id='dddddddd-0000-0000-0000-0000000000d5'`) === 'public');
 sql(`update community_profiles set username='carla_priv', visibility='private', bio='No deberías ver esto', avatar_path='cccccccc-0000-0000-0000-0000000000c5/avatar/c1.jpg' where user_id='cccccccc-0000-0000-0000-0000000000c5'; update community_profiles set username='diego_pub' where user_id='dddddddd-0000-0000-0000-0000000000d5'`);
 await page.click('#communityTabWorld'); await page.waitForTimeout(1200);

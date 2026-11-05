@@ -35,6 +35,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 
 // ---------- Datos de prueba (solo en la base local de pruebas) ----------
 sql(`insert into auth.users(id,email) values('${C}','carla@example.test'),('${D}','dario@example.test') on conflict do nothing`);
+sql(`insert into community_rules_acceptance(user_id,rules_version) select id,1 from auth.users on conflict (user_id) do nothing`); // v72: estas cuentas ya aceptaron las normas de la comunidad (el diálogo se prueba en v72.e2e.mjs)
 sql(`insert into community_profiles(user_id,username,display_name,visibility) values('${C}','carla_fit','Carla','public'),('${D}','dario_fit','Darío','public') on conflict (user_id) do update set visibility='public'`);
 sql(`delete from community_posts where user_id in ('${C}','${D}'); delete from monetization_usage; delete from monetization_rewards; delete from community_memberships where user_id in ('${C}','${D}')`);
 // Darío tiene Plus vigente (fila que en producción escribe solo el servidor tras verificar el pago).

@@ -1,5 +1,24 @@
 # FittForma AI — Registro de cambios
 
+## v72.0 — Normas de la comunidad, recordatorios en la app de Android y revisión completa (5 de noviembre de 2026)
+
+Pedido de la persona dueña: «examiná toda la app y fijate qué podés mejorar en todos los sentidos» y, después, «dale, hacelo» (etapa 1 del plan).
+
+- **Revisión completa:** informe en `docs/AUDITORIA_v72.md`, con los hallazgos y el plan por etapas (v73 velocidad, v74 base y seguridad, v75 experiencia; después, pagos y anuncios).
+- **Base de producción al día:** se aplicó en Supabase la migración de v70, que faltaba. Ya nadie puede leer qué cuentas tienen membresía, salvo la propia (verificado).
+- **Normas de la comunidad** (Google Play las exige para el contenido de usuarios):
+  - Antes de publicar, comentar, mandar mensajes, compartir una actividad o editar el perfil público aparecen las normas. «Aceptar y seguir» se activa recién al marcar «Leí y acepto».
+  - Con «Ahora no» no se publica nada y lo escrito queda en el formulario.
+  - La aceptación se guarda en el teléfono y en la base (tabla nueva, la fecha la pone la base y solo la persona la ve). En otro teléfono no se vuelve a pedir.
+  - Se pueden leer cuando quieras en Ajustes › Privacidad en Comunidad, debajo del formulario de publicar y en la página pública `/normas.html`, que sirve como enlace para la ficha de Google Play.
+- **Recordatorios en la app de Android:** hasta ahora no llegaban, porque usaban notificaciones del navegador.
+  - Ahora se programan en el teléfono con el plugin oficial `@capacitor/local-notifications` y llegan aunque la app esté cerrada.
+  - Entrenamiento: 14 días, con el aviso de la hora elegida y el de seguimiento. Agua: los horarios elegidos, por 3 días.
+  - Se vuelven a armar con cada cambio: si hoy ya entrenaste o llegaste al objetivo de agua, se quitan los de hoy.
+  - Ajustes › Recordatorios muestra cuántos avisos hay programados y cuándo llega el próximo. Usan el ícono propio de FittForma.
+  - **Falta probarlo en un teléfono:** acá no hay SDK de Android para compilar. Se probó con un plugin simulado que tiene la misma API.
+- Traducido a los seis idiomas. **Migración nueva:** `2026-11-05_v72_community_rules.sql` (ver docs/DESPLIEGUE.md).
+
 ## v71.0 — Coronita de miembros, próxima serie, «Lo de siempre» y tendencia del peso (5 de noviembre de 2026)
 
 Pedido de la persona dueña: «que aparezca una coronita que diga miembros en vez de gratis» y «qué más mejorarías dentro de cada sector».

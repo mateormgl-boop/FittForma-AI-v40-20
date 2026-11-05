@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v71.0
+# Despliegue de FittForma AI v72.0
 
-Esta guía es la lista de pasos para publicar v71.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v72.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -12,11 +12,27 @@ Si Comunidad dice «Comunidad se está actualizando…» o «Could not find the 
 3. Recargá la app.
 
 Detalles del archivo:
-- Tiene las 18 migraciones (v41 a v70), en orden.
+- Tiene las 19 migraciones (v41 a v72), en orden.
 - Cada una va en su propia transacción y se puede ejecutar más de una vez: no borra datos ni desactiva RLS.
 - Al final recarga la caché de la API de Supabase.
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
+
+## Qué cambia en v72.0
+
+- **Producción:** la migración de v70 ya quedó aplicada en Supabase el 5 de noviembre (con autorización de la persona dueña). No hace falta volver a aplicarla.
+- **Migración nueva (aditiva):** `supabase/migrations/2026-11-05_v72_community_rules.sql`. Crea la tabla `community_rules_acceptance` con RLS: cada persona lee y guarda solo su aceptación; la fecha la pone la base.
+  - **Orden recomendado:** primero desplegá v72 en Render y después pegá esta migración en el SQL Editor. Así nunca hay un momento en que se pidan normas que no se puedan guardar.
+  - Si la app v72 corre sin la migración, igual pide las normas y guarda la aceptación en el teléfono; cuando la tabla existe, la sube sola.
+  - No bloquea publicaciones desde la base: lo controla la app (es lo que exige Google Play) y la base guarda el registro.
+- **Archivos que se actualizan:** `index.html`, `community.js`, `design.css`, `i18n-v53.js`, `i18n.js`, `sw.js`, `backend/server.mjs` y los nuevos `native-notify.js` y `normas.html`.
+- El service worker cambia a `fittforma-ai-static-v72-0`. El servidor tiene que informar `0.72.0`.
+- **App de Android:** `mobile/` suma `@capacitor/local-notifications` 8.3.1 y el ícono `ic_stat_fittforma`. Para compilar: `cd mobile && npm install && npm run sync && npm run open` (Android Studio).
+  - **Probar en un teléfono:** Ajustes › Recordatorios › Permitir notificaciones (Android 13 o más lo pide) → «Probar notificación» → cerrar la app y esperar el aviso; guardar recordatorios y ver «Programados en este teléfono».
+- **Para publicar en Google Play** (lo hace la persona dueña):
+  - Completar `legal-config.js` con nombre y correo de contacto. Hoy la política y las normas dicen «todavía no publicado».
+  - En Play Console, completar «Apps de salud» y «Seguridad de los datos».
+  - Usar `https://<tu-dominio>/normas.html` como normas de la comunidad y `/privacidad.html` como política de privacidad.
 
 ## Qué cambia en v71.0
 

@@ -25,6 +25,7 @@ const PASS = 'clave-segura-123';
 // Supabase crea la fila de auth.users al registrarse; acá se prepara antes para que PostgREST la encuentre.
 sql(`delete from auth.users where id in ('${NEW_ID}','${PEND_ID}')`);
 sql(`insert into auth.users(id,email,raw_user_meta_data) values('${NEW_ID}','${NEW}','{"full_name":"Nueva"}'),('${PEND_ID}','${PEND}','{"full_name":"Pendiente"}')`);
+sql(`insert into community_rules_acceptance(user_id,rules_version) select id,1 from auth.users on conflict (user_id) do nothing`); // v72: estas cuentas ya aceptaron las normas de la comunidad (el diálogo se prueba en v72.e2e.mjs)
 
 let failures = 0;
 const step = (name, ok, detail = '') => { console.log(`${ok ? 'PASA' : 'FALLA'}  ${name}${detail !== '' ? ' — ' + detail : ''}`); if (!ok) failures++; };
