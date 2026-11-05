@@ -123,7 +123,27 @@
     if (s == null || c == null || t == null || Math.abs(t - s) < 0.1) return null;
     return Math.max(0, Math.min(100, Math.round((s - c) / (s - t) * 100)));
   }
-  const api = { ACTIVITY, bmi, bmiCategory, waistToHeight, bmr, tdee, goalDirection, summary, goalProgress, addDays };
+  // v71: tendencia del peso = promedio móvil exponencial por día (cada día pesa ~10 %, ajustado a los días entre registros),
+  // para que una comida salada o un día de retención no parezcan un cambio real. Devuelve la línea suavizada y el ritmo semanal
+  // (recta sobre los últimos 28 días). Con menos de 2 registros o menos de 7 días, sin ritmo.
+  function weightTrend(points, alpha = 0.1) {
+    const list = (points || []).map(p => ({ date: String(p.date || '').slice(0, 10), kg: num(p.kg) })).filter(p => p.kg != null && /^\d{4}-\d{2}-\d{2}$/.test(p.date)).sort((a, b) => a.date.localeCompare(b.date));
+    if (!list.length) return { points: [], weeklyKg: null, spanDays: 0 };
+    const t = d => new Date(d + 'T12:00:00').getTime() / 864e5;
+    let ema = list[0].kg, prev = t(list[0].date); const out = [{ date: list[0].date, kg: list[0].kg, trend: ema }];
+    for (const p of list.slice(1)) { const gap = Math.max(1, Math.round(t(p.date) - prev)); const a = 1 - Math.pow(1 - alpha, gap); ema = ema + a * (p.kg - ema); prev = t(p.date); out.push({ date: p.date, kg: p.kg, trend: Math.round(ema * 100) / 100 }); }
+    const spanDays = Math.round(t(out[out.length - 1].date) - t(out[0].date));
+    // Ritmo: recta de mínimos cuadrados sobre los registros de los últimos 28 días (menos sensible a un dato suelto).
+    let weeklyKg = null;
+    const endT = t(out[out.length - 1].date), recent = out.filter(p => endT - t(p.date) <= 28);
+    if (recent.length >= 3 && endT - t(recent[0].date) >= 7) {
+      const xs = recent.map(p => t(p.date)), mx = xs.reduce((a, b) => a + b, 0) / xs.length, my = recent.reduce((a, p) => a + p.kg, 0) / recent.length;
+      const sxx = xs.reduce((a, x) => a + (x - mx) ** 2, 0), sxy = xs.reduce((a, x, i) => a + (x - mx) * (recent[i].kg - my), 0);
+      if (sxx > 0) weeklyKg = Math.round(sxy / sxx * 7 * 100) / 100;
+    }
+    return { points: out, weeklyKg, spanDays };
+  }
+  const api = { ACTIVITY, bmi, bmiCategory, waistToHeight, bmr, tdee, goalDirection, summary, goalProgress, addDays, weightTrend };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaBody = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);

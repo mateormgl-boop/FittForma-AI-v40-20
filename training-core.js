@@ -712,6 +712,28 @@
     return { kind: 'repeat', weight: w, reps: lo, unit: 'reps' };
   }
 
+  // v71: sugerencia para la PRÓXIMA serie en la sesión en curso. Usa la misma serie de la última vez y lo que hiciste hoy;
+  // si hoy te costó (quedaste por debajo del rango), no sube la carga. Sin datos registrados devuelve null.
+  function nextSetHint(prev, today, spec, measure = 'reps', setIndex = 0) {
+    const pick = x => (x ? { r: num(x.reps), w: num(x.weight) } : null);
+    const before = pick((prev || [])[setIndex]);
+    const doneToday = (today || []).slice(0, setIndex).filter(x => x && x.done).map(pick).filter(x => x.r > 0);
+    const last = doneToday.length ? doneToday[doneToday.length - 1] : null;
+    const m = String(spec || '').match(/(\d+)\s*[–-]\s*(\d+)/), one = String(spec || '').match(/\d+/);
+    const base = before && before.r > 0 ? before : last;
+    if (!base) return null;
+    const lo = m ? Number(m[1]) : one ? Number(one[0]) : base.r, hi = m ? Number(m[2]) : lo;
+    const w0 = base.w > 0 ? base.w : 0;
+    const out = (kind, weight, reps) => ({ kind, weight, reps, unit: measure === 'seconds' ? 's' : 'reps', from: before && before.r > 0 ? { weight: before.w > 0 ? before.w : 0, reps: before.r } : null, today: last ? { weight: last.w > 0 ? last.w : 0, reps: last.r } : null });
+    if (last && last.r < lo) return out('hold', last.w > 0 ? last.w : w0, lo);
+    if (!(before && before.r > 0)) return out('repeat', w0, last.r);
+    if (measure === 'seconds') return out(before.r >= hi ? 'time' : 'repeat', w0, before.r >= hi ? before.r + 5 : Math.min(hi, before.r + 5));
+    if (last && last.w > w0 && last.r >= lo) return out('repeat', last.w, last.r);
+    if (before.r >= hi) return w0 > 0 ? out('load', Math.round((w0 + loadStep(w0)) * 2) / 2, lo) : out('reps', 0, before.r + 1);
+    if (before.r >= lo) return out('reps', w0, Math.min(hi, before.r + 1));
+    return out('repeat', w0, lo);
+  }
+
   // ---------- v58: Mi semana, rutinas listas y recomendaciones ----------
   // Días: 1 = lunes … 7 = domingo. Cada día del plan es { kind: 'focus', key } | { kind: 'groups', groups } |
   // { kind: 'routine', id } | { kind: 'rest' }. Las recomendaciones solo usan lo que la persona registró y su perfil.
@@ -827,7 +849,7 @@
     return set >= 0 ? { rest: false, next, set } : { rest: true };
   }
 
-  const api = { oneRepMax, weightForReps, repsAtWeight, fitToTime, estimateMinutes, SCHEMES, PLATES_KG, platesPerSide, supersetGroup, supersetNext, WEEKDAYS, weekdayOf, PROGRAMS, programWeek, groupsOfExercise, groupHistory, recommendPrograms, recommendToday, SPLIT_PLANS, nextFocusInSplit, suggestProgression, norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
+  const api = { oneRepMax, weightForReps, repsAtWeight, fitToTime, estimateMinutes, SCHEMES, PLATES_KG, platesPerSide, supersetGroup, supersetNext, WEEKDAYS, weekdayOf, PROGRAMS, programWeek, groupsOfExercise, groupHistory, recommendPrograms, recommendToday, SPLIT_PLANS, nextFocusInSplit, suggestProgression, nextSetHint, norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaTraining = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);

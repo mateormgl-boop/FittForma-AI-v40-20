@@ -9,6 +9,12 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v71
+
+- `npm test` (376): `tests/v71.test.mjs` prueba la coronita (sin «Gratis», solo corona en 320 px), la próxima serie (progresión doble, no sube la carga si la serie anterior quedó corta, respeta la carga de hoy, sin datos devuelve nada), el récord anunciado una vez por serie, «Lo de siempre» (mismo momento del día, al menos 2 días, últimas 4 semanas, no repite lo de hoy) y la tendencia del peso (suaviza y calcula el ritmo semanal).
+- E2E `v71` (22 pasos, solo la app): coronita y «Próximamente»; a 320 px solo la corona y sin desborde; en la sesión, la sugerencia de la serie 1 con la última vez, el aviso del récord al momento, sin repetirse, la sugerencia que respeta la carga de hoy y no sube si la serie quedó corta; «Lo de siempre» del momento del día con un toque, que deja de sugerirse; línea de tendencia y ritmo por semana.
+- `v70` E2E y `tests/v70.test.mjs` se actualizaron a los textos nuevos («Miembros» en vez de «Gratis» y «Miembros Plus»).
+
 ### v70
 
 - RLS `rls_v70_test.sql` (12 comprobaciones): la membresía ajena no se lee (con o sin sesión), nadie se da Plus, la insignia y la fila «Miembros Plus» solo con Plus vigente + `show_plus` + perfil visible.

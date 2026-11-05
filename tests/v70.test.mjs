@@ -23,7 +23,7 @@ test('v70: la app muestra Plus solo con lo que confirma la base y nunca concede 
   assert.doesNotMatch(js, /from\('community_memberships'\)/, 'la app no lee membresías ajenas');
   assert.match(ads, /const isPlus = \(\) => ent\?\.plan === 'plus' && ent\?\.planVerified === true;/);
   assert.match(ads, /showPlusRow'\); if \(spr\) spr\.hidden = !\(isPlus\(\) && signed\)/, 'el interruptor solo con Plus verificado');
-  assert.match(html, /id="communityPlusRow" aria-label="Miembros Plus" hidden/);
+  assert.match(html, /id="communityPlusRow" aria-label="Miembros" hidden/);
   assert.match(html, /id="showPlusRow" hidden><input id="showPlusToggle" type="checkbox">/, 'empieza apagado');
   assert.match(html, /id="planChip" type="button" hidden/);
 });

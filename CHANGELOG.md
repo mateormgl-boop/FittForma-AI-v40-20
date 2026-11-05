@@ -1,5 +1,20 @@
 # FittForma AI — Registro de cambios
 
+## v71.0 — Coronita de miembros, próxima serie, «Lo de siempre» y tendencia del peso (5 de noviembre de 2026)
+
+Pedido de la persona dueña: «que aparezca una coronita que diga miembros en vez de gratis» y «qué más mejorarías dentro de cada sector».
+
+- **Coronita de miembros** arriba, al lado de «FittForma AI»:
+  - Sin membresía: corona sin rellenar y «Miembros». Al tocarla abre la membresía, que avisa **«Próximamente»**: la suscripción todavía no se puede comprar (no hay pagos conectados en la web ni en la app actual). Nada se cobra.
+  - Con membresía verificada por el servidor: corona dorada rellena y «Miembro».
+  - En pantallas de 320 px queda solo la corona (el nombre sigue disponible para lectores de pantalla).
+  - En Comunidad, la insignia de la foto también pasa a ser una coronita y la fila de arriba se llama «Miembros». Sigue siendo opcional y apagada por defecto.
+- **Entrenar — próxima serie:** debajo de cada ejercicio, «Serie 2 · La última vez 20 kg × 10 → probá 22 kg × 10». Se actualiza al marcar cada serie. Usa la misma serie de la vez anterior y lo que hiciste hoy. Si la serie anterior quedó por debajo del rango, sugiere mantener la carga en vez de subirla. Sin registros previos no inventa números.
+- **Entrenar — récord al momento:** al marcar una serie que supera tu mejor marca, aparece «¡Nuevo récord personal…!», la fila destella y el teléfono vibra (si tenés la vibración activada en el descanso). Se anuncia una sola vez por serie. Si esa serie también cierra el ejercicio, el aviso suma las calorías estimadas.
+- **Nutrición — «Lo de siempre»:** en Hoy, según la hora (desayuno, almuerzo, merienda o cena), las comidas que más registraste en ese momento en las últimas 4 semanas. Tienen que aparecer al menos 2 días distintos. Se agregan con un toque y después se pueden editar. Lo que ya registraste hoy no se vuelve a sugerir.
+- **Progreso — tendencia del peso:** el gráfico suma una línea punteada que suaviza los altibajos de un día al otro (promedio móvil exponencial). Debajo muestra el ritmo de las últimas 4 semanas («−0,35 kg por semana»), calculado como recta sobre tus registros. Con menos de 3 registros o menos de una semana no se muestra un ritmo.
+- Traducido a los seis idiomas. **Sin migraciones nuevas.**
+
 ## v70.0 — Miembros Plus en Comunidad y detalles visuales (5 de noviembre de 2026)
 
 Pedido de la persona dueña: «que los miembros aparezcan arriba en Todos» y «mirá toda la app y decime qué mejorarías».

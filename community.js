@@ -676,7 +676,7 @@
     const els=[...root.querySelectorAll('.community-avatar[data-uid]')],ask=[...new Set(els.map(e=>e.dataset.uid))].filter(id=>!plusAsked.has(id)).slice(0,200);
     if(ask.length){ask.forEach(id=>plusAsked.add(id));const r=await client.rpc('community_plus_ids',{p_ids:ask});
       if(r.error){if(isMissingFunction(r.error))plusEnabled=false;return;}(r.data||[]).forEach(x=>plusIds.add(typeof x==='string'?x:x.community_plus_ids||x.user_id));}
-    els.forEach(e=>{const on=plusIds.has(e.dataset.uid);e.classList.toggle('is-plus',on);if(on&&!e.querySelector('.cm-plus-badge'))e.insertAdjacentHTML('beforeend','<b class="cm-plus-badge" role="img" aria-label="Miembro Plus">Plus</b>');});
+    els.forEach(e=>{const on=plusIds.has(e.dataset.uid);e.classList.toggle('is-plus',on);if(on&&!e.querySelector('.cm-plus-badge'))e.insertAdjacentHTML('beforeend','<b class="cm-plus-badge" role="img" aria-label="Miembro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 8.5 8 12l4-6.5 4 6.5 4.5-3.5-1.6 9.5H5.1z"/></svg></b>');});
   }
   function watchPlus(){const view=$('view-community');if(!view||view.__plusObs)return;view.__plusObs=new MutationObserver(()=>{clearTimeout(plusTimer);plusTimer=setTimeout(()=>decoratePlus(view),160);});view.__plusObs.observe(view,{childList:true,subtree:true});}
   async function loadPlusRow(){
@@ -686,14 +686,14 @@
     if(r.error||!r.data?.length){if(r.error&&isMissingFunction(r.error))plusEnabled=false;box.hidden=true;return;}
     r.data.forEach(x=>{plusIds.add(x.user_id);plusAsked.add(x.user_id);});
     const urlOf=await signedMany(r.data.map(x=>x.avatar_path));
-    box.innerHTML=`<div class="cm-plus-row-head"><strong>Miembros Plus</strong><small class="muted">Eligieron mostrarse en Comunidad</small></div><ul class="cm-plus-list">${r.data.map(x=>`<li><button type="button" data-community-open-user="${esc(x.user_id)}">${avatarHtml(x,urlOf)}<span>${esc(x.display_name||x.username)}</span><small>@${esc(x.username)}</small></button></li>`).join('')}</ul>`;
+    box.innerHTML=`<div class="cm-plus-row-head"><strong>Miembros</strong><small class="muted">Eligieron mostrarse en Comunidad</small></div><ul class="cm-plus-list">${r.data.map(x=>`<li><button type="button" data-community-open-user="${esc(x.user_id)}">${avatarHtml(x,urlOf)}<span>${esc(x.display_name||x.username)}</span><small>@${esc(x.username)}</small></button></li>`).join('')}</ul>`;
     box.hidden=false;bindPeople(box);decoratePlus(box);
   }
   async function saveShowPlus(e){
     const box=e.target;if(!authReady()){box.checked=false;return;}
     const {error}=await client.from('community_profiles').update({show_plus:box.checked}).eq('user_id',user.id);
     if(error){box.checked=!box.checked;window.toast?.(friendlySupabaseError(error,'guardar la insignia'));return;}
-    plusAsked.delete(user.id);plusIds.delete(user.id);window.toast?.(box.checked?'Tu insignia Plus ya se ve en Comunidad.':'Tu insignia Plus quedó oculta.');
+    plusAsked.delete(user.id);plusIds.delete(user.id);window.toast?.(box.checked?'Tu coronita de miembro ya se ve en Comunidad.':'Tu coronita de miembro quedó oculta.');
   }
   async function loadDirectory(reset=true){
     const root=$('communityPeople'),more=$('communityPeopleMore');if(!root)return;
