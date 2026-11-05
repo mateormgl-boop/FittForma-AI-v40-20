@@ -2,6 +2,11 @@
 (window.FittFormaI18nExtra = window.FittFormaI18nExtra || []).push(
   ["Nombre o @usuario", "Name or @username", "Nome ou @usuário", "Nom ou @pseudo", "Nome o @utente", "Name oder @Nutzer"],
   ["Todos", "Everyone", "Todos", "Tout le monde", "Tutti", "Alle"],
+  // v69.1: insignia del plan
+  ["Gratis", "Free", "Grátis", "Gratuit", "Gratis", "Kostenlos"],
+  ["Plan gratuito", "Free plan", "Plano gratuito", "Forfait gratuit", "Piano gratuito", "Kostenloser Tarif"],
+  ["Plus · verificado", "Plus · verified", "Plus · verificado", "Plus · vérifié", "Plus · verificato", "Plus · verifiziert"],
+  ["Ver membresía", "See membership", "Ver assinatura", "Voir l’abonnement", "Vedi abbonamento", "Mitgliedschaft ansehen"],
   ["Todo el mundo", "Everyone", "Todo mundo", "Tout le monde", "Tutti", "Alle"],
   ["Avisos", "Alerts", "Avisos", "Notifications", "Avvisi", "Benachrichtigungen"],
   ["Seguimientos, mensajes y ranking", "Follows, messages and leaderboard", "Seguidores, mensagens e ranking", "Abonnements, messages et classement", "Follower, messaggi e classifica", "Follows, Nachrichten und Rangliste"],

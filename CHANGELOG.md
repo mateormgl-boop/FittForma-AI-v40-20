@@ -1,5 +1,13 @@
 # FittForma AI — Registro de cambios
 
+## v69.1 — Tu plan al lado del nombre (5 de noviembre de 2026)
+
+Pedido de la persona dueña: «que lo de miembros aparezca arriba al lado del nombre FittForma».
+
+- **Insignia del plan** junto a «FittForma AI» en la barra de arriba: «Gratis» o, con una suscripción verificada por el servidor, «Plus» en dorado. Al tocarla abre Ajustes › Membresía. Solo aparece cuando el servidor responde; nunca se muestra «Plus» por un dato guardado en el teléfono.
+- **Corrección:** la tarjeta de membresía tenía dos elementos con el mismo id y el estado se quedaba en «Consultando tu plan…». Ahora la cabecera muestra «Plan gratuito» o «Plus · verificado» y el detalle se actualiza.
+- Revisado a 320, 360 y 390 px en claro y oscuro. Traducido a los seis idiomas. Sin migraciones.
+
 ## v69.0 — Ajustes en un solo lugar, el Muro dentro de Amigos y Perfil con «Este mes» (31 de octubre de 2026)
 
 Pedido de la persona dueña: «que el muro aparezca en Amigos» y «una sección de ajustes con todo lo que está en otras secciones».

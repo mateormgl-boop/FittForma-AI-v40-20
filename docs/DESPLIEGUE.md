@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v69.0
+# Despliegue de FittForma AI v69.1
 
-Esta guía es la lista de pasos para publicar v69.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v69.1. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -18,11 +18,11 @@ Detalles del archivo:
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
 
-## Qué cambia en v69.0
+## Qué cambia en v69.1 (y v69.0)
 
 - **No hay migraciones nuevas** (no hace falta pegar nada en Supabase).
 - **Archivos que se actualizan:** `index.html`, `community.js`, `design.css` e `i18n-v53.js`.
-- El service worker cambia a `fittforma-ai-static-v69-0`.
+- El service worker cambia a `fittforma-ai-static-v69-1`.
 
 ## Qué cambia en v68.0
 

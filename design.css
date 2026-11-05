@@ -62,6 +62,14 @@ header{background:color-mix(in srgb,var(--ff-page) 88%,transparent)!important;ba
 .brand{gap:10px!important;color:var(--text)!important;font-weight:800!important;letter-spacing:-.02em!important;font-size:19px!important;text-transform:none!important}
 .brand-logo{filter:none!important;border-radius:0!important}
 .brand .brand-word b{color:#a996ff;font-weight:800}
+/* v69.1: insignia del plan junto al nombre */
+.plan-chip{display:inline-flex;align-items:center;gap:6px;margin-left:2px;padding:4px 10px 4px 8px;border-radius:999px;border:1px solid var(--line,rgba(255,255,255,.14));background:var(--panel-2,rgba(255,255,255,.06));color:var(--muted,#a3abc6);font-weight:700;font-size:12px;line-height:1;letter-spacing:.02em;cursor:pointer;white-space:nowrap}
+.plan-chip:hover{color:var(--text)}
+.plan-chip:focus-visible{outline:2px solid #6ff2cf;outline-offset:2px}
+.plan-chip-dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.7}
+.plan-chip.is-plus{border-color:transparent;background:linear-gradient(135deg,#ffd23f,#f0a92b);color:#241a00}
+.plan-chip.is-plus .plan-chip-dot{background:#241a00;opacity:1}
+@media (max-width:380px){.brand{gap:6px!important;font-size:16px!important;min-width:0}.brand-logo{width:30px;height:30px}.plan-chip{padding:4px 8px;font-size:11px}.plan-chip-dot{display:none}}
 :root[data-theme="light"] .brand .brand-word b{color:#5a3ed6}
 .theme-toggle{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;border:1px solid var(--ff-border);background:var(--ff-panel);color:var(--text);cursor:pointer;box-shadow:var(--ff-shadow-sm)}
 .theme-toggle svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
