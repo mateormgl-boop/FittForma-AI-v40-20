@@ -66,10 +66,12 @@ header{background:color-mix(in srgb,var(--ff-page) 88%,transparent)!important;ba
 .plan-chip{display:inline-flex;align-items:center;gap:6px;margin-left:2px;padding:4px 10px 4px 8px;border-radius:999px;border:1px solid var(--line,rgba(255,255,255,.14));background:var(--panel-2,rgba(255,255,255,.06));color:var(--muted,#a3abc6);font-weight:700;font-size:12px;line-height:1;letter-spacing:.02em;cursor:pointer;white-space:nowrap}
 .plan-chip:hover{color:var(--text)}
 .plan-chip:focus-visible{outline:2px solid #6ff2cf;outline-offset:2px}
-.plan-chip-dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.7}
+.plan-chip .crown{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;flex:none}
 .plan-chip.is-plus{border-color:transparent;background:linear-gradient(135deg,#ffd23f,#f0a92b);color:#241a00}
-.plan-chip.is-plus .plan-chip-dot{background:#241a00;opacity:1}
-@media (max-width:380px){.brand{gap:6px!important;font-size:16px!important;min-width:0}.brand-logo{width:30px;height:30px}.plan-chip{padding:4px 8px;font-size:11px}.plan-chip-dot{display:none}}
+.plan-chip.is-plus .crown{fill:#241a00;stroke:#241a00}
+@media (max-width:380px){.brand{gap:6px!important;font-size:16px!important;min-width:0}.brand-logo{width:30px;height:30px}.plan-chip{padding:4px 8px;font-size:11px;gap:4px}.plan-chip .crown{width:13px;height:13px}}
+/* v71: en pantallas muy angostas queda solo la coronita (el nombre sigue en aria-label). */
+@media (max-width:359px){.plan-chip{padding:5px 7px}.plan-chip #planChipText{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.plan-chip .crown{width:15px;height:15px}}
 :root[data-theme="light"] .brand .brand-word b{color:#5a3ed6}
 .theme-toggle{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;border:1px solid var(--ff-border);background:var(--ff-panel);color:var(--text);cursor:pointer;box-shadow:var(--ff-shadow-sm)}
 .theme-toggle svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -538,6 +540,12 @@ body{font-feature-settings:"cv11","ss01"}
 .set-table .set-pr::before{content:'★ ';}
 @keyframes pr-pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.set-table .set-pr{animation:none}}
+/* v71: próxima serie sugerida y destello al batir un récord. */
+.next-set-hint{margin:8px 0 2px;padding:8px 11px;border-radius:12px;border:1px solid color-mix(in srgb,var(--t-green) 35%,transparent);background:color-mix(in srgb,var(--t-green) 9%,transparent);color:var(--text);font-size:13px;font-weight:650;line-height:1.35}
+.next-set-hint[hidden]{display:none!important}
+.setrow.pr-flash{animation:pr-row-flash 1.4s ease-out}
+@keyframes pr-row-flash{0%{box-shadow:0 0 0 0 rgba(255,198,107,.0);background:rgba(255,198,107,.32)}100%{box-shadow:0 0 0 0 transparent;background:transparent}}
+@media(prefers-reduced-motion:reduce){.setrow.pr-flash{animation:none}}
 @media(max-width:420px){
   .workout-live-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .workout-exercise .train-exercise-head{grid-template-columns:56px minmax(0,1fr) 70px}
@@ -2015,7 +2023,8 @@ header .language-picker{display:none!important}
 /* v70: miembros Plus en Comunidad (solo quien eligió mostrarse) */
 .community-avatar{position:relative}
 .community-avatar.is-plus{box-shadow:0 0 0 2px #ffd23f,0 0 0 4px rgba(255,210,63,.28)}
-.cm-plus-badge{position:absolute;right:-6px;bottom:-4px;padding:1px 5px;border-radius:999px;background:linear-gradient(135deg,#ffd23f,#f0a92b);color:#241a00;font-size:9px;font-weight:800;line-height:1.3;letter-spacing:.02em;box-shadow:0 2px 6px rgba(0,0,0,.35);pointer-events:none}
+.cm-plus-badge{position:absolute;right:-5px;bottom:-4px;display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#ffd23f,#f0a92b);box-shadow:0 2px 6px rgba(0,0,0,.35);pointer-events:none}
+.cm-plus-badge svg{width:11px;height:11px;fill:#241a00}
 .community-avatar-xs .cm-plus-badge{display:none}
 .cm-plus-row{display:grid;gap:10px;margin:0 0 14px;padding:12px;border-radius:16px;border:1px solid rgba(255,210,63,.35);background:linear-gradient(135deg,rgba(255,210,63,.10),rgba(240,169,43,.04))}
 .cm-plus-row-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
@@ -2032,3 +2041,20 @@ header .language-picker{display:none!important}
 /* la insignia sobresale del círculo: la foto se recorta por sí misma */
 #view-community .community-avatar.is-plus,.community-post-dialog .community-avatar.is-plus{overflow:visible!important}
 .community-avatar.is-plus img{border-radius:50%}
+
+/* v71: «Próximamente» en la membresía mientras no se pueda pagar desde la app */
+.membership-soon{margin:8px 0 0;padding:10px 12px;border-radius:12px;border:1px dashed rgba(255,210,63,.55);background:rgba(255,210,63,.08);font-size:13px;line-height:1.45}
+.membership-soon strong{color:#ffd23f}
+:root[data-theme="light"] .membership-soon strong{color:#9a6a00}
+
+/* v71: «Lo de siempre» en Nutrición y tendencia del peso. */
+.usual-meals[hidden]{display:none!important}
+.usual-list{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
+.usual-list li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:var(--panel-2,transparent)}
+.usual-list li div{min-width:0;display:grid;gap:2px}
+.usual-list strong{font-size:14px;overflow-wrap:anywhere}
+.usual-list small{color:var(--muted);font-size:12px}
+.usual-list .btn{flex:none}
+.weight-chart .wc-trend{stroke:var(--t-amber);stroke-width:2.5;stroke-dasharray:7 6;stroke-linecap:round}
+.wc-trend-note{display:flex;align-items:center;gap:8px;margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.35}
+.wc-trend-note i{flex:none;width:22px;height:0;border-top:2.5px dashed var(--t-amber)}

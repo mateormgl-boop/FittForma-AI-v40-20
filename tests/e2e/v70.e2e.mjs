@@ -82,7 +82,7 @@ await wire(page);
 await page.goto(APP + '/'); await page.waitForTimeout(1200);
 
 // 1) Arriba, al lado del nombre: el plan («Gratis» sin Plus verificado por el servidor).
-step('La insignia del plan aparece al lado de FittForma AI', await page.isVisible('#planChip') && (await page.textContent('#planChipText')).trim() === 'Gratis');
+step('La insignia del plan aparece al lado de FittForma AI', await page.isVisible('#planChip') && (await page.textContent('#planChipText')).trim() === 'Miembros');
 await page.click('#planChip'); await page.waitForTimeout(700);
 step('Tocar la insignia abre la membresía en Ajustes', await page.isVisible('#membershipCard') && (await page.textContent('#membershipStatus')).includes('Tu plan: Gratis'));
 step('Sin Plus no aparece el interruptor de la insignia', await page.isHidden('#showPlusRow'));
@@ -91,7 +91,7 @@ step('Sin Plus no aparece el interruptor de la insignia', await page.isHidden('#
 await page.click('.mobile-nav-item[data-mobile-view="community"]'); await page.waitForTimeout(1800);
 const row = await page.$('#communityPlusRow:not([hidden])');
 const rowText = row ? (await row.textContent()).replace(/\s+/g, ' ') : '';
-step('La fila «Miembros Plus» aparece arriba de Todos', !!row && /Miembros Plus/.test(rowText));
+step('La fila «Miembros Plus» aparece arriba de Todos', !!row && /Miembros/.test(rowText));
 step('Muestra a Alicia (Plus y eligió mostrarse)', /Alicia/.test(rowText));
 step('No muestra a Bruno (Plus, pero no lo eligió)', !/Bruno/.test(rowText));
 const order = await page.evaluate(() => { const r = document.getElementById('communityPlusRow'), f = document.getElementById('communitySearchForm'); return !!(r && f && (r.compareDocumentPosition(f) & Node.DOCUMENT_POSITION_FOLLOWING)); });

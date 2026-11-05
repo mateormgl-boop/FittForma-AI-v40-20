@@ -192,5 +192,26 @@
     return { kcal: Math.round(t.kcal), protein: r1(t.protein), carbs: r1(t.carbs), fat: r1(t.fat) };
   }
 
-  root.FittFormaFood = Object.freeze({ CATS, norm, label, search, variantsOf, unitsFor, nutrientsFor, sourceInfo, fromOpenFoodFacts, frequentIds, parseMealText, matchFood, totalsFor, splitMeal });
+  // v71: «Lo de siempre»: según la hora, el momento del día y lo que más registraste en ese momento (al menos 2 días distintos
+  // en las últimas semanas). Sale solo de tus registros; no se repite lo que ya cargaste hoy en ese momento.
+  function mealTypeForHour(h) { h = Number(h); return h < 11 ? 'Desayuno' : h < 15.5 ? 'Almuerzo' : h < 19.5 ? 'Merienda' : 'Cena'; }
+  function usualMeals(meals, opts = {}) {
+    const today = String(opts.today || ''), type = opts.type || mealTypeForHour(opts.hour ?? 12), limit = opts.limit || 3, days = opts.days || 28;
+    const since = today ? new Date(new Date(today + 'T12:00:00').getTime() - days * 864e5).toISOString().slice(0, 10) : '';
+    const key = m => norm(String(m.name || '')).replace(/\s+/g, ' ').trim();
+    const loggedToday = new Set((meals || []).filter(m => m && String(m.date) === today && m.type === type).map(key));
+    const by = new Map();
+    for (const m of meals || []) {
+      if (!m || m.type !== type || !m.name || String(m.date) >= today || (since && String(m.date) < since)) continue;
+      const k = key(m); if (!k || loggedToday.has(k)) continue;
+      const g = by.get(k) || { dates: new Set(), last: null };
+      g.dates.add(String(m.date)); if (!g.last || String(m.date) >= String(g.last.date)) g.last = m; by.set(k, g);
+    }
+    return [...by.values()].filter(g => g.dates.size >= 2)
+      .sort((a, b) => b.dates.size - a.dates.size || String(b.last.date).localeCompare(String(a.last.date)))
+      .slice(0, limit)
+      .map(g => ({ name: g.last.name, type, calories: Math.round(Number(g.last.calories) || 0), protein: Number(g.last.protein) || 0, carbs: Number(g.last.carbs) || 0, fat: Number(g.last.fat) || 0, items: g.last.items, estimated: g.last.estimated, times: g.dates.size }));
+  }
+
+  root.FittFormaFood = Object.freeze({ CATS, norm, label, search, variantsOf, unitsFor, nutrientsFor, sourceInfo, fromOpenFoodFacts, frequentIds, parseMealText, matchFood, totalsFor, splitMeal, mealTypeForHour, usualMeals });
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v70.0
+# Despliegue de FittForma AI v71.0
 
-Esta guía es la lista de pasos para publicar v70.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v71.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -17,6 +17,13 @@ Detalles del archivo:
 - Al final recarga la caché de la API de Supabase.
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
+
+## Qué cambia en v71.0
+
+- **Sin migraciones nuevas.** Si v70 ya está aplicada, la base no cambia. Si no, aplicá `APLICAR_MIGRACIONES.sql`: sin la migración de v70 la coronita de Comunidad no se ve, y el resto funciona igual.
+- **Archivos que se actualizan:** `index.html`, `ads.js`, `community.js`, `design.css`, `training-core.js`, `food-core.js`, `body-goals.js`, `i18n-v53.js` e `i18n.js`.
+- El service worker cambia a `fittforma-ai-static-v71-0`. El servidor tiene que informar `0.71.0`: si Render sigue con la anterior, Comunidad avisa que las versiones no coinciden.
+- Membresía: la tarjeta dice «Próximamente», porque todavía no hay forma de pagar. Se oculta sola cuando la cuenta tiene membresía verificada o cuando la app corre donde Google Play puede cobrar.
 
 ## Qué cambia en v70.0
 

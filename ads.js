@@ -230,11 +230,13 @@
   // Insignia junto al nombre (cabecera) y píldora de la tarjeta: solo «Plus» si el servidor lo verificó.
   function renderPlanChip() {
     const chip = document.getElementById('planChip'), text = document.getElementById('planChipText'), pill = document.getElementById('membershipPill');
-    const plus = isPlus(), label = plus ? 'Plus' : t('Gratis');
-    if (pill) pill.textContent = plus ? t('Plus · verificado') : t('Plan gratuito');
+    const plus = isPlus(), label = plus ? t('Miembro') : t('Miembros');
+    if (pill) pill.textContent = plus ? t('Miembro · verificado') : t('Plan gratuito');
     if (!chip || !text) return;
     chip.hidden = !ent; text.textContent = label; chip.classList.toggle('is-plus', plus);
-    chip.setAttribute('aria-label', `${plus ? t('Tu plan: FittForma AI Plus') : t('Tu plan: Gratis')}. ${t('Ver membresía')}`);
+    chip.setAttribute('aria-label', plus ? `${t('Tu plan: FittForma AI Plus')}. ${t('Ver membresía')}` : `${t('Membresía')}: ${t('hacete miembro')}`);
+    // Mientras no se pueda pagar desde la app, la tarjeta lo dice en vez de mostrar un botón que no existe.
+    const soon = document.getElementById('membershipSoon'); if (soon) soon.hidden = plus || Boolean(ent?.payments?.googlePlay && 'getDigitalGoodsService' in window);
   }
   function openMembership() {
     window.FittFormaGo?.('settings');
