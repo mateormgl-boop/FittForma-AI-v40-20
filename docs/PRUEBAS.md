@@ -9,6 +9,12 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v70
+
+- RLS `rls_v70_test.sql` (12 comprobaciones): la membresía ajena no se lee (con o sin sesión), nadie se da Plus, la insignia y la fila «Miembros Plus» solo con Plus vigente + `show_plus` + perfil visible.
+- E2E `v70` (15 pasos, base local): insignia del plan al lado del nombre y su acceso a la membresía; sin Plus no aparece el interruptor; «Miembros Plus» arriba de Todos solo con quien eligió mostrarse; marco dorado solo en esa persona; sin sesión la base rechaza leer membresías; la fila se oculta al buscar; el botón + se corre al bajar y vuelve al subir; Perfil con «Editar nombre y objetivo» plegado.
+- `rls_v66_test.sql`: una comprobación dependía del día del mes (la base recorta los días activos al día actual); ahora vale cualquier día.
+
 ### v69
 
 - `npm test`: se actualizaron las pruebas que contaban los grupos de Perfil (ahora 10 grupos en Ajustes) y las pestañas de Comunidad (vuelven a ser tres).

@@ -2,6 +2,23 @@
 (window.FittFormaI18nExtra = window.FittFormaI18nExtra || []).push(
   ["Nombre o @usuario", "Name or @username", "Nome ou @usuário", "Nom ou @pseudo", "Nome o @utente", "Name oder @Nutzer"],
   ["Todos", "Everyone", "Todos", "Tout le monde", "Tutti", "Alle"],
+  // v70: Perfil, Progreso
+  ["Editar nombre y objetivo", "Edit name and goal", "Editar nome e objetivo", "Modifier le nom et l’objectif", "Modifica nome e obiettivo", "Name und Ziel bearbeiten"],
+  ["Cómo te llamamos y tu objetivo principal", "What we call you and your main goal", "Como te chamamos e seu objetivo principal", "Comment on t’appelle et ton objectif principal", "Come ti chiamiamo e il tuo obiettivo principale", "Wie wir dich nennen und dein Hauptziel"],
+  ["tus primeras 4 semanas", "your first 4 weeks", "suas primeiras 4 semanas", "tes 4 premières semaines", "le tue prime 4 settimane", "deine ersten 4 Wochen"],
+  ["tocá para empezar", "tap to start", "toque para começar", "touche pour commencer", "tocca per iniziare", "zum Starten tippen"],
+  ["Miembros Plus", "Plus members", "Membros Plus", "Membres Plus", "Membri Plus", "Plus-Mitglieder"],
+  ["Eligieron mostrarse en Comunidad", "They chose to be shown in Community", "Escolheram aparecer na Comunidade", "Ils ont choisi d’apparaître dans la Communauté", "Hanno scelto di mostrarsi nella Community", "Sie möchten in der Community gezeigt werden"],
+  ["Mostrar mi insignia Plus en Comunidad", "Show my Plus badge in Community", "Mostrar meu selo Plus na Comunidade", "Afficher mon badge Plus dans la Communauté", "Mostra il mio badge Plus nella Community", "Mein Plus-Abzeichen in der Community zeigen"],
+  ["Se ve un distintivo dorado en tu foto y podés aparecer en «Miembros Plus». Está apagado hasta que lo actives.", "A gold badge shows on your photo and you can appear in “Plus members”. It stays off until you turn it on.", "Um selo dourado aparece na sua foto e você pode aparecer em “Membros Plus”. Fica desligado até você ativar.", "Un badge doré s’affiche sur ta photo et tu peux apparaître dans « Membres Plus ». Désactivé tant que tu ne l’actives pas.", "Un badge dorato appare sulla tua foto e puoi comparire in «Membri Plus». Resta spento finché non lo attivi.", "Ein goldenes Abzeichen erscheint auf deinem Foto und du kannst unter „Plus-Mitglieder“ erscheinen. Bleibt aus, bis du es einschaltest."],
+  ["Tu insignia Plus ya se ve en Comunidad.", "Your Plus badge now shows in Community.", "Seu selo Plus já aparece na Comunidade.", "Ton badge Plus s’affiche maintenant dans la Communauté.", "Il tuo badge Plus ora si vede nella Community.", "Dein Plus-Abzeichen ist jetzt in der Community sichtbar."],
+  ["Tu insignia Plus quedó oculta.", "Your Plus badge is now hidden.", "Seu selo Plus ficou oculto.", "Ton badge Plus est maintenant masqué.", "Il tuo badge Plus ora è nascosto.", "Dein Plus-Abzeichen ist jetzt ausgeblendet."],
+  ["Miembro Plus", "Plus member", "Membro Plus", "Membre Plus", "Membro Plus", "Plus-Mitglied"],
+  // v69.1: insignia del plan
+  ["Gratis", "Free", "Grátis", "Gratuit", "Gratis", "Kostenlos"],
+  ["Plan gratuito", "Free plan", "Plano gratuito", "Forfait gratuit", "Piano gratuito", "Kostenloser Tarif"],
+  ["Plus · verificado", "Plus · verified", "Plus · verificado", "Plus · vérifié", "Plus · verificato", "Plus · verifiziert"],
+  ["Ver membresía", "See membership", "Ver assinatura", "Voir l’abonnement", "Vedi abbonamento", "Mitgliedschaft ansehen"],
   ["Todo el mundo", "Everyone", "Todo mundo", "Tout le monde", "Tutti", "Alle"],
   ["Avisos", "Alerts", "Avisos", "Notifications", "Avvisi", "Benachrichtigungen"],
   ["Seguimientos, mensajes y ranking", "Follows, messages and leaderboard", "Seguidores, mensagens e ranking", "Abonnements, messages et classement", "Follower, messaggi e classifica", "Follows, Nachrichten und Rangliste"],

@@ -52,7 +52,7 @@ select t.expect_count($q$select * from public.community_wall_ids() w join public
 select t.as_user('a6600000-0000-0000-0000-0000000000c2');
 select t.expect_rows($q$insert into public.community_athlete_stats(user_id,workouts_total,workouts_30d,active_days_30d,workouts_month,active_days_month,run_count_30d,run_km_30d,run_minutes_30d,run_km_month,stats_date) values('a6600000-0000-0000-0000-0000000000c2',20,14,12,13,11,4,20,110,18.5,current_date) on conflict (user_id) do update set workouts_month=13, active_days_month=11, run_km_month=18.5, stats_date=current_date$q$,1,'v66 Beto publica sus números del mes');
 select t.expect_value($q$select month_start::text from public.community_athlete_stats where user_id='a6600000-0000-0000-0000-0000000000c2'$q$,to_char(date_trunc('month',current_date),'YYYY-MM-DD'),'v66 el mes lo fija el servidor');
-select t.expect_error($q$update public.community_athlete_stats set workouts_month=5, active_days_month=9 where user_id='a6600000-0000-0000-0000-0000000000c2'$q$,'v66 no puede haber más días activos que entrenamientos');
+select t.expect_error($q$update public.community_athlete_stats set workouts_month=0, active_days_month=9 where user_id='a6600000-0000-0000-0000-0000000000c2'$q$,'v66 no puede haber más días activos que entrenamientos');
 select t.as_user('a6600000-0000-0000-0000-0000000000c1');
 select t.expect_value($q$select workouts_month::text||'|'||run_km_month::text from public.community_month_board() where username='beto66'$q$,'13|18.50','v66 Ana ve a Beto en el tablero del mes');
 select t.as_user('a6600000-0000-0000-0000-0000000000c3');

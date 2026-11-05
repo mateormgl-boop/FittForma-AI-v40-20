@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v69.0
+# Despliegue de FittForma AI v70.0
 
-Esta guía es la lista de pasos para publicar v69.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v70.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -12,17 +12,26 @@ Si Comunidad dice «Comunidad se está actualizando…» o «Could not find the 
 3. Recargá la app.
 
 Detalles del archivo:
-- Tiene las 17 migraciones (v41 a v67), en orden.
+- Tiene las 18 migraciones (v41 a v70), en orden.
 - Cada una va en su propia transacción y se puede ejecutar más de una vez: no borra datos ni desactiva RLS.
 - Al final recarga la caché de la API de Supabase.
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
 
-## Qué cambia en v69.0
+## Qué cambia en v70.0
+
+- **Migración nueva (aditiva):** `supabase/migrations/2026-11-05_v70_plus_badge.sql`. Si ya aplicaste `APLICAR_MIGRACIONES.sql` antes, alcanza con pegar en el SQL Editor solo este archivo.
+  - Agrega `community_profiles.show_plus` (apagado por defecto) y dos funciones de lectura: `community_plus_ids` y `community_plus_featured`.
+  - **Privacidad:** la membresía de otra persona deja de poder leerse (antes la política `community_memberships_read_active` la dejaba ver a cualquiera). Cada persona lee solo la suya; la insignia se ve solo si la persona la activa.
+  - Sin la migración, la app funciona igual pero no muestra insignias Plus ni la fila «Miembros Plus».
+- **Archivos que se actualizan:** `index.html`, `community.js`, `ads.js`, `design.css`, `i18n-v53.js` e `i18n.js`.
+- El service worker cambia a `fittforma-ai-static-v70-0`.
+
+## Qué cambia en v69.1 (y v69.0)
 
 - **No hay migraciones nuevas** (no hace falta pegar nada en Supabase).
 - **Archivos que se actualizan:** `index.html`, `community.js`, `design.css` e `i18n-v53.js`.
-- El service worker cambia a `fittforma-ai-static-v69-0`.
+- El service worker cambia a `fittforma-ai-static-v69-1`.
 
 ## Qué cambia en v68.0
 

@@ -62,6 +62,14 @@ header{background:color-mix(in srgb,var(--ff-page) 88%,transparent)!important;ba
 .brand{gap:10px!important;color:var(--text)!important;font-weight:800!important;letter-spacing:-.02em!important;font-size:19px!important;text-transform:none!important}
 .brand-logo{filter:none!important;border-radius:0!important}
 .brand .brand-word b{color:#a996ff;font-weight:800}
+/* v69.1: insignia del plan junto al nombre */
+.plan-chip{display:inline-flex;align-items:center;gap:6px;margin-left:2px;padding:4px 10px 4px 8px;border-radius:999px;border:1px solid var(--line,rgba(255,255,255,.14));background:var(--panel-2,rgba(255,255,255,.06));color:var(--muted,#a3abc6);font-weight:700;font-size:12px;line-height:1;letter-spacing:.02em;cursor:pointer;white-space:nowrap}
+.plan-chip:hover{color:var(--text)}
+.plan-chip:focus-visible{outline:2px solid #6ff2cf;outline-offset:2px}
+.plan-chip-dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.7}
+.plan-chip.is-plus{border-color:transparent;background:linear-gradient(135deg,#ffd23f,#f0a92b);color:#241a00}
+.plan-chip.is-plus .plan-chip-dot{background:#241a00;opacity:1}
+@media (max-width:380px){.brand{gap:6px!important;font-size:16px!important;min-width:0}.brand-logo{width:30px;height:30px}.plan-chip{padding:4px 8px;font-size:11px}.plan-chip-dot{display:none}}
 :root[data-theme="light"] .brand .brand-word b{color:#5a3ed6}
 .theme-toggle{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;border:1px solid var(--ff-border);background:var(--ff-panel);color:var(--text);cursor:pointer;box-shadow:var(--ff-shadow-sm)}
 .theme-toggle svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -1987,3 +1995,40 @@ header .language-picker{display:none!important}
 .cm-friends-parts{margin:0 0 12px}
 .cm-privacy-link .btn{margin-top:4px}
 @media (max-width:360px){.profile-month-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* v70: el botón + se corre al bajar (vuelve al subir); carteles de sección más bajos en el celular; píldoras que no se cortan */
+.ff-fab{transition:transform .22s ease,opacity .22s ease}
+.ff-fab.is-tucked{transform:translateY(calc(100% + 110px));opacity:0;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.ff-fab{transition:none}}
+@media (max-width:899px){.section-hero p{display:none!important}.section-hero{padding:11px 16px!important}.section-hero h2{font-size:19px!important}}
+#view-plan .home-hero .home-meta span{max-width:100%;white-space:normal;line-height:1.3}
+.profile-edit{border:1px solid var(--ff-border,rgba(255,255,255,.1));border-radius:14px;padding:0 14px;margin:4px 0 12px;background:var(--panel-2,transparent)}
+.profile-edit>summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:12px 0}
+.profile-edit>summary::-webkit-details-marker{display:none}
+.profile-edit>summary span{font-weight:700}
+.profile-edit>summary small{color:var(--muted)}
+.profile-edit>summary::after{content:"›";position:absolute;right:16px;transform:rotate(90deg);color:var(--muted)}
+.profile-edit{position:relative}
+.profile-edit[open]>summary::after{transform:rotate(-90deg)}
+.profile-edit[open]{padding-bottom:12px}
+
+/* v70: miembros Plus en Comunidad (solo quien eligió mostrarse) */
+.community-avatar{position:relative}
+.community-avatar.is-plus{box-shadow:0 0 0 2px #ffd23f,0 0 0 4px rgba(255,210,63,.28)}
+.cm-plus-badge{position:absolute;right:-6px;bottom:-4px;padding:1px 5px;border-radius:999px;background:linear-gradient(135deg,#ffd23f,#f0a92b);color:#241a00;font-size:9px;font-weight:800;line-height:1.3;letter-spacing:.02em;box-shadow:0 2px 6px rgba(0,0,0,.35);pointer-events:none}
+.community-avatar-xs .cm-plus-badge{display:none}
+.cm-plus-row{display:grid;gap:10px;margin:0 0 14px;padding:12px;border-radius:16px;border:1px solid rgba(255,210,63,.35);background:linear-gradient(135deg,rgba(255,210,63,.10),rgba(240,169,43,.04))}
+.cm-plus-row-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.cm-plus-row-head strong{color:#ffd23f}
+:root[data-theme="light"] .cm-plus-row-head strong{color:#9a6a00}
+.cm-plus-list{list-style:none;margin:0;padding:2px 2px 4px;display:flex;gap:12px;overflow-x:auto;scrollbar-width:none}
+.cm-plus-list::-webkit-scrollbar{display:none}
+.cm-plus-list button{display:grid;justify-items:center;gap:4px;width:78px;background:none;border:0;color:var(--text);cursor:pointer;padding:4px 0}
+.cm-plus-list button span:not(.community-avatar):not(.cm-plus-badge){font-weight:700;font-size:12.5px;max-width:78px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cm-plus-list small{font-size:11px;color:var(--muted);max-width:78px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* v70: una fila con «hidden» queda oculta aunque su clase le dé display:flex */
+.reminder-pref-row[hidden]{display:none!important}
+/* la insignia sobresale del círculo: la foto se recorta por sí misma */
+#view-community .community-avatar.is-plus,.community-post-dialog .community-avatar.is-plus{overflow:visible!important}
+.community-avatar.is-plus img{border-radius:50%}

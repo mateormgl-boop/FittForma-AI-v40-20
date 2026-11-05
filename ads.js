@@ -227,12 +227,30 @@
   }
 
   // ---------- Plus ----------
+  // Insignia junto al nombre (cabecera) y píldora de la tarjeta: solo «Plus» si el servidor lo verificó.
+  function renderPlanChip() {
+    const chip = document.getElementById('planChip'), text = document.getElementById('planChipText'), pill = document.getElementById('membershipPill');
+    const plus = isPlus(), label = plus ? 'Plus' : t('Gratis');
+    if (pill) pill.textContent = plus ? t('Plus · verificado') : t('Plan gratuito');
+    if (!chip || !text) return;
+    chip.hidden = !ent; text.textContent = label; chip.classList.toggle('is-plus', plus);
+    chip.setAttribute('aria-label', `${plus ? t('Tu plan: FittForma AI Plus') : t('Tu plan: Gratis')}. ${t('Ver membresía')}`);
+  }
+  function openMembership() {
+    window.FittFormaGo?.('settings');
+    const card = document.getElementById('membershipCard'); if (!card) return;
+    // La tarjeta vive dentro de un grupo plegable de Ajustes: se abre antes de bajar hasta ella.
+    for (let d = card.closest('details'); d; d = d.parentElement?.closest('details')) d.open = true;
+    requestAnimationFrame(() => card.scrollIntoView({ block: 'start', behavior: 'smooth' }));
+  }
   function renderPlan() {
+    renderPlanChip();
     const box = document.getElementById('membershipStatus'); if (!box) return;
     const signed = ent?.signedIn;
     box.innerHTML = !ent ? t('No se pudo consultar el estado del plan.')
       : isPlus() ? `<strong>${t('Tu plan: FittForma AI Plus')}</strong> · ${t('verificado')}${ent.planPeriodEnd ? ` · ${t('vigente hasta')} ${new Date(ent.planPeriodEnd).toLocaleDateString()}` : ''}`
         : `<strong>${t('Tu plan: Gratis')}</strong>${signed ? '' : ` · ${t('iniciá sesión para asociar una suscripción a tu cuenta')}`}`;
+    const spr = document.getElementById('showPlusRow'); if (spr) spr.hidden = !(isPlus() && signed);
     const buy = document.getElementById('plusBuyGooglePlay'); if (buy) buy.hidden = !(ent?.payments?.googlePlay && 'getDigitalGoodsService' in window && signed && !isPlus());
     const restore = document.getElementById('plusRestore'); if (restore) restore.hidden = !(ent?.payments?.googlePlay && 'getDigitalGoodsService' in window && signed);
   }
@@ -269,6 +287,7 @@
     document.getElementById('plusBuyGooglePlay')?.addEventListener('click', buyPlusGooglePlay);
     document.getElementById('plusRestore')?.addEventListener('click', restorePlus);
     document.getElementById('membershipInfoButton')?.addEventListener('click', () => refresh(true));
+    document.getElementById('planChip')?.addEventListener('click', openMembership);
     refresh(true); metric('app_open');
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refresh(); });
   }
