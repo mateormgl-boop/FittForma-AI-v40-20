@@ -250,6 +250,7 @@
     box.innerHTML = !ent ? t('No se pudo consultar el estado del plan.')
       : isPlus() ? `<strong>${t('Tu plan: FittForma AI Plus')}</strong> · ${t('verificado')}${ent.planPeriodEnd ? ` · ${t('vigente hasta')} ${new Date(ent.planPeriodEnd).toLocaleDateString()}` : ''}`
         : `<strong>${t('Tu plan: Gratis')}</strong>${signed ? '' : ` · ${t('iniciá sesión para asociar una suscripción a tu cuenta')}`}`;
+    const spr = document.getElementById('showPlusRow'); if (spr) spr.hidden = !(isPlus() && signed);
     const buy = document.getElementById('plusBuyGooglePlay'); if (buy) buy.hidden = !(ent?.payments?.googlePlay && 'getDigitalGoodsService' in window && signed && !isPlus());
     const restore = document.getElementById('plusRestore'); if (restore) restore.hidden = !(ent?.payments?.googlePlay && 'getDigitalGoodsService' in window && signed);
   }

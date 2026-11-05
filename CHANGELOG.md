@@ -1,5 +1,21 @@
 # FittForma AI — Registro de cambios
 
+## v70.0 — Miembros Plus en Comunidad y detalles visuales (5 de noviembre de 2026)
+
+Pedido de la persona dueña: «que los miembros aparezcan arriba en Todos» y «mirá toda la app y decime qué mejorarías».
+
+- **Miembros Plus en Comunidad:** una fila «Miembros Plus» arriba de Todos (hasta 6 perfiles públicos; el orden rota cada día) y un marco dorado con «Plus» en la foto, en todas las listas, publicaciones, ranking y muro.
+  - **Es opcional:** saber quién paga es un dato de la cuenta. Solo se ve si la persona activa «Mostrar mi insignia Plus en Comunidad» en Ajustes › Membresía (apagado por defecto). El interruptor aparece solo con Plus verificado por el servidor.
+  - El Ranking no cambia: se gana entrenando, no pagando.
+  - **Privacidad reforzada:** antes cualquiera podía consultar qué cuentas tenían membresía activa; ahora cada persona lee solo la suya.
+- **Detalles visuales:**
+  - El botón «+» se corre al bajar (no tapa lo que estás leyendo) y vuelve al subir.
+  - Los carteles de cada sección son más bajos en el celular.
+  - Progreso: «tus primeras 4 semanas» o «tocá para empezar» en vez de «sin datos del período anterior».
+  - Inicio: el motivo de la recomendación ya no se corta.
+  - Perfil: «Editar nombre y objetivo» queda plegado, para ver primero lo tuyo.
+- Incluye v69.1 (insignia del plan al lado del nombre). Migración nueva: ver docs/DESPLIEGUE.md. Traducido a los seis idiomas.
+
 ## v69.1 — Tu plan al lado del nombre (5 de noviembre de 2026)
 
 Pedido de la persona dueña: «que lo de miembros aparezca arriba al lado del nombre FittForma».

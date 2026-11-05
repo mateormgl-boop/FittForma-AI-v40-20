@@ -64,7 +64,7 @@
     }
     return p=>signedCache.get(p)?.url||'';
   }
-  function avatarHtml(profile,urlOf,size=''){const name=profile?.display_name||profile?.username||'Usuario',url=profile?.avatar_path&&urlOf?urlOf(profile.avatar_path):'';return `<span class="community-avatar${size?' community-avatar-'+size:''}${url?' has-photo':''}">${url?`<img src="${esc(url)}" alt="" loading="lazy" onerror="this.parentElement.classList.remove('has-photo');this.remove()">`:''}<span aria-hidden="true">${esc(initials(name))}</span></span>`;}
+  function avatarHtml(profile,urlOf,size=''){const name=profile?.display_name||profile?.username||'Usuario',url=profile?.avatar_path&&urlOf?urlOf(profile.avatar_path):'';return `<span class="community-avatar${size?' community-avatar-'+size:''}${url?' has-photo':''}"${profile?.user_id?` data-uid="${esc(profile.user_id)}"`:''}>${url?`<img src="${esc(url)}" alt="" loading="lazy" onerror="this.parentElement.classList.remove('has-photo');this.remove()">`:''}<span aria-hidden="true">${esc(initials(name))}</span></span>`;}
   // v62: las insignias se pueden tocar: ficha con qué es, nivel, marca, fecha y cómo se registró.
   // Si es tuya, «Ver en mis insignias» lleva a tu galería. Se guarda cada insignia mostrada para abrir su ficha.
   const badgeRegistry=new Map();let badgeSeq=0;
@@ -110,6 +110,7 @@
     if(result.error)throw result.error;fillProfile(result.data);return result.data;
   }
   function fillProfile(p){
+    const sp=$('showPlusToggle');if(sp)sp.checked=!!p?.show_plus;
     if(!$('communityDisplayName'))return;
     ownProfile=p;
     if(schemaV49===null)schemaV49=Object.prototype.hasOwnProperty.call(p,'featured_badges');
@@ -668,6 +669,32 @@
   }
   // Todos: usuarios reales, por @usuario, de a 20 (carga progresiva).
   let peopleAfter=null,peopleTerm='',peopleBusy=false,peopleQueued=false;
+  // ---------- v70: miembros Plus (solo quien eligió mostrar su insignia; lo decide la base) ----------
+  const plusIds=new Set(),plusAsked=new Set();let plusEnabled=true,plusTimer=null;
+  async function decoratePlus(root){
+    if(!client||!plusEnabled||!root)return;
+    const els=[...root.querySelectorAll('.community-avatar[data-uid]')],ask=[...new Set(els.map(e=>e.dataset.uid))].filter(id=>!plusAsked.has(id)).slice(0,200);
+    if(ask.length){ask.forEach(id=>plusAsked.add(id));const r=await client.rpc('community_plus_ids',{p_ids:ask});
+      if(r.error){if(isMissingFunction(r.error))plusEnabled=false;return;}(r.data||[]).forEach(x=>plusIds.add(typeof x==='string'?x:x.community_plus_ids||x.user_id));}
+    els.forEach(e=>{const on=plusIds.has(e.dataset.uid);e.classList.toggle('is-plus',on);if(on&&!e.querySelector('.cm-plus-badge'))e.insertAdjacentHTML('beforeend','<b class="cm-plus-badge" role="img" aria-label="Miembro Plus">Plus</b>');});
+  }
+  function watchPlus(){const view=$('view-community');if(!view||view.__plusObs)return;view.__plusObs=new MutationObserver(()=>{clearTimeout(plusTimer);plusTimer=setTimeout(()=>decoratePlus(view),160);});view.__plusObs.observe(view,{childList:true,subtree:true});}
+  async function loadPlusRow(){
+    const box=$('communityPlusRow');if(!box)return;
+    if(!client||!plusEnabled||peopleTerm){box.hidden=true;return;}
+    const r=await client.rpc('community_plus_featured',{p_limit:6});
+    if(r.error||!r.data?.length){if(r.error&&isMissingFunction(r.error))plusEnabled=false;box.hidden=true;return;}
+    r.data.forEach(x=>{plusIds.add(x.user_id);plusAsked.add(x.user_id);});
+    const urlOf=await signedMany(r.data.map(x=>x.avatar_path));
+    box.innerHTML=`<div class="cm-plus-row-head"><strong>Miembros Plus</strong><small class="muted">Eligieron mostrarse en Comunidad</small></div><ul class="cm-plus-list">${r.data.map(x=>`<li><button type="button" data-community-open-user="${esc(x.user_id)}">${avatarHtml(x,urlOf)}<span>${esc(x.display_name||x.username)}</span><small>@${esc(x.username)}</small></button></li>`).join('')}</ul>`;
+    box.hidden=false;bindPeople(box);decoratePlus(box);
+  }
+  async function saveShowPlus(e){
+    const box=e.target;if(!authReady()){box.checked=false;return;}
+    const {error}=await client.from('community_profiles').update({show_plus:box.checked}).eq('user_id',user.id);
+    if(error){box.checked=!box.checked;window.toast?.(friendlySupabaseError(error,'guardar la insignia'));return;}
+    plusAsked.delete(user.id);plusIds.delete(user.id);window.toast?.(box.checked?'Tu insignia Plus ya se ve en Comunidad.':'Tu insignia Plus quedó oculta.');
+  }
   async function loadDirectory(reset=true){
     const root=$('communityPeople'),more=$('communityPeopleMore');if(!root)return;
     if(!client){root.innerHTML='';setStatus('communityWorldStatus',authHint());return;}
@@ -675,6 +702,7 @@
     peopleBusy=true;
     if(reset){peopleAfter=null;root.innerHTML='<div class="cm-skeleton" aria-hidden="true"><i></i><i></i><i></i></div>';setStatus('communityWorldStatus','Cargando personas…');}
     try{
+      if(reset)loadPlusRow();watchPlus();
       const r=await peopleRpc('all',peopleTerm,peopleAfter,20);
       if(r.error){root.innerHTML='';setStatus('communityWorldStatus',friendlySupabaseError(r.error,'cargar personas'));return;}
       const list=r.data||[];const urlOf=await signedMany(list.map(x=>x.avatar_path));
@@ -1508,7 +1536,7 @@
     document.querySelector('[data-community-home]')?.addEventListener('click',()=>showCommunitySubView('world'));
     $('communityUserBack')?.addEventListener('click',()=>showCommunitySubView(lastTab||'world'));$('communityCompareBack')?.addEventListener('click',()=>viewedUser&&viewedUser===compareUser?openUser(viewedUser):showCommunitySubView(lastTab||'world'));
     document.querySelectorAll('[data-ranking-scope]').forEach(b=>b.addEventListener('click',()=>{rankScope=b.dataset.rankingScope;document.querySelectorAll('[data-ranking-scope]').forEach(x=>{const on=x===b;x.classList.toggle('active',on);x.setAttribute('aria-pressed',String(on));});loadRanking();}));
-    $('communityFriendsMore')?.addEventListener('click',()=>loadFriends(false));$('communityWallMore')?.addEventListener('click',()=>loadWall(false));
+    $('showPlusToggle')?.addEventListener('change',saveShowPlus);$('communityFriendsMore')?.addEventListener('click',()=>loadFriends(false));$('communityWallMore')?.addEventListener('click',()=>loadWall(false));
     document.querySelectorAll('[data-friends-part]').forEach(b=>b.addEventListener('click',()=>{showFriendsPart(b.dataset.friendsPart);loadFriendsPart();}));
     document.querySelectorAll('[data-ranking-period]').forEach(b=>b.addEventListener('click',()=>{rankPeriod=b.dataset.rankingPeriod;loadRanking();}));
     document.querySelectorAll('#view-community [data-community-go]').forEach(b=>b.addEventListener('click',()=>showCommunitySubView(b.dataset.communityGo)));
