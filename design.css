@@ -765,7 +765,7 @@ body{font-feature-settings:"cv11","ss01"}
 .gps-summary{margin:14px 0;border:1px solid rgba(29,111,232,.25)}
 .gps-summary-stats{grid-template-columns:repeat(2,minmax(0,1fr));margin:10px 0}
 @media (min-width:640px){.gps-summary-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.kcal-tag{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(249,115,22,.14);color:#c2410c;font-weight:700;font-size:12px}
+.kcal-tag{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(249,115,22,.14);color:#9a3412;font-weight:700;font-size:12px}
 :root[data-theme="dark"] .kcal-tag{color:#fdba74}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .kcal-tag{color:#fdba74}}
 .expenditure-card .exp-rows{display:grid;gap:8px;margin:10px 0}
@@ -1373,10 +1373,10 @@ body{font-feature-settings:"cv11","ss01"}
 .library-view-toggle button{border:0;background:transparent;color:var(--text-2);font:inherit;font-size:13px;font-weight:700;padding:8px 12px;min-height:38px;cursor:pointer}
 .library-view-toggle button.active{background:var(--mod,var(--blue));color:#fff}
 .library-extra-filters{align-items:center;flex-wrap:wrap}
-.ex-new{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:#16a36a;color:#fff;vertical-align:2px}
+.ex-new{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:#08744a;color:#fff;vertical-align:2px}
 .ex-muscles{margin:6px 0 2px;font-size:12.5px;line-height:1.4;color:var(--text-2)}
 .ex-muscles b{color:var(--text);font-weight:700}
-.ex-used{margin:2px 0 0;font-size:12px;color:#18a06a;font-weight:700}
+.ex-used{margin:2px 0 0;font-size:12px;color:var(--t-green,#08744a);font-weight:700}
 #exerciseLibraryResults.is-list{display:grid!important;grid-template-columns:1fr!important;gap:8px}
 .exercise-list-row{display:flex;align-items:center;gap:6px;padding:6px;border:1px solid var(--ff-border);border-radius:16px;background:var(--ff-panel)}
 .exercise-list-main{flex:1;min-width:0;display:flex;align-items:center;gap:10px;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;padding:0}
@@ -1434,8 +1434,8 @@ body{font-feature-settings:"cv11","ss01"}
 .mc-day{margin-top:8px;padding:10px;border-radius:12px;background:var(--ff-panel-2);border:1px solid var(--ff-border)}
 .mc-day ul{margin:4px 0 0;padding-left:18px}
 .mw-list{list-style:none;padding:0;margin:8px 0;display:grid;gap:6px}
-.mw-list li{display:grid;grid-template-columns:minmax(0,9.5em) 1fr 2.2em;align-items:center;gap:8px;font-size:13px}
-.mw-list li span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mw-list li,.mw-list .mw-row{display:grid;grid-template-columns:minmax(0,9.5em) 1fr 2.2em;align-items:center;gap:8px;font-size:13px}
+.mw-list li span:first-child,.mw-list .mw-row span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mw-bar{position:relative;height:10px;border-radius:999px;background:var(--ff-panel-2);border:1px solid var(--ff-border)}
 .mw-bar i{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--mod,#3b82f6)}
 .mw-bar b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--text-3)}
@@ -1617,7 +1617,7 @@ html[data-theme="dark"] .mp-unknown{color:#fbbf24}
 .goal-menu-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
 .goal-meal{padding:12px;border-radius:14px;background:var(--ff-panel-2);border:1px solid var(--ff-border)}
 .goal-meal-head>div{display:flex;flex-direction:column;gap:2px}
-.goal-meal-head small{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#22c993}
+.goal-meal-head small{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--t-green,#08744a)}
 .goal-meal ul{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:4px}
 .goal-meal li{display:grid;grid-template-columns:64px 1fr;gap:8px;font-size:.86rem}
 .goal-meal li b{font-variant-numeric:tabular-nums;text-align:right}
@@ -2076,3 +2076,21 @@ header .language-picker{display:none!important}
 .cm-rules-open{margin:4px 0 10px}
 .native-reminder-status{margin:6px 0 0}
 .native-reminder-status[hidden]{display:none!important}
+
+/* v73: detalles de experiencia. */
+/* Filas tocables con el alto mínimo recomendado (antes 20 px) y desplegables chicos más fáciles de tocar. */
+.mw-list .mw-row{min-height:34px;padding:2px 4px;border-radius:10px;cursor:pointer}
+.mw-list .mw-row:focus-visible{outline:2px solid var(--t-blue);outline-offset:2px}
+details:not(.ff-group):not(.guide-item)>summary{padding-block:7px}
+.cm-body-card .reminder-pref-row{min-height:40px;align-items:center}
+/* Historial: espacio entre el tipo de sesión y la fecha («Rutina propia · 4 nov.»). */
+.session-type-tag{margin-right:6px}
+/* El botón + no tapa el final de cada pantalla. */
+.footer{padding-bottom:96px}
+/* FittAI: el detalle técnico queda plegado debajo del estado. */
+.coach-status .tech-detail{margin-top:6px;font-size:.85rem}
+.coach-status .tech-detail summary{cursor:pointer;color:var(--text-3)}
+/* Sin conexión, la explicación del ranking queda vacía: no se muestra una caja en blanco. */
+.cm-explain:empty{display:none}
+/* Enlaces sueltos de Ajustes con área táctil cómoda. */
+#privacyPolicyLink,#communityRulesLink{display:inline-block;padding:7px 0}

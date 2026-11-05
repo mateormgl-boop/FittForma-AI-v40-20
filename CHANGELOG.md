@@ -1,5 +1,36 @@
 # FittForma AI — Registro de cambios
 
+## v73.0 — La app abre más rápido y detalles de experiencia (5 de noviembre de 2026)
+
+Pedido de la persona dueña: «hacé lo que tengas que hacer» (etapa de velocidad) y «¿viste toda la app parte por parte?».
+
+- **Revisión de producto, sección por sección:** `docs/REVISION_PRODUCTO_v73.md` dice qué sacar, qué unificar, qué agregar y qué dibujos sumar en cada pantalla, con el orden propuesto (v74 a v77).
+- **Velocidad** (servidor):
+  - Comprime el código con brotli o gzip: `index.html` pasa de 1 MB a 227 KB.
+  - Responde «no cambió» (304) cuando el teléfono ya tiene el archivo. El ETag depende del contenido, así que un despliegue nuevo no obliga a bajar lo que no cambió.
+  - Medido con un celular de gama media simulado (4G lenta):
+
+    | | Antes | Ahora |
+    |---|---|---|
+    | Primer contenido en pantalla | 4,0 s | 1,6 s |
+    | Pantalla principal | 6,3 s | 3,1 s |
+    | Carga completa | 11,6 s | 4,1 s |
+    | Datos de la primera vez | 6,2 MB | 1,6 MB |
+    | Datos al volver a abrir con internet | 2.124 KB | 2 KB |
+- **Detalles de experiencia:**
+  - **Músculos:** quien ya entrena ve «En camino a Bronce» en lugar de «SIN ENTRENAR».
+  - **FittAI:** muestra un estado claro («Listo para responder» o «Responde en modo básico»). Lo técnico (servidor, clave, modelo) quedó plegado en «Detalle técnico», y ya no aparece «la monetización no está activa».
+  - **Un solo nombre para el plan pago:** «FittForma AI Plus». Ajustes decía «FittForma Pro».
+  - **Rutinas:** un solo aviso cuando todavía no hay plan (antes eran dos iguales).
+  - **Ranking sin conexión:** un aviso en lugar de una caja vacía.
+  - **Historial:** espacio entre el tipo de sesión y la fecha («Rutina propia4 nov.»).
+  - **El botón +** ya no tapa el final de las pantallas.
+- **Accesibilidad:**
+  - Contraste corregido en Ejercicios, Nutrición › Plan y Progreso; axe no encuentra problemas de contraste.
+  - «Actividad reciente» y «Series por grupo muscular» son grupos de botones bien armados.
+  - Las filas de músculos, los desplegables y los enlaces de Ajustes ahora tienen un área cómoda para tocar.
+- Traducido a los seis idiomas. **Sin migraciones nuevas.**
+
 ## v72.0 — Normas de la comunidad, recordatorios en la app de Android y revisión completa (5 de noviembre de 2026)
 
 Pedido de la persona dueña: «examiná toda la app y fijate qué podés mejorar en todos los sentidos» y, después, «dale, hacelo» (etapa 1 del plan).

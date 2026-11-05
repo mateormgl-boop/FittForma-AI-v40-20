@@ -845,7 +845,7 @@
   }
   async function loadRanking(){
     renderRankingChips();const podium=$('rankingPodium'),list=$('rankingList');if(!podium||!list)return;
-    if(!client){podium.innerHTML='';list.innerHTML='';setStatus('rankingStatus',authHint());return;}
+    if(!client){podium.innerHTML='';list.innerHTML='';setStatus('rankingStatus',authHint()||'El ranking aparece cuando hay conexión con la comunidad.');return;}
     if(rankScope==='friends'&&!user){podium.innerHTML='';list.innerHTML='';setStatus('rankingStatus','Iniciá sesión para ver el ranking con tus amigos.');return;}
     if(rankBusy)return;rankBusy=true;setStatus('rankingStatus','Cargando ranking…');
     const cat=rankCategory,scope=rankScope;

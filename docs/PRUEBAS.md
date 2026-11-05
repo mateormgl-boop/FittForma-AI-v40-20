@@ -9,6 +9,18 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v73
+
+- `npm test` (385): `tests/v73.test.mjs` levanta el servidor y prueba:
+  - brotli, gzip y sin comprimir, con el contenido idéntico al descomprimir; respeta `q=0`.
+  - Mismo ETag para el mismo contenido; 304 con el ETag (también en forma débil y en listas); 200 si no coincide.
+  - Las imágenes no se recomprimen; HEAD sin cuerpo; 404 para lo que no existe y para el código del servidor.
+  - Además revisa en el código los arreglos de experiencia (Músculos, FittAI, nombre del plan, Rutinas, listas, contraste, Ranking).
+- **Medición de velocidad** con un intermediario que cuenta los bytes que manda el servidor, también los que pide el service worker. Celular de gama media simulado:
+  - Primera apertura: de 6,2 MB a 1,6 MB, y la carga de 11,6 s a 4,1 s.
+  - Volver a abrir: de 2.124 KB a 2 KB, con 25 respuestas «no cambió».
+- axe (WCAG 2.1 AA) en las 20 pantallas: sin problemas de listas ni de contraste. Sin desbordes a 320 ni a 390 px y sin errores de la página.
+
 ### v72
 
 - `npm test` (383): `tests/v72.test.mjs` prueba el puente de notificaciones (en el navegador no hace nada; prepara solo avisos futuros, ordenados y dentro de su rango; en Android reemplaza solo su grupo y respeta el permiso), que la app no duplica avisos web en Android, el proyecto de Android (plugin, ícono, gradle), que las siete acciones de Comunidad piden las normas, la migración y `normas.html`.
