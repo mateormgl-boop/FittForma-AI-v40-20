@@ -10,7 +10,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('dialog', d => d.accept());
 await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
-await page.addInitScript(() => { localStorage.setItem('fittforma-welcome-v1', '1'); setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50); });
+await page.addInitScript(() => { localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-train-more-v74', '1'); setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50); });
 await page.goto(APP + '/'); await page.waitForTimeout(500);
 const st = () => page.evaluate(k => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
 // Perfil de prueba antes de que cargue la app (si se escribe con la app abierta, la app lo pisa al guardar).

@@ -16,7 +16,7 @@ const open = async (state, theme = 'dark') => {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on('pageerror', e => errors.push(e.message)); page.on('dialog', d => d.accept());
   await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
-  await page.addInitScript(([s, t]) => { localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-theme', t); if (!sessionStorage.getItem('v59-seed')) { sessionStorage.setItem('v59-seed', '1'); localStorage.setItem('fittforma-ai-v4', s); } setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50); }, [JSON.stringify(state), theme]);
+  await page.addInitScript(([s, t]) => { localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-train-more-v74', '1'); localStorage.setItem('fittforma-theme', t); if (!sessionStorage.getItem('v59-seed')) { sessionStorage.setItem('v59-seed', '1'); localStorage.setItem('fittforma-ai-v4', s); } setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50); }, [JSON.stringify(state), theme]);
   await page.goto(APP + '/'); await page.waitForTimeout(800);
   return page;
 };

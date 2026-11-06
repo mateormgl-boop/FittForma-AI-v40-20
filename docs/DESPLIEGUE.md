@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v73.0
+# Despliegue de FittForma AI v74.0
 
-Esta guía es la lista de pasos para publicar v73.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v74.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -17,6 +17,15 @@ Detalles del archivo:
 - Al final recarga la caché de la API de Supabase.
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
+
+## Qué cambia en v74.0
+
+- **Sin migraciones nuevas.** La de v72 (normas de la comunidad) sigue pendiente de aplicar en producción después de desplegar; los pasos están más abajo.
+- **Archivos que se actualizan:** `index.html`, `community.js`, `design.css`, `i18n-v53.js`, `i18n.js`, `sw.js`, `backend/server.mjs`, `package.json` y `backend/package.json`.
+- **Archivos nuevos:** 14 dibujos en `assets/illustrations/` (`place-*`, `empty-*` y `tip-*`). El servidor ya publica esa carpeta; no hay que configurar nada.
+- El service worker cambia a `fittforma-ai-static-v74-0` y guarda los dibujos para usar sin conexión. El servidor tiene que informar `0.74.0`.
+- **Para comprobar después de desplegar:** abrí la app en una ventana privada, tocá «Seguir sin cuenta», elegí dónde entrenás y tu experiencia, tocá «Armar mi plan» y después «Empezar ahora»: tiene que abrirse el primer entrenamiento.
+- Quien ya usa la app no ve la bienvenida de nuevo. Inicio cambia de orden solo si nunca lo personalizaste.
 
 ## Qué cambia en v73.0
 

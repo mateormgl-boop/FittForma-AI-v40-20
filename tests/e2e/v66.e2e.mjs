@@ -100,7 +100,7 @@ const open = async (lang = '', withSeed = true) => {
   page.on('dialog', d => d.accept());
   await page.addInitScript(CLOSE_CELEBRATION);
   await page.addInitScript(([s, l]) => {
-    localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-health-notice-v64', '1');
+    localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-train-more-v74', '1'); localStorage.setItem('fittforma-health-notice-v64', '1');
     if (l) localStorage.setItem('fittforma-language-v1', l);
     if (s && !sessionStorage.getItem('seeded')) { localStorage.setItem('fittforma-ai-v4', s); sessionStorage.setItem('seeded', '1'); }
   }, [withSeed ? JSON.stringify(seed) : '', lang]);

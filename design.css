@@ -2094,3 +2094,59 @@ details:not(.ff-group):not(.guide-item)>summary{padding-block:7px}
 .cm-explain:empty{display:none}
 /* Enlaces sueltos de Ajustes con área táctil cómoda. */
 #privacyPolicyLink,#communityRulesLink{display:inline-block;padding:7px 0}
+
+/* v74: primera impresión. */
+/* Bienvenida: si no entra en pantallas chicas se desplaza; si sobra lugar queda abajo, como antes. */
+.welcome{overflow-y:auto;align-items:flex-start}
+.welcome-step{margin-top:auto}
+.welcome-choice{border:0;margin:12px 0;padding:0;min-width:0;text-align:left}
+.welcome-choice legend{padding:0;margin:0 0 7px;color:var(--text);font-size:12px;font-weight:800}
+.welcome-places,.welcome-levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.place-card,.level-pill{position:relative;display:block;cursor:pointer}
+.place-card input,.level-pill input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.place-box{display:flex;flex-direction:column;align-items:center;gap:6px;padding:9px 4px 8px;border:2px solid var(--line);border-radius:18px;background:var(--panel);transition:border-color .15s,box-shadow .15s}
+.place-box img{display:block;width:60px;height:60px;border-radius:16px}
+.place-box b{font-size:13px;line-height:1.2;text-align:center}
+.level-pill span{display:flex;align-items:center;justify-content:center;min-height:44px;padding:6px 4px;border:2px solid var(--line);border-radius:999px;background:var(--panel);font-size:13px;font-weight:700;text-align:center}
+.place-card input:checked+.place-box,.level-pill input:checked+span{border-color:var(--t-violet);background:color-mix(in srgb,var(--t-violet) 12%,var(--panel));box-shadow:0 0 0 3px color-mix(in srgb,var(--t-violet) 20%,transparent)}
+.place-card input:focus-visible+.place-box,.level-pill input:focus-visible+span{outline:3px solid var(--t-blue);outline-offset:2px}
+.welcome-ready-ill{display:block;margin:0 auto 10px;border-radius:24px;box-shadow:0 12px 30px rgba(20,30,80,.28)}
+.welcome-ready-card{display:grid;gap:3px;margin:0 0 16px;padding:14px 16px;border:1px solid var(--line);border-radius:20px;background:var(--panel);text-align:left}
+.welcome-ready-card>small{color:var(--t-violet);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.welcome-ready-card>strong{font-size:18px;line-height:1.25}
+.welcome-ready-card>span{color:var(--text-2);font-size:13px}
+.welcome-ready-card ul{display:grid;gap:6px;margin:8px 0 0;padding:0;list-style:none}
+.welcome-ready-card li{display:flex;justify-content:space-between;gap:10px;padding-top:6px;border-top:1px solid var(--line);font-size:14px}
+.welcome-ready-card li small{flex:none;color:var(--text-2);font-size:13px;font-weight:650}
+.welcome-ready-card li.welcome-ready-more{color:var(--text-2)}
+
+/* Entrenar: lo de hoy arriba con «Empezar»; lo demás plegado en «Otras formas de entrenar». */
+.wp-today{margin-bottom:12px}
+.wp-today-btns{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.wp-today-btns .btn{min-height:46px}
+.train-launch>.daily-card{margin-bottom:12px}
+.train-more{margin:12px -6px 0;border-top:1px solid var(--ff-border)}
+.train-launch details.train-more>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px;padding:12px 6px;cursor:pointer;list-style:none}
+.train-more>summary::-webkit-details-marker{display:none}
+.train-more>summary::after{content:'';flex:none;width:9px;height:9px;margin-right:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .2s}
+.train-more[open]>summary::after{transform:rotate(-135deg)}
+.train-more-text b{display:block;font-size:16px}
+.train-more-text small{display:block;color:var(--muted);font-size:12.5px;line-height:1.35}
+.train-more-body{padding:0 6px 4px}
+.train-more-body>.btn-row{margin-top:12px}
+
+/* Inicio: consejo de la semana con dibujo y «Ver todo el historial». */
+.home-tip{display:flex;align-items:center;gap:14px}
+.home-tip-img{flex:none;width:76px;height:76px;border-radius:20px}
+.home-tip-copy{min-width:0}
+.home-tip-copy strong{display:block;margin:2px 0;font-size:16px}
+.home-tip-copy p{margin:0;color:var(--text-2);font-size:13.5px;line-height:1.45}
+.home-gym-all{display:block;margin:10px auto 0;padding:8px 4px}
+/* Al completar los datos, el fondo se suaviza para que los textos se lean sobre la foto. */
+.welcome.is-setup::before{content:'';position:fixed;inset:0;background:linear-gradient(180deg,rgb(var(--bg-rgb) / .45) 0%,rgb(var(--bg-rgb) / .88) 30%,rgb(var(--bg-rgb) / .97) 60%);pointer-events:none}
+.welcome-step{position:relative;z-index:1}
+/* Pantallas vacías con dibujo. */
+.empty.empty-sm{padding:16px 12px}
+.empty.empty-sm img{margin-bottom:6px}
+.empty.empty-sm p{margin:0}
+.cm-empty-img{display:block;width:72px;height:72px;margin:0 auto 4px;border-radius:18px}

@@ -13,7 +13,7 @@ const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('dialog', d => d.accept());
 await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
 await page.addInitScript(() => {
-  localStorage.setItem('fittforma-welcome-v1', '1'); setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50);
+  localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-train-more-v74', '1'); setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50);
   if (sessionStorage.getItem('v56-seed')) return; sessionStorage.setItem('v56-seed', '1');
   const d = n => { const x = new Date(); x.setDate(x.getDate() - n); const z = new Date(x.getTime() - x.getTimezoneOffset() * 60000); return z.toISOString().slice(0, 10); };
   const ex = (name, group, w, r, n = 3) => ({ name, group, kind: 'strength', entries: Array.from({ length: n }, () => ({ reps: String(r), weight: String(w), done: true })) });

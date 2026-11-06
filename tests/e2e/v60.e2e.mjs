@@ -17,7 +17,7 @@ const open = async (state, { stubNotify = false } = {}) => {
   page.on('pageerror', e => errors.push(e.message)); page.on('dialog', d => d.accept());
   await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
   await page.addInitScript(([s, stub]) => {
-    localStorage.setItem('fittforma-welcome-v1', '1'); window.__vib = []; navigator.vibrate = x => { window.__vib.push(x); return true; };
+    localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-train-more-v74', '1'); window.__vib = []; navigator.vibrate = x => { window.__vib.push(x); return true; };
     if (stub) { window.__notes = []; class N { static permission = 'granted'; static requestPermission() { return Promise.resolve('granted'); } constructor(t, o) { window.__notes.push(t + ' | ' + (o?.body || '')); } } window.Notification = N;
       Object.defineProperty(navigator, 'serviceWorker', { value: { getRegistration: () => Promise.resolve(null), register: () => Promise.resolve({}), addEventListener() {} }, configurable: true }); }
     if (s && !sessionStorage.getItem('v60-seed')) { sessionStorage.setItem('v60-seed', '1'); localStorage.setItem('fittforma-ai-v4', s); }

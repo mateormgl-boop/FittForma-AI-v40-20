@@ -78,7 +78,8 @@ async function newPage({ clock = false, blockEntitlements = false } = {}) {
   page.on('dialog', d => d.accept());
   if (clock) await page.clock.install();
   await page.addInitScript(CLOSE_CELEBRATION);
-  await page.addInitScript(() => localStorage.setItem('fittforma-welcome-v1', '1'));
+  // v74: «Otras formas de entrenar» abierto (ahí están entrenamiento libre, grupos musculares y la calculadora).
+  await page.addInitScript(() => { localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-train-more-v74', '1'); });
   await page.route(/unpkg\.com/, r => r.abort());
   await page.route(/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js/, r => r.fulfill({ contentType: 'text/javascript', headers: { 'access-control-allow-origin': '*' }, body: fs.readFileSync(process.env.SUPABASE_UMD) }));
   await page.route('**/api/public-config', async r => {

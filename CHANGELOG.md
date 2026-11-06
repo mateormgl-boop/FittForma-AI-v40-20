@@ -1,5 +1,31 @@
 # FittForma AI — Registro de cambios
 
+## v74.0 — Primera impresión: bienvenida, Inicio y Entrenar más claros, y dibujos propios (6 de noviembre de 2026)
+
+Pedido de la persona dueña: «seguí y después pasame para mergear todo» (etapa v74 de `docs/REVISION_PRODUCTO_v73.md`).
+
+- **Bienvenida:**
+  - «Contanos un poco» ahora pregunta dónde entrenás (gimnasio, en casa o sin equipo) con tarjetas con dibujo, y tu experiencia (principiante, intermedia o avanzada). Antes había que buscar esas opciones en Rutinas.
+  - Al tocar «Armar mi plan» se arma el plan y aparece «Tu primer entrenamiento está listo», con el nombre del día, los ejercicios y el tiempo estimado.
+  - «Empezar ahora» abre ese entrenamiento al instante; «Ver mi plan» lleva a Rutinas; «Más tarde» vuelve a Inicio.
+  - En celulares chicos la bienvenida se puede desplazar, y el fondo se suaviza para que los textos se lean sobre la foto.
+- **Inicio:**
+  - Lo de hoy va primero, con el botón grande «Empezar entrenamiento», que arranca la sesión directamente. Antes había que pasar por «Ver la sesión».
+  - Los accesos rápidos van debajo (antes estaban a mitad de pantalla).
+  - Si ya ordenaste Inicio a tu gusto, tu orden se respeta.
+  - «Lo que hiciste en el gym» muestra solo la última sesión y «Ver todo el historial» (antes tres sesiones completas).
+  - La frase fija «Disciplina hoy…» pasó a ser el **Consejo de la semana**: seis consejos con su dibujo, uno distinto cada lunes.
+- **Entrenar:**
+  - Arriba, lo de hoy: el entrenamiento diario si tenés plan, o lo que toca según tu semana, con «Empezar» y «Ver la sesión».
+  - Lo demás quedó plegado en «Otras formas de entrenar»: grupos musculares, entrenamiento libre, registrar uno ya hecho y calculadora de RM. La app recuerda si lo dejaste abierto.
+  - Con plan, ya no aparecen dos recomendaciones distintas para hoy.
+  - La pantalla pasó de 2.078 a 1.329 px de alto.
+- **Dibujos propios:**
+  - 14 ilustraciones en SVG, livianas (de 1,4 a 2,5 KB cada una) y con los colores de la app, en `assets/illustrations/`.
+  - Se usan en la bienvenida, en el consejo de la semana y en las pantallas vacías: Mis rutinas, Historial, Medidas, Fotos, Amigos y el muro.
+  - Sin fotos de stock ni personas. Quedan guardadas para usar sin conexión.
+- Traducido a los seis idiomas. **Sin migraciones nuevas.**
+
 ## v73.0 — La app abre más rápido y detalles de experiencia (5 de noviembre de 2026)
 
 Pedido de la persona dueña: «hacé lo que tengas que hacer» (etapa de velocidad) y «¿viste toda la app parte por parte?».

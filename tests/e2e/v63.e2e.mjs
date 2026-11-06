@@ -101,6 +101,8 @@ await page.fill('#authPassword', PASS); await page.click('#authSubmit'); await p
 step('Crear la cuenta inicia sesión al instante y avisa', /¡Listo! Creaste tu cuenta y ya iniciaste sesión/.test(await page.textContent('#authDone')) && await page.isVisible('#authDone') && !(await page.isVisible('#authSheet')));
 step('Después de crear la cuenta sigue «Contanos un poco»', await page.isVisible('#welcomeStep2'));
 await page.fill('#welcomeName', 'Nueva'); await page.click('#welcomeSubmit'); await page.waitForTimeout(500);
+step('Muestra el primer entrenamiento listo', await page.isVisible('#welcomeStep3'));
+await page.click('#welcomeLater'); await page.waitForTimeout(400);
 step('La bienvenida termina y queda en la app', !(await page.isVisible('#welcomeScreen')));
 step('Inicio no muestra la invitación a crear cuenta con la sesión iniciada', !(await page.isVisible('#homeAccountCard')));
 await page.evaluate(() => window.FittFormaGo('settings:account')); await page.waitForTimeout(500);

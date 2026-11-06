@@ -22,7 +22,10 @@ for (const [w, h, label] of [[390, 844, 'móvil'], [1366, 900, 'escritorio']]) {
     step('Bienvenida visible en el primer uso', await fresh.isVisible('#welcomeScreen'));
     await fresh.click('#welcomeStart'); await fresh.fill('#welcomeName', 'Lucía'); await fresh.selectOption('#welcomeDays', '4'); await fresh.click('#welcomeSubmit'); await fresh.waitForTimeout(300);
     const fs = await fresh.evaluate(k => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
-    step('Bienvenida guarda nombre y días', fs.profile?.displayName === 'Lucía' && String(fs.profile?.days) === '4' && !(await fresh.isVisible('#welcomeScreen')));
+    // v74: al enviar arma el plan y muestra «Tu primer entrenamiento está listo»; «Más tarde» cierra la bienvenida.
+    step('Bienvenida guarda nombre y días y arma el plan', fs.profile?.displayName === 'Lucía' && String(fs.profile?.days) === '4' && fs.plan?.days?.length === 4 && await fresh.isVisible('#welcomeStep3'));
+    await fresh.click('#welcomeLater'); await fresh.waitForTimeout(300);
+    step('«Más tarde» termina la bienvenida', !(await fresh.isVisible('#welcomeScreen')));
     await fresh.reload(); await fresh.waitForTimeout(400);
     step('La bienvenida no vuelve a aparecer', !(await fresh.isVisible('#welcomeScreen')));
     await fresh.close();
@@ -34,7 +37,8 @@ for (const [w, h, label] of [[390, 844, 'móvil'], [1366, 900, 'escritorio']]) {
   page.on('dialog', d => d.accept());
   await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
   await page.addInitScript(CLOSE_CELEBRATION);
-  await page.addInitScript(() => localStorage.setItem('fittforma-welcome-v1', '1'));
+  // v74: «Otras formas de entrenar» abierto (ahí están entrenamiento libre, grupos musculares y la calculadora).
+  await page.addInitScript(() => { localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-train-more-v74', '1'); });
   await page.goto(APP + '/'); await page.evaluate(k => localStorage.removeItem(k), KEY); await page.reload(); await page.waitForTimeout(500);
   const st = () => page.evaluate(k => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
   const go = async view => { const sel = w < 761 ? `.mobile-nav-item[data-mobile-view="${view}"]` : `.tab[data-view="${view}"]`; await page.click(sel); await page.waitForTimeout(200); };
