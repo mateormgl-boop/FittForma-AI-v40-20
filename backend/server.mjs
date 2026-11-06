@@ -1,6 +1,8 @@
 import http from 'node:http';
 import { isIP } from 'node:net';
-import { readFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { gzipSync, brotliCompressSync, constants as zlibConstants } from 'node:zlib';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,7 +21,7 @@ const root=rootCandidates.find(candidate=>existsSync(path.join(candidate,'index.
 const rawPort=String(process.env.PORT||'8787');
 const port=Number(rawPort);
 if(!Number.isInteger(port)||port<0||port>65535)throw new Error(`PORT debe ser un entero entre 0 y 65535; se recibió ${JSON.stringify(rawPort)}.`);
-const appVersion='0.71.0';
+const appVersion='0.74.0';
 const apiKey=String(process.env.GEMINI_API_KEY||'').trim(), model=String(process.env.GEMINI_MODEL||'gemini-3.8-flash').trim()||'gemini-3.8-flash';
 const trustRenderClientIp=String(process.env.TRUST_RENDER_CLIENT_IP||'').toLowerCase()==='true';
 // If the primary model temporarily returns 503, try a lighter official model automatically.
@@ -105,11 +107,13 @@ const MAX_TRACKED_CLIENTS=5000;
 // v60: dirección pública opcional (solo https y sin ruta) para la vista previa al compartir.
 const SITE_URL=(()=>{try{const u=new URL(String(process.env.PUBLIC_SITE_URL||''));return u.protocol==='https:'&&!u.username&&!u.password?u.origin:'';}catch{return '';}})();
 const PUBLIC_ROOT_FILES=new Set([
-  '/index.html','/i18n.js','/i18n-extra.js','/i18n-v48.js','/i18n-v50.js','/i18n-v51.js','/i18n-v52.js','/i18n-v53.js','/anatomy.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js','/training-core.js','/body-goals.js','/muscle-ranks.js','/athlete-stats.js','/monetization-core.js','/exercise-guides.js','/exercise-media.js','/exercise-gifs.js','/activity-core.js','/native-gps.js','/food-db.js','/food-core.js','/nutrition-guides.js',
+  '/index.html','/i18n.js','/i18n-extra.js','/i18n-v48.js','/i18n-v50.js','/i18n-v51.js','/i18n-v52.js','/i18n-v53.js','/anatomy.js','/design.css','/community.js','/ads-config.js','/ads.js','/membership-config.js','/training-core.js','/body-goals.js','/muscle-ranks.js','/athlete-stats.js','/monetization-core.js','/exercise-guides.js','/exercise-media.js','/exercise-gifs.js','/activity-core.js','/native-gps.js','/native-notify.js','/food-db.js','/food-core.js','/nutrition-guides.js',
   '/manifest.json','/icon.svg','/icon-180.png','/icon-192.png','/icon-512.png',
   '/supabase-config.js','/achievements.js','/sw.js',
   // v60: página 404 propia, robots.txt, política de privacidad e imagen para compartir.
-  '/404.html','/robots.txt','/privacidad.html','/legal-config.js','/og-image.png'
+  '/404.html','/robots.txt','/privacidad.html','/legal-config.js','/og-image.png',
+  // v72: normas de la comunidad (las pide Google Play para el contenido de usuarios).
+  '/normas.html'
 ]);
 const CSP=[
   "default-src 'self'",
@@ -141,6 +145,38 @@ function applySecurityHeaders(req,res){
   if(req.socket.encrypted||String(req.headers['x-forwarded-proto']||'').split(',')[0].trim()==='https'){
     res.setHeader('Strict-Transport-Security','max-age=15552000');
   }
+}
+// v73: archivos públicos en memoria, comprimidos una sola vez (brotli o gzip) y con ETag según el contenido.
+// Así cada apertura de la app con internet ya no vuelve a bajar todo el código: si no cambió, la respuesta es un 304 vacío.
+// El ETag depende del contenido (no de la fecha del archivo), así que un despliegue nuevo no invalida lo que no cambió.
+const COMPRESSIBLE=new Set(['.html','.js','.mjs','.css','.json','.svg','.webmanifest','.txt']);
+const ASSET_CACHE_MAX_BYTES=80*1024*1024;
+const assetCache=new Map();let assetCacheBytes=0;
+async function loadStaticAsset(file,requested){
+  const info=await stat(file);const hit=assetCache.get(file);
+  if(hit&&hit.mtimeMs===info.mtimeMs&&hit.size===info.size)return hit;
+  let data=await readFile(file);const ext=path.extname(file);
+  // v60: con PUBLIC_SITE_URL (https://…) la imagen para compartir y og:url quedan con dirección absoluta, como piden las redes.
+  if(requested==='/index.html'&&SITE_URL)data=Buffer.from(data.toString('utf8').replace('<meta property="og:image" content="/og-image.png">',`<meta property="og:image" content="${SITE_URL}/og-image.png">\n  <meta property="og:url" content="${SITE_URL}/">`));
+  const etag='"'+createHash('sha256').update(data).digest('base64url').slice(0,32)+'"';
+  let gz=null,br=null;
+  const asset={ext,data,etag,mtimeMs:info.mtimeMs,size:info.size,compressible:COMPRESSIBLE.has(ext)&&data.length>=1024,
+    gz:()=>gz||(gz=gzipSync(data,{level:9})),
+    br:()=>br||(br=brotliCompressSync(data,{params:{[zlibConstants.BROTLI_PARAM_QUALITY]:9,[zlibConstants.BROTLI_PARAM_SIZE_HINT]:data.length}}))};
+  if(hit)assetCacheBytes-=hit.data.length;
+  if(assetCacheBytes+data.length>ASSET_CACHE_MAX_BYTES){assetCache.clear();assetCacheBytes=0;}
+  assetCache.set(file,asset);assetCacheBytes+=data.length;
+  return asset;
+}
+function pickEncoding(header){
+  const offered=String(header||'').toLowerCase().split(',').map(part=>{const [name,...params]=part.trim().split(';');const q=params.map(x=>x.trim()).find(x=>x.startsWith('q='));return {name:name.trim(),q:q?Number(q.slice(2)):1};}).filter(x=>x.name&&x.q>0);
+  if(offered.some(x=>x.name==='br'))return 'br';
+  if(offered.some(x=>x.name==='gzip'))return 'gzip';
+  return '';
+}
+function etagMatches(header,etag){
+  if(!header)return false;
+  return String(header).split(',').map(tag=>tag.trim().replace(/^W\//,'')).some(tag=>tag===etag||tag==='*');
 }
 function send(req,res,status,data,type='application/json; charset=utf-8'){
   applySecurityHeaders(req,res);
@@ -377,15 +413,21 @@ const server=http.createServer(async(req,res)=>{try{
     const file=path.resolve(root,'.'+requested);
     if(!file.startsWith(root+path.sep))return send(req,res,404,{error:'No encontrado.'});
     try{
-      let data=await readFile(file);const ext=path.extname(file);
-      // v60: con PUBLIC_SITE_URL (https://…) la imagen para compartir y og:url quedan con dirección absoluta, como piden las redes.
-      if(requested==='/index.html'&&SITE_URL)data=Buffer.from(data.toString('utf8').replace('<meta property="og:image" content="/og-image.png">',`<meta property="og:image" content="${SITE_URL}/og-image.png">\n  <meta property="og:url" content="${SITE_URL}/">`));
+      const asset=await loadStaticAsset(file,requested),ext=asset.ext;
       applySecurityHeaders(req,res);
       // v59.1: el CSS también se revalida siempre; si quedaba guardado 1 hora, una versión nueva se veía con los estilos viejos.
+      // v73: «revalidar» ya no es volver a bajar todo: con el ETag el navegador pregunta y, si no cambió, recibe un 304 vacío.
       const cacheControl=['.html','.js','.mjs','.json','.webmanifest','.css'].includes(ext)?'no-cache':'public, max-age=3600';
-      res.writeHead(200,{'Content-Type':mime[ext]||'application/octet-stream','Cache-Control':cacheControl});
+      const headers={'Content-Type':mime[ext]||'application/octet-stream','Cache-Control':cacheControl,'ETag':asset.etag};
+      if(asset.compressible)headers.Vary='Accept-Encoding';
+      if(etagMatches(req.headers['if-none-match'],asset.etag)){res.writeHead(304,headers);return res.end();}
+      const encoding=asset.compressible?pickEncoding(req.headers['accept-encoding']):'';
+      const body=encoding==='br'?asset.br():encoding==='gzip'?asset.gz():asset.data;
+      if(encoding)headers['Content-Encoding']=encoding;
+      headers['Content-Length']=String(body.length);
+      res.writeHead(200,headers);
       if(req.method==='HEAD')return res.end();
-      return res.end(data);
+      return res.end(body);
     }catch{if(String(req.headers.accept||'').includes('text/html'))return notFound(req,res);return send(req,res,404,{error:'No encontrado. Revisá que el archivo exista en el repositorio conectado a este servicio.'});}
   }
   return send(req,res,404,{error:'No encontrado.'});

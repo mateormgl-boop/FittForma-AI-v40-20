@@ -33,6 +33,7 @@ const APP_VERSION = (await (await fetch(APP + '/api/public-config')).json()).ver
 // Datos externos: B publica un texto y le escribe a A (con auth.uid() de B para pasar el trigger anti-spam).
 // Fixture propio (el último paso elimina la cuenta de A, así que se recrea en cada ejecución).
 sql(`insert into auth.users(id,email) values('aaaaaaaa-0000-0000-0000-000000000001','alice@example.test'),('bbbbbbbb-0000-0000-0000-000000000002','bob@example.test') on conflict do nothing`);
+sql(`insert into community_rules_acceptance(user_id,rules_version) select id,1 from auth.users on conflict (user_id) do nothing`); // v72: estas cuentas ya aceptaron las normas de la comunidad (el diálogo se prueba en v72.e2e.mjs)
 sql(`insert into community_profiles(user_id,username,display_name,visibility) values('aaaaaaaa-0000-0000-0000-000000000001','alicia_fit','Alicia','public'),('bbbbbbbb-0000-0000-0000-000000000002','bruno_fit','Bruno Fit','public') on conflict (user_id) do update set visibility='public'`);
 sql(`insert into community_follows(follower_id,following_id,status) values('aaaaaaaa-0000-0000-0000-000000000001','bbbbbbbb-0000-0000-0000-000000000002','accepted'),('bbbbbbbb-0000-0000-0000-000000000002','aaaaaaaa-0000-0000-0000-000000000001','accepted') on conflict do nothing`);
 sql(`delete from user_app_data where user_id='aaaaaaaa-0000-0000-0000-000000000001'; delete from community_messages; delete from community_reports; delete from community_posts; delete from community_moderators;`);
@@ -94,6 +95,7 @@ const A = 'aaaaaaaa-0000-0000-0000-000000000001', B = 'bbbbbbbb-0000-0000-0000-0
 const C = 'cccccccc-0000-0000-0000-0000000000c6', D = 'dddddddd-0000-0000-0000-0000000000d6', E = 'eeeeeeee-0000-0000-0000-0000000000e6';
 sql(`delete from community_athlete_stats; delete from community_follows where follower_id in ('${C}','${D}','${E}') or following_id in ('${C}','${D}','${E}'); delete from community_profiles where user_id in ('${C}','${D}','${E}'); delete from auth.users where id in ('${C}','${D}','${E}')`);
 sql(`insert into auth.users(id,email,raw_user_meta_data) values('${C}','carla53@example.test','{"full_name":"Carla"}'),('${D}','diego53@example.test','{"full_name":"Diego"}'),('${E}','eva53@example.test','{"full_name":"Eva"}')`);
+sql(`insert into community_rules_acceptance(user_id,rules_version) select id,1 from auth.users on conflict (user_id) do nothing`); // v72: estas cuentas ya aceptaron las normas de la comunidad (el diálogo se prueba en v72.e2e.mjs)
 sql(`update community_profiles set username='carla_priv53', visibility='private', bio='Bio solo para seguidores' where user_id='${C}'; update community_profiles set username='diego_pub53', display_name='Diego' where user_id='${D}'; update community_profiles set username='eva_oculta53', display_name='Eva' where user_id='${E}'`);
 // Estadísticas de prueba de los demás (las de Alicia las calcula y publica la app).
 sql(`insert into community_athlete_stats(user_id,training_level,xp_level,overall_rank,ranked_muscles,badges_count,badges,workouts_total,workouts_30d,active_days_30d,best_pushups,best_pullups) values

@@ -21,7 +21,7 @@ const open = async (state, width = 390) => {
   const page = await browser.newPage({ viewport: { width, height: 844 } });
   page.on('pageerror', e => errors.push(e.message)); page.on('dialog', d => d.accept());
   await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
-  await page.addInitScript(s => { for (const k of ['fittforma-welcome-v1', 'fittforma-tour-v68', 'fittforma-guide-hint-v68', 'fittforma-health-notice-v64']) localStorage.setItem(k, '1'); if (!sessionStorage.getItem('v71-seed')) { sessionStorage.setItem('v71-seed', '1'); localStorage.setItem('fittforma-ai-v4', s); } setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50); }, JSON.stringify(state));
+  await page.addInitScript(s => { for (const k of ['fittforma-welcome-v1', 'fittforma-train-more-v74', 'fittforma-tour-v68', 'fittforma-guide-hint-v68', 'fittforma-health-notice-v64']) localStorage.setItem(k, '1'); if (!sessionStorage.getItem('v71-seed')) { sessionStorage.setItem('v71-seed', '1'); localStorage.setItem('fittforma-ai-v4', s); } setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50); }, JSON.stringify(state));
   await page.goto(APP + '/'); await page.waitForTimeout(900);
   return page;
 };

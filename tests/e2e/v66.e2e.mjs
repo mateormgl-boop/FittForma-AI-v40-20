@@ -71,6 +71,7 @@ const POST_B = 'b6600000-0000-0000-0000-0000000000b1', POST_F = 'b6600000-0000-0
 
 // Datos: Alicia y Bruno se siguen (aceptado). Franco es un desconocido con una publicación pública: NO va al muro de Alicia.
 sql(`insert into auth.users(id,email) values('${A}','alice@example.test'),('${B}','bob@example.test'),('${F}','franco66@example.test') on conflict do nothing`);
+sql(`insert into community_rules_acceptance(user_id,rules_version) select id,1 from auth.users on conflict (user_id) do nothing`); // v72: estas cuentas ya aceptaron las normas de la comunidad (el diálogo se prueba en v72.e2e.mjs)
 sql(`insert into community_profiles(user_id,username,display_name,visibility) values('${A}','alicia_fit','Alicia','public'),('${B}','bruno_fit','Bruno Fit','public'),('${F}','franco66','Franco Desconocido','public') on conflict (user_id) do update set username=excluded.username, display_name=excluded.display_name, visibility=excluded.visibility`);
 sql(`delete from community_blocks where blocker_id in ('${A}','${B}') or blocked_id in ('${A}','${B}'); delete from community_follows where follower_id in ('${A}','${F}') or following_id in ('${A}','${F}');
      insert into community_follows(follower_id,following_id,status) values('${A}','${B}','accepted'),('${B}','${A}','accepted') on conflict do nothing`);
@@ -99,7 +100,7 @@ const open = async (lang = '', withSeed = true) => {
   page.on('dialog', d => d.accept());
   await page.addInitScript(CLOSE_CELEBRATION);
   await page.addInitScript(([s, l]) => {
-    localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-health-notice-v64', '1');
+    localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-train-more-v74', '1'); localStorage.setItem('fittforma-health-notice-v64', '1');
     if (l) localStorage.setItem('fittforma-language-v1', l);
     if (s && !sessionStorage.getItem('seeded')) { localStorage.setItem('fittforma-ai-v4', s); sessionStorage.setItem('seeded', '1'); }
   }, [withSeed ? JSON.stringify(seed) : '', lang]);

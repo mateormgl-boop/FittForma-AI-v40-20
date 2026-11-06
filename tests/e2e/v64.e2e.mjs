@@ -18,7 +18,7 @@ const open = async (lang = '') => {
   page.on('pageerror', e => errors.push(e.message)); page.on('dialog', d => d.accept());
   await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
   await page.addInitScript(([s, l]) => {
-    localStorage.setItem('fittforma-welcome-v1', '1'); if (l) localStorage.setItem('fittforma-language-v1', l);
+    localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-train-more-v74', '1'); if (l) localStorage.setItem('fittforma-language-v1', l);
     if (!sessionStorage.getItem('v64-seed')) { sessionStorage.setItem('v64-seed', '1'); localStorage.setItem('fittforma-ai-v4', s); }
     setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50);
   }, [JSON.stringify(seed), lang]);
