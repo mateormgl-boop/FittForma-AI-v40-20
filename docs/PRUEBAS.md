@@ -24,6 +24,12 @@ migración. No se conecta a Supabase, Gemini ni Render.
   - **Pantallas vacías** con dibujo: Mis rutinas, Historial, Medidas y Fotos.
   - **Tamaños e idioma:** a 320 px sin desbordes y con la bienvenida desplazable; en inglés, traducido.
 - Las E2E existentes que usan entrenamiento libre, grupos musculares o la calculadora abren «Otras formas de entrenar» antes; las de la bienvenida tocan «Más tarde» al final.
+- La de «Personalizar inicio» (v58) sube «gym» cuatro lugares en vez de dos, porque cambió el orden por defecto.
+- **Resultados:**
+  - `npm test`: 391 pasan, 0 fallan.
+  - Las 29 E2E pasan: 896 pasos.
+  - axe (WCAG 2.1 AA) sin problemas, en claro y oscuro, en ocho pantallas: bienvenida, primer entrenamiento, Entrenar con plan y con datos, Inicio, y Rutinas, Historial y Cuerpo vacíos.
+  - Revisión visual a 320 y 390 px, en claro y oscuro, y en escritorio.
 
 ### v73
 
