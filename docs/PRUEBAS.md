@@ -9,6 +9,22 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v74
+
+- `npm test`: `tests/v74.test.mjs` revisa:
+  - Los 14 dibujos: SVG de 120×120, livianos, sin scripts ni recursos externos, y guardados en el service worker.
+  - La bienvenida: tarjetas de dónde entrenás, experiencia y «Tu primer entrenamiento está listo».
+  - Entrenar: lo de hoy arriba, «Otras formas de entrenar» plegado y recordado, «Empezar» directo.
+  - Inicio: orden nuevo, consejo de la semana con dibujo y traducido, botón grande que empieza y gym corto.
+  - Las pantallas vacías con dibujo y las traducciones.
+- E2E `v74` (48 pasos):
+  - **Bienvenida:** tarjetas con dibujo que también se eligen con el teclado; guarda dónde entrenás y la experiencia y arma el plan. El primer entrenamiento muestra el día, los ejercicios y el tiempo, y «Empezar ahora» lo abre sin el recorrido encima. «Ver mi plan» lleva a Rutinas.
+  - **Inicio:** lo de hoy y los accesos rápidos primero; «Empezar entrenamiento» arranca la sesión; una sola sesión del gym y «Ver todo el historial»; el consejo de la semana; un orden propio se respeta.
+  - **Entrenar:** lo de hoy antes de la semana; lo demás plegado y recordado al volver y al reabrir; «Ver la sesión» lo abre sin cambiar tu preferencia; «Empezar» arranca directo. Con plan, el entrenamiento diario va arriba y no hay otra recomendación.
+  - **Pantallas vacías** con dibujo: Mis rutinas, Historial, Medidas y Fotos.
+  - **Tamaños e idioma:** a 320 px sin desbordes y con la bienvenida desplazable; en inglés, traducido.
+- Las E2E existentes que usan entrenamiento libre, grupos musculares o la calculadora abren «Otras formas de entrenar» antes; las de la bienvenida tocan «Más tarde» al final.
+
 ### v73
 
 - `npm test` (385): `tests/v73.test.mjs` levanta el servidor y prueba:
