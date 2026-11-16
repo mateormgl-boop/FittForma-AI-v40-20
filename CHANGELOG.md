@@ -1,5 +1,45 @@
 # FittForma AI — Registro de cambios
 
+## v79.0 — Todo lo que faltaba de la revisión: menos scroll, compartir, gasto real, base más rápida y etapa nueva (16 de noviembre de 2026)
+
+Pedido de la persona dueña: «hacé todo lo faltante que le falta a la app y pasame el archivo». Junta las etapas v75 a v78 de `docs/REVISION_PRODUCTO_v73.md` y una etapa nueva (v79).
+
+- **v75 · Menos scroll:**
+
+  | Pantalla | Antes | Ahora |
+  |---|---|---|
+  | Ejercicios | 17.130 px | 1.591 px |
+  | Correr | 6.162 px | 4.027 px |
+  | Progreso › Resumen | 5.039 px | 2.962 px |
+  | Progreso › Historial | 5.349 px | 3.383 px |
+  | Progreso › Músculos | 4.971 px | 3.667 px |
+
+  - Ejercicios agrupados por músculo y plegados. Al buscar o filtrar, la lista vuelve a ser plana.
+  - Historial de a 10 sesiones, con «Ver más».
+  - Registrar comida: cinco botones arriba (Escribir, Buscar, Escanear, Foto y Favoritas) que llevan a cada forma de cargar.
+  - Correr: «Iniciar GPS» arriba y la privacidad plegada. Un solo «Registro sin GPS» en el que se elige carrera, caminata o bicicleta (antes eran dos formularios). Las semanas del plan, plegadas.
+  - Progreso › Resumen: la comparación semanal, el resumen del mes, los retos y los hábitos (que repetían a Inicio) quedaron en «Más estadísticas».
+  - Músculos plegados por zona del cuerpo.
+  - Insignias: primero las que empezaste y están más cerca del próximo nivel; la explicación de los estados, plegada.
+  - Recetas: primero 6, con «Ver todas».
+- **v76 · Crecer:**
+  - **Compartir como imagen:** al terminar un entrenamiento o una carrera se arma una imagen con la marca de la app, lista para Instagram, TikTok o WhatsApp. Se dibuja en el teléfono y no se sube a ningún servidor.
+  - **Invitá a un amigo:** en Comunidad y en «Amigos» vacío. Comparte el enlace de la app (o lo copia); no manda datos tuyos.
+  - La cuenta oficial de FittForma la tiene que crear la persona dueña: los pasos están en `docs/DESPLIEGUE.md`. No se inventan cuentas ni publicaciones.
+- **v77 · Nutrición inteligente:**
+  - **Gasto real estimado:** con lo que comiste y la tendencia de tu peso en las últimas 4 semanas, la app calcula cuánto gastás por día y sugiere calorías según tu objetivo, con un botón para usarlas. Necesita 10 días con comidas completas y pesos que cubran una semana; si no, explica qué falta.
+  - Cada comida de «Hoy» muestra su dibujo (desayuno, almuerzo, merienda, cena o colación) en lugar del mismo tenedor.
+  - Los textos de Nutrición que seguían en español en los otros idiomas ya están traducidos.
+- **v78 · Base y seguridad** (migración nueva `2026-11-16_v78_performance_security.sql`, aditiva):
+  - Índices para las 5 claves foráneas que no tenían.
+  - Las 53 políticas RLS calculan `auth.uid()` una vez por consulta en lugar de una vez por fila.
+  - «¿Está bloqueado?» solo responde sobre pares que incluyen a quien pregunta.
+  - La contraseña mínima de 8 caracteres se configura en Supabase (pasos en `docs/DESPLIEGUE.md`); la app ya la pedía.
+- **v79 · Etapa nueva:**
+  - **Calentamiento sugerido:** en el primer ejercicio con carga de la sesión, 1 × 8 al 50 % y 1 × 5 al 70 % del peso de trabajo.
+  - **Comparar dos fotos:** en Progreso › Cuerpo, dos fotos lado a lado con los días entre una y otra. Siguen guardadas solo en el teléfono.
+- Traducido a los seis idiomas. Hay **una migración nueva** (v78).
+
 ## v74.0 — Primera impresión: bienvenida, Inicio y Entrenar más claros, y dibujos propios (6 de noviembre de 2026)
 
 Pedido de la persona dueña: «seguí y después pasame para mergear todo» (etapa v74 de `docs/REVISION_PRODUCTO_v73.md`).

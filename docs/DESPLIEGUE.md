@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v74.0
+# Despliegue de FittForma AI v79.0
 
-Esta guía es la lista de pasos para publicar v74.0. **No se desplegó a producción**: el despliegue lo
+Esta guía es la lista de pasos para publicar v79.0. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -17,6 +17,20 @@ Detalles del archivo:
 - Al final recarga la caché de la API de Supabase.
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
+
+## Qué cambia en v79.0
+
+- **Migraciones pendientes en producción:** la de v72 (normas de la comunidad) y la nueva de v78 (`2026-11-16_v78_performance_security.sql`). Las dos son aditivas: no borran datos ni apagan RLS.
+  - Orden: primero desplegá en Render, después pegá cada una en Supabase › SQL Editor (o todo `supabase/APLICAR_MIGRACIONES.sql`, que ya incluye las 20).
+  - v78 agrega 5 índices, reescribe las políticas con `(select auth.uid())` (mismos permisos, más rápido) y vuelve a aplicar la función de bloqueos.
+  - Para comprobarlo: Supabase › Advisors › Performance ya no debería mostrar «auth_rls_initplan» ni «unindexed_foreign_keys».
+- **Contraseña mínima de 8 caracteres:** Supabase › Authentication › Sign In / Providers › Email › «Minimum password length» = 8. La app ya la pide.
+- **Archivos nuevos:** `share-card.js` (imagen para compartir; el servidor ya lo publica y el service worker lo guarda).
+- El service worker cambia a `fittforma-ai-static-v79-0`. El servidor tiene que informar `0.79.0`.
+- **Cuenta oficial de FittForma (la crea la persona dueña):**
+  1. Creá una cuenta normal en la app con un correo de FittForma.
+  2. Poné como nombre «FittForma» y una foto del logo.
+  3. Publicá retos y consejos reales. No hay que inventar personas ni publicaciones.
 
 ## Qué cambia en v74.0
 

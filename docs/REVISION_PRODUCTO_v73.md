@@ -133,7 +133,7 @@ Ilustraciones propias hechas en SVG, livianas, con los colores de la app y en cl
 | Etapa | Qué | Por qué primero |
 |---|---|---|
 | v74 · Primera impresión (**hecha el 6 de noviembre**) | Bienvenida con tarjetas y dibujos, primer entrenamiento listo, Inicio reordenado, Entrenar con un botón principal, estados vacíos ilustrados | Es lo que ve cada persona nueva: decide si se queda |
-| v75 · Menos scroll | Ejercicios por grupos, un solo resumen en Progreso, Historial de a 10, Correr con un formulario, Registrar comida con botones arriba | Las pantallas más largas son las que más se usan |
-| v76 · Crecer | Resumen para compartir como imagen, invitar amigos, cuenta oficial | Con 10 cuentas, crecer importa más que cualquier función |
-| v77 · Nutrición inteligente | Gasto real estimado, íconos de comida, traducciones de Nutrición | Diferencia la app de un simple contador de calorías |
-| Técnica | Base y seguridad (bloqueos, índices, reglas más rápidas) | Necesario antes de tener muchas cuentas |
+| v75 · Menos scroll (**hecha en v79**) | Ejercicios por grupos, un solo resumen en Progreso, Historial de a 10, Correr con un formulario, Registrar comida con botones arriba | Las pantallas más largas son las que más se usan |
+| v76 · Crecer (**hecha en v79**) | Resumen para compartir como imagen, invitar amigos, cuenta oficial | Con 10 cuentas, crecer importa más que cualquier función |
+| v77 · Nutrición inteligente (**hecha en v79**) | Gasto real estimado, íconos de comida, traducciones de Nutrición | Diferencia la app de un simple contador de calorías |
+| Técnica (**hecha en v79, migración v78**) | Base y seguridad (bloqueos, índices, reglas más rápidas) | Necesario antes de tener muchas cuentas |
