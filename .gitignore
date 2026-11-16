@@ -25,3 +25,6 @@ Thumbs.db
 # Impeccable review captures (regenerated per review)
 .impeccable/review/
 .gif-frames/
+
+# Archivos para descargar (no van al repositorio)
+entregas/
