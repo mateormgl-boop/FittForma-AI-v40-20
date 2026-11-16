@@ -143,7 +143,31 @@
     }
     return { points: out, weeklyKg, spanDays };
   }
-  const api = { ACTIVITY, bmi, bmiCategory, waistToHeight, bmr, tdee, goalDirection, summary, goalProgress, addDays, weightTrend };
+  // v77: gasto calórico real estimado (adaptativo). Si comiste en promedio X kcal y tu tendencia de peso cambió Y kg por semana,
+  // tu gasto fue X − Y/7 × 7700 kcal por día (≈7700 kcal por kg de tejido; es una aproximación). Usa los últimos 28 días
+  // hasta ayer y solo los días con comidas cargadas que parecen completas (800 kcal o más). Hace falta: 10 días así y
+  // pesos que cubran al menos una semana. Si el resultado sale fuera de 1200–5000 kcal, los registros no alcanzan.
+  function adaptiveExpenditure(meals, weights, todayKey, opts = {}) {
+    const days = opts.days || 28, minDays = opts.minDays || 10, end = addDays(todayKey, -1), start = addDays(todayKey, -days);
+    const byDay = new Map();
+    for (const m of meals || []) { const d = String(m?.date || '').slice(0, 10); if (d < start || d > end) continue; byDay.set(d, (byDay.get(d) || 0) + (num(m.calories) || 0)); }
+    const logged = [...byDay.values()].filter(k => k >= 800), loggedDays = logged.length;
+    if (loggedDays < minDays) return { ok: false, reason: 'few-meals', loggedDays, needDays: minDays };
+    const w = (weights || []).filter(p => { const d = String(p?.date || '').slice(0, 10); return d >= start && d <= todayKey; });
+    const trend = weightTrend(w);
+    if (trend.weeklyKg == null) return { ok: false, reason: 'few-weights', loggedDays, weightCount: w.length };
+    const avgIntake = logged.reduce((a, b) => a + b, 0) / loggedDays;
+    const tdee = Math.round((avgIntake - trend.weeklyKg / 7 * KCAL_PER_KG) / 10) * 10;
+    if (tdee < 1200 || tdee > 5000) return { ok: false, reason: 'inconsistent', loggedDays, tdee };
+    return { ok: true, tdee, avgIntake: Math.round(avgIntake), weeklyKg: trend.weeklyKg, loggedDays, confidence: loggedDays >= 20 ? 'alta' : 'media' };
+  }
+  // Calorías sugeridas según la dirección: bajar ≈ −0,4 kg/semana (−440 kcal/día, sin bajar del 80 % del gasto), subir ≈ +250 kcal.
+  function suggestedCalories(tdee, direction) {
+    const t = num(tdee); if (t == null) return null;
+    const v = direction === 'lose' ? Math.max(t * 0.8, t - 440) : direction === 'gain' ? t + 250 : t;
+    return Math.round(v / 50) * 50;
+  }
+  const api = { ACTIVITY, bmi, bmiCategory, waistToHeight, bmr, tdee, goalDirection, summary, goalProgress, addDays, weightTrend, adaptiveExpenditure, suggestedCalories, KCAL_PER_KG };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaBody = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);

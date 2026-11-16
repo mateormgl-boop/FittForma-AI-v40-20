@@ -4,18 +4,20 @@
   'use strict';
   const W = 1080, H = 1350;
   const fmt = n => Number(n).toLocaleString('es-UY', { maximumFractionDigits: 1 });
+  // Los textos de la imagen siguen el idioma elegido en la app.
+  const tr = s => (root.FittFormaI18n && root.FittFormaI18n.translate ? root.FittFormaI18n.translate(s) : s) || s;
   function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
   function fitText(ctx, text, max, size, weight) { let s = size; do { ctx.font = `${weight} ${s}px Inter, system-ui, sans-serif`; s -= 2; } while (ctx.measureText(text).width > max && s > 28); return text; }
   // Métricas que se muestran: solo las que tienen valor.
   function metricsOf(d) {
     const out = [];
-    if (d.minutes > 0) out.push([`${Math.round(d.minutes)} min`, 'Tiempo']);
-    if (d.distanceKm > 0) out.push([`${fmt(d.distanceKm)} km`, 'Distancia']);
-    if (d.pace) out.push([d.pace, 'Ritmo /km']);
-    if (d.exercises > 0) out.push([String(d.exercises), 'Ejercicios']);
-    if (d.sets > 0) out.push([String(d.sets), 'Series']);
-    if (d.volumeKg > 0) out.push([`${fmt(d.volumeKg)} kg`, 'Kilos levantados']);
-    if (d.kcal > 0) out.push([`~${Math.round(d.kcal)}`, 'kcal estimadas']);
+    if (d.minutes > 0) out.push([`${Math.round(d.minutes)} min`, tr('Tiempo')]);
+    if (d.distanceKm > 0) out.push([`${fmt(d.distanceKm)} km`, tr('Distancia')]);
+    if (d.pace) out.push([d.pace, tr('Ritmo /km')]);
+    if (d.exercises > 0) out.push([String(d.exercises), tr('Ejercicios')]);
+    if (d.sets > 0) out.push([String(d.sets), tr('Series')]);
+    if (d.volumeKg > 0) out.push([`${fmt(d.volumeKg)} kg`, tr('Kilos levantados')]);
+    if (d.kcal > 0) out.push([`~${Math.round(d.kcal)}`, tr('kcal estimadas')]);
     return out.slice(0, 6);
   }
   function draw(canvas, d) {
@@ -26,7 +28,7 @@
     ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = '#ffffff'; ctx.font = '800 54px Inter, system-ui, sans-serif'; ctx.fillText('FittForma', 80, 130);
     ctx.fillStyle = '#9d8cff'; ctx.fillText(' AI', 80 + ctx.measureText('FittForma').width, 130);
-    ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.font = '600 34px Inter, system-ui, sans-serif'; ctx.fillText(d.kicker || 'Entrenamiento completado', 80, 250);
+    ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.font = '600 34px Inter, system-ui, sans-serif'; ctx.fillText(tr(d.kicker || 'Entrenamiento completado'), 80, 250);
     ctx.fillStyle = '#ffffff'; fitText(ctx, d.title || 'Entrenamiento', W - 160, 84, 850); ctx.fillText(d.title || 'Entrenamiento', 80, 350);
     if (d.dateLabel) { ctx.fillStyle = 'rgba(255,255,255,.6)'; ctx.font = '500 34px Inter, system-ui, sans-serif'; ctx.fillText(d.dateLabel, 80, 410); }
     const m = metricsOf(d), cols = 2, gw = (W - 160 - 30) / cols, gh = 190;
@@ -39,7 +41,7 @@
     });
     const bar = ctx.createLinearGradient(80, 0, W - 80, 0); bar.addColorStop(0, '#2a6dff'); bar.addColorStop(.5, '#19b8ff'); bar.addColorStop(1, '#6ff2cf');
     ctx.fillStyle = bar; roundRect(ctx, 80, H - 200, W - 160, 10, 5); ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.font = '600 32px Inter, system-ui, sans-serif'; ctx.fillText(d.footer || 'Registrado con FittForma AI', 80, H - 120);
+    ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.font = '600 32px Inter, system-ui, sans-serif'; ctx.fillText(tr(d.footer || 'Registrado con FittForma AI'), 80, H - 120);
     return canvas;
   }
   function toBlob(canvas) { return new Promise((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('No se pudo crear la imagen.')), 'image/png')); }
@@ -58,7 +60,7 @@
   }
   // Invitación: comparte el enlace de la app (o lo copia). No manda datos de la persona.
   async function invite() {
-    const url = `${root.location.origin}/`, text = 'Entrená conmigo en FittForma AI: rutinas, comidas, carreras con GPS y retos con amigos.';
+    const url = `${root.location.origin}/`, text = tr('Entrená conmigo en FittForma AI: rutinas, comidas, carreras con GPS y retos con amigos.');
     const nav = root.navigator;
     if (nav?.share) { try { await nav.share({ title: 'FittForma AI', text, url }); return 'shared'; } catch (e) { if (e && e.name === 'AbortError') return 'cancelled'; } }
     try { await nav.clipboard.writeText(`${text} ${url}`); return 'copied'; } catch { return 'failed'; }

@@ -2209,3 +2209,10 @@ details.mr-zone[open]>summary::after{transform:rotate(-135deg)}
 .cm-invite-text{flex:1;min-width:0}
 .cm-invite-text strong{display:block}
 .cm-invite-text span{display:block;color:var(--muted);font-size:13px}
+
+/* v77: gasto real estimado. */
+.adaptive-main{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:4px 0 6px}
+.adaptive-main strong{font-size:34px;font-weight:850;line-height:1}
+.adaptive-main strong small{font-size:14px;color:var(--muted);font-weight:650}
+.adaptive-suggest{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:12px;border-radius:14px;background:color-mix(in srgb,var(--t-green) 10%,transparent)}
+.adaptive-ok{color:var(--t-green);font-weight:700;font-size:13px}
