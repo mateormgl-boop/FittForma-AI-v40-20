@@ -76,6 +76,8 @@ step('La guía elige el objetivo de la persona y calcula proteína con su peso',
 step('Muestra fuentes y el aviso de que es orientativa', (await page.$$('#nutritionGuideCard .ng-sources a')).length >= 1 && /no reemplaza a un profesional/.test(guide));
 await page.click('#nutritionGuideCard [data-guide="lose"]'); await page.waitForTimeout(150);
 step('Se puede ver la guía de otro objetivo', /Bajar grasa|grasa/i.test(await page.textContent('#nutritionGuideCard h3')));
+// v75: primero se ven 6 recetas; «Ver todas» muestra el resto.
+await page.click('[data-recipes-all]'); await page.waitForTimeout(150);
 const all = (await page.$$('#recipeList details.recipe')).length;
 await page.click('[data-recipe-filter="goal"]'); await page.waitForTimeout(150);
 const some = (await page.$$('#recipeList details.recipe')).length;
