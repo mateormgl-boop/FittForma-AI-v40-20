@@ -9,6 +9,25 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v79 (incluye v75 a v78)
+
+- `npm test`: 398 pasan, 0 fallan. `tests/v79.test.mjs` revisa:
+  - Ejercicios agrupados, historial de a 10, botones de registrar, Correr con un solo registro sin GPS, Progreso y Músculos plegados y recetas de a 6.
+  - La imagen para compartir: no usa la red y el servidor y el service worker la publican.
+  - El cálculo del gasto real: 2.300 kcal y −0,35 kg/semana dan 2.690 kcal. Faltan comidas, faltan pesos, datos que no cierran y el día de hoy no cuenta.
+  - La migración v78 (no borra nada), el calentamiento sugerido y las traducciones.
+- RLS `rls_v78_test.sql`: los 5 índices, ninguna clave foránea sin índice, ninguna política con `auth.uid()` por fila, y que los bloqueos solo los ve quien está en el par. Las pruebas anteriores corren con la migración aplicada y siguen pasando: 459 comprobaciones.
+- E2E `v79` (29 pasos):
+  - Ejercicios plegados que se abren y se recuerdan.
+  - «Ver más» del historial y los botones de registrar llevan al lugar correcto.
+  - En Correr se elige bicicleta y se guarda.
+  - Gasto real de 2.690 kcal con la sugerencia de 2.250 kcal, que se aplica.
+  - Calentamiento 1 × 8 con 32,5 kg y 1 × 5 con 45 kg.
+  - La imagen PNG se descarga, «Invitar» copia el enlace y se comparan dos fotos.
+- **Resultados:** las 30 E2E pasan, 926 pasos.
+  - Con una base de pruebas nueva aparecieron pruebas viejas que dependían del día (v60 y athletes fallaban los lunes) o de datos de otras pruebas. Se corrigieron las pruebas, no la app.
+  - El rol `authenticator` de la base de pruebas necesita `grant anon, authenticated, service_role to authenticator`.
+
 ### v74
 
 - `npm test`: `tests/v74.test.mjs` revisa:
@@ -413,7 +432,7 @@ sus usuarios, perfiles y seguimientos en cada ejecución.
 Preparación (resumen):
 
 1. Base `ff_e2e` con `supabase/tests/supabase_stub.sql`, `schema.sql`, `community.sql` y la migración;
-   rol `authenticator` (`login noinherit`) con `grant anon, authenticated to authenticator`;
+   rol `authenticator` (`login noinherit`) con `grant anon, authenticated, service_role to authenticator`;
    migraciones v41, v43, v44, v48 y v49 aplicadas (el script crea los usuarios de prueba).
 2. PostgREST 12 con `db-anon-role = "anon"` y un `jwt-secret` guardado en un archivo.
 3. `npm start` en otra terminal.
