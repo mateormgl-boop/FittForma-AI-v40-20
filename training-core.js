@@ -849,7 +849,15 @@
     return set >= 0 ? { rest: false, next, set } : { rest: true };
   }
 
-  const api = { oneRepMax, weightForReps, repsAtWeight, fitToTime, estimateMinutes, SCHEMES, PLATES_KG, platesPerSide, supersetGroup, supersetNext, WEEKDAYS, weekdayOf, PROGRAMS, programWeek, groupsOfExercise, groupHistory, recommendPrograms, recommendToday, SPLIT_PLANS, nextFocusInSplit, suggestProgression, nextSetHint, norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
+  // v79: series de calentamiento antes del primer ejercicio con carga: 1 × 8 al 50 % y 1 × 5 al 70 % del peso de trabajo,
+  // redondeado a 2,5 kg. Con menos de 20 kg de trabajo no hace falta (alcanza con una serie liviana del mismo ejercicio).
+  function warmupSets(workKg) {
+    const w = Number(workKg); if (!Number.isFinite(w) || w < 20) return [];
+    const r = x => Math.round(x / 2.5) * 2.5;
+    const out = [{ pct: 50, reps: 8, kg: r(w * 0.5) }, { pct: 70, reps: 5, kg: r(w * 0.7) }].filter(s => s.kg > 0 && s.kg < w);
+    return out.filter((s, i) => !i || s.kg !== out[i - 1].kg);
+  }
+  const api = { warmupSets, oneRepMax, weightForReps, repsAtWeight, fitToTime, estimateMinutes, SCHEMES, PLATES_KG, platesPerSide, supersetGroup, supersetNext, WEEKDAYS, weekdayOf, PROGRAMS, programWeek, groupsOfExercise, groupHistory, recommendPrograms, recommendToday, SPLIT_PLANS, nextFocusInSplit, suggestProgression, nextSetHint, norm, slugify, LIBRARY, ALIASES, RETIRED, canonicalName, libraryEntry, allExercises, buildPlan, FOCUS, MUSCLE_GROUPS, buildFocusDay, buildGroupsDay, prescription, exerciseCountFor, SPLITS, DAILY_COOLDOWN_MS, DAILY_MIN_SET_RATIO, evaluateDailyCompletion, dailyStatus, formatRemaining, sessionXp, hydrationDay, hydrationRecommendation, hydrationPace, hydrationStreak, validWaterMl, highestPerChallenge, featuredBadges };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.FittFormaTraining = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);

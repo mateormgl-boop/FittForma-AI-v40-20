@@ -2216,3 +2216,13 @@ details.mr-zone[open]>summary::after{transform:rotate(-135deg)}
 .adaptive-main strong small{font-size:14px;color:var(--muted);font-weight:650}
 .adaptive-suggest{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:12px;border-radius:14px;background:color-mix(in srgb,var(--t-green) 10%,transparent)}
 .adaptive-ok{color:var(--t-green);font-weight:700;font-size:13px}
+.warmup-hint{margin:4px 0 0;padding:6px 10px;border-radius:10px;background:color-mix(in srgb,var(--t-amber) 14%,transparent);font-size:12.5px;line-height:1.4}
+.warmup-hint b{margin-right:4px}
+
+/* v79: comparar dos fotos y calentamiento sugerido. */
+.photo-compare{margin:0 0 12px;border:1px solid var(--line);border-radius:16px;padding:0 12px}
+.photo-compare>summary{cursor:pointer;font-weight:750;padding:12px 0}
+.photo-compare-view{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.photo-compare-view figure{margin:0}
+.photo-compare-view img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px}
+.photo-compare-view figcaption{text-align:center;font-size:12.5px;color:var(--muted);margin-top:4px}
