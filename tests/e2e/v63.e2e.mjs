@@ -25,6 +25,7 @@ const PASS = 'clave-segura-123';
 // Supabase crea la fila de auth.users al registrarse; acá se prepara antes para que PostgREST la encuentre.
 sql(`delete from auth.users where id in ('${NEW_ID}','${PEND_ID}')`);
 sql(`insert into auth.users(id,email,raw_user_meta_data) values('${NEW_ID}','${NEW}','{"full_name":"Nueva"}'),('${PEND_ID}','${PEND}','{"full_name":"Pendiente"}')`);
+sql(`insert into community_rules_acceptance(user_id,rules_version) select id,1 from auth.users on conflict (user_id) do nothing`); // v72: estas cuentas ya aceptaron las normas de la comunidad (el diálogo se prueba en v72.e2e.mjs)
 
 let failures = 0;
 const step = (name, ok, detail = '') => { console.log(`${ok ? 'PASA' : 'FALLA'}  ${name}${detail !== '' ? ' — ' + detail : ''}`); if (!ok) failures++; };
@@ -100,6 +101,8 @@ await page.fill('#authPassword', PASS); await page.click('#authSubmit'); await p
 step('Crear la cuenta inicia sesión al instante y avisa', /¡Listo! Creaste tu cuenta y ya iniciaste sesión/.test(await page.textContent('#authDone')) && await page.isVisible('#authDone') && !(await page.isVisible('#authSheet')));
 step('Después de crear la cuenta sigue «Contanos un poco»', await page.isVisible('#welcomeStep2'));
 await page.fill('#welcomeName', 'Nueva'); await page.click('#welcomeSubmit'); await page.waitForTimeout(500);
+step('Muestra el primer entrenamiento listo', await page.isVisible('#welcomeStep3'));
+await page.click('#welcomeLater'); await page.waitForTimeout(400);
 step('La bienvenida termina y queda en la app', !(await page.isVisible('#welcomeScreen')));
 step('Inicio no muestra la invitación a crear cuenta con la sesión iniciada', !(await page.isVisible('#homeAccountCard')));
 await page.evaluate(() => window.FittFormaGo('settings:account')); await page.waitForTimeout(500);

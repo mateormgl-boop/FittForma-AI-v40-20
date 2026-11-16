@@ -14,7 +14,7 @@ const errors = []; page.on('pageerror', e => errors.push(e.message));
 page.on('dialog', d => d.accept());
 await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
 // La pantalla de logro se registra (para comprobar que aparece una sola vez) y se cierra para seguir.
-await page.addInitScript(() => { localStorage.setItem('fittforma-welcome-v1', '1'); window.__celebrations = JSON.parse(sessionStorage.getItem('cel') || '[]'); setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d && d.open) { window.__celebrations.push(document.getElementById('badgeCelebrationName')?.textContent + ' · ' + document.getElementById('badgeCelebrationRank')?.textContent); sessionStorage.setItem('cel', JSON.stringify(window.__celebrations)); d.close(); } }, 50); });
+await page.addInitScript(() => { localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-train-more-v74', '1'); window.__celebrations = JSON.parse(sessionStorage.getItem('cel') || '[]'); setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d && d.open) { window.__celebrations.push(document.getElementById('badgeCelebrationName')?.textContent + ' · ' + document.getElementById('badgeCelebrationRank')?.textContent); sessionStorage.setItem('cel', JSON.stringify(window.__celebrations)); d.close(); } }, 50); });
 await page.goto(APP + '/'); await page.evaluate(k => localStorage.removeItem(k), KEY); await page.reload(); await page.waitForTimeout(600);
 const st = () => page.evaluate(k => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
 const go = async v => { await page.click(`.mobile-nav-item[data-mobile-view="${v}"]`); await page.waitForTimeout(250); };

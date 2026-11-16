@@ -17,7 +17,7 @@ const open = async (state, { stubNotify = false } = {}) => {
   page.on('pageerror', e => errors.push(e.message)); page.on('dialog', d => d.accept());
   await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
   await page.addInitScript(([s, stub]) => {
-    localStorage.setItem('fittforma-welcome-v1', '1'); window.__vib = []; navigator.vibrate = x => { window.__vib.push(x); return true; };
+    localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-train-more-v74', '1'); window.__vib = []; navigator.vibrate = x => { window.__vib.push(x); return true; };
     if (stub) { window.__notes = []; class N { static permission = 'granted'; static requestPermission() { return Promise.resolve('granted'); } constructor(t, o) { window.__notes.push(t + ' | ' + (o?.body || '')); } } window.Notification = N;
       Object.defineProperty(navigator, 'serviceWorker', { value: { getRegistration: () => Promise.resolve(null), register: () => Promise.resolve({}), addEventListener() {} }, configurable: true }); }
     if (s && !sessionStorage.getItem('v60-seed')) { sessionStorage.setItem('v60-seed', '1'); localStorage.setItem('fittforma-ai-v4', s); }
@@ -28,7 +28,8 @@ const open = async (state, { stubNotify = false } = {}) => {
 
 // 1) Avisos según Mi semana
 const base = { profile: { equipment: 'gym', level: 'intermediate', goal: 'muscle', currentWeightKg: 75 }, sessions: [], reminders: { enabled: true, time: '00:01', days: [], missedEnabled: false } };
-let { ctx, page } = await open({ ...base, weekPlan: { days: { [wd]: { kind: 'focus', key: 'legs' }, [next]: { kind: 'rest' }, 1: { kind: 'focus', key: 'chest_triceps' } } } }, { stubNotify: true });
+// Los lunes no se agrega el lunes aparte (pisaría lo de hoy); por eso el calendario espera un solo evento ese día.
+let { ctx, page } = await open({ ...base, weekPlan: { days: { [wd]: { kind: 'focus', key: 'legs' }, [next]: { kind: 'rest' }, ...(wd === 1 ? {} : { 1: { kind: 'focus', key: 'chest_triceps' } }) } } }, { stubNotify: true });
 await page.goto(APP + '/'); await page.waitForTimeout(2500);
 const notes = await page.evaluate(() => window.__notes);
 step('El aviso dice lo que toca hoy según Mi semana', notes.length === 1 && /^Hoy toca: Piernas/.test(notes[0]), JSON.stringify(notes));

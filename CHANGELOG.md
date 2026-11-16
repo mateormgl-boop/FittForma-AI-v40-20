@@ -1,5 +1,121 @@
 # FittForma AI — Registro de cambios
 
+## v79.0 — Todo lo que faltaba de la revisión: menos scroll, compartir, gasto real, base más rápida y etapa nueva (16 de noviembre de 2026)
+
+Pedido de la persona dueña: «hacé todo lo faltante que le falta a la app y pasame el archivo». Junta las etapas v75 a v78 de `docs/REVISION_PRODUCTO_v73.md` y una etapa nueva (v79).
+
+- **v75 · Menos scroll:**
+
+  | Pantalla | Antes | Ahora |
+  |---|---|---|
+  | Ejercicios | 17.130 px | 1.591 px |
+  | Correr | 6.162 px | 4.027 px |
+  | Progreso › Resumen | 5.039 px | 2.962 px |
+  | Progreso › Historial | 5.349 px | 3.383 px |
+  | Progreso › Músculos | 4.971 px | 3.667 px |
+
+  - Ejercicios agrupados por músculo y plegados. Al buscar o filtrar, la lista vuelve a ser plana.
+  - Historial de a 10 sesiones, con «Ver más».
+  - Registrar comida: cinco botones arriba (Escribir, Buscar, Escanear, Foto y Favoritas) que llevan a cada forma de cargar.
+  - Correr: «Iniciar GPS» arriba y la privacidad plegada. Un solo «Registro sin GPS» en el que se elige carrera, caminata o bicicleta (antes eran dos formularios). Las semanas del plan, plegadas.
+  - Progreso › Resumen: la comparación semanal, el resumen del mes, los retos y los hábitos (que repetían a Inicio) quedaron en «Más estadísticas».
+  - Músculos plegados por zona del cuerpo.
+  - Insignias: primero las que empezaste y están más cerca del próximo nivel; la explicación de los estados, plegada.
+  - Recetas: primero 6, con «Ver todas».
+- **v76 · Crecer:**
+  - **Compartir como imagen:** al terminar un entrenamiento o una carrera se arma una imagen con la marca de la app, lista para Instagram, TikTok o WhatsApp. Se dibuja en el teléfono y no se sube a ningún servidor.
+  - **Invitá a un amigo:** en Comunidad y en «Amigos» vacío. Comparte el enlace de la app (o lo copia); no manda datos tuyos.
+  - La cuenta oficial de FittForma la tiene que crear la persona dueña: los pasos están en `docs/DESPLIEGUE.md`. No se inventan cuentas ni publicaciones.
+- **v77 · Nutrición inteligente:**
+  - **Gasto real estimado:** con lo que comiste y la tendencia de tu peso en las últimas 4 semanas, la app calcula cuánto gastás por día y sugiere calorías según tu objetivo, con un botón para usarlas. Necesita 10 días con comidas completas y pesos que cubran una semana; si no, explica qué falta.
+  - Cada comida de «Hoy» muestra su dibujo (desayuno, almuerzo, merienda, cena o colación) en lugar del mismo tenedor.
+  - Los textos de Nutrición que seguían en español en los otros idiomas ya están traducidos.
+- **v78 · Base y seguridad** (migración nueva `2026-11-16_v78_performance_security.sql`, aditiva):
+  - Índices para las 5 claves foráneas que no tenían.
+  - Las 53 políticas RLS calculan `auth.uid()` una vez por consulta en lugar de una vez por fila.
+  - «¿Está bloqueado?» solo responde sobre pares que incluyen a quien pregunta.
+  - La contraseña mínima de 8 caracteres se configura en Supabase (pasos en `docs/DESPLIEGUE.md`); la app ya la pedía.
+- **v79 · Etapa nueva:**
+  - **Calentamiento sugerido:** en el primer ejercicio con carga de la sesión, 1 × 8 al 50 % y 1 × 5 al 70 % del peso de trabajo.
+  - **Comparar dos fotos:** en Progreso › Cuerpo, dos fotos lado a lado con los días entre una y otra. Siguen guardadas solo en el teléfono.
+- Traducido a los seis idiomas. Hay **una migración nueva** (v78).
+
+## v74.0 — Primera impresión: bienvenida, Inicio y Entrenar más claros, y dibujos propios (6 de noviembre de 2026)
+
+Pedido de la persona dueña: «seguí y después pasame para mergear todo» (etapa v74 de `docs/REVISION_PRODUCTO_v73.md`).
+
+- **Bienvenida:**
+  - «Contanos un poco» ahora pregunta dónde entrenás (gimnasio, en casa o sin equipo) con tarjetas con dibujo, y tu experiencia (principiante, intermedia o avanzada). Antes había que buscar esas opciones en Rutinas.
+  - Al tocar «Armar mi plan» se arma el plan y aparece «Tu primer entrenamiento está listo», con el nombre del día, los ejercicios y el tiempo estimado.
+  - «Empezar ahora» abre ese entrenamiento al instante; «Ver mi plan» lleva a Rutinas; «Más tarde» vuelve a Inicio.
+  - En celulares chicos la bienvenida se puede desplazar, y el fondo se suaviza para que los textos se lean sobre la foto.
+- **Inicio:**
+  - Lo de hoy va primero, con el botón grande «Empezar entrenamiento», que arranca la sesión directamente. Antes había que pasar por «Ver la sesión».
+  - Los accesos rápidos van debajo (antes estaban a mitad de pantalla).
+  - Si ya ordenaste Inicio a tu gusto, tu orden se respeta.
+  - «Lo que hiciste en el gym» muestra solo la última sesión y «Ver todo el historial» (antes tres sesiones completas).
+  - La frase fija «Disciplina hoy…» pasó a ser el **Consejo de la semana**: seis consejos con su dibujo, uno distinto cada lunes.
+- **Entrenar:**
+  - Arriba, lo de hoy: el entrenamiento diario si tenés plan, o lo que toca según tu semana, con «Empezar» y «Ver la sesión».
+  - Lo demás quedó plegado en «Otras formas de entrenar»: grupos musculares, entrenamiento libre, registrar uno ya hecho y calculadora de RM. La app recuerda si lo dejaste abierto.
+  - Con plan, ya no aparecen dos recomendaciones distintas para hoy.
+  - La pantalla pasó de 2.078 a 1.329 px de alto.
+- **Dibujos propios:**
+  - 14 ilustraciones en SVG, livianas (de 1,4 a 2,5 KB cada una) y con los colores de la app, en `assets/illustrations/`.
+  - Se usan en la bienvenida, en el consejo de la semana y en las pantallas vacías: Mis rutinas, Historial, Medidas, Fotos, Amigos y el muro.
+  - Sin fotos de stock ni personas. Quedan guardadas para usar sin conexión.
+- Traducido a los seis idiomas. **Sin migraciones nuevas.**
+
+## v73.0 — La app abre más rápido y detalles de experiencia (5 de noviembre de 2026)
+
+Pedido de la persona dueña: «hacé lo que tengas que hacer» (etapa de velocidad) y «¿viste toda la app parte por parte?».
+
+- **Revisión de producto, sección por sección:** `docs/REVISION_PRODUCTO_v73.md` dice qué sacar, qué unificar, qué agregar y qué dibujos sumar en cada pantalla, con el orden propuesto (v74 a v77).
+- **Velocidad** (servidor):
+  - Comprime el código con brotli o gzip: `index.html` pasa de 1 MB a 227 KB.
+  - Responde «no cambió» (304) cuando el teléfono ya tiene el archivo. El ETag depende del contenido, así que un despliegue nuevo no obliga a bajar lo que no cambió.
+  - Medido con un celular de gama media simulado (4G lenta):
+
+    | | Antes | Ahora |
+    |---|---|---|
+    | Primer contenido en pantalla | 4,0 s | 1,6 s |
+    | Pantalla principal | 6,3 s | 3,1 s |
+    | Carga completa | 11,6 s | 4,1 s |
+    | Datos de la primera vez | 6,2 MB | 1,6 MB |
+    | Datos al volver a abrir con internet | 2.124 KB | 2 KB |
+- **Detalles de experiencia:**
+  - **Músculos:** quien ya entrena ve «En camino a Bronce» en lugar de «SIN ENTRENAR».
+  - **FittAI:** muestra un estado claro («Listo para responder» o «Responde en modo básico»). Lo técnico (servidor, clave, modelo) quedó plegado en «Detalle técnico», y ya no aparece «la monetización no está activa».
+  - **Un solo nombre para el plan pago:** «FittForma AI Plus». Ajustes decía «FittForma Pro».
+  - **Rutinas:** un solo aviso cuando todavía no hay plan (antes eran dos iguales).
+  - **Ranking sin conexión:** un aviso en lugar de una caja vacía.
+  - **Historial:** espacio entre el tipo de sesión y la fecha («Rutina propia4 nov.»).
+  - **El botón +** ya no tapa el final de las pantallas.
+- **Accesibilidad:**
+  - Contraste corregido en Ejercicios, Nutrición › Plan y Progreso; axe no encuentra problemas de contraste.
+  - «Actividad reciente» y «Series por grupo muscular» son grupos de botones bien armados.
+  - Las filas de músculos, los desplegables y los enlaces de Ajustes ahora tienen un área cómoda para tocar.
+- Traducido a los seis idiomas. **Sin migraciones nuevas.**
+
+## v72.0 — Normas de la comunidad, recordatorios en la app de Android y revisión completa (5 de noviembre de 2026)
+
+Pedido de la persona dueña: «examiná toda la app y fijate qué podés mejorar en todos los sentidos» y, después, «dale, hacelo» (etapa 1 del plan).
+
+- **Revisión completa:** informe en `docs/AUDITORIA_v72.md`, con los hallazgos y el plan por etapas (v73 velocidad, v74 base y seguridad, v75 experiencia; después, pagos y anuncios).
+- **Base de producción al día:** se aplicó en Supabase la migración de v70, que faltaba. Ya nadie puede leer qué cuentas tienen membresía, salvo la propia (verificado).
+- **Normas de la comunidad** (Google Play las exige para el contenido de usuarios):
+  - Antes de publicar, comentar, mandar mensajes, compartir una actividad o editar el perfil público aparecen las normas. «Aceptar y seguir» se activa recién al marcar «Leí y acepto».
+  - Con «Ahora no» no se publica nada y lo escrito queda en el formulario.
+  - La aceptación se guarda en el teléfono y en la base (tabla nueva, la fecha la pone la base y solo la persona la ve). En otro teléfono no se vuelve a pedir.
+  - Se pueden leer cuando quieras en Ajustes › Privacidad en Comunidad, debajo del formulario de publicar y en la página pública `/normas.html`, que sirve como enlace para la ficha de Google Play.
+- **Recordatorios en la app de Android:** hasta ahora no llegaban, porque usaban notificaciones del navegador.
+  - Ahora se programan en el teléfono con el plugin oficial `@capacitor/local-notifications` y llegan aunque la app esté cerrada.
+  - Entrenamiento: 14 días, con el aviso de la hora elegida y el de seguimiento. Agua: los horarios elegidos, por 3 días.
+  - Se vuelven a armar con cada cambio: si hoy ya entrenaste o llegaste al objetivo de agua, se quitan los de hoy.
+  - Ajustes › Recordatorios muestra cuántos avisos hay programados y cuándo llega el próximo. Usan el ícono propio de FittForma.
+  - **Falta probarlo en un teléfono:** acá no hay SDK de Android para compilar. Se probó con un plugin simulado que tiene la misma API.
+- Traducido a los seis idiomas. **Migración nueva:** `2026-11-05_v72_community_rules.sql` (ver docs/DESPLIEGUE.md).
+
 ## v71.0 — Coronita de miembros, próxima serie, «Lo de siempre» y tendencia del peso (5 de noviembre de 2026)
 
 Pedido de la persona dueña: «que aparezca una coronita que diga miembros en vez de gratis» y «qué más mejorarías dentro de cada sector».

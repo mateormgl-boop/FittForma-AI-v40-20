@@ -61,7 +61,8 @@ step('«Repetir» empieza la misma sesión', live?.title === 'Pecho y tríceps' 
 await page.click('#cancelWorkout'); await page.waitForTimeout(300);
 await page.evaluate(() => document.querySelector('[data-mobile-view="plan"]')?.click()); await page.waitForTimeout(300);
 await page.click('#homeCustomize'); await page.waitForTimeout(150);
-await page.uncheck('[data-layout-show="quote"]'); for (let i = 0; i < 2; i++) await page.click('[data-layout-move="gym:-1"]');
+// v74: en el orden por defecto «gym» es la quinta tarjeta (lo de hoy, accesos, semana, resumen, gym): 4 lugares para subirla primera.
+await page.uncheck('[data-layout-show="quote"]'); for (let i = 0; i < 4; i++) await page.click('[data-layout-move="gym:-1"]');
 await page.click('#homeLayoutDialog button[value="ok"]'); await page.waitForTimeout(200);
 s = await st();
 step('Personalizar inicio guarda orden y tarjetas ocultas', s.homeLayout?.order?.[0] === 'gym' && s.homeLayout.hidden.includes('quote'), JSON.stringify(s.homeLayout));

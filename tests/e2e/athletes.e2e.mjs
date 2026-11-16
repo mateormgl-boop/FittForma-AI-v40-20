@@ -33,7 +33,8 @@ const APP_VERSION = (await (await fetch(APP + '/api/public-config')).json()).ver
 // Datos externos: B publica un texto y le escribe a A (con auth.uid() de B para pasar el trigger anti-spam).
 // Fixture propio (el último paso elimina la cuenta de A, así que se recrea en cada ejecución).
 sql(`insert into auth.users(id,email) values('aaaaaaaa-0000-0000-0000-000000000001','alice@example.test'),('bbbbbbbb-0000-0000-0000-000000000002','bob@example.test') on conflict do nothing`);
-sql(`insert into community_profiles(user_id,username,display_name,visibility) values('aaaaaaaa-0000-0000-0000-000000000001','alicia_fit','Alicia','public'),('bbbbbbbb-0000-0000-0000-000000000002','bruno_fit','Bruno Fit','public') on conflict (user_id) do update set visibility='public'`);
+sql(`insert into community_rules_acceptance(user_id,rules_version) select id,1 from auth.users on conflict (user_id) do nothing`); // v72: estas cuentas ya aceptaron las normas de la comunidad (el diálogo se prueba en v72.e2e.mjs)
+sql(`insert into community_profiles(user_id,username,display_name,visibility) values('aaaaaaaa-0000-0000-0000-000000000001','alicia_fit','Alicia','public'),('bbbbbbbb-0000-0000-0000-000000000002','bruno_fit','Bruno Fit','public') on conflict (user_id) do update set visibility='public',username=excluded.username,display_name=excluded.display_name`);
 sql(`insert into community_follows(follower_id,following_id,status) values('aaaaaaaa-0000-0000-0000-000000000001','bbbbbbbb-0000-0000-0000-000000000002','accepted'),('bbbbbbbb-0000-0000-0000-000000000002','aaaaaaaa-0000-0000-0000-000000000001','accepted') on conflict do nothing`);
 sql(`delete from user_app_data where user_id='aaaaaaaa-0000-0000-0000-000000000001'; delete from community_messages; delete from community_reports; delete from community_posts; delete from community_moderators;`);
 sql(`insert into community_posts(id,user_id,post_kind,description,visibility) values('b0000000-0000-0000-0000-0000000000b1','bbbbbbbb-0000-0000-0000-000000000002','text','Primera semana completa de entrenamientos','public')`);
@@ -42,7 +43,8 @@ sql(`set request.jwt.claim.sub='bbbbbbbb-0000-0000-0000-000000000002'; insert in
 // Alicia tiene entrenamientos de todo el cuerpo: su rango general es real, calculado por la app.
 // Alicia entrena de verdad en la app: flexiones, plancha y todo el cuerpo en los últimos días, y una carrera.
 const day = n => { const d = new Date(); d.setDate(d.getDate() - n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
-const seed = { profile: { goal: 'fitness', level: 'intermediate' }, activities: [{ id: 900, type: 'Correr', date: day(2), distance: 5, minutes: 30 }], sessions: Array.from({ length: 6 }, (_, i) => ({ id: 100 + i, date: day(1 + i), status: 'completed', type: 'custom', title: 'Cuerpo completo', minutes: 45,
+// Las sesiones arrancan hoy (day(0)): así la semana actual siempre tiene entrenamientos, también los lunes.
+const seed = { profile: { goal: 'fitness', level: 'intermediate' }, activities: [{ id: 900, type: 'Correr', date: day(2), distance: 5, minutes: 30 }], sessions: Array.from({ length: 6 }, (_, i) => ({ id: 100 + i, date: day(i), status: 'completed', type: 'custom', title: 'Cuerpo completo', minutes: 45,
   exercises: ['Sentadilla goblet', 'Press de banca con barra', 'Remo con barra', 'Press militar con mancuernas', 'Peso muerto rumano con mancuernas', 'Curl de bíceps con mancuernas', 'Elevación de talones con apoyo'].map(name => ({ name, entries: [1, 2, 3].map(() => ({ reps: '10', weight: '20', done: true })) }))
     .concat([{ name: 'Flexiones clásicas', entries: [{ reps: String(18 + i), weight: '', done: true }] }, { name: 'Plancha frontal', entries: [{ reps: '60', weight: '', done: true }] }]) })) };
 const browser = await chromium.launch();
@@ -94,6 +96,7 @@ const A = 'aaaaaaaa-0000-0000-0000-000000000001', B = 'bbbbbbbb-0000-0000-0000-0
 const C = 'cccccccc-0000-0000-0000-0000000000c6', D = 'dddddddd-0000-0000-0000-0000000000d6', E = 'eeeeeeee-0000-0000-0000-0000000000e6';
 sql(`delete from community_athlete_stats; delete from community_follows where follower_id in ('${C}','${D}','${E}') or following_id in ('${C}','${D}','${E}'); delete from community_profiles where user_id in ('${C}','${D}','${E}'); delete from auth.users where id in ('${C}','${D}','${E}')`);
 sql(`insert into auth.users(id,email,raw_user_meta_data) values('${C}','carla53@example.test','{"full_name":"Carla"}'),('${D}','diego53@example.test','{"full_name":"Diego"}'),('${E}','eva53@example.test','{"full_name":"Eva"}')`);
+sql(`insert into community_rules_acceptance(user_id,rules_version) select id,1 from auth.users on conflict (user_id) do nothing`); // v72: estas cuentas ya aceptaron las normas de la comunidad (el diálogo se prueba en v72.e2e.mjs)
 sql(`update community_profiles set username='carla_priv53', visibility='private', bio='Bio solo para seguidores' where user_id='${C}'; update community_profiles set username='diego_pub53', display_name='Diego' where user_id='${D}'; update community_profiles set username='eva_oculta53', display_name='Eva' where user_id='${E}'`);
 // Estadísticas de prueba de los demás (las de Alicia las calcula y publica la app).
 sql(`insert into community_athlete_stats(user_id,training_level,xp_level,overall_rank,ranked_muscles,badges_count,badges,workouts_total,workouts_30d,active_days_30d,best_pushups,best_pullups) values
@@ -176,9 +179,9 @@ step('11. Dejar de seguir borra la relación', sql(`select count(*) from communi
 
 await page.click('#communityUserBack'); await page.waitForTimeout(600);
 await page.click('#communityTabWorld'); await page.waitForTimeout(900);
-await page.click('#communityPeople .cm-card-open[aria-label*="Carla"]'); await page.waitForTimeout(1200);
+await page.click(`#communityPeople .cm-card-open[data-community-open-user="${C}"]`); await page.waitForTimeout(1200); // por id: otras pruebas también crean una «Carla»
 prof = await page.textContent('#communityUserProfile');
-step('12. Perfil privado: sin bio ni estadísticas', /Este perfil es privado/.test(prof) && !/Bio solo para seguidores/.test(prof) && !/Estadísticas/.test(prof) && !/70 rep/.test(prof));
+step('12. Perfil privado: sin bio ni estadísticas', /Este perfil es privado/.test(prof) && !/Bio solo para seguidores/.test(prof) && !/Estadísticas/.test(prof) && !/70 rep/.test(prof), prof.replace(/\s+/g, ' ').slice(0, 220));
 step('12. La tabla no se puede leer directamente', sql(`set role authenticated; set request.jwt.claim.sub='${A}'; select count(*) from community_athlete_stats`) === 'SET\nSET\n1');
 
 // Ocultar las propias estadísticas.

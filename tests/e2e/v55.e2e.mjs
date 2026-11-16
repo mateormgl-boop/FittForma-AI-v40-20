@@ -10,7 +10,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('dialog', d => d.accept());
 await page.route(/cdn\.jsdelivr|unpkg\.com/, r => r.abort());
-await page.addInitScript(() => { localStorage.setItem('fittforma-welcome-v1', '1'); setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50); });
+await page.addInitScript(() => { localStorage.setItem('fittforma-welcome-v1', '1'); localStorage.setItem('fittforma-train-more-v74', '1'); setInterval(() => { const d = document.getElementById('badgeCelebration'); if (d?.open) d.close(); }, 50); });
 await page.goto(APP + '/'); await page.waitForTimeout(500);
 const st = () => page.evaluate(k => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
 // Perfil de prueba antes de que cargue la app (si se escribe con la app abierta, la app lo pisa al guardar).
@@ -76,6 +76,8 @@ step('La guía elige el objetivo de la persona y calcula proteína con su peso',
 step('Muestra fuentes y el aviso de que es orientativa', (await page.$$('#nutritionGuideCard .ng-sources a')).length >= 1 && /no reemplaza a un profesional/.test(guide));
 await page.click('#nutritionGuideCard [data-guide="lose"]'); await page.waitForTimeout(150);
 step('Se puede ver la guía de otro objetivo', /Bajar grasa|grasa/i.test(await page.textContent('#nutritionGuideCard h3')));
+// v75: primero se ven 6 recetas; «Ver todas» muestra el resto.
+await page.click('[data-recipes-all]'); await page.waitForTimeout(150);
 const all = (await page.$$('#recipeList details.recipe')).length;
 await page.click('[data-recipe-filter="goal"]'); await page.waitForTimeout(150);
 const some = (await page.$$('#recipeList details.recipe')).length;

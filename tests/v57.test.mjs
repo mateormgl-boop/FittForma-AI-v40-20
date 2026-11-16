@@ -70,7 +70,8 @@ test('Copia automática en la nube: nunca pisa una copia más nueva ni sube dato
   assert.match(html, /id="cloudAutoToggle"/);
   assert.match(html, /if\(remote&&!\(mark&&mark\.user===uid&&mark\.at===remote\.updated_at\)\)\{setCloudAutoStatus\('newer'/);
   assert.match(html, /if\(!stateHasData\(state\)\)\{if\(remote\)setCloudAutoStatus\('empty'\)/);
-  assert.match(html, /function save\(\)\{try\{localStorage\.setItem\(STORAGE,JSON\.stringify\(state\)\);scheduleCloudBackup\(\);return true;\}/);
+  // v72: save() también rearma los recordatorios del teléfono (app de Android); la copia en la nube sigue igual.
+  assert.match(html, /function save\(\)\{try\{localStorage\.setItem\(STORAGE,JSON\.stringify\(state\)\);scheduleCloudBackup\(\);(?:queueNativeReminderSync\(\);)?return true;\}/);
   assert.match(html, /if\(cloudAutoTimer&&cloudAutoDue<=due\)return;/, 'guardar seguido no posterga la copia indefinidamente');
 });
 

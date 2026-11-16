@@ -9,6 +9,69 @@ npm test
 Cubre sintaxis, estructura, motor de insignias, PWA, backend HTTP local, i18n y contratos de la
 migración. No se conecta a Supabase, Gemini ni Render.
 
+### v79 (incluye v75 a v78)
+
+- `npm test`: 398 pasan, 0 fallan. `tests/v79.test.mjs` revisa:
+  - Ejercicios agrupados, historial de a 10, botones de registrar, Correr con un solo registro sin GPS, Progreso y Músculos plegados y recetas de a 6.
+  - La imagen para compartir: no usa la red y el servidor y el service worker la publican.
+  - El cálculo del gasto real: 2.300 kcal y −0,35 kg/semana dan 2.690 kcal. Faltan comidas, faltan pesos, datos que no cierran y el día de hoy no cuenta.
+  - La migración v78 (no borra nada), el calentamiento sugerido y las traducciones.
+- RLS `rls_v78_test.sql`: los 5 índices, ninguna clave foránea sin índice, ninguna política con `auth.uid()` por fila, y que los bloqueos solo los ve quien está en el par. Las pruebas anteriores corren con la migración aplicada y siguen pasando: 459 comprobaciones.
+- E2E `v79` (29 pasos):
+  - Ejercicios plegados que se abren y se recuerdan.
+  - «Ver más» del historial y los botones de registrar llevan al lugar correcto.
+  - En Correr se elige bicicleta y se guarda.
+  - Gasto real de 2.690 kcal con la sugerencia de 2.250 kcal, que se aplica.
+  - Calentamiento 1 × 8 con 32,5 kg y 1 × 5 con 45 kg.
+  - La imagen PNG se descarga, «Invitar» copia el enlace y se comparan dos fotos.
+- **Resultados:** las 30 E2E pasan, 926 pasos.
+  - Con una base de pruebas nueva aparecieron pruebas viejas que dependían del día (v60 y athletes fallaban los lunes) o de datos de otras pruebas. Se corrigieron las pruebas, no la app.
+  - El rol `authenticator` de la base de pruebas necesita `grant anon, authenticated, service_role to authenticator`.
+
+### v74
+
+- `npm test`: `tests/v74.test.mjs` revisa:
+  - Los 14 dibujos: SVG de 120×120, livianos, sin scripts ni recursos externos, y guardados en el service worker.
+  - La bienvenida: tarjetas de dónde entrenás, experiencia y «Tu primer entrenamiento está listo».
+  - Entrenar: lo de hoy arriba, «Otras formas de entrenar» plegado y recordado, «Empezar» directo.
+  - Inicio: orden nuevo, consejo de la semana con dibujo y traducido, botón grande que empieza y gym corto.
+  - Las pantallas vacías con dibujo y las traducciones.
+- E2E `v74` (48 pasos):
+  - **Bienvenida:** tarjetas con dibujo que también se eligen con el teclado; guarda dónde entrenás y la experiencia y arma el plan. El primer entrenamiento muestra el día, los ejercicios y el tiempo, y «Empezar ahora» lo abre sin el recorrido encima. «Ver mi plan» lleva a Rutinas.
+  - **Inicio:** lo de hoy y los accesos rápidos primero; «Empezar entrenamiento» arranca la sesión; una sola sesión del gym y «Ver todo el historial»; el consejo de la semana; un orden propio se respeta.
+  - **Entrenar:** lo de hoy antes de la semana; lo demás plegado y recordado al volver y al reabrir; «Ver la sesión» lo abre sin cambiar tu preferencia; «Empezar» arranca directo. Con plan, el entrenamiento diario va arriba y no hay otra recomendación.
+  - **Pantallas vacías** con dibujo: Mis rutinas, Historial, Medidas y Fotos.
+  - **Tamaños e idioma:** a 320 px sin desbordes y con la bienvenida desplazable; en inglés, traducido.
+- Las E2E existentes que usan entrenamiento libre, grupos musculares o la calculadora abren «Otras formas de entrenar» antes; las de la bienvenida tocan «Más tarde» al final.
+- La de «Personalizar inicio» (v58) sube «gym» cuatro lugares en vez de dos, porque cambió el orden por defecto.
+- **Resultados:**
+  - `npm test`: 391 pasan, 0 fallan.
+  - Las 29 E2E pasan: 896 pasos.
+  - axe (WCAG 2.1 AA) sin problemas, en claro y oscuro, en ocho pantallas: bienvenida, primer entrenamiento, Entrenar con plan y con datos, Inicio, y Rutinas, Historial y Cuerpo vacíos.
+  - Revisión visual a 320 y 390 px, en claro y oscuro, y en escritorio.
+
+### v73
+
+- `npm test` (385): `tests/v73.test.mjs` levanta el servidor y prueba:
+  - brotli, gzip y sin comprimir, con el contenido idéntico al descomprimir; respeta `q=0`.
+  - Mismo ETag para el mismo contenido; 304 con el ETag (también en forma débil y en listas); 200 si no coincide.
+  - Las imágenes no se recomprimen; HEAD sin cuerpo; 404 para lo que no existe y para el código del servidor.
+  - Además revisa en el código los arreglos de experiencia (Músculos, FittAI, nombre del plan, Rutinas, listas, contraste, Ranking).
+- **Medición de velocidad** con un intermediario que cuenta los bytes que manda el servidor, también los que pide el service worker. Celular de gama media simulado:
+  - Primera apertura: de 6,2 MB a 1,6 MB, y la carga de 11,6 s a 4,1 s.
+  - Volver a abrir: de 2.124 KB a 2 KB, con 25 respuestas «no cambió».
+- axe (WCAG 2.1 AA) en las 20 pantallas: sin problemas de listas ni de contraste. Sin desbordes a 320 ni a 390 px y sin errores de la página.
+
+### v72
+
+- `npm test` (383): `tests/v72.test.mjs` prueba el puente de notificaciones (en el navegador no hace nada; prepara solo avisos futuros, ordenados y dentro de su rango; en Android reemplaza solo su grupo y respeta el permiso), que la app no duplica avisos web en Android, el proyecto de Android (plugin, ícono, gradle), que las siete acciones de Comunidad piden las normas, la migración y `normas.html`.
+- RLS `rls_v72_test.sql` (17 comprobaciones): cada persona acepta y lee solo la suya, la fecha la pone la base y no se toca a mano, no se baja de versión, nadie borra aceptaciones, sin sesión no se lee nada y al eliminar la cuenta se borra. Total: 452.
+- E2E `v72` (30 pasos):
+  - Normas, con la base local: aparecen en la primera publicación; sin aceptar no se publica nada y el texto queda; aceptadas, se publica y queda en la base; se leen desde Ajustes con la fecha; en otro dispositivo no se vuelven a pedir; sin la migración igual funcionan; `/normas.html` se publica.
+  - Android, con un plugin simulado con la misma API: permiso, 14 días de avisos de entrenamiento a las horas elegidas, ícono, estado en Ajustes, sin avisos para hoy si ya entrenaste, agua en sus horarios, aviso de prueba y permiso negado.
+- Las pruebas E2E que publican, comentan o mandan mensajes (athletes, community, monetization, rank-board, v63, v65, v66 y v70) dan por aceptadas las normas de sus cuentas de prueba. El diálogo se prueba en v72.
+- **No probado:** la app de Android en un teléfono real. Acá no hay SDK de Android y `dl.google.com` está bloqueado.
+
 ### v71
 
 - `npm test` (376): `tests/v71.test.mjs` prueba la coronita (sin «Gratis», solo corona en 320 px), la próxima serie (progresión doble, no sube la carga si la serie anterior quedó corta, respeta la carga de hoy, sin datos devuelve nada), el récord anunciado una vez por serie, «Lo de siempre» (mismo momento del día, al menos 2 días, últimas 4 semanas, no repite lo de hoy) y la tendencia del peso (suaviza y calcula el ritmo semanal).
@@ -369,7 +432,7 @@ sus usuarios, perfiles y seguimientos en cada ejecución.
 Preparación (resumen):
 
 1. Base `ff_e2e` con `supabase/tests/supabase_stub.sql`, `schema.sql`, `community.sql` y la migración;
-   rol `authenticator` (`login noinherit`) con `grant anon, authenticated to authenticator`;
+   rol `authenticator` (`login noinherit`) con `grant anon, authenticated, service_role to authenticator`;
    migraciones v41, v43, v44, v48 y v49 aplicadas (el script crea los usuarios de prueba).
 2. PostgREST 12 con `db-anon-role = "anon"` y un `jwt-secret` guardado en un archivo.
 3. `npm start` en otra terminal.

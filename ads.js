@@ -202,7 +202,9 @@
   // ---------- IA: consultas diarias ----------
   function renderCoachUsage() {
     const text = document.getElementById('coachUsageText'), button = document.getElementById('watchRewardedAd'); if (!text || !button) return;
-    if (!ent || !ent.enabled) { text.textContent = t('Sin límites nuevos: la monetización no está activa.'); button.hidden = true; return; }
+    // v73: con la monetización apagada no se muestra nada (era un texto técnico); las consultas no tienen límite nuevo.
+    if (!ent || !ent.enabled) { text.textContent = ''; text.hidden = true; button.hidden = true; return; }
+    text.hidden = false;
     const q = ent.ai;
     if (isPlus()) { text.textContent = `${t('Plus')}: ${q.remaining} ${t('consultas disponibles hoy')} (${q.limit} ${t('por día')}).`; button.hidden = true; return; }
     text.textContent = q.remaining > 0 ? `${t('Consultas de IA disponibles hoy')}: ${q.remaining}. ${t('Se renuevan cada día.')}` : q.canOfferVideo && ent.ads.rewardedAvailable ? t('Usaste tus consultas gratuitas de hoy. Podés esperar a que se renueven mañana o mirar un video voluntario para sumar consultas.') : t('Usaste tus consultas de hoy. Se renuevan mañana.');
