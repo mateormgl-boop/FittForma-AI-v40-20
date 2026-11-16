@@ -2201,3 +2201,11 @@ details.mr-zone[open]>summary::after{transform:rotate(-135deg)}
 .badge-help{margin-top:12px}
 .badge-help>summary{cursor:pointer;color:var(--muted);font-weight:650}
 .recipes-all{display:block;width:100%;margin-top:10px}
+
+/* v76: crecer — compartir como imagen e invitar amigos. */
+.share-image-btn{margin-top:8px}
+.cm-invite{display:flex;align-items:center;gap:12px;margin:0 0 12px;padding:12px 14px;border:1px solid var(--line);border-radius:18px;background:var(--panel)}
+.cm-invite img{flex:none;width:56px;height:56px;border-radius:16px}
+.cm-invite-text{flex:1;min-width:0}
+.cm-invite-text strong{display:block}
+.cm-invite-text span{display:block;color:var(--muted);font-size:13px}

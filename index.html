@@ -2146,6 +2146,8 @@
       <!-- v53: Comunidad de deportistas. Tres apartados (Todos, Ranking, Amigos); sin feed general.
            Mensajes y Mi perfil quedan como accesos en la cabecera. La barra inferior principal de la app no cambia. -->
       <div class="cm-auth-banner" id="communityAuthBanner" hidden><div class="cm-auth-text"><strong>Entrá a Comunidad</strong><span>Con tu cuenta seguís personas, escribís y competís con tus amigos.</span></div><div class="cm-auth-btns"><button class="btn btn-sm" type="button" data-auth-open="login">Iniciar sesión</button><button class="btn secondary btn-sm" type="button" data-auth-open="signup">Crear cuenta</button></div></div>
+      <!-- v76: invitar amigos con el enlace de la app (no se manda ningún dato tuyo). -->
+      <div class="cm-invite" id="communityInvite"><img src="./assets/illustrations/empty-friends.svg" alt="" width="56" height="56" loading="lazy"><div class="cm-invite-text"><strong>Invitá a un amigo</strong><span>Entrenar acompañado ayuda a no aflojar.</span></div><button type="button" class="btn btn-sm" data-invite>Invitar</button></div>
       <header class="community-topbar cm-topbar">
         <div class="cm-head">
           <button class="community-brand" type="button" data-community-home aria-label="Ir al inicio de Comunidad"><h2>Comunidad</h2></button>
@@ -2762,6 +2764,7 @@
 <script src="./activity-core.js"></script>
 <script src="./native-gps.js"></script>
 <script src="./native-notify.js"></script>
+<script src="./share-card.js"></script>
 <script src="./food-db.js"></script>
 <script src="./food-core.js"></script>
 <script src="./nutrition-guides.js"></script>
@@ -3641,8 +3644,14 @@ function findCatalogExercise(name){
       if(r.ok){memo.done=true;$(id).innerHTML='<strong>Compartido con tus amigos.</strong> <span class="muted small">Lo ven en su muro de Comunidad.</span>';$(id).classList.add('is-done');}
       else{b.disabled=false;toast(r.message||'No se pudo compartir.');}};
   }
+  // v76: resumen como imagen para redes (se arma en el teléfono; no se sube nada).
+  async function shareImage(d){
+    if(!window.FittFormaShareCard){toast('No se pudo preparar la imagen.');return;}
+    try{const r=await FittFormaShareCard.share(d);if(r==='downloaded')toast('Imagen guardada. Subila a Instagram, TikTok o WhatsApp.');else if(r==='shared')toast('¡Listo!');}catch(e){toast('No se pudo crear la imagen.');}
+  }
   function offerRunShare(activity){
     const box=$('runShareBox');if(!box||!activity||!/correr|carrera|run/i.test(String(activity.type||'')))return;box.innerHTML='';
+    {const b=document.createElement('button');b.type='button';b.className='btn secondary share-image-btn';b.textContent='Compartir como imagen';const km=Number(activity.distance)||0,min=Number(activity.minutes)||0;b.onclick=()=>shareImage({kicker:'Carrera completada',title:`${km.toLocaleString('es-UY',{maximumFractionDigits:2})} km corriendo`,dateKey:activity.date,dateLabel:prettyDate(activity.date),minutes:min,distanceKm:km,pace:activity.pace||'',kcal:activity.calories?.kcal||0});box.appendChild(b);}
     const clamp=(v,max)=>Math.max(0,Math.min(max,Math.round(Number(v)*100)/100));
     offerShare(box,{type:'run',date:activity.date,distance_km:clamp(activity.distance,300),minutes:clamp(activity.minutes,600),kcal:activity.calories?.kcal?Math.min(5000,Math.round(activity.calories.kcal)):null},'la distancia, el tiempo y el ritmo (sin el mapa)');
   }
@@ -4296,11 +4305,12 @@ function findCatalogExercise(name){
       if(workoutClockInterval){clearInterval(workoutClockInterval);workoutClockInterval=null;}
       if(lastWorkoutSummary){
         const x=lastWorkoutSummary;
-        root.innerHTML=`<div class="card workout-live-card"><div class="eyebrow">ENTRENAMIENTO GUARDADO</div><h2 style="margin:5px 0">${esc(x.title)}</h2><p class="muted small">${prettyDate(x.date)} · Sesión guardada en tu historial.</p><div class="workout-summary-grid"><div class="workout-summary-metric"><small>Tiempo total</small><strong>${formatWorkoutDuration(x.minutes*60)}</strong></div><div class="workout-summary-metric"><small>Series completadas</small><strong>${x.completedSets}/${x.totalSets}</strong></div><div class="workout-summary-metric"><small>Ejercicios con datos</small><strong>${x.completedExercises}/${x.totalExercises}</strong></div><div class="workout-summary-metric"><small>Volumen registrado</small><strong>${x.volumeKg.toLocaleString('es-UY',{maximumFractionDigits:1})} kg</strong></div></div>${workoutKcalSummary(x)}<div class="workout-summary-check">✓ Tu sesión está guardada en este dispositivo. ${x.recordedSets>x.completedSets?`${x.recordedSets-x.completedSets} serie(s) tenían datos pero no quedaron marcadas como completadas.`:'Las series marcadas como listas quedaron registradas.'}</div><div class="btn-row" style="margin-top:14px"><button class="btn full" id="summaryGoProgress" type="button">Ver mi progreso</button><button class="btn ghost full" id="summaryGoPlan" type="button">Volver al plan</button></div></div>`;
+        root.innerHTML=`<div class="card workout-live-card"><div class="eyebrow">ENTRENAMIENTO GUARDADO</div><h2 style="margin:5px 0">${esc(x.title)}</h2><p class="muted small">${prettyDate(x.date)} · Sesión guardada en tu historial.</p><div class="workout-summary-grid"><div class="workout-summary-metric"><small>Tiempo total</small><strong>${formatWorkoutDuration(x.minutes*60)}</strong></div><div class="workout-summary-metric"><small>Series completadas</small><strong>${x.completedSets}/${x.totalSets}</strong></div><div class="workout-summary-metric"><small>Ejercicios con datos</small><strong>${x.completedExercises}/${x.totalExercises}</strong></div><div class="workout-summary-metric"><small>Volumen registrado</small><strong>${x.volumeKg.toLocaleString('es-UY',{maximumFractionDigits:1})} kg</strong></div></div>${workoutKcalSummary(x)}<div class="workout-summary-check">✓ Tu sesión está guardada en este dispositivo. ${x.recordedSets>x.completedSets?`${x.recordedSets-x.completedSets} serie(s) tenían datos pero no quedaron marcadas como completadas.`:'Las series marcadas como listas quedaron registradas.'}</div><div class="btn-row" style="margin-top:14px"><button class="btn full" id="summaryGoProgress" type="button">Ver mi progreso</button><button class="btn secondary full share-image-btn" id="summaryShareImage" type="button">Compartir como imagen</button><button class="btn ghost full" id="summaryGoPlan" type="button">Volver al plan</button></div></div>`;
         {const saved=state.sessions[0];const map=saved?sessionMuscleMap(saved,'Músculos que trabajaste hoy'):'';if(map)root.querySelector('.workout-live-card')?.insertAdjacentHTML('beforeend',map);}
         {x.share=x.share||{};const lim=(v,max)=>Math.max(0,Math.min(max,Math.round(Number(v)||0)));offerShare(root.querySelector('.workout-live-card'),{type:'workout',title:String(x.title||'Entrenamiento').slice(0,80),date:x.date,minutes:lim(x.minutes,600),exercises:lim(x.completedExercises,40),sets:lim(x.completedSets,300),volume_kg:x.volumeKg?lim(x.volumeKg,200000):null,kcal:x.kcal?lim(x.kcal,5000):null},'el nombre, el tiempo, los ejercicios, las series, los kilos levantados y las calorías estimadas',x.share);}
         root.insertAdjacentHTML('beforeend',trainLauncherMarkup());bindTrainLauncher(root);
         root.querySelector('[data-go-profile-weight]')?.addEventListener('click',()=>{switchView('profile');setTimeout(()=>{const d=$('bodyEditDetails');if(d)d.open=true;$('profileCurrentWeight')?.focus();},80);});
+        $('summaryShareImage').onclick=()=>shareImage({kicker:'Entrenamiento completado',title:x.title,dateKey:x.date,dateLabel:prettyDate(x.date),minutes:x.minutes,exercises:x.completedExercises,sets:x.completedSets,volumeKg:x.volumeKg,kcal:x.kcal});
         $('summaryGoProgress').onclick=()=>switchView('progress');$('summaryGoPlan').onclick=()=>switchView('routines');return;
       }
       root.innerHTML=trainLauncherMarkup();bindTrainLauncher(root);return;
@@ -5571,6 +5581,7 @@ function findCatalogExercise(name){
   // v55: guía de alimentación según el objetivo (nutrition-guides.js). Orientativa; no es un plan clínico.
   let guideKeyChoice='';
   function currentGuideKey(){const NG=window.FittFormaNutritionGuides;if(!NG)return 'maintain';if(guideKeyChoice&&NG.GUIDES[guideKeyChoice])return guideKeyChoice;const s=bodyGoalSummary();return NG.guideFor({bodyGoal:s?.direction,goal:state.profile?.goal});}
+  document.addEventListener('click',async e=>{if(!e.target.closest('[data-invite]'))return;const r=await window.FittFormaShareCard?.invite?.();if(r==='copied')toast('Enlace copiado. Pegalo donde quieras.');else if(r==='failed')toast(`Compartí este enlace: ${location.origin}/`);});
   let recipesAll=false;document.addEventListener('click',e=>{if(e.target.closest('[data-recipes-all]')){recipesAll=true;renderRecipes();}});
   function renderNutritionGuide(){
     const root=$('nutritionGuideCard'),NG=window.FittFormaNutritionGuides;if(!root||!NG)return;
