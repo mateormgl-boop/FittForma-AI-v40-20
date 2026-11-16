@@ -43,7 +43,8 @@ sql(`set request.jwt.claim.sub='bbbbbbbb-0000-0000-0000-000000000002'; insert in
 // Alicia tiene entrenamientos de todo el cuerpo: su rango general es real, calculado por la app.
 // Alicia entrena de verdad en la app: flexiones, plancha y todo el cuerpo en los últimos días, y una carrera.
 const day = n => { const d = new Date(); d.setDate(d.getDate() - n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
-const seed = { profile: { goal: 'fitness', level: 'intermediate' }, activities: [{ id: 900, type: 'Correr', date: day(2), distance: 5, minutes: 30 }], sessions: Array.from({ length: 6 }, (_, i) => ({ id: 100 + i, date: day(1 + i), status: 'completed', type: 'custom', title: 'Cuerpo completo', minutes: 45,
+// Las sesiones arrancan hoy (day(0)): así la semana actual siempre tiene entrenamientos, también los lunes.
+const seed = { profile: { goal: 'fitness', level: 'intermediate' }, activities: [{ id: 900, type: 'Correr', date: day(2), distance: 5, minutes: 30 }], sessions: Array.from({ length: 6 }, (_, i) => ({ id: 100 + i, date: day(i), status: 'completed', type: 'custom', title: 'Cuerpo completo', minutes: 45,
   exercises: ['Sentadilla goblet', 'Press de banca con barra', 'Remo con barra', 'Press militar con mancuernas', 'Peso muerto rumano con mancuernas', 'Curl de bíceps con mancuernas', 'Elevación de talones con apoyo'].map(name => ({ name, entries: [1, 2, 3].map(() => ({ reps: '10', weight: '20', done: true })) }))
     .concat([{ name: 'Flexiones clásicas', entries: [{ reps: String(18 + i), weight: '', done: true }] }, { name: 'Plancha frontal', entries: [{ reps: '60', weight: '', done: true }] }]) })) };
 const browser = await chromium.launch();
@@ -178,9 +179,9 @@ step('11. Dejar de seguir borra la relación', sql(`select count(*) from communi
 
 await page.click('#communityUserBack'); await page.waitForTimeout(600);
 await page.click('#communityTabWorld'); await page.waitForTimeout(900);
-await page.click('#communityPeople .cm-card-open[aria-label*="Carla"]'); await page.waitForTimeout(1200);
+await page.click(`#communityPeople .cm-card-open[data-community-open-user="${C}"]`); await page.waitForTimeout(1200); // por id: otras pruebas también crean una «Carla»
 prof = await page.textContent('#communityUserProfile');
-step('12. Perfil privado: sin bio ni estadísticas', /Este perfil es privado/.test(prof) && !/Bio solo para seguidores/.test(prof) && !/Estadísticas/.test(prof) && !/70 rep/.test(prof));
+step('12. Perfil privado: sin bio ni estadísticas', /Este perfil es privado/.test(prof) && !/Bio solo para seguidores/.test(prof) && !/Estadísticas/.test(prof) && !/70 rep/.test(prof), prof.replace(/\s+/g, ' ').slice(0, 220));
 step('12. La tabla no se puede leer directamente', sql(`set role authenticated; set request.jwt.claim.sub='${A}'; select count(*) from community_athlete_stats`) === 'SET\nSET\n1');
 
 // Ocultar las propias estadísticas.
