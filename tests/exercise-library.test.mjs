@@ -31,3 +31,32 @@ test('v48: el catálogo depurado tiene datos válidos y cada ejercicio tiene un 
  }
 });
 
+
+test('las posiciones de cada ejercicio apuntan a dos imágenes WebP del catálogo',async()=>{
+ const ctx=vm.createContext({window:{}});
+ for(const file of ['training-core.js','exercise-media.js'])vm.runInContext(await read(file),ctx);
+ const {FittFormaTraining:T,FittFormaExerciseMedia:media,FittFormaExerciseStages:stages}=ctx.window;
+ const catalog=new Map(Object.keys(media).map(name=>[T.norm(name),name]));
+ const used=new Set();
+ assert.equal(Object.keys(stages).length,catalog.size);
+ for(const [key,stage] of Object.entries(stages)){
+  const name=catalog.get(key);
+  assert.ok(name,key);
+  const original=media[name];
+  if(typeof stage!=='string'){
+   assert.equal(original.kind,'photo',name);
+   assert.equal([...stage.photoOrder].sort().join(','),'0,1',name);
+  }
+  const frames=typeof stage==='string'
+   ? ['inicial','final'].map(phase=>`stages/${stage}/${phase}.webp`)
+   : stage.photoOrder.map(index=>original.frames[index]);
+  for(const frame of frames){
+   assert.ok(!used.has(frame),frame);
+   used.add(frame);
+   const file=await readFile(path.join(root,'assets/exercises',frame));
+   assert.equal(file.subarray(8,12).toString(),'WEBP',frame);
+  }
+ }
+ assert.equal(used.size,catalog.size*2);
+ assert.equal(stages['curl femoral sentado'].photoOrder.join(','),'0,1');
+});
