@@ -2614,6 +2614,7 @@
     <div class="exercise-viewer-controls" role="group" aria-label="Posiciones del ejercicio">
       <button type="button" data-exercise-viewer-step="0" aria-pressed="true">Posición inicial</button>
       <button type="button" data-exercise-viewer-step="1" aria-pressed="false">Posición final</button>
+      <button type="button" id="exerciseViewerToggle" hidden>Reproducir</button>
     </div>
     <span class="sr-only" id="exerciseViewerStatus" role="status"></span>
   </footer>
@@ -3191,24 +3192,35 @@ function findCatalogExercise(name){
   }
   const exercisePositionLabels=['Posición inicial','Posición final'];
   let exerciseViewerPlayback=null;
-  function showExerciseViewerFrame(index){
+  function showExerciseViewerFrame(index,announce=false){
+    exerciseViewerPlayback.index=index;
     const frames=$('exerciseViewerFrames').children;
     for(let i=0;i<frames.length;i++)frames[i].hidden=i!==index;
     $('exerciseViewer').querySelectorAll('[data-exercise-viewer-step]').forEach((button,i)=>{
       button.setAttribute('aria-pressed',String(i===index));
     });
-    $('exerciseViewerStatus').textContent=exercisePositionLabels[index];
+    if(announce)$('exerciseViewerStatus').textContent=exercisePositionLabels[index];
+  }
+  function setExerciseViewerPlaying(playing){
+    const playback=exerciseViewerPlayback;
+    clearInterval(playback.timer);
+    playback.timer=playing?setInterval(()=>showExerciseViewerFrame(1-playback.index),1600):0;
+    $('exerciseViewerToggle').textContent=playing?'Pausar':'Reproducir';
   }
   function selectExerciseViewerFrame(index){
     exerciseViewerPlayback.manual=true;
-    clearTimeout(exerciseViewerPlayback.timer);
-    showExerciseViewerFrame(index);
+    setExerciseViewerPlaying(false);
+    showExerciseViewerFrame(index,true);
   }
   function openExerciseViewer(name){
     const dialog=$('exerciseViewer'),meta=exerciseIllustrationMeta(name);
     if(exerciseViewerPlayback||meta.kind!=='stages')return;
-    const playback={overflow:document.body.style.overflow,manual:false,timer:0};
+    const playback={overflow:document.body.style.overflow,manual:false,timer:0,index:0};
     exerciseViewerPlayback=playback;
+    const toggle=$('exerciseViewerToggle');
+    toggle.hidden=true;
+    toggle.textContent='Reproducir';
+    $('exerciseViewerStatus').textContent='';
     $('exerciseViewerTitle').textContent=name;
     $('exerciseViewerHold').hidden=!/\bseg\b/.test(FittFormaTraining.libraryEntry(name)?.reps||'');
     $('exerciseViewerFrames').innerHTML=meta.frames.map((src,i)=>{
@@ -3219,12 +3231,10 @@ function findCatalogExercise(name){
     showExerciseViewerFrame(0);
     dialog.showModal();
     document.body.style.overflow='hidden';
-    if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     Promise.allSettled(Array.from(imgs,img=>img.decode())).then(()=>{
-      if(exerciseViewerPlayback!==playback||!dialog.open||playback.manual||!imgs[1]?.naturalWidth)return;
-      playback.timer=setTimeout(()=>{
-        if(dialog.open&&exerciseViewerPlayback===playback)showExerciseViewerFrame(1);
-      },1200);
+      if(exerciseViewerPlayback!==playback||!dialog.open||!imgs[0]?.naturalWidth||!imgs[1]?.naturalWidth)return;
+      toggle.hidden=false;
+      if(!playback.manual&&!matchMedia('(prefers-reduced-motion: reduce)').matches)setExerciseViewerPlaying(true);
     });
   }
   function exerciseIllustrationMeta(name){const media=exerciseMedia(name);return media?{src:'./assets/exercises/'+media.frames[0],frames:media.frames.map(f=>'./assets/exercises/'+f),kind:media.kind,credit:media.credit,family:media.family||'',specific:true}:{src:'',frames:[],kind:'none',specific:false};}
@@ -7555,6 +7565,7 @@ function findCatalogExercise(name){
     const step=e.target.closest('[data-exercise-viewer-step]');
     if(step)selectExerciseViewerFrame(Number(step.dataset.exerciseViewerStep));
   });
+  $('exerciseViewerToggle').addEventListener('click',()=>setExerciseViewerPlaying(!exerciseViewerPlayback.timer));
   $('exerciseViewer').addEventListener('keydown',e=>{
     if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
       e.preventDefault();
@@ -7562,7 +7573,7 @@ function findCatalogExercise(name){
     }
   });
   $('exerciseViewer').addEventListener('close',()=>{
-    clearTimeout(exerciseViewerPlayback.timer);
+    clearInterval(exerciseViewerPlayback.timer);
     document.body.style.overflow=exerciseViewerPlayback.overflow;
     exerciseViewerPlayback=null;
   });

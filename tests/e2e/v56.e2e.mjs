@@ -86,6 +86,13 @@ const final = viewer.locator('[data-exercise-viewer-step="1"][aria-pressed="true
 step('El visor de pantalla completa abre en la posición inicial', await initial.isVisible());
 await final.waitFor();
 step('El visor avanza a la posición final', (await viewer.locator('.exercise-viewer-frame:not([hidden]) img').getAttribute('src')).endsWith('/final.webp'));
+await initial.waitFor();
+step('La reproducción vuelve a la posición inicial', await initial.isVisible());
+await viewer.getByRole('button', { name: 'Pausar' }).click();
+await page.waitForTimeout(1750);
+step('Pausar mantiene la posición visible', await initial.isVisible());
+await viewer.getByRole('button', { name: 'Reproducir' }).click();
+await final.waitFor();
 await page.keyboard.press('Escape');
 await viewer.waitFor({ state: 'hidden' });
 step('Cerrar el visor deja abierta la ficha', await page.isVisible('#exerciseModal'));
