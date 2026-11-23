@@ -2603,6 +2603,21 @@
     <div class="btn-row"><button class="btn secondary" type="button" data-close-exercise-modal>Cerrar guía</button></div>
   </section>
 </div>
+<dialog class="exercise-viewer" id="exerciseViewer" aria-labelledby="exerciseViewerTitle">
+  <div class="exercise-viewer-header">
+    <h2 id="exerciseViewerTitle"></h2>
+    <form method="dialog"><button type="submit" class="exercise-viewer-close" aria-label="Cerrar pantalla completa" autofocus>×</button></form>
+  </div>
+  <div class="exercise-viewer-frames" id="exerciseViewerFrames"></div>
+  <footer class="exercise-viewer-footer">
+    <p id="exerciseViewerHold" hidden>Sostené la posición final.</p>
+    <div class="exercise-viewer-controls" role="group" aria-label="Posiciones del ejercicio">
+      <button type="button" data-exercise-viewer-step="0" aria-pressed="true">Posición inicial</button>
+      <button type="button" data-exercise-viewer-step="1" aria-pressed="false">Posición final</button>
+    </div>
+    <span class="sr-only" id="exerciseViewerStatus" role="status"></span>
+  </footer>
+</dialog>
 <section class="welcome" id="welcomeScreen" hidden aria-labelledby="welcomeTitle">
   <div class="welcome-step" id="welcomeStep1">
     <img class="welcome-logo" src="icon.svg" alt="" width="72" height="72">
@@ -3168,8 +3183,49 @@ function findCatalogExercise(name){
     const media=window.FittFormaExerciseMedia||{};
     return Object.hasOwn(media,canonical)?media[canonical]:null;
   }
-  function exerciseStageImage(src,alt,fallback){
-    return `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" decoding="async" onerror="this.nextElementSibling.hidden=false;this.remove();"><span class="exercise-stage-fallback" hidden>${fallback}</span>`;
+  function exerciseStageImage(src,alt,fallback,loading='lazy'){
+    return `<img src="${esc(src)}" alt="${esc(alt)}" loading="${loading}" decoding="async" onerror="this.nextElementSibling.hidden=false;this.remove();"><span class="exercise-stage-fallback" hidden>${fallback}</span>`;
+  }
+  function exerciseStagePreview(name,src,classes){
+    return `<button type="button" class="exercise-stage-open ${classes}" data-exercise-viewer="${esc(name)}" aria-label="Ver ${esc(name)} a pantalla completa" aria-haspopup="dialog">${exerciseStageImage(src,'','Imagen no disponible')}<span class="exercise-stage-open-label" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/></svg>Pantalla completa</span></button>`;
+  }
+  const exercisePositionLabels=['Posición inicial','Posición final'];
+  let exerciseViewerPlayback=null;
+  function showExerciseViewerFrame(index){
+    const frames=$('exerciseViewerFrames').children;
+    for(let i=0;i<frames.length;i++)frames[i].hidden=i!==index;
+    $('exerciseViewer').querySelectorAll('[data-exercise-viewer-step]').forEach((button,i)=>{
+      button.setAttribute('aria-pressed',String(i===index));
+    });
+    $('exerciseViewerStatus').textContent=exercisePositionLabels[index];
+  }
+  function selectExerciseViewerFrame(index){
+    exerciseViewerPlayback.manual=true;
+    clearTimeout(exerciseViewerPlayback.timer);
+    showExerciseViewerFrame(index);
+  }
+  function openExerciseViewer(name){
+    const dialog=$('exerciseViewer'),meta=exerciseIllustrationMeta(name);
+    if(exerciseViewerPlayback||meta.kind!=='stages')return;
+    const playback={overflow:document.body.style.overflow,manual:false,timer:0};
+    exerciseViewerPlayback=playback;
+    $('exerciseViewerTitle').textContent=name;
+    $('exerciseViewerHold').hidden=!/\bseg\b/.test(FittFormaTraining.libraryEntry(name)?.reps||'');
+    $('exerciseViewerFrames').innerHTML=meta.frames.map((src,i)=>{
+      const label=exercisePositionLabels[i];
+      return `<div class="exercise-viewer-frame"${i?' hidden':''}>${exerciseStageImage(src,name+': '+label,label+' no disponible','eager')}</div>`;
+    }).join('');
+    const imgs=$('exerciseViewerFrames').querySelectorAll('img');
+    showExerciseViewerFrame(0);
+    dialog.showModal();
+    document.body.style.overflow='hidden';
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    Promise.allSettled(Array.from(imgs,img=>img.decode())).then(()=>{
+      if(exerciseViewerPlayback!==playback||!dialog.open||playback.manual||!imgs[1]?.naturalWidth)return;
+      playback.timer=setTimeout(()=>{
+        if(dialog.open&&exerciseViewerPlayback===playback)showExerciseViewerFrame(1);
+      },1200);
+    });
   }
   function exerciseIllustrationMeta(name){const media=exerciseMedia(name);return media?{src:'./assets/exercises/'+media.frames[0],frames:media.frames.map(f=>'./assets/exercises/'+f),kind:media.kind,credit:media.credit,family:media.family||'',specific:true}:{src:'',frames:[],kind:'none',specific:false};}
   function exerciseIllustrationUrl(name){return exerciseIllustrationMeta(name).src;}
@@ -3178,9 +3234,8 @@ function findCatalogExercise(name){
   function exercisePhoto(name,group,compact=false,kind='strength'){
     const meta=exerciseIllustrationMeta(name),sizeClass=compact?' compact':'';
     if(meta.kind==='stages'){
-      const label=compact?'posición inicial':'posición inicial y final';
-      const frames=compact?meta.frames.slice(0,1):meta.frames;
-      return `<div class="exercise-photo is-stages${sizeClass}" role="img" aria-label="${esc(name)}: ${label}">${frames.map(src=>exerciseStageImage(src,'','—')).join('')}</div>`;
+      if(!compact)return exerciseStagePreview(name,meta.src,'exercise-photo is-stages');
+      return `<div class="exercise-photo is-stages compact" role="img" aria-label="${esc(name)}: posición inicial">${exerciseStageImage(meta.src,'','—')}</div>`;
     }
     const gif=exerciseGif(name);
     if(gif)return `<div class="exercise-photo is-gif${sizeClass}" role="img" aria-label="${esc(name)}: animación del movimiento"><img src="${gif.src}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.closest('.exercise-photo').classList.add('exercise-photo-unavailable');this.remove();"></div>`;
@@ -3192,11 +3247,7 @@ function findCatalogExercise(name){
   function exerciseModalMedia(name){
     const meta=exerciseIllustrationMeta(name);
     if(meta.kind==='stages'){
-      const frames=meta.frames.map((src,i)=>{
-        const label=i?'Posición final':'Posición inicial';
-        return `<figure class="exercise-modal-image">${exerciseStageImage(src,name+': '+label,'Imagen no disponible')}<figcaption><b>${i+1}</b> ${label}</figcaption></figure>`;
-      });
-      return `<div class="exercise-modal-frames is-stages">${frames.join('')}</div><p class="muted small exercise-media-credit">${esc(meta.credit)}</p>`;
+      return `${exerciseStagePreview(name,meta.src,'exercise-stage-sheet')}<p class="muted small exercise-media-credit">${esc(meta.credit)}</p>`;
     }
     const gif=exerciseGif(name);
     if(gif){
@@ -7500,7 +7551,24 @@ function findCatalogExercise(name){
     navigator.serviceWorker.addEventListener('controllerchange',()=>{if(hadController)showUpdateNotice();hadController=true;});
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
   }
+  $('exerciseViewer').addEventListener('click',e=>{
+    const step=e.target.closest('[data-exercise-viewer-step]');
+    if(step)selectExerciseViewerFrame(Number(step.dataset.exerciseViewerStep));
+  });
+  $('exerciseViewer').addEventListener('keydown',e=>{
+    if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
+      e.preventDefault();
+      selectExerciseViewerFrame(e.key==='ArrowRight'?1:0);
+    }
+  });
+  $('exerciseViewer').addEventListener('close',()=>{
+    clearTimeout(exerciseViewerPlayback.timer);
+    document.body.style.overflow=exerciseViewerPlayback.overflow;
+    exerciseViewerPlayback=null;
+  });
   document.addEventListener('click',e=>{
+    const viewerTrigger=e.target.closest('[data-exercise-viewer]');
+    if(viewerTrigger){openExerciseViewer(viewerTrigger.dataset.exerciseViewer);return;}
     const favoriteTrigger=e.target.closest('[data-exercise-favorite]');
     if(favoriteTrigger){toggleExerciseFavorite(favoriteTrigger.dataset.exerciseFavorite,favoriteTrigger.dataset.favoriteMode||libraryMode);return;}
     const replaceTrigger=e.target.closest('[data-replace-exercise]');
@@ -7509,7 +7577,7 @@ function findCatalogExercise(name){
     if(trigger){openExerciseDetails(trigger.dataset.exerciseDetail,trigger.dataset.exerciseGroup||'Cardio',trigger.dataset.exerciseKind||'strength',trigger.dataset.equipmentMode||state.profile.equipment);return;}
     if(e.target.closest('[data-close-exercise-modal]')){const modal=$('exerciseModal');modal.hidden=true;document.body.style.overflow='';}
   });
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('exerciseModal').hidden){$('exerciseModal').hidden=true;document.body.style.overflow='';}if(e.key==='Escape'&&!$('mobileMoreMenu').hidden){$('mobileMoreMenu').hidden=true;$('mobileMoreToggle').setAttribute('aria-expanded','false');}});
+  document.addEventListener('keydown',e=>{if($('exerciseViewer').open)return;if(e.key==='Escape'&&!$('exerciseModal').hidden){$('exerciseModal').hidden=true;document.body.style.overflow='';}if(e.key==='Escape'&&!$('mobileMoreMenu').hidden){$('mobileMoreMenu').hidden=true;$('mobileMoreToggle').setAttribute('aria-expanded','false');}});
   document.querySelectorAll('[data-library-mode]').forEach(b=>b.addEventListener('click',()=>{libraryMode=b.dataset.libraryMode;renderExerciseLibrary();}));
   document.querySelectorAll('.addMealIdea').forEach(b=>b.addEventListener('click',()=>{switchView('nutrition');$('mealName').value=b.dataset.name;$('mealCalories').value=b.dataset.cal;$('mealProtein').value=b.dataset.pro;$('mealCarbs').value=b.dataset.carbs||'';$('mealFat').value=b.dataset.fat||'';$('mealType').value='Almuerzo';$('mealName').focus();}));
   $('exerciseSearch').addEventListener('input',renderExerciseLibrary);$('exerciseGroupFilter').addEventListener('change',renderExerciseLibrary);for(const id of ['exerciseLevelFilter','exerciseKindFilter','exerciseSort'])$(id)?.addEventListener('change',renderExerciseLibrary);document.querySelectorAll('[data-library-view]').forEach(b=>b.addEventListener('click',()=>{libraryView=b.dataset.libraryView==='list'?'list':'grid';try{localStorage.setItem(LIBRARY_VIEW_KEY,libraryView);}catch{}renderExerciseLibrary();}));$('exerciseFavoritesOnly').addEventListener('click',()=>{exerciseFavoritesOnly=!exerciseFavoritesOnly;renderExerciseLibrary();});$('exerciseLibraryResults')?.addEventListener('toggle',e=>{const d=e.target;if(!d?.matches?.('details.ex-group'))return;if(d.open)exerciseGroupsOpen.add(d.dataset.exGroup);else exerciseGroupsOpen.delete(d.dataset.exGroup);},true);
