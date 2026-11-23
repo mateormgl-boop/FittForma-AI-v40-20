@@ -78,7 +78,17 @@ await page.evaluate(() => document.querySelector('[data-close-exercise-modal]')?
 await page.fill('#exerciseSearch', 'búlgara'); await page.waitForTimeout(200);
 await page.click('#exerciseLibraryResults .exercise-list-main'); await page.waitForTimeout(400);
 const bulg = await page.textContent('#exerciseModal');
-step('Ejercicio nuevo con animación, fotos, músculos y ficha', await page.isVisible('#exerciseModal .exercise-gif-hero img') && /Cuádriceps/.test(bulg) && /Posición inicial/.test(bulg) && /Errores comunes/.test(bulg));
+step('Ejercicio nuevo con imagen, músculos y ficha', await page.isVisible('#exerciseModal [data-exercise-viewer] img') && /Cuádriceps/.test(bulg) && /Posición inicial/.test(bulg) && /Errores comunes/.test(bulg));
+await page.click('#exerciseModal [data-exercise-viewer]');
+const viewer = page.locator('#exerciseViewer');
+const initial = viewer.locator('[data-exercise-viewer-step="0"][aria-pressed="true"]');
+const final = viewer.locator('[data-exercise-viewer-step="1"][aria-pressed="true"]');
+step('El visor de pantalla completa abre en la posición inicial', await initial.isVisible());
+await final.waitFor();
+step('El visor avanza a la posición final', (await viewer.locator('.exercise-viewer-frame:not([hidden]) img').getAttribute('src')).endsWith('/final.webp'));
+await page.keyboard.press('Escape');
+await viewer.waitFor({ state: 'hidden' });
+step('Cerrar el visor deja abierta la ficha', await page.isVisible('#exerciseModal'));
 await page.evaluate(() => document.querySelector('[data-close-exercise-modal]')?.click()); await page.waitForTimeout(150);
 await page.click('[data-library-view="grid"]'); await page.fill('#exerciseSearch', '');
 

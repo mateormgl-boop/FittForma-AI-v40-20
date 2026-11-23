@@ -178,9 +178,9 @@ window.FittFormaExerciseStages = Object.freeze({
   "lenador en polea": "171_lenador-en-polea",
   "escaladores": "172_escaladores",
   "subir y bajar un escalon estable": "173_subir-y-bajar-un-escalon-estable",
-  "caminata a ritmo comodo": "174_caminata-a-ritmo-comodo",
+  "caminata a ritmo comodo": "174_caminata-a-ritmo-comodo-v2",
   "caminata en intervalos dentro de casa": "175_caminata-en-intervalos-dentro-de-casa",
-  "cinta con inclinacion suave": "176_cinta-con-inclinacion-suave",
+  "cinta con inclinacion suave": "176_cinta-con-inclinacion-suave-v2",
   "marcha en el lugar": "177_marcha-en-el-lugar",
   "marcha elevando rodillas": "178_marcha-elevando-rodillas",
   "bicicleta estatica": "179_bicicleta-estatica",
@@ -194,8 +194,8 @@ window.FittFormaExerciseStages = Object.freeze({
   "saltar la cuerda": "187_saltar-la-cuerda",
   "caminata rapida de recuperacion": "188_caminata-rapida-de-recuperacion",
   "carrera continua a ritmo comodo": "189_carrera-continua-a-ritmo-comodo",
-  "carrera suave de recuperacion": "190_carrera-suave-de-recuperacion",
+  "carrera suave de recuperacion": "190_carrera-suave-de-recuperacion-v2",
   "trote suave o alternancia trote-caminata": "191_trote-suave-o-alternancia-trote-caminata",
-  "intervalos de trote controlado": "192_intervalos-de-trote-controlado",
+  "intervalos de trote controlado": "192_intervalos-de-trote-controlado-v2",
   "alternancia de trote suave y caminata": "193_alternancia-de-trote-suave-y-caminata"
 });
