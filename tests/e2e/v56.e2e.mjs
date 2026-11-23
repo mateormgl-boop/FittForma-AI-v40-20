@@ -78,7 +78,9 @@ await page.evaluate(() => document.querySelector('[data-close-exercise-modal]')?
 await page.fill('#exerciseSearch', 'búlgara'); await page.waitForTimeout(200);
 await page.click('#exerciseLibraryResults .exercise-list-main'); await page.waitForTimeout(400);
 const bulg = await page.textContent('#exerciseModal');
-step('Ejercicio nuevo con imagen, músculos y ficha', await page.isVisible('#exerciseModal [data-exercise-viewer] img') && /Cuádriceps/.test(bulg) && /Posición inicial/.test(bulg) && /Errores comunes/.test(bulg));
+const stages = page.locator('#exerciseModal .exercise-modal-frames.is-stages');
+step('La ficha muestra las posiciones inicial y final', await stages.locator('img[src$="/inicial.webp"]').isVisible() && await stages.locator('img[src$="/final.webp"]').isVisible() && (await stages.locator('figcaption').allTextContents()).join(', ') === 'Posición inicial, Posición final');
+step('La ficha muestra músculos y errores comunes', /Cuádriceps/.test(bulg) && /Errores comunes/.test(bulg));
 await page.click('#exerciseModal [data-exercise-viewer]');
 const viewer = page.locator('#exerciseViewer');
 const initial = viewer.locator('[data-exercise-viewer-step="0"][aria-pressed="true"]');

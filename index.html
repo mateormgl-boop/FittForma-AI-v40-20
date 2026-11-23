@@ -3187,8 +3187,8 @@ function findCatalogExercise(name){
   function exerciseStageImage(src,alt,fallback,loading='lazy'){
     return `<img src="${esc(src)}" alt="${esc(alt)}" loading="${loading}" decoding="async" onerror="this.nextElementSibling.hidden=false;this.remove();"><span class="exercise-stage-fallback" hidden>${fallback}</span>`;
   }
-  function exerciseStagePreview(name,src,classes){
-    return `<button type="button" class="exercise-stage-open ${classes}" data-exercise-viewer="${esc(name)}" aria-label="Ver ${esc(name)} a pantalla completa" aria-haspopup="dialog">${exerciseStageImage(src,'','Imagen no disponible')}<span class="exercise-stage-open-label" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/></svg>Pantalla completa</span></button>`;
+  function exerciseStagePreview(name,src){
+    return `<button type="button" class="exercise-stage-open exercise-photo is-stages" data-exercise-viewer="${esc(name)}" aria-label="Ver ${esc(name)} a pantalla completa" aria-haspopup="dialog">${exerciseStageImage(src,'','Imagen no disponible')}<span class="exercise-stage-open-label" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/></svg>Pantalla completa</span></button>`;
   }
   const exercisePositionLabels=['Posición inicial','Posición final'];
   let exerciseViewerPlayback=null;
@@ -3244,7 +3244,7 @@ function findCatalogExercise(name){
   function exercisePhoto(name,group,compact=false,kind='strength'){
     const meta=exerciseIllustrationMeta(name),sizeClass=compact?' compact':'';
     if(meta.kind==='stages'){
-      if(!compact)return exerciseStagePreview(name,meta.src,'exercise-photo is-stages');
+      if(!compact)return exerciseStagePreview(name,meta.src);
       return `<div class="exercise-photo is-stages compact" role="img" aria-label="${esc(name)}: posición inicial">${exerciseStageImage(meta.src,'','—')}</div>`;
     }
     const gif=exerciseGif(name);
@@ -3257,7 +3257,15 @@ function findCatalogExercise(name){
   function exerciseModalMedia(name){
     const meta=exerciseIllustrationMeta(name);
     if(meta.kind==='stages'){
-      return `${exerciseStagePreview(name,meta.src,'exercise-stage-sheet')}<p class="muted small exercise-media-credit">${esc(meta.credit)}</p>`;
+      const figures=meta.frames.map((src,i)=>{
+        const label=exercisePositionLabels[i];
+        return `<figure class="exercise-modal-image">${exerciseStageImage(src,name+': '+label,label+' no disponible')}<figcaption>${label}</figcaption></figure>`;
+      }).join('');
+      return `<div class="exercise-modal-frames is-stages">${figures}</div>
+        <div class="exercise-stage-actions">
+          <p class="muted small exercise-media-credit">${esc(meta.credit)}</p>
+          <button type="button" class="btn secondary" data-exercise-viewer="${esc(name)}" aria-haspopup="dialog">Pantalla completa</button>
+        </div>`;
     }
     const gif=exerciseGif(name);
     if(gif){
