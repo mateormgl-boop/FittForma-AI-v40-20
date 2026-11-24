@@ -287,7 +287,7 @@
   partialRows.push(['vasos', ['glasses', 'copos', 'verres', 'bicchieri', 'Gläser']]);
   const originals=new WeakMap();
   const attrOriginals=new WeakMap();
-  const attrNames=['placeholder','title','aria-label'];
+  const attrNames=['placeholder','title','aria-label','alt'];
   const skipSelector='script,style,textarea,pre,code,[data-i18n-ignore],.bubble,.exercise-photo,.hero-art-chip-icon';
   let active='es';
   function langSafe(){try{const value=localStorage.getItem(LANG_KEY);if(langs.includes(value))return value;}catch{}return 'es';}

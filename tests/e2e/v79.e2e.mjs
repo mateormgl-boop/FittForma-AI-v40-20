@@ -113,8 +113,9 @@ step('Sin «compartir» del sistema, copia el enlace de la app', clip.includes(A
 // v79: comparar dos fotos
 await go('progress:body');
 await page.evaluate(async () => {
+  const today = document.querySelector('#progressPhotoForm [name=progressPhotoDate]').value;
   const c = document.createElement('canvas'); c.width = 60; c.height = 80; const g = c.getContext('2d');
-  for (const [i, color] of ['#c33', '#3c3'].entries()) { g.fillStyle = color; g.fillRect(0, 0, 60, 80); const b = await new Promise(r => c.toBlob(r, 'image/jpeg')); const f = new File([b], `p${i}.jpg`, { type: 'image/jpeg' }); const dt = new DataTransfer(); dt.items.add(f); const inp = document.querySelector('#progressPhotoForm [name=progressPhotoFile]'); inp.files = dt.files; document.querySelector('#progressPhotoForm [name=progressPhotoDate]').value = i ? new Date().toISOString().slice(0, 10) : '2026-09-01'; document.querySelector('#progressPhotoForm button[type=submit]').click(); await new Promise(r => setTimeout(r, 900)); }
+  for (const [i, color] of ['#c33', '#3c3'].entries()) { g.fillStyle = color; g.fillRect(0, 0, 60, 80); const b = await new Promise(r => c.toBlob(r, 'image/jpeg')); const f = new File([b], `p${i}.jpg`, { type: 'image/jpeg' }); const dt = new DataTransfer(); dt.items.add(f); const inp = document.querySelector('#progressPhotoForm [name=progressPhotoFile]'); inp.files = dt.files; document.querySelector('#progressPhotoForm [name=progressPhotoDate]').value = i ? today : '2026-09-01'; document.querySelector('#progressPhotoForm button[type=submit]').click(); await new Promise(r => setTimeout(r, 900)); }
 });
 await page.waitForTimeout(500);
 step('Con dos fotos aparece «Comparar dos fotos»', await page.isVisible('details.photo-compare summary'));

@@ -3511,8 +3511,19 @@ function findCatalogExercise(name){
     for(const [t,panel,btn] of [['how','exTabHow','exTabHowBtn'],['mine','exTabMine','exTabMineBtn']]){const on=t===tab;$(panel).hidden=!on;$(btn).setAttribute('aria-selected',String(on));$(btn).classList.toggle('active',on);}
   }
   document.addEventListener('click',e=>{const b=e.target.closest('[data-ex-tab]');if(b){showExerciseTab(b.dataset.exTab);b.closest('.exercise-modal-panel')?.querySelector('.ex-tabs')?.scrollIntoView({block:'nearest'});}});
-  function openExerciseDetails(name,group,kind,equipmentMode=''){
+  let exerciseModalReturnFocus=null,exerciseModalOverflow='';
+  function closeExerciseDetails(){
+    $('exerciseModal').hidden=true;
+    document.body.style.overflow=exerciseModalOverflow;
+    exerciseModalReturnFocus?.focus();
+    exerciseModalReturnFocus=null;
+  }
+  function openExerciseDetails(name,group,kind,equipmentMode='',trigger=document.activeElement){
     const modal=$('exerciseModal');if(!modal)return;
+    if(modal.hidden){
+      exerciseModalReturnFocus=trigger;
+      exerciseModalOverflow=document.body.style.overflow;
+    }
     $('exerciseModalTitle').textContent=name;
     $('exerciseModalDescription').textContent=kind==='cardio'?'Actividad cardiovascular':kind==='mobility'?'Movilidad y control':'Ejercicio de fuerza y control';
     $('exerciseModalGroup').textContent=group||'';
@@ -4430,9 +4441,20 @@ function findCatalogExercise(name){
       (e.kind==='cardio'?`<div class="field"><label>Minutos completados</label><input type="number" min="0" max="300" step="1" inputmode="numeric" data-e="${ei}" data-s="0" data-k="reps" placeholder="Ej. 10" value="${esc(e.entries[0]?.reps||'')}"></div><label class="cardio-complete"><input type="checkbox" data-done="1" data-e="${ei}" data-s="0" ${e.entries[0]?.done?'checked':''}><span>Marcar actividad como completada</span></label>`:
       `<div class="set-table ${load?'':'no-load'}"><div class="set-head" aria-hidden="true"><span>#</span><span>Anterior</span><span>${load?'Kg':measure==='seconds'?'':'Lastre'}</span><span>${valueLabel}</span><span>✓</span></div>`+
       e.entries.map((entry,si)=>{const prev=previous[si];const prevText=prev?(measure==='seconds'?(prev.reps?`${prev.reps} s`:'—'):`${prev.weight?`${prev.weight} kg × `:''}${prev.reps||'—'}`):'—';
-        return `<div class="setrow${entry.done?' is-done':''}" data-set-row="${ei}:${si}"><span class="setnum"><span class="sr-only">Serie </span>${si+1}</span><span class="set-prev" title="Serie ${si+1} de la vez anterior">${esc(prevText)}</span>${measure==='seconds'?'<span class="set-empty" aria-hidden="true">—</span>':`<input aria-label="${load?'Peso':'Lastre opcional'} serie ${si+1} de ${esc(e.name)} en kg" type="number" min="0" max="1000" step="0.5" inputmode="decimal" placeholder="${load?(e.targetWeight?esc(e.targetWeight):(suggestedWeightFor(e)||'kg')):'+kg'}" data-e="${ei}" data-s="${si}" data-k="weight" value="${esc(entry.weight)}">`}<input aria-label="${measure==='seconds'?'Segundos':'Repeticiones'} serie ${si+1} de ${esc(e.name)}" type="number" min="0" max="${valueMax}" step="1" inputmode="numeric" placeholder="${measure==='seconds'?'seg':(prev?.reps?esc(String(prev.reps)):'reps')}" data-e="${ei}" data-s="${si}" data-k="reps" value="${esc(entry.reps)}"><label class="set-check"><input aria-label="Marcar serie ${si+1} como completada" type="checkbox" data-done="1" data-e="${ei}" data-s="${si}" ${entry.done?'checked':''}><span>Listo</span></label><span class="set-pr" hidden>Récord</span></div>`;}).join('')+'</div>'+`<p class="next-set-hint" data-next-set="${ei}" role="status" hidden></p>`)+sessionExerciseToolsMarkup(e,ei)+'</div>';}).join('')+sessionAddExerciseMarkup()+
+        return `<div class="setrow${entry.done?' is-done':''}" data-set-row="${ei}:${si}"><span class="setnum"><span class="sr-only">Serie </span>${si+1}</span>${prev?.done&&Number(prev.reps)>0?`<button type="button" class="set-prev set-repeat" data-repeat-set aria-label="Repetir y marcar serie ${si+1}" title="Repetir y marcar serie ${si+1}" ${entry.done?'disabled':''}><span>${esc(prevText)}</span><small>Repetir</small></button>`:`<span class="set-prev">${esc(prevText)}</span>`}${measure==='seconds'?'<span class="set-empty" aria-hidden="true">—</span>':`<input aria-label="${load?'Peso':'Lastre opcional'} serie ${si+1} de ${esc(e.name)} en kg" type="number" min="0" max="1000" step="0.5" inputmode="decimal" placeholder="${load?(e.targetWeight?esc(e.targetWeight):(suggestedWeightFor(e)||'kg')):'+kg'}" data-e="${ei}" data-s="${si}" data-k="weight" value="${esc(entry.weight)}">`}<input aria-label="${measure==='seconds'?'Segundos':'Repeticiones'} serie ${si+1} de ${esc(e.name)}" type="number" min="0" max="${valueMax}" step="1" inputmode="numeric" placeholder="${measure==='seconds'?'seg':(prev?.reps?esc(String(prev.reps)):'reps')}" data-e="${ei}" data-s="${si}" data-k="reps" value="${esc(entry.reps)}"><label class="set-check"><input aria-label="Marcar serie ${si+1} como completada" type="checkbox" data-done="1" data-e="${ei}" data-s="${si}" ${entry.done?'checked':''}><span>Listo</span></label><span class="set-pr" hidden>Récord</span></div>`;}).join('')+'</div>'+`<p class="next-set-hint" data-next-set="${ei}" role="status" hidden></p>`)+sessionExerciseToolsMarkup(e,ei)+'</div>';}).join('')+sessionAddExerciseMarkup()+
     `<div class="card"><div class="field"><label for="sessionNotes">Notas (opcional)</label><input id="sessionNotes" maxlength="180" placeholder="¿Cómo te sentiste?"></div><div class="btn-row"><button class="btn full" id="finishWorkout" type="button">Finalizar y guardar</button><button class="btn ghost full" id="cancelWorkout" type="button">Cancelar y descartar sesión</button></div></div>`;
     root.querySelectorAll('input[data-e]:not([data-done])').forEach(inp=>inp.addEventListener('input',()=>{const e=Number(inp.dataset.e),s=Number(inp.dataset.s),k=inp.dataset.k;activeSession.exercises[e].entries[s][k]=inp.value;persistActiveSessionDraft();updateWorkoutProgress();}));
+    root.querySelectorAll('[data-repeat-set]').forEach(button=>button.addEventListener('click',()=>{
+      const row=button.closest('[data-set-row]'),[ei,si]=row.dataset.setRow.split(':').map(Number);
+      const exercise=activeSession.exercises[ei],entry=exercise.entries[si];
+      const previous=lastLoggedExercise(exercise.name)?.exercise?.entries?.[si];
+      if(entry.done||!previous?.done||!(Number(previous.reps)>0))return;
+      for(const input of row.querySelectorAll('input[data-k]')){
+        input.value=previous[input.dataset.k]??'';
+        entry[input.dataset.k]=input.value;
+      }
+      row.querySelector('[data-done]').click();
+    }));
     root.querySelectorAll('input[data-done]').forEach(inp=>inp.addEventListener('change',()=>{const e=Number(inp.dataset.e),s=Number(inp.dataset.s),ex=activeSession.exercises[e],wasComplete=ex.entries.every(x=>x.done);activeSession.exercises[e].entries[s].done=inp.checked;updateWorkoutProgress();persistActiveSessionDraft();if(inp.checked&&setBeatsRecord(ex,ex.entries[s]))announceSetRecord(ex,e,s);const restAfter=Number(ex.rest)||0;const nowComplete=ex.entries.length>0&&ex.entries.every(x=>x.done);
       // v59: al completar todas las series de un ejercicio, sus calorías estimadas.
       // v60: en una superserie se pasa al otro ejercicio sin descanso; se descansa al cerrar la ronda.
@@ -6503,7 +6525,7 @@ function findCatalogExercise(name){
     // v49: ejercicios completos, series, volumen en vivo y récords superados con datos reales.
     let exDone=0,prs=0;const summary=calculateWorkoutSummary(activeSession);
     activeSession.exercises.forEach((e,ei)=>{const list=e.entries||[],complete=list.length>0&&list.every(x=>x.done);if(complete)exDone++;{const it=document.querySelector(`[data-ex-jump="${ei}"]`);if(it){it.classList.toggle('is-done',complete);it.classList.toggle('is-started',!complete&&list.some(x=>x.done));}}document.querySelector(`[data-ex-card="${ei}"]`)?.classList.toggle('is-complete',complete);
-      list.forEach((entry,si)=>{const row=document.querySelector(`[data-set-row="${ei}:${si}"]`);const pr=setBeatsRecord(e,entry);if(pr)prs++;if(row){row.classList.toggle('is-done',Boolean(entry.done));const tag=row.querySelector('.set-pr');if(tag)tag.hidden=!pr;}});const hint=document.querySelector(`[data-next-set="${ei}"]`);if(hint){const txt=nextSetHintText(e);hint.textContent=txt;hint.hidden=!txt;}});
+      list.forEach((entry,si)=>{const row=document.querySelector(`[data-set-row="${ei}:${si}"]`);const pr=setBeatsRecord(e,entry);if(pr)prs++;if(row){row.classList.toggle('is-done',Boolean(entry.done));const repeat=row.querySelector('[data-repeat-set]');if(repeat)repeat.disabled=Boolean(entry.done);const tag=row.querySelector('.set-pr');if(tag)tag.hidden=!pr;}});const hint=document.querySelector(`[data-next-set="${ei}"]`);if(hint){const txt=nextSetHintText(e);hint.textContent=txt;hint.hidden=!txt;}});
     const set=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
     set('workoutExerciseCount',`${exDone}/${activeSession.exercises.length}`);set('workoutSetCount',`${done}/${total}`);set('workoutVolumeLive',`${summary.volumeKg.toLocaleString('es-UY',{maximumFractionDigits:1})} kg`);set('workoutPrCount',String(prs));const kg=Number(state.profile?.currentWeightKg)>0,kc=activeSession.exercises.reduce((a,e)=>a+(exerciseKcal(e).kcal||0),0);set('workoutKcalLive',kg?(kc?`≈ ${kc} kcal`:'0 kcal'):'Cargá tu peso');}
   // v59: calorías estimadas de un ejercicio con las series que marcaste (ver FittFormaActivity.estimateExerciseCalories).
@@ -7560,7 +7582,8 @@ function findCatalogExercise(name){
       const res=await fetch('/api/public-config',{cache:'no-store',headers:{Accept:'application/json'}});
       if(!res.ok)throw new Error('http '+res.status);
       const info=await res.json();
-      if(info?.version&&info.version!==APP_VERSION){out.textContent='El servidor tiene la versión '+info.version+'. Actualizando…';setTimeout(()=>location.reload(),900);}
+      if(!info?.version){out.textContent='El servidor no informó su versión.';return;}
+      if(info.version!==APP_VERSION){out.textContent='El servidor tiene la versión '+info.version+'. Actualizando…';setTimeout(()=>location.reload(),900);}
       else out.textContent='Ya tenés la última versión ('+APP_VERSION+').';
     }catch{out.textContent='No se pudo consultar el servidor. Revisá tu conexión e intentá de nuevo.';}
     finally{btn.disabled=false;}
@@ -7596,10 +7619,28 @@ function findCatalogExercise(name){
     const replaceTrigger=e.target.closest('[data-replace-exercise]');
     if(replaceTrigger){const [dayIndex,exerciseIndex]=replaceTrigger.dataset.replaceExercise.split(':').map(Number);replacePlanExercise(dayIndex,exerciseIndex);return;}
     const trigger=e.target.closest('[data-exercise-detail]');
-    if(trigger){openExerciseDetails(trigger.dataset.exerciseDetail,trigger.dataset.exerciseGroup||'Cardio',trigger.dataset.exerciseKind||'strength',trigger.dataset.equipmentMode||state.profile.equipment);return;}
-    if(e.target.closest('[data-close-exercise-modal]')){const modal=$('exerciseModal');modal.hidden=true;document.body.style.overflow='';}
+    if(trigger){openExerciseDetails(trigger.dataset.exerciseDetail,trigger.dataset.exerciseGroup||'Cardio',trigger.dataset.exerciseKind||'strength',trigger.dataset.equipmentMode||state.profile.equipment,trigger);return;}
+    if(e.target.closest('[data-close-exercise-modal]'))closeExerciseDetails();
   });
-  document.addEventListener('keydown',e=>{if($('exerciseViewer').open)return;if(e.key==='Escape'&&!$('exerciseModal').hidden){$('exerciseModal').hidden=true;document.body.style.overflow='';}if(e.key==='Escape'&&!$('mobileMoreMenu').hidden){$('mobileMoreMenu').hidden=true;$('mobileMoreToggle').setAttribute('aria-expanded','false');}});
+  document.addEventListener('keydown',e=>{
+    if($('exerciseViewer').open)return;
+    const modal=$('exerciseModal');
+    if(!modal.hidden){
+      if(e.key==='Escape'){e.preventDefault();closeExerciseDetails();}
+      if(e.key==='Tab'){
+        const panel=modal.querySelector('.exercise-modal-panel');
+        const controls=[...panel.querySelectorAll('button,input,select,textarea,a[href],summary,[tabindex]')]
+          .filter(el=>el.tabIndex>=0&&!el.matches(':disabled')&&el.getClientRects().length);
+        const active=document.activeElement;
+        if(!controls.includes(active)||active===(e.shiftKey?controls.at(0):controls.at(-1))){
+          e.preventDefault();
+          ((e.shiftKey?controls.at(-1):controls.at(0))||panel).focus();
+        }
+      }
+      return;
+    }
+    if(e.key==='Escape'&&!$('mobileMoreMenu').hidden){$('mobileMoreMenu').hidden=true;$('mobileMoreToggle').setAttribute('aria-expanded','false');}
+  });
   document.querySelectorAll('[data-library-mode]').forEach(b=>b.addEventListener('click',()=>{libraryMode=b.dataset.libraryMode;renderExerciseLibrary();}));
   document.querySelectorAll('.addMealIdea').forEach(b=>b.addEventListener('click',()=>{switchView('nutrition');$('mealName').value=b.dataset.name;$('mealCalories').value=b.dataset.cal;$('mealProtein').value=b.dataset.pro;$('mealCarbs').value=b.dataset.carbs||'';$('mealFat').value=b.dataset.fat||'';$('mealType').value='Almuerzo';$('mealName').focus();}));
   $('exerciseSearch').addEventListener('input',renderExerciseLibrary);$('exerciseGroupFilter').addEventListener('change',renderExerciseLibrary);for(const id of ['exerciseLevelFilter','exerciseKindFilter','exerciseSort'])$(id)?.addEventListener('change',renderExerciseLibrary);document.querySelectorAll('[data-library-view]').forEach(b=>b.addEventListener('click',()=>{libraryView=b.dataset.libraryView==='list'?'list':'grid';try{localStorage.setItem(LIBRARY_VIEW_KEY,libraryView);}catch{}renderExerciseLibrary();}));$('exerciseFavoritesOnly').addEventListener('click',()=>{exerciseFavoritesOnly=!exerciseFavoritesOnly;renderExerciseLibrary();});$('exerciseLibraryResults')?.addEventListener('toggle',e=>{const d=e.target;if(!d?.matches?.('details.ex-group'))return;if(d.open)exerciseGroupsOpen.add(d.dataset.exGroup);else exerciseGroupsOpen.delete(d.dataset.exGroup);},true);

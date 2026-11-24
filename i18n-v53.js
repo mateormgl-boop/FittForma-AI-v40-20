@@ -1671,3 +1671,21 @@ window.FittFormaI18nDynamic = [
   [/^(\d+) días entre una y otra\.$/, (m, i) => [`${m[1]} days apart.`, `${m[1]} dias entre uma e outra.`, `${m[1]} jours d’écart.`, `${m[1]} giorni di distanza.`, `${m[1]} Tage Abstand.`][i]],
   [/^((?:1 × \d+ con [\d,]+ kg(?: · )?)+)$/, (m, i) => m[1].replace(/ con /g, [' with ', ' com ', ' avec ', ' con ', ' mit '][i])]
 ].concat(window.FittFormaI18nDynamic || []);
+
+(window.FittFormaI18nExtra = window.FittFormaI18nExtra || []).push(
+  ['Pantalla completa','Full screen','Tela cheia','Plein écran','Schermo intero','Vollbild'],
+  ['Cerrar pantalla completa','Close full screen','Fechar tela cheia','Fermer le plein écran','Chiudi schermo intero','Vollbild schließen'],
+  ['Posiciones del ejercicio','Exercise positions','Posições do exercício','Positions de l’exercice','Posizioni dell’esercizio','Übungspositionen'],
+  ['Posición inicial no disponible','Starting position unavailable','Posição inicial indisponível','Position de départ indisponible','Posizione iniziale non disponibile','Ausgangsposition nicht verfügbar'],
+  ['Posición final no disponible','End position unavailable','Posição final indisponível','Position finale indisponible','Posizione finale non disponibile','Endposition nicht verfügbar'],
+  ['Sostené la posición final.','Hold the end position.','Mantenha a posição final.','Maintiens la position finale.','Mantieni la posizione finale.','Halte die Endposition.'],
+  ['Pausar','Pause','Pausar','Mettre en pause','Metti in pausa','Pausieren'],
+  ['Reproducir','Play','Reproduzir','Lire','Riproduci','Abspielen'],
+  ['Repetir','Repeat','Repetir','Répéter','Ripeti','Wiederholen'],
+  ['El servidor no informó su versión.','The server did not report its version.','O servidor não informou sua versão.','Le serveur n’a pas indiqué sa version.','Il server non ha indicato la sua versione.','Der Server hat keine Versionsnummer gemeldet.']
+);
+window.FittFormaI18nDynamic = [
+  [/^(.+): (posición inicial|posición final)$/i, (m,i,t) => `${t(m[1])}: ${t(m[2][0].toUpperCase()+m[2].slice(1))}`],
+  [/^Ver (.+) a pantalla completa$/, (m,i,t) => [`View ${t(m[1])} in full screen`,`Ver ${t(m[1])} em tela cheia`,`Voir ${t(m[1])} en plein écran`,`Visualizza ${t(m[1])} a schermo intero`,`${t(m[1])} im Vollbild anzeigen`][i]],
+  [/^Repetir y marcar serie (\d+)$/, (m,i) => [`Repeat and complete set ${m[1]}`,`Repetir e concluir série ${m[1]}`,`Répéter et terminer la série ${m[1]}`,`Ripeti e completa la serie ${m[1]}`,`Satz ${m[1]} wiederholen und abschließen`][i]]
+].concat(window.FittFormaI18nDynamic || []);

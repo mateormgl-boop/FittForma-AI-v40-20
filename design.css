@@ -569,6 +569,11 @@ body{font-feature-settings:"cv11","ss01"}
 .set-table .setnum{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--ff-panel-2);color:var(--text);font-size:12px;font-weight:800}
 .set-table .setrow.is-done .setnum{background:var(--ok);color:#03241a}
 .set-table .set-prev{font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.set-table .set-repeat{display:grid;gap:2px;min-width:0;min-height:44px;padding:4px;border:1px solid var(--ff-border);border-radius:8px;background:transparent;text-align:start;color:inherit}
+.set-table .set-repeat span{overflow:hidden;text-overflow:ellipsis}
+.set-table .set-repeat small{font-size:10px;color:var(--accent);font-weight:700}
+.set-table .set-repeat:disabled small{visibility:hidden}
+
 .set-table .set-empty{text-align:center;color:var(--text-3)}
 .set-table .setrow input[type=number]{width:100%;min-width:0;text-align:center;font-variant-numeric:tabular-nums}
 .set-table .set-check span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
