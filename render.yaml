@@ -25,6 +25,8 @@ services:
         value: "false"
       - key: MONETIZATION_ENABLED
         value: "false"
+      - key: MERCADOPAGO_ENABLED
+        value: "false"
       - key: ADS_PROVIDER
         value: none
       - key: APP_TIMEZONE
