@@ -91,8 +91,9 @@
           .addSize([600, 0], [[468, 60]])
           .addSize([0, 0], [[320, 100], [320, 50]])
           .build();
-        const slot = gpt.defineSlot(cfg.slots[place], mapping, id);
+        const slot = gpt.defineSlot(cfg.slots[place], [[728, 90], [468, 60], [320, 100], [320, 50]], id);
         if (!slot) { box.classList.remove('is-reserved', 'is-visible'); return; }
+        slot.defineSizeMapping(mapping);
         slot.__ff = 'banner'; slot.__el = content; slot.addService(gpt.pubads()); box.classList.add('is-visible'); gpt.display(id);
       });
     } catch { box.classList.remove('is-reserved', 'is-visible'); }
