@@ -216,7 +216,8 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
   }
   function publicAdsConfig() {
     const a = settings.ads;
-    return { provider: a.enabled ? a.provider : 'none', testMode: a.enabled && a.testMode, networkCode: a.enabled ? a.networkCode : '', slots: a.enabled ? a.slots : {}, consent: a.consent };
+    const slots = a.enabled ? a.slots : Object.fromEntries(Object.keys(a.slots).map(key => [key, '']));
+    return { provider: a.enabled ? a.provider : 'none', testMode: a.enabled && a.testMode, networkCode: a.enabled ? a.networkCode : '', slots, consent: a.consent };
   }
 
   // Consume una consulta de IA antes de llamar al modelo; si el modelo falla, se devuelve (refund).
