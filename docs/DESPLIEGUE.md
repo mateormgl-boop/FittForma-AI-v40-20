@@ -20,9 +20,11 @@ Detalles del archivo:
 
 ## Qué cambia en v80.0
 
-- No hay migraciones nuevas de Supabase. El RIR opcional se guarda dentro de las entradas de series existentes, tanto en el borrador como en el historial y las copias de estado que ya conservan esas entradas.
-- Las personas que no seleccionen RIR siguen usando exactamente la progresión anterior.
-- El backend valida RIR entre 0 y 5 antes de pasárselo a FittAI. El dato solo se incluye cuando la persona permite compartir sus registros.
+- No hay migraciones nuevas de Supabase. El RIR opcional se guarda en las entradas de series existentes, sin alterar los registros anteriores.
+- FittAI recibe señales de progresión calculadas a partir de series completadas y solo puede sugerir una meseta con cuatro exposiciones durante al menos tres semanas; el RIR 0–1 prioriza mantener la carga.
+- Las fotos de comidas devuelven una porción visual asumida y una confianza orientativa; el formulario sigue siendo editable y no guarda automáticamente.
+- Los endpoints de IA aplican límites por IP y un límite adicional por cuenta cuando el token de Supabase es válido. Los invitados siguen habilitados. Sin migraciones SQL.
+- `script-src` usa hashes SHA-256 y deja de permitir `unsafe-inline`; `style-src` todavía requiere ese permiso hasta migrar estilos inline.
 - El backend y los paquetes informan `0.80.0`; el service worker usa `fittforma-ai-static-v80-0`.
 - Los pasos de v79 que siguen debajo mantienen validez para funciones y migraciones de versiones anteriores que puedan faltar en el proyecto real.
 

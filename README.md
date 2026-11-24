@@ -6,10 +6,10 @@ servidor y comunidad opcional con Supabase. Se despliega en Render desde GitHub 
 
 ## Novedades v80.0
 
-- Registro opcional de esfuerzo por serie (RIR 0–5) durante los entrenamientos. Se conserva junto al historial y la copia en la nube; si se deja vacío, el registro funciona como antes.
-- La progresión toma en cuenta cuando una serie quedó muy cerca del fallo y evita recomendar un aumento automático de carga en ese caso.
-- FittAI puede usar ese dato para responder mejor, sin inventarlo ni modificar el plan sin aprobación.
-- Sin migraciones nuevas de Supabase. Versión de la app: 0.80.0.
+- Registro opcional de esfuerzo por serie (RIR 0–5), progresión más cuidadosa y señales de progreso para FittAI sin diagnosticar mesetas con pocos datos.
+- Estimación por foto más transparente: porción asumida, confianza visual orientativa y formulario editable antes de guardar.
+- Límites por IP y por cuenta verificada en los endpoints de IA; los invitados siguen pudiendo usar la app.
+- CSP con hashes de scripts inline, además de pruebas nuevas para las mejoras. Sin migraciones nuevas de Supabase. Versión 0.80.0.
 
 ## Novedades v79.0
 
