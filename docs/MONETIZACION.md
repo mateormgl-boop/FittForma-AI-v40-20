@@ -74,7 +74,7 @@ La tarjeta de Plus ya no fija un precio orientativo en el código: muestra el mo
    - Crear la cuenta de servicio y vincularla.
    - Crear el tema de Pub/Sub y configurarlo en «Monetization setup» (RTDN).
    - El botón «Suscribirme con Google Play» solo aparece dentro de esa app y con sesión iniciada.
-6. **Web.** No hay pagos web. Si en el futuro se agregan (por ejemplo, Stripe), tienen que escribir `community_memberships` solo desde el servidor, con `source='web'`. Nunca se deben mezclar con las compras de Play.
+6. **Web.** La suscripción opcional con Mercado Pago está implementada pero apagada por defecto. Configurá las variables v81, aplicá la migración nueva y seguí el bloque «Membresía web con Mercado Pago». Nunca se habilita Plus desde el navegador ni se mezclan las referencias con las compras de Play.
 
 ## Límites conocidos (honestos)
 
