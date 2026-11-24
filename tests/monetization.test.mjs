@@ -110,6 +110,13 @@ test('monetización: Plus verificado sin anuncios ni videos; error de estado no 
   const e = await plus.entitlements(req(TOKEN), 'ip');
   assert.equal(e.plan, 'plus'); assert.equal(e.ads.show, false); assert.equal(e.ai.limit, 40);
   assert.equal((await plus.startReward(req(TOKEN), 'ip', 'ai')).status, 409);
+  let clock = Date.now();
+  const end = clock + 3000;
+  const expiring = createMonetization({ env: ENV, now: () => clock, fetchImpl: async () => new Response(JSON.stringify(
+    [{ tier: 'pro', status: 'active', current_period_end: new Date(end).toISOString() }])) });
+  assert.equal((await expiring.planFor({ id: USER, token: TOKEN })).plan, 'plus');
+  clock = end;
+  assert.equal((await expiring.planFor({ id: USER, token: TOKEN })).plan, 'free');
   const broken = createMonetization({ env: ENV, fetchImpl: fakeSupabase({ membershipError: true }) });
   const e2 = await broken.entitlements(req(TOKEN), 'ip');
   assert.equal(e2.plan, 'free'); assert.equal(e2.planVerified, false, 'si no se puede verificar, no se afirma Plus');
@@ -127,28 +134,49 @@ test('monetización: Google Play — estados de suscripción y verificación en 
   assert.equal(m.membershipFromPlay({ subscriptionState: 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD', lineItems: [{ productId: 'p', expiryTime: future }] }).status, 'active');
   assert.equal(m.membershipFromPlay({ subscriptionState: 'SUBSCRIPTION_STATE_ACTIVE', lineItems: [{ productId: 'p', expiryTime: past }] }).status, 'inactive', 'vencida');
   assert.equal(m.membershipFromPlay({ subscriptionState: 'SUBSCRIPTION_STATE_CANCELED', lineItems: [{ productId: 'p', expiryTime: past }] }).status, 'cancelled');
+  assert.equal(m.membershipFromPlay({ subscriptionState: 'SUBSCRIPTION_STATE_CANCELED', lineItems: [{ productId: 'p', expiryTime: future }] }).status, 'active', 'el período pagado sigue vigente');
+  assert.equal(m.membershipFromPlay({ subscriptionState: 'SUBSCRIPTION_STATE_ACTIVE', lineItems: [{ productId: 'p' }, { productId: 'other', expiryTime: future }] }, ['p']).status, 'inactive', 'el vencimiento corresponde al producto Plus');
   assert.equal(m.membershipFromPlay({ subscriptionState: 'SUBSCRIPTION_STATE_ON_HOLD', lineItems: [] }).status, 'past_due');
   assert.equal((await m.verifyPlayPurchase(req(TOKEN), { purchaseToken: 'abcdefghijkl', productId: 'x' })).status, 503, 'sin configuración no se verifica ni se activa nada');
   // Con configuración: firma JWT real con una clave de prueba y respuestas simuladas de Google.
   const { privateKey } = crypto.generateKeyPairSync('rsa', { modulusLength: 2048 });
   const sa = JSON.stringify({ client_email: 'svc@demo.iam.gserviceaccount.com', private_key: privateKey.export({ type: 'pkcs8', format: 'pem' }) });
-  const calls = [];
+  const calls = [], saved = [];
+  let ackStatus = 200, owner = null;
+  const subscription = { subscriptionState: 'SUBSCRIPTION_STATE_ACTIVE', acknowledgementState: 'ACKNOWLEDGEMENT_STATE_PENDING',
+    lineItems: [{ productId: 'fittforma_plus_monthly', expiryTime: future }] };
   const fetchImpl = async (url, init = {}) => {
     const u = String(url); calls.push(u);
     if (u === 'https://oauth2.googleapis.com/token') return new Response(JSON.stringify({ access_token: 'g-token', expires_in: 3600 }));
-    if (u.includes('/purchases/subscriptionsv2/tokens/')) return new Response(JSON.stringify({ subscriptionState: 'SUBSCRIPTION_STATE_ACTIVE', acknowledgementState: 'ACKNOWLEDGEMENT_STATE_PENDING', lineItems: [{ productId: 'fittforma_plus_monthly', expiryTime: future }] }));
-    if (u.includes(':acknowledge')) return new Response('{}');
-    if (u.includes('/rest/v1/rpc/monetization_user_for_purchase')) return new Response('null');
-    if (u.includes('/rest/v1/rpc/monetization_set_membership')) return new Response('true');
+    if (u.includes('/purchases/subscriptionsv2/tokens/')) return new Response(JSON.stringify(subscription));
+    if (u.includes(':acknowledge')) return new Response('{}', { status: ackStatus });
+    if (u.includes('/rest/v1/rpc/monetization_user_for_purchase')) return new Response(JSON.stringify(owner));
+    if (u.includes('/rest/v1/rpc/monetization_set_membership')) { saved.push(JSON.parse(init.body)); return new Response('true'); }
     return fakeSupabase()(url, init);
   };
-  const m2 = createMonetization({ env: { ...ENV, SUPABASE_SERVICE_ROLE_KEY: 'service', GOOGLE_PLAY_PACKAGE_NAME: 'ai.fittforma.app', GOOGLE_PLAY_PLUS_PRODUCT_IDS: 'fittforma_plus_monthly', GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: sa }, fetchImpl });
+  const m2 = createMonetization({ env: { ...ENV, SUPABASE_SERVICE_ROLE_KEY: 'service', GOOGLE_PLAY_PACKAGE_NAME: 'app.fittforma.ai', GOOGLE_PLAY_RTDN_TOKEN: 'notifications-test', GOOGLE_PLAY_PLUS_PRODUCT_IDS: 'fittforma_plus_monthly', GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: sa }, fetchImpl });
   assert.equal((await m2.verifyPlayPurchase(req(), { purchaseToken: 'abcdefghijkl', productId: 'fittforma_plus_monthly' })).status, 401);
   assert.equal((await m2.verifyPlayPurchase(req(TOKEN), { purchaseToken: 'abcdefghijkl', productId: 'otro_producto' })).status, 400);
   const ok = await m2.verifyPlayPurchase(req(TOKEN), { purchaseToken: 'abcdefghijkl', productId: 'fittforma_plus_monthly' });
   assert.equal(ok.status, 200); assert.equal(ok.body.plan, 'plus');
   assert.ok(calls.some(u => u.includes(':acknowledge')), 'la compra se reconoce para que Google no la reembolse');
   assert.ok(calls.some(u => u.includes('monetization_set_membership')), 'Plus se guarda con la clave de servicio');
+  ackStatus = 503;
+  const retry = await m2.verifyPlayPurchase(req(TOKEN), { purchaseToken: 'abcdefghijkl', productId: 'fittforma_plus_monthly' });
+  assert.equal(retry.status, 503, 'si Google no confirma el acuse se puede reintentar');
+  ackStatus = 200;
+  assert.equal((await m2.verifyPlayPurchase(req(TOKEN), { purchaseToken: 'abcdefghijkl', productId: 'fittforma_plus_monthly' })).body.plan, 'plus');
+  owner = USER;
+  const notification = { message: { data: Buffer.from(JSON.stringify({ packageName: 'app.fittforma.ai', subscriptionNotification: { purchaseToken: 'abcdefghijkl' } })).toString('base64') } };
+  subscription.subscriptionState = 'SUBSCRIPTION_STATE_CANCELED';
+  assert.equal((await m2.playNotification('notifications-test', notification)).body.status, 'active');
+  subscription.lineItems[0].expiryTime = past;
+  assert.equal((await m2.playNotification('notifications-test', notification)).body.status, 'cancelled');
+  assert.equal(saved.at(-1).p_period_end, past);
+  subscription.externalAccountIdentifiers = { obfuscatedExternalAccountId: 'other-account' };
+  const before = saved.length;
+  assert.equal((await m2.verifyPlayPurchase(req(TOKEN), { purchaseToken: 'abcdefghijkl', productId: 'fittforma_plus_monthly' })).status, 409);
+  assert.equal(saved.length, before);
   assert.equal((await m2.playNotification('token-incorrecto', {})).status, 403, 'las notificaciones requieren el token configurado');
 });
 

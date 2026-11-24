@@ -394,13 +394,12 @@ dispositivo y Comunidad muestra qué variable falta.
 
 ## 4. Publicar
 
-1. Hacer merge del PR a la rama que despliega Render (`render.yaml` mantiene el nombre del servicio
-   `fittforma-ai-v19-final` para no cambiar el dominio).
+1. La app en uso está en https://fittforma-ai-v40-20.onrender.com. Para publicar, integrá el PR en la rama que despliega ese servicio en Render. El nombre `fittforma-ai-v19-final` que aparece en el Blueprint corresponde al servicio anterior.
 2. Render ejecuta `npm install` y `npm start`; el chequeo de salud es `GET /healthz`.
 
 ## 5. Comprobar después de publicar
 
-- `https://<dominio>/healthz` responde `{"ok":true,"service":"fittforma-ai","version":"0.47.0"}`.
+- Verificá que `https://fittforma-ai-v40-20.onrender.com/healthz` devuelva la versión de `package.json`.
 - `https://<dominio>/api/public-config` muestra `"configured":true` (si se cargó Supabase).
 - `https://<dominio>/api/status` muestra `"configured":true` (si se cargó Gemini).
 - Al abrir la app instalada, aparece el aviso de actualización (service worker

@@ -1,6 +1,6 @@
 services:
   - type: web
-    # Se conserva el nombre existente para no arriesgar el dominio de Render ya desplegado.
+    # Blueprint del servicio anterior. La URL de la app en uso figura en docs/DESPLIEGUE.md.
     name: fittforma-ai-v19-final
     runtime: node
     plan: free

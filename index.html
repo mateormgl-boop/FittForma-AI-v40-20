@@ -54,6 +54,7 @@
     .membership-tier.pro{border-color:#3976c4;background:linear-gradient(145deg,rgb(var(--surface2-rgb) / 1),rgb(var(--surface-rgb) / 1))}
     .membership-tier h4{margin:0 0 8px;font-size:14px}
     .membership-tier ul{padding-left:17px;margin:0;color:var(--text-2);font-size:12px;line-height:1.7}
+    #membershipCard [hidden]{display:none!important}
     .membership-note{font-size:11px;line-height:1.6;color:var(--text-2)}
     @media(max-width:560px){.membership-grid{grid-template-columns:1fr}.membership-price{font-size:24px}}
     .macro-progress{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0 3px}.macro-progress-label{display:flex;justify-content:space-between;gap:6px;color:var(--muted);font-size:11px;margin-bottom:5px}.macro-progress-label strong{color:var(--text);font-size:11px;white-space:nowrap}.macro-progress .progressbar{margin-top:0}.macro-progress .progressbar span{background:linear-gradient(90deg,#3989ff,#83bdff)}
@@ -2518,13 +2519,14 @@
       <details class="ff-group" data-settings-group="membership" data-settings-keys="membresía plus pro suscripción precio">
         <summary><span><strong>Membresía</strong><small>Plan gratuito y FittForma AI Plus</small></span></summary>
         <div class="card membership-card" id="membershipCard">
-        <div class="membership-head"><div><div class="eyebrow">Tu membresía</div><h3>FittForma AI Plus</h3><p class="muted small">Una propuesta de beneficios para la futura suscripción. La versión gratuita seguirá siendo útil.</p></div><span class="membership-status membership-pill" id="membershipPill">Plan gratuito</span></div>
-        <div class="membership-price">US$ 5,99 <small>/ mes · precio orientativo, aún no definitivo</small></div>
+        <div class="membership-head"><div><div class="eyebrow">Tu membresía</div><h3>FittForma AI Plus</h3></div><span class="membership-status membership-pill" id="membershipPill">Plan gratuito</span></div>
+        <div class="membership-price" id="membershipEstimate">US$ 5,99 <small>/ mes · precio orientativo, aún no definitivo</small></div>
+        <div class="membership-price" id="membershipStorePrice" hidden><span></span> <small>/ mes</small></div>
         <div class="membership-grid">
           <div class="membership-tier"><h4>Gratis</h4><ul><li>Rutinas y biblioteca de ejercicios</li><li>Registro de sesiones y actividad</li><li>Seguimiento nutricional básico</li><li>Historial local y estadísticas</li><li>Acceso a la IA según límites gratuitos</li></ul></div>
-          <div class="membership-tier pro"><h4>Plus · beneficios</h4><ul><li>Experiencia sin anuncios</li><li>Mayor disponibilidad del entrenador IA</li><li>Personalización y análisis avanzados</li><li>Estadísticas ampliadas de progreso</li><li>Herramientas nutricionales avanzadas</li></ul></div>
+          <div class="membership-tier pro"><h4>Plus · beneficios</h4><ul><li>Experiencia sin anuncios</li><li>Mayor disponibilidad del entrenador IA</li><li>Insignia opcional de miembro en Comunidad</li></ul></div>
         </div>
-        <p class="membership-note">Los beneficios y el precio son una propuesta de producto, no una oferta de compra activa. Todavía no hay proveedor de pagos conectado ni suscripciones verificadas. No se hará ningún cobro desde esta pantalla.</p>
+        <p id="membershipPreviewNote" class="membership-note">Los beneficios y el precio son una propuesta de producto, no una oferta de compra activa. Todavía no hay proveedor de pagos conectado ni suscripciones verificadas. No se hará ningún cobro desde esta pantalla.</p>
         <p class="membership-status" id="membershipStatus" role="status" aria-live="polite">Consultando tu plan…</p><p class="membership-soon" id="membershipSoon" hidden><strong>Próximamente</strong> · La suscripción va a estar disponible desde la app de Android. Mientras tanto, todo lo gratis sigue funcionando.</p><label class="reminder-pref-row" id="showPlusRow" hidden><input id="showPlusToggle" type="checkbox"><span><strong>Mostrar mi coronita de miembro en Comunidad</strong><br><span class="muted small">Se ve una coronita dorada en tu foto y podés aparecer en «Miembros». Está apagado hasta que lo actives.</span></span></label><div class="btn-row"><button class="btn" id="plusBuyGooglePlay" type="button" hidden>Suscribirme con Google Play</button><button class="btn ghost" id="plusRestore" type="button" hidden>Restaurar compra</button><button class="btn secondary" id="membershipInfoButton" type="button">Actualizar estado</button></div>
         <p id="membershipMessage" class="muted small" style="margin:10px 0 0">Plus solo se activa cuando Google Play (app de Android) confirma la compra y el servidor la verifica. En la web todavía no hay pagos: no se hace ningún cobro.</p>
       </div>
@@ -2769,6 +2771,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 <script src="./ads-config.js"></script>
 <script src="./monetization-core.js"></script>
+<script src="./play-billing.js"></script>
 <script src="./ads.js"></script>
 <script src="./membership-config.js"></script>
 <script src="./anatomy.js"></script>
@@ -6151,7 +6154,13 @@ function findCatalogExercise(name){
     if(!gpsStartedAt)return;if(gpsNative&&gpsWatchId!==null){persistGpsDraft(true);return;}persistGpsDraft(true);clearGpsWatch();gpsLastPoint=null;if(gpsElapsedTimer)clearInterval(gpsElapsedTimer);gpsElapsedTimer=null;releaseGpsWakeLock();if(!gpsPaused){gpsPaused=true;gpsPauseAt=Date.now();}$('gpsPause').textContent='Reanudar';$('gpsStart').disabled=true;$('gpsStart').textContent='GPS pausado';$('gpsStatus').textContent='Sesión pausada para conservar el recorrido. Volvé a la app y reanudá cuando esté visible.';persistGpsDraft(true);
   }
   function setCloudStatus(message){const el=$('cloudStatus');if(el)el.textContent=message;}
-  function updateCloudControls(){{const o=$('avatarCommunityOpt');if(o)o.hidden=!cloudUser;}if(cloudUser&&cloudUser.id!==updateCloudControls.lastUser){updateCloudControls.lastUser=cloudUser.id;setTimeout(reconcileDailyFromCloud,0);if(cloudAutoOn())scheduleCloudBackup(2500);else setCloudAutoStatus('off');}if($('cloudAutoRow'))$('cloudAutoRow').hidden=!cloudUser;if(!cloudUser)updateCloudControls.lastUser=null;const ready=!!supabaseClient,logged=!!cloudUser;if($('deleteCloudAccount'))$('deleteCloudAccount').hidden=!logged;$('cloudLogin').hidden=!ready||logged;$('cloudRegister').hidden=!ready||logged;refreshAccountPrompts();$('cloudLogout').hidden=!logged;$('cloudDownload').disabled=!ready||!logged;$('cloudUpload').disabled=!ready||!logged;if(!ready)setCloudStatus('Las cuentas no están disponibles en este momento. La app sigue funcionando en este celular.');else if(logged)setCloudStatus('Sesión iniciada: '+cloudUser.email+'. Tus cambios se copian solos en la nube; también podés cargar o guardar a mano.');else setCloudStatus('Todavía no iniciaste sesión. Creá tu cuenta o entrá con la que ya tenés.');}
+  function updateCloudControls(){
+    const accountId = cloudUser?.id || null;
+    if (updateCloudControls.planAccount !== accountId) {
+      updateCloudControls.planAccount = accountId;
+      window.FittFormaAds?.accountChanged();
+    }
+    {const o=$('avatarCommunityOpt');if(o)o.hidden=!cloudUser;}if(cloudUser&&cloudUser.id!==updateCloudControls.lastUser){updateCloudControls.lastUser=cloudUser.id;setTimeout(reconcileDailyFromCloud,0);if(cloudAutoOn())scheduleCloudBackup(2500);else setCloudAutoStatus('off');}if($('cloudAutoRow'))$('cloudAutoRow').hidden=!cloudUser;if(!cloudUser)updateCloudControls.lastUser=null;const ready=!!supabaseClient,logged=!!cloudUser;if($('deleteCloudAccount'))$('deleteCloudAccount').hidden=!logged;$('cloudLogin').hidden=!ready||logged;$('cloudRegister').hidden=!ready||logged;refreshAccountPrompts();$('cloudLogout').hidden=!logged;$('cloudDownload').disabled=!ready||!logged;$('cloudUpload').disabled=!ready||!logged;if(!ready)setCloudStatus('Las cuentas no están disponibles en este momento. La app sigue funcionando en este celular.');else if(logged)setCloudStatus('Sesión iniciada: '+cloudUser.email+'. Tus cambios se copian solos en la nube; también podés cargar o guardar a mano.');else setCloudStatus('Todavía no iniciaste sesión. Creá tu cuenta o entrá con la que ya tenés.');}
   function normalizeCloudState(data){
     if(!data||typeof data!=='object'||!data.profile||!Array.isArray(data.sessions))throw new Error('Los datos de la nube no tienen un formato reconocido.');
     return sanitizeState({...structuredClone(defaults),...data,profile:{...defaults.profile,...(data.profile||{})},nutritionGoals:{...defaults.nutritionGoals,...(data.nutritionGoals||{})},reminders:{...defaults.reminders,...(data.reminders||{}),days:Array.isArray(data.reminders?.days)?data.reminders.days.filter(d=>[0,1,2,3,4,5,6].includes(Number(d))).map(Number):defaults.reminders.days.slice()},water:data.water&&typeof data.water==='object'?data.water:structuredClone(defaults.water),waterLogs:data.waterLogs&&typeof data.waterLogs==='object'&&!Array.isArray(data.waterLogs)?data.waterLogs:{},habitLogs:data.habitLogs&&typeof data.habitLogs==='object'&&!Array.isArray(data.habitLogs)?data.habitLogs:{},sessions:Array.isArray(data.sessions)?data.sessions:[],meals:Array.isArray(data.meals)?data.meals:[],weights:Array.isArray(data.weights)?data.weights:[],activities:Array.isArray(data.activities)?data.activities:[],chat:Array.isArray(data.chat)?data.chat:[],planHistory:Array.isArray(data.planHistory)?data.planHistory.slice(-8):[],badgeRecords:Array.isArray(data.badgeRecords)?data.badgeRecords.slice(-500):[],badgeUnlocks:data.badgeUnlocks&&typeof data.badgeUnlocks==='object'&&!Array.isArray(data.badgeUnlocks)?data.badgeUnlocks:{}});

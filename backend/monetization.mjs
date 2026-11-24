@@ -100,6 +100,9 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
   const sb = supabase || { url: String(env.SUPABASE_URL || '').trim().replace(/\/$/, ''), anonKey: String(env.SUPABASE_ANON_KEY || env.SUPABASE_PUBLISHABLE_KEY || '').trim() };
   const serviceKey = String(env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
   const store = serviceKey && sb.url ? new SupabaseStore({ url: sb.url, serviceKey, fetchImpl }) : new MemoryStore();
+  const playReady = Boolean(config.enabled && settings.play.packageName && settings.play.productIds.length &&
+    settings.play.serviceAccount && store.kind === 'supabase' && sb.anonKey);
+  const playAccountId = userId => crypto.createHash('sha256').update('fittforma-play:' + userId).digest('hex');
   const metrics = new Map();
   const userCache = new Map(), planCache = new Map();
 
@@ -134,7 +137,8 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
         if (active) value = { plan: 'plus', verified: true, source: 'membership', periodEnd: row.current_period_end || null };
       }
     } catch { value = { plan: 'free', verified: false, source: null, periodEnd: null, error: 'membership_unavailable' }; }
-    planCache.set(user.id, { value, exp: now() + 2 * 60000 });
+    const cacheEnd = now() + 2 * 60000;
+    planCache.set(user.id, { value, exp: value.periodEnd ? Math.min(cacheEnd, Date.parse(value.periodEnd)) : cacheEnd });
     return value;
   }
   // Fotos publicadas hoy: las cuenta la base (las publicaciones van directo del navegador a Supabase).
@@ -176,7 +180,7 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
       ai, photos, store: store.kind,
       timezone: TZ,
       ads: { show: adsOn, provider: adsOn ? settings.ads.provider : 'none', testMode: settings.ads.testMode, interstitialMinMinutes: config.ads.interstitialMinMinutes, sectionChangesBetweenInterstitials: config.ads.sectionChangesBetweenInterstitials, rewardedAvailable: adsOn && (settings.ads.provider === 'test' || Boolean(settings.ads.slots.rewarded)) },
-      payments: { googlePlay: Boolean(settings.play.packageName && settings.play.productIds.length && settings.play.serviceAccount && serviceKey), web: false }
+      payments: { googlePlay: playReady, productIds: playReady ? settings.play.productIds : [], accountId: playReady && user ? playAccountId(user.id) : null, web: false }
     };
   }
   function publicAdsConfig() {
@@ -275,13 +279,44 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     const j = await r.json(); playToken = { token: j.access_token, exp: now() + (Number(j.expires_in) || 3600) * 1000 };
     return playToken.token;
   }
-  // Estado según subscriptionsv2: ACTIVE y IN_GRACE_PERIOD dan acceso; el resto, no.
-  function membershipFromPlay(sub) {
-    const active = ['SUBSCRIPTION_STATE_ACTIVE', 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD'].includes(sub?.subscriptionState);
-    const expiries = (sub?.lineItems || []).map(li => Date.parse(li.expiryTime)).filter(Number.isFinite);
+  function membershipFromPlay(sub, allowedIds) {
+    const items = (sub?.lineItems || []).filter(item => !allowedIds || allowedIds.includes(item.productId));
+    const expiries = items.map(item => Date.parse(item.expiryTime)).filter(Number.isFinite);
     const periodEnd = expiries.length ? new Date(Math.max(...expiries)).toISOString() : null;
-    const status = active && (!periodEnd || Date.parse(periodEnd) > now()) ? 'active' : sub?.subscriptionState === 'SUBSCRIPTION_STATE_ON_HOLD' ? 'past_due' : sub?.subscriptionState === 'SUBSCRIPTION_STATE_CANCELED' ? 'cancelled' : 'inactive';
-    return { status, periodEnd, productIds: (sub?.lineItems || []).map(li => li.productId), acknowledged: sub?.acknowledgementState === 'ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED' };
+    const state = sub?.subscriptionState;
+    const paid = ['SUBSCRIPTION_STATE_ACTIVE', 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD', 'SUBSCRIPTION_STATE_CANCELED'].includes(state);
+    const status = paid && periodEnd && Date.parse(periodEnd) > now() ? 'active' :
+      state === 'SUBSCRIPTION_STATE_ON_HOLD' ? 'past_due' : state === 'SUBSCRIPTION_STATE_CANCELED' ? 'cancelled' : 'inactive';
+    return { status, periodEnd, productIds: items.map(item => item.productId),
+      pending: state === 'SUBSCRIPTION_STATE_PENDING', acknowledged: sub?.acknowledgementState === 'ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED' };
+  }
+
+  async function syncPlayPurchase(userId, token, requestedId) {
+    const p = settings.play;
+    const base = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(p.packageName)}/purchases`;
+    let access, sub;
+    try {
+      access = await googleAccessToken();
+      const r = await fetchImpl(`${base}/subscriptionsv2/tokens/${encodeURIComponent(token)}`, { headers: { Authorization: `Bearer ${access}` } });
+      if (!r.ok) throw new Error('lookup');
+      sub = await r.json();
+    } catch { return { status: 502, body: { error: 'No se pudo verificar la compra con Google Play. No se activó Plus.' } }; }
+    const account = sub.externalAccountIdentifiers?.obfuscatedExternalAccountId;
+    if (account && account !== playAccountId(userId)) return { status: 409, body: { error: 'Esta compra ya está asociada a otra cuenta.' } };
+    const m = membershipFromPlay(sub, p.productIds);
+    const productId = requestedId || m.productIds[0];
+    if (!productId || !m.productIds.includes(productId)) return { status: 400, body: { error: 'El producto no corresponde a FittForma AI Plus.' } };
+    const saved = await store.setMembership({ userId, status: m.status, periodEnd: m.periodEnd, source: 'google_play', purchaseToken: token, productId });
+    if (!saved) return { status: 409, body: { error: 'Esta compra ya está asociada a otra cuenta.' } };
+    planCache.delete(userId);
+    if (m.status === 'active' && !m.acknowledged) {
+      try {
+        const ack = await fetchImpl(`${base}/subscriptions/${encodeURIComponent(productId)}/tokens/${encodeURIComponent(token)}:acknowledge`,
+          { method: 'POST', headers: { Authorization: `Bearer ${access}`, 'Content-Type': 'application/json' }, body: '{}' });
+        if (!ack.ok) throw new Error('acknowledge');
+      } catch { return { status: 503, body: { error: 'Usá Restaurar compra para verificar tu suscripción.' } }; }
+    }
+    return { status: 200, body: { plan: m.status === 'active' ? 'plus' : 'free', status: m.status, pending: m.pending, periodEnd: m.periodEnd } };
   }
   async function verifyPlayPurchase(req, body) {
     const p = settings.play;
@@ -292,22 +327,9 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     if (!/^[A-Za-z0-9._\-:]{10,600}$/.test(token) || !p.productIds.includes(productId)) return { status: 400, body: { error: 'Compra inválida.' } };
     const owner = await store.userForPurchase(token);
     if (owner && owner !== user.id) return { status: 409, body: { error: 'Esta compra ya está asociada a otra cuenta.' } };
-    let sub;
-    try {
-      const access = await googleAccessToken();
-      const r = await fetchImpl(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(p.packageName)}/purchases/subscriptionsv2/tokens/${encodeURIComponent(token)}`, { headers: { Authorization: `Bearer ${access}` } });
-      if (!r.ok) return { status: 502, body: { error: 'Google Play no confirmó la compra. No se activó Plus.' } };
-      sub = await r.json();
-    } catch { return { status: 502, body: { error: 'No se pudo verificar la compra con Google Play. No se activó Plus.' } }; }
-    const m = membershipFromPlay(sub);
-    if (!m.productIds.some(id => p.productIds.includes(id))) return { status: 400, body: { error: 'El producto no corresponde a FittForma AI Plus.' } };
-    await store.setMembership({ userId: user.id, status: m.status, periodEnd: m.periodEnd, source: 'google_play', purchaseToken: token, productId });
-    planCache.delete(user.id);
-    if (m.status === 'active' && !m.acknowledged) {
-      try { const access = await googleAccessToken(); await fetchImpl(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(p.packageName)}/purchases/subscriptions/${encodeURIComponent(productId)}/tokens/${encodeURIComponent(token)}:acknowledge`, { method: 'POST', headers: { Authorization: `Bearer ${access}`, 'Content-Type': 'application/json' }, body: '{}' }); } catch { /* Google reintenta; se reconoce en la próxima verificación */ }
-    }
-    if (m.status === 'active') metric('plus_purchase_verified');
-    return { status: 200, body: { plan: m.status === 'active' ? 'plus' : 'free', status: m.status, periodEnd: m.periodEnd } };
+    const result = await syncPlayPurchase(user.id, token, productId);
+    if (result.status === 200 && result.body.plan === 'plus') metric('plus_purchase_verified');
+    return result;
   }
   // Notificaciones en tiempo real (renovación, cancelación, vencimiento) desde Pub/Sub.
   async function playNotification(token, body) {
@@ -320,14 +342,8 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     if (!purchaseToken || note.packageName !== p.packageName) return { status: 200, body: { ignored: true } };
     const userId = await store.userForPurchase(purchaseToken);
     if (!userId) return { status: 200, body: { ignored: true, reason: 'unknown_purchase' } };
-    let r;
-    try { const access = await googleAccessToken();
-    r = await fetchImpl(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(p.packageName)}/purchases/subscriptionsv2/tokens/${encodeURIComponent(purchaseToken)}`, { headers: { Authorization: `Bearer ${access}` } }); } catch { return { status: 502, body: { error: 'google_error' } }; }
-    if (!r.ok) return { status: 502, body: { error: 'google_error' } };
-    const m = membershipFromPlay(await r.json());
-    await store.setMembership({ userId, status: m.status, periodEnd: m.periodEnd, source: 'google_play', purchaseToken });
-    planCache.delete(userId);
-    return { status: 200, body: { updated: true, status: m.status } };
+    const result = await syncPlayPurchase(userId, purchaseToken);
+    return result.status === 200 ? { status: 200, body: { updated: true, status: result.body.status } } : result;
   }
 
   return { settings, store, entitlements, publicAdsConfig, consumeAi, startReward, claimReward, metric, metricsSummary, verifyPlayPurchase, playNotification, membershipFromPlay, resolveUser, planFor };

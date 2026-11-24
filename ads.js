@@ -8,12 +8,12 @@
   const M = window.FittFormaMonetization;
   let cfg = { provider: 'none', slots: {}, consent: 'google-cmp' }, ent = null, gptPromise = null, cmpLoaded = false;
   let lastAdAt = 0, activeMsSinceLast = 0, sectionChanges = 0, adOpen = false, lastTick = Date.now(), entLoadedAt = 0;
-  const shownBanners = new Set();
+  const shownBanners = new Set(), bannerObservers = new Map(), bannerSlots = new Map();
   let communitySlot = null;
 
   async function authHeader() { try { return (await window.FittFormaAuthHeader?.()) || {}; } catch { return {}; } }
-  async function api(path, body) {
-    const headers = { Accept: 'application/json', ...(await authHeader()) };
+  async function api(path, body, auth) {
+    const headers = { Accept: 'application/json', ...(auth || await authHeader()) };
     const init = body ? { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { headers, cache: 'no-store' };
     const r = await fetch(path, init); const j = await r.json().catch(() => ({}));
     return { ok: r.ok, status: r.status, data: j };
@@ -23,14 +23,55 @@
   const toast = m => window.toast?.(m);
 
   // ---------- Estado del servidor ----------
-  async function refresh(force = false) {
+  let refreshId = 0, billing = null, offer = null, paymentBusy = false;
+  function accountChanged() {
+    refreshId++;
+    ent = billing = offer = null;
+    renderPlan(); renderCoachUsage(); syncBanners();
+    // Supabase libera el bloqueo de su sesión al salir de onAuthStateChange.
+    setTimeout(() => refresh(true), 0);
+  }
+  async function refresh(force = false, afterPayment = false) {
+    if (paymentBusy && !afterPayment) return ent;
     if (!force && ent && Date.now() - entLoadedAt < 60000) return ent;
+    const id = ++refreshId;
     try {
       const pc = await fetch('/api/public-config', { cache: 'no-store' }).then(r => r.json()).catch(() => ({}));
       if (pc?.monetization?.ads) cfg = pc.monetization.ads;
       const r = await api('/api/entitlements');
-      if (r.ok) { ent = r.data; entLoadedAt = Date.now(); }
-    } catch { /* sin red: sin anuncios ni recompensas, la app sigue igual */ }
+      if (id !== refreshId) return ent;
+      ent = r.ok ? r.data : null;
+      entLoadedAt = Date.now();
+    } catch { if (id === refreshId) ent = null; }
+    if (id !== refreshId) return ent;
+    billing = offer = null;
+    renderPlan(); renderCoachUsage(); syncBanners();
+    if (!ent?.payments?.googlePlay || !ent.signedIn) return ent;
+    let service, result;
+    try {
+      service = await window.FittFormaPlayBilling.connect();
+      if (id !== refreshId) return ent;
+      const { productIds, accountId } = ent.payments;
+      if (!afterPayment && accountId && service?.unfinished) {
+        // Recupera una compra interrumpida aunque la persona haya cerrado la app al pagar.
+        const unfinished = await service.unfinished(productIds, accountId);
+        if (unfinished.length && id === refreshId) {
+          const auth = await authHeader();
+          for (const receipt of unfinished) {
+            if (id !== refreshId) return ent;
+            await verifyReceipt(receipt, auth);
+          }
+          const updated = await api('/api/entitlements', null, auth);
+          if (id !== refreshId) return ent;
+          if (updated.ok) ent = updated.data;
+        }
+      }
+      if (id === refreshId && service && ent.planVerified && !isPlus() && productIds?.length) {
+        result = await service.monthlyOffer(productIds, accountId);
+      }
+    } catch { /* Restaurar sigue disponible si falla la consulta de precio o de recibos pendientes. */ }
+    if (id !== refreshId) return ent;
+    billing = service; offer = result;
     renderPlan(); renderCoachUsage(); syncBanners();
     return ent;
   }
@@ -66,13 +107,21 @@
       const box = document.getElementById(id); if (!box) continue;
       const allowed = adsOn() && (cfg.provider === 'test' || Boolean(cfg.slots?.[place]));
       box.classList.toggle('is-reserved', allowed);
-      if (!allowed) { box.classList.remove('is-visible'); continue; }
-      if (shownBanners.has(place)) continue;
+      if (!allowed) {
+        bannerObservers.get(place)?.disconnect(); bannerObservers.delete(place);
+        const slot = bannerSlots.get(place);
+        if (slot) { window.googletag?.destroySlots([slot]); bannerSlots.delete(place); }
+        shownBanners.delete(place);
+        box.querySelector('.ad-slot-content')?.replaceChildren();
+        box.classList.remove('is-visible');
+        continue;
+      }
+      if (shownBanners.has(place) || bannerObservers.has(place)) continue;
       const io = new IntersectionObserver(entries => {
-        if (!entries.some(e => e.isIntersecting) || shownBanners.has(place)) return;
-        io.disconnect(); shownBanners.add(place); renderBanner(place, box);
+        if (!entries.some(e => e.isIntersecting) || bannerObservers.get(place) !== io || !adsOn()) return;
+        io.disconnect(); bannerObservers.delete(place); shownBanners.add(place); renderBanner(place, box);
       }, { rootMargin: '120px' });
-      io.observe(box);
+      bannerObservers.set(place, io); io.observe(box);
     }
   }
   async function renderBanner(place, box) {
@@ -84,7 +133,7 @@
     }
     try {
       const gpt = await loadGpt(); const id = content.id || `adContent-${place}`; content.id = id;
-      gpt.cmd.push(() => { const slot = gpt.defineSlot(cfg.slots[place], [[320, 100], [320, 50], [300, 250], [728, 90]], id); if (!slot) return; slot.__ff = 'banner'; slot.__el = content; slot.addService(gpt.pubads()); box.classList.add('is-visible'); gpt.display(id); });
+      gpt.cmd.push(() => { if (!adsOn() || cfg.provider !== 'gam' || bannerSlots.has(place)) return; const slot = gpt.defineSlot(cfg.slots[place], [[320, 100], [320, 50], [300, 250], [728, 90]], id); if (!slot) return; bannerSlots.set(place, slot); slot.__ff = 'banner'; slot.__el = content; slot.addService(gpt.pubads()); box.classList.add('is-visible'); gpt.display(id); });
     } catch { box.classList.remove('is-reserved', 'is-visible'); }
   }
 
@@ -100,7 +149,7 @@
   // Se cuenta solo el tiempo de uso activo (pestaña visible). Nunca durante entrenamiento, descanso,
   // GPS, comidas, IA, inicio de sesión, pagos, fotos o guardado.
   setInterval(() => { const now = Date.now(); if (document.visibilityState === 'visible' && !adOpen) activeMsSinceLast += now - lastTick; lastTick = now; }, 1000);
-  function activities() { try { return (window.FittFormaActivities?.() || []).concat(adOpen ? ['ad-open'] : []); } catch { return ['unknown']; } }
+  function activities() { try { return (window.FittFormaActivities?.() || []).concat(adOpen ? ['ad-open'] : [], paymentBusy ? ['payment'] : []); } catch { return ['unknown']; } }
   async function maybeInterstitial(event) {
     if (event === 'section-change') sectionChanges++;
     if (!ent || !adsOn() || !M) return { shown: false, reason: 'off' };
@@ -238,7 +287,7 @@
     chip.hidden = !ent; text.textContent = label; chip.classList.toggle('is-plus', plus);
     chip.setAttribute('aria-label', plus ? `${t('Tu plan: FittForma AI Plus')}. ${t('Ver membresía')}` : `${t('Membresía')}: ${t('hacete miembro')}`);
     // Mientras no se pueda pagar desde la app, la tarjeta lo dice en vez de mostrar un botón que no existe.
-    const soon = document.getElementById('membershipSoon'); if (soon) soon.hidden = plus || Boolean(ent?.payments?.googlePlay && 'getDigitalGoodsService' in window);
+    const soon = document.getElementById('membershipSoon'); if (soon) soon.hidden = plus || Boolean(ent?.payments?.googlePlay);
   }
   function openMembership() {
     window.FittFormaGo?.('settings');
@@ -255,32 +304,78 @@
       : isPlus() ? `<strong>${t('Tu plan: FittForma AI Plus')}</strong> · ${t('verificado')}${ent.planPeriodEnd ? ` · ${t('vigente hasta')} ${new Date(ent.planPeriodEnd).toLocaleDateString()}` : ''}`
         : `<strong>${t('Tu plan: Gratis')}</strong>${signed ? '' : ` · ${t('iniciá sesión para asociar una suscripción a tu cuenta')}`}`;
     const spr = document.getElementById('showPlusRow'); if (spr) spr.hidden = !(isPlus() && signed);
-    const buy = document.getElementById('plusBuyGooglePlay'); if (buy) buy.hidden = !(ent?.payments?.googlePlay && 'getDigitalGoodsService' in window && signed && !isPlus());
-    const restore = document.getElementById('plusRestore'); if (restore) restore.hidden = !(ent?.payments?.googlePlay && 'getDigitalGoodsService' in window && signed);
+    const buy = document.getElementById('plusBuyGooglePlay'), restore = document.getElementById('plusRestore');
+    if (buy) { buy.hidden = !offer || !signed || isPlus(); buy.disabled = paymentBusy; }
+    if (restore) { restore.hidden = !billing || !signed; restore.disabled = paymentBusy; }
+    const preview = !ent?.payments?.googlePlay && !isPlus();
+    for (const id of ['membershipEstimate', 'membershipPreviewNote']) {
+      const el = document.getElementById(id);
+      if (el) el.hidden = !preview;
+    }
+    const price = document.getElementById('membershipStorePrice');
+    if (price) { price.hidden = !offer; price.querySelector('span').textContent = offer?.price || ''; }
+    const message = document.getElementById('membershipMessage');
+    if (message && ent?.payments?.googlePlay && !isPlus()) {
+      message.textContent = t(!signed ? 'Iniciá sesión para asociar la suscripción a tu cuenta.' :
+        offer ? 'Google Play te muestra el precio y te pide confirmación antes de suscribirte.' :
+        billing ? 'Google Play no encontró el producto.' : 'Abrí la app desde Google Play para consultar la suscripción disponible.');
+    } else if (message) {
+      message.textContent = t('Plus solo se activa cuando Google Play (app de Android) confirma la compra y el servidor la verifica. En la web todavía no hay pagos: no se hace ningún cobro.');
+    }
   }
-  // Google Play (app de Android como TWA): Digital Goods API + Payment Request; el servidor verifica.
-  async function buyPlusGooglePlay() {
-    try {
-      const productId = (window.FittFormaMembershipConfig?.googlePlayProductIds || [])[0];
-      if (!productId) { toast(t('Falta configurar el producto de Google Play.')); return; }
-      const service = await window.getDigitalGoodsService('https://play.google.com/billing');
-      const [details] = await service.getDetails([productId]);
-      if (!details) { toast(t('Google Play no encontró el producto.')); return; }
-      const request = new PaymentRequest([{ supportedMethods: 'https://play.google.com/billing', data: { sku: productId } }], { total: { label: 'FittForma AI Plus', amount: details.price } });
-      const response = await request.show();
-      const v = await api('/api/billing/play/verify', { purchaseToken: response.details.purchaseToken, productId });
-      await response.complete(v.ok ? 'success' : 'fail');
-      await refresh(true);
-      toast(v.ok && v.data.plan === 'plus' ? t('¡Plus activo! Verificado con Google Play.') : v.data?.error || t('No se pudo verificar la compra. No se activó Plus.'));
-    } catch (e) { if (e?.name !== 'AbortError') toast(t('No se completó la compra. No se hizo ningún cobro desde la app.')); }
+
+  async function runBilling(action) {
+    if (!billing || !ent?.signedIn || paymentBusy) return;
+    paymentBusy = true;
+    renderPlan();
+    try { await action(); }
+    catch (e) {
+      if (e?.name !== 'AbortError' && e?.code !== 'USER_CANCELED') {
+        toast(t(e?.code === 'ITEM_ALREADY_OWNED' ? 'Usá Restaurar compra para verificar tu suscripción.' : 'No se pudo consultar Google Play.'));
+      }
+    } finally { paymentBusy = false; renderPlan(); }
   }
-  async function restorePlus() {
-    try {
-      const service = await window.getDigitalGoodsService('https://play.google.com/billing');
-      const purchases = await service.listPurchases(); let ok = false;
-      for (const p of purchases) { const v = await api('/api/billing/play/verify', { purchaseToken: p.purchaseToken, productId: p.itemId }); ok = ok || (v.ok && v.data.plan === 'plus'); }
-      await refresh(true); toast(ok ? t('Suscripción restaurada.') : t('No encontramos una suscripción activa en esta cuenta de Google Play.'));
-    } catch { toast(t('No se pudo consultar Google Play.')); }
+
+  async function verifyReceipt(receipt, auth) {
+    if (receipt.pending && !receipt.purchaseToken) return { pending: true };
+    if (!receipt.purchaseToken) throw new Error('missing_receipt');
+    const v = await api('/api/billing/play/verify', { purchaseToken: receipt.purchaseToken, productId: receipt.productId }, auth);
+    if (!v.ok) throw new Error(v.data?.error || 'No se pudo verificar la compra. No se activó Plus.');
+    return { active: v.data.plan === 'plus', pending: v.data.pending === true };
+  }
+
+  function buyPlusGooglePlay() {
+    if (!offer) return;
+    return runBilling(async () => {
+      const auth = authHeader();
+      const receipt = await offer.buy();
+      let result, error;
+      try { result = await verifyReceipt(receipt, await auth); }
+      catch (e) { error = e; }
+      try { await receipt.complete?.(result?.active ? 'success' : 'unknown'); } catch { /* El recibo se puede restaurar. */ }
+      await refresh(true, true);
+      if (error) toast(t('Usá Restaurar compra para verificar tu suscripción.'));
+      else toast(t(result.active ? '¡Plus activo! Verificado con Google Play.' : result.pending ?
+        'El pago está pendiente en Google Play.' : 'No encontramos una suscripción activa en esta cuenta de Google Play.'));
+    });
+  }
+
+  function restorePlus() {
+    return runBilling(async () => {
+      const store = billing, ids = ent.payments.productIds, auth = await authHeader();
+      const purchases = await store.purchases();
+      let active = false, pending = false, error = '';
+      for (const p of purchases.filter(p => ids.includes(p.productId))) {
+        try {
+          const result = await verifyReceipt(p, auth);
+          active ||= result.active;
+          pending ||= result.pending;
+        } catch (e) { error = e instanceof TypeError ? 'No se pudo consultar Google Play.' : e.message; }
+      }
+      await refresh(true, true);
+      toast(t(active ? 'Suscripción restaurada.' : error || (pending ? 'El pago está pendiente en Google Play.' :
+        'No encontramos una suscripción activa en esta cuenta de Google Play.')));
+    });
   }
 
   // Compatibilidad con la API anterior (index.html).
@@ -295,5 +390,5 @@
     refresh(true); metric('app_open');
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refresh(); });
   }
-  window.FittFormaAds = Object.freeze({ init, refresh, canAskCoach, recordCoachSuccess, renderCoachUsage, showAiQuota, earnPhoto, maybeInterstitial, isPlus, entitlements: () => ent, showRewarded: () => earnReward('ai') });
+  window.FittFormaAds = Object.freeze({ init, refresh, accountChanged, canAskCoach, recordCoachSuccess, renderCoachUsage, showAiQuota, earnPhoto, maybeInterstitial, isPlus, entitlements: () => ent, showRewarded: () => earnReward('ai') });
 })();

@@ -16,12 +16,13 @@ No hay identificadores de anuncios, precios ni credenciales reales en el reposit
 | Plus | Sin anuncios, más IA y más fotos. Se activa **solo** con una compra verificada en el servidor contra Google Play. En la web no hay cobro. | Servidor + tabla `community_memberships` |
 | Métricas | Contadores agregados, sin datos personales. Solo se cuentan impresiones que el proveedor confirma (`slotRenderEnded` con anuncio, `rewardedSlotReady`). Las recompensas las cuenta el servidor al canjear. | `/api/metrics`, `/api/metrics/summary` |
 
-No se modificaron los precios ni los beneficios publicados. La tarjeta muestra el mismo precio **orientativo** de antes (US$ 5,99/mes, «aún no definitivo»). Solo cambió el nombre de «Pro» a «FittForma AI Plus», y la tarjeta ahora explica que se activa con Google Play.
+Con los pagos apagados la tarjeta conserva el precio orientativo. Al habilitarlos, Android consulta a Google Play y muestra el precio mensual en la moneda de la tienda. El precio definitivo se confirma en la hoja de compra de Google Play.
 
 ## Archivos
 
 - `monetization-core.js`: reglas compartidas por el navegador, el servidor y las pruebas (límites, política de intersticiales, cuotas).
-- `ads.js`: integración en el navegador (GPT de Google Ad Manager, proveedor de prueba, videos, Plus con Digital Goods API).
+- `ads.js`: integración en el navegador (GPT de Google Ad Manager, proveedor de prueba, videos, controles de membresía).
+- `play-billing.js` conecta el proyecto Android Capacitor con Google Play Billing. También admite Digital Goods API en una TWA compatible.
 - `backend/monetization.mjs`: plan verificado, cuotas, comprobantes, Google Play (subscriptionsv2 + acknowledge + RTDN) y métricas.
 - `backend/server.mjs`: rutas `/api/entitlements`, `/api/rewards/*`, `/api/metrics`, `/api/metrics/summary`, `/api/billing/play/verify` y `/api/billing/play/rtdn`; cuota de IA en `/api/coach`; la CSP suma los dominios de Google **solo** con `ADS_PROVIDER=gam`.
 - `supabase/migrations/2026-10-21_v48_monetization.sql`: tablas de contadores, comprobantes y compras; trigger del límite de fotos (desactivado); `my_photo_quota()`. Es aditiva y re-ejecutable.
@@ -51,8 +52,8 @@ No se modificaron los precios ni los beneficios publicados. La tarjeta muestra e
 | `APP_TIMEZONE` | `America/Montevideo` | Día de los contadores. Tiene que coincidir con `monetization_settings.timezone`. |
 | `SUPABASE_SERVICE_ROLE_KEY` | *(secreto)* | **Solo en el servidor.** Sin esta clave, los contadores quedan en memoria (se reinician con cada despliegue) y no hay fotos extra ni Google Play. |
 | `ADMIN_METRICS_TOKEN` | *(secreto largo)* | Para leer `/api/metrics/summary` con el encabezado `X-Admin-Token`. |
-| `GOOGLE_PLAY_PACKAGE_NAME` | `com.tuempresa.fittforma` | |
-| `GOOGLE_PLAY_PLUS_PRODUCT_IDS` | `fittforma_plus_monthly` | Lista separada por comas. También va en `membership-config.js` → `googlePlayProductIds`. |
+| `GOOGLE_PLAY_PACKAGE_NAME` | `app.fittforma.ai` | |
+| `GOOGLE_PLAY_PLUS_PRODUCT_IDS` | `fittforma_plus_monthly` | Lista de IDs de suscripción en orden de preferencia. El servidor envía los IDs públicos a la app. |
 | `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` | *(JSON de la cuenta de servicio)* | **Secreto.** Permiso «Ver datos financieros» y «Gestionar pedidos» en Play Console. |
 | `GOOGLE_PLAY_RTDN_TOKEN` | *(secreto largo)* | La suscripción push de Pub/Sub apunta a `https://<tu-dominio>/api/billing/play/rtdn?token=<este valor>`. |
 
@@ -66,20 +67,23 @@ No se modificaron los precios ni los beneficios publicados. La tarjeta muestra e
    - Publicar `ads.txt` cuando Google lo pida.
 3. **Render.** Cargar las variables de arriba, empezando por `MONETIZATION_ENABLED=true` y `ADS_PROVIDER=gam` con los identificadores reales, y `SUPABASE_SERVICE_ROLE_KEY`. Revisar en un entorno de prueba antes de producción.
 4. **Límite de fotos.** Cuando se quiera activar: `update public.monetization_settings set photo_limit_enabled = true;` (en el SQL editor de Supabase).
-5. **Plus con Google Play.** Requiere una **app de Android**: este repositorio no tiene un proyecto Android. Pasos:
-   - Empaquetar la PWA como TWA (por ejemplo con Bubblewrap) y habilitar Play Billing en la TWA (Digital Goods API).
-   - Crear la suscripción en Play Console con su precio real.
-   - Crear la cuenta de servicio y vincularla.
-   - Crear el tema de Pub/Sub y configurarlo en «Monetization setup» (RTDN).
-   - El botón «Suscribirme con Google Play» solo aparece dentro de esa app y con sesión iniciada.
+5. **Plus con Google Play.** Usá el proyecto Android de `mobile/` y el procedimiento de prueba interna de abajo.
 6. **Web.** No hay pagos web. Si en el futuro se agregan (por ejemplo, Stripe), tienen que escribir `community_memberships` solo desde el servidor, con `source='web'`. Nunca se deben mezclar con las compras de Play.
+
+## Prueba interna de Plus en Android
+
+1. En Google Play Console, usá la app con paquete `app.fittforma.ai`. Creá o elegí la suscripción y activá un plan base mensual autorrenovable, sin cuotas, en el país del tester. Incluí su cuenta en la pista de prueba interna y en **Pruebas de licencia**.
+2. Desplegá la rama de prueba en un servidor HTTPS de pruebas con su propia base Supabase. La app pública está en https://fittforma-ai-v40-20.onrender.com. En pruebas, aplicá las migraciones hasta `2026-11-23_play_membership.sql`. Configurá las variables de Supabase, `MONETIZATION_ENABLED=true`, `ADS_PROVIDER=none`, el paquete, los IDs reales, la cuenta de servicio con acceso a esa app y las notificaciones RTDN. Comprobá `/healthz` y que `/api/entitlements` informe `payments.googlePlay: true`.
+3. Desde `mobile/`, ejecutá `npm ci` y `FITTFORMA_APP_URL=https://<servidor-de-pruebas> npm run sync`. En Android Studio, generá el Android App Bundle firmado con la clave de subida de la app. Su `versionCode` debe ser superior al último que subiste a Play. Subilo a **Prueba interna** y abrí el enlace de participación con la cuenta tester para instalar desde Google Play.
+4. Iniciá sesión en FittForma y abrí **Miembros**. Comprobá el precio en la moneda de la tienda. Elegí una tarjeta de prueba de Google Play y completá la compra. La app debe mostrar **Miembro · verificado** y el período vigente. Probá también cancelar la hoja sin comprar y usar el método de prueba que rechaza el pago.
+5. Reinstalá desde la pista y entrá con la misma cuenta. **Restaurar compra** debe recuperar el acceso sin otra compra. Si se cierra la app al pagar, al abrirla con la misma cuenta se vuelven a consultar los recibos pendientes de verificación. También podés restaurarlos a mano cuando Play confirme el pago. Cancelá la renovación de prueba para verificar que Plus dure hasta el vencimiento y luego vuelva a Gratis. Los eventos de Play se pueden comprobar con las notificaciones RTDN.
 
 ## Límites conocidos (honestos)
 
 - **Videos recompensados en la web:**
   - GPT no ofrece verificación del lado del servidor (SSV) para la web.
   - El servidor exige un comprobante de un solo uso, un tiempo mínimo y un tope diario. Eso evita repeticiones y abusos simples, pero no puede probar criptográficamente que el video se vio.
-  - En la app de Android con AdMob sí existe SSV, pero no está implementada porque no hay proyecto Android.
+  - En la app de Android con AdMob sí existe SSV, pero el proyecto Capacitor aún usa los anuncios web.
 - **Intersticiales web:** Google decide cuándo mostrarlos con sus propios disparadores (navegación). La app solo habilita el bloque en las pausas permitidas; no puede forzarlo.
 - **Personas sin cuenta:**
   - La cuota de IA se cuenta por IP anonimizada (hash).

@@ -53,5 +53,11 @@ reset role; set role authenticated;
 select t.as_user('a4800000-0000-0000-0000-0000000000f2');
 select t.expect_json($q$select public.my_photo_quota()$q$, 'plan', 'free', 'Al vencer vuelve a gratis');
 reset role;
+set role service_role;
+select t.expect_json($q$select jsonb_build_object('ok',public.monetization_set_membership('a4800000-0000-0000-0000-0000000000f2','active',now()+interval '1 month','google_play','new-period-token','monthly'))$q$, 'ok', 'true', 'Una nueva suscripción activa Plus');
+select t.expect_json($q$select jsonb_build_object('ok',public.monetization_set_membership('a4800000-0000-0000-0000-0000000000f2','inactive',now()-interval '1 day','google_play','token-test-123456'))$q$, 'ok', 'true', 'Una notificación tardía actualiza su propio recibo');
+select t.expect_json($q$select jsonb_build_object('plus',public.monetization_is_plus('a4800000-0000-0000-0000-0000000000f2'))$q$, 'plus', 'true', 'El recibo vigente conserva el mes pagado');
+select t.expect_json($q$select jsonb_build_object('ok',public.monetization_set_membership('a4800000-0000-0000-0000-0000000000f1','active',now()+interval '1 month','google_play','new-period-token','monthly'))$q$, 'ok', 'false', 'Se respeta la cuenta asociada al recibo');
+reset role;
 update public.monetization_settings set photo_limit_enabled = false;
 \echo PRUEBAS v48 MONETIZACION PASARON
