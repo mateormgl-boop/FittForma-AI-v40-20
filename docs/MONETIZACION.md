@@ -70,7 +70,7 @@ La tarjeta de Plus ya no fija un precio orientativo en el código: muestra el mo
 1. **Base de datos.** Aplicar las migraciones pendientes en el orden de `supabase/migrations` (incluida `2026-11-24_v81_mercadopago_memberships.sql`), o usar el consolidado `supabase/APLICAR_MIGRACIONES.sql`. El límite de fotos queda **apagado**.
 2. **Google Ad Manager.**
    - Crear la cuenta y obtener el código de red.
-    - Crear 8 bloques: 5 banners (`fittforma_home`, `fittforma_explore`, `fittforma_community`, `fittforma_nutrition`, `fittforma_progress`), 1 ancla inferior (`fittforma_anchor`), 1 recompensado web (`fittforma_rewarded`) y 1 intersticial web (`fittforma_interstitial`).
+   - Crear 8 bloques: 5 banners (`fittforma_home`, `fittforma_explore`, `fittforma_community`, `fittforma_nutrition`, `fittforma_progress`), 1 ancla inferior (`fittforma_anchor`), 1 recompensado web (`fittforma_rewarded`) y 1 intersticial web (`fittforma_interstitial`).
    - Configurar tamaños de banner de 728×90 en pantallas grandes, 468×60 en tablets y 320×50 en móviles; no se solicita 300×250 para evitar saltos altos de diseño.
    - Aprobar el sitio y configurar el mensaje de consentimiento de Google (Privacy & messaging) para la UE, el Reino Unido y Suiza.
    - El repositorio publica `ads.txt` en la raíz con la línea de autorización de AdSense configurada; si Google Ad Manager solicita otro identificador de vendedor, agregar su línea sin borrar la existente.
