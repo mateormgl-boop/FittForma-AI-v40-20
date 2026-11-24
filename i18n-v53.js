@@ -1696,7 +1696,7 @@ window.FittFormaI18nDynamic = [
   ["Repeticiones en reserva", "Reps in reserve", "Repetições em reserva", "Répétitions en réserve", "Ripetizioni in riserva", "Wiederholungen in Reserve"]
 );
 (window.FittFormaI18nDynamic = window.FittFormaI18nDynamic || []).push(
-  [/^Serie (\\d+): la anterior fue muy exigente \\(RIR (\\d)\\)\\. Mantené (.+), sin subir la carga\\.$/,
+  [/^Serie (\d+): la anterior fue muy exigente \\(RIR (\d)\\)\\. Mantené (.+), sin subir la carga\\.$/,
     (m, i) => [
       `Set ${m[1]}: the previous set was very hard (RIR ${m[2]}). Keep ${m[3]}, without increasing the load.`,
       `Série ${m[1]}: a série anterior foi muito exigente (RIR ${m[2]}). Mantenha ${m[3]}, sem aumentar a carga.`,
