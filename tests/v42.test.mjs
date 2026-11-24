@@ -42,7 +42,7 @@ test('v42: sesiones desde plan, rutina o libre, editables en curso', () => {
   assert.match(html, /beginSession\(\{type:'daily',dailySeq:st\.seq\+1,dayIndex:st\.nextIndex,title:day\.title\},day\.exercises\)/);
   for (const attr of ['data-session-add-set', 'data-session-remove-set', 'data-session-remove-ex']) assert.match(html, new RegExp(attr));
   assert.match(html, /if\(inp\.checked&&restAfter>0\)startRestTimer\(restAfter\)/);
-  assert.match(html, /entries:Array\.from\(\{length:sets\},\(\)=>\(\{reps:'',weight:'',done:false\}\)\)/, 'el peso objetivo no precarga series para no guardar sesiones vacías');
+  assert.match(html, /entries:Array\.from\(\{length:sets\},\(\)=>\(\{reps:'',weight:'',rir:'',done:false\}\)\)/, 'el peso objetivo no precarga series para no guardar sesiones vacías');
 });
 
 test('v42: historial de sesiones y comidas editables sin duplicar', () => {

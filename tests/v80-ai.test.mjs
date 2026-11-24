@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { deriveTrainingInsights } from '../backend/ai-insights.mjs';
+import { readFile } from 'node:fs/promises';
 
 const session = (date, reps='10', weight='50', rir='2') => ({
   date,
@@ -39,9 +40,10 @@ test('el esfuerzo alto se detecta sin inventar RIR y se omiten actividades que n
 test('sin RIR se conserva el análisis de progreso y los registros incompletos se ignoran',()=>{
   const a=session('2026-10-01','8','40','');
   const b=session('2026-10-08','10','45','');
+  const c=session('2026-10-15','11','45','');
   a.exercises[0].entries[0].done=false;
-  assert.equal(deriveTrainingInsights([a,b]).length,1);
-  assert.equal(deriveTrainingInsights([b])[0].highEffort,false);
+  assert.equal(deriveTrainingInsights([a,b,c]).length,1);
+  assert.equal(deriveTrainingInsights([b,c])[0].highEffort,false);
 });
 
 test('v80: FittAI recibe señales de progreso calculadas y cuotas por cuenta validada', async()=>{
