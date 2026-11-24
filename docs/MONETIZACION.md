@@ -1,4 +1,4 @@
-# FittForma AI v48 — Publicidad, recompensas y Plus
+# FittForma AI — Publicidad, recompensas y Plus (v48 + v81)
 
 Estado: **implementado y probado en local, APAGADO por defecto** (`MONETIZATION_ENABLED=false`).
 Con la configuración por defecto, la app funciona igual que antes: no hay anuncios, no hay límites nuevos y no se cobra nada.
@@ -16,19 +16,20 @@ No hay identificadores de anuncios, precios ni credenciales reales en el reposit
 | Plus | Sin anuncios, más IA y más fotos. Se activa solo con una compra verificada en el servidor: Google Play en Android o Mercado Pago en la web. | Servidor + tabla `community_memberships` |
 | Métricas | Contadores agregados, sin datos personales. Solo se cuentan impresiones que el proveedor confirma (`slotRenderEnded` con anuncio, `rewardedSlotReady`). Las recompensas las cuenta el servidor al canjear. | `/api/metrics`, `/api/metrics/summary` |
 
-No se modificaron los precios ni los beneficios publicados. La tarjeta muestra el mismo precio **orientativo** de antes (US$ 5,99/mes, «aún no definitivo»). Solo cambió el nombre de «Pro» a «FittForma AI Plus», y la tarjeta ahora explica que se activa con Google Play.
+La tarjeta de Plus ya no fija un precio orientativo en el código: muestra el monto y la moneda configurados en Render cuando Mercado Pago está habilitado. Sin configuración completa, el botón de compra permanece oculto y no se inicia ningún cobro.
 
 ## Archivos
 
 - `monetization-core.js`: reglas compartidas por el navegador, el servidor y las pruebas (límites, política de intersticiales, cuotas).
-- `ads.js`: integración en el navegador (GPT de Google Ad Manager, proveedor de prueba, videos, Plus con Digital Goods API).
-- `backend/monetization.mjs`: plan verificado, cuotas, comprobantes, Google Play (subscriptionsv2 + acknowledge + RTDN) y métricas.
-- `backend/server.mjs`: rutas `/api/entitlements`, `/api/rewards/*`, `/api/metrics`, `/api/metrics/summary`, `/api/billing/play/verify` y `/api/billing/play/rtdn`; cuota de IA en `/api/coach`; la CSP suma los dominios de Google **solo** con `ADS_PROVIDER=gam`.
+- `ads.js`: integración en el navegador (GPT de Google Ad Manager, proveedor de prueba, videos, Plus con Google Play y Mercado Pago).
+- `backend/monetization.mjs`: plan verificado, cuotas, comprobantes, Google Play (subscriptionsv2 + acknowledge + RTDN), Mercado Pago (checkout recurrente + Webhook HMAC) y métricas.
+- `backend/server.mjs`: rutas de cuotas, métricas, Google Play y `/api/billing/mercadopago/{checkout,verify,webhook}`; cuota de IA en `/api/coach`; la CSP suma los dominios de Google **solo** con `ADS_PROVIDER=gam`.
 - `supabase/migrations/2026-10-21_v48_monetization.sql`: tablas de contadores, comprobantes y compras; trigger del límite de fotos (desactivado); `my_photo_quota()`. Es aditiva y re-ejecutable.
 - `supabase/migrations/2026-11-24_v81_mercadopago_memberships.sql`: referencias privadas de suscripciones Mercado Pago. Es aditiva y re-ejecutable.
 - `community.js`: aviso de fotos, video voluntario y borrador conservado.
 - Pruebas:
   - `tests/monetization.test.mjs`
+  - `tests/mercadopago.test.mjs`
   - `supabase/tests/rls_v48m_test.sql`
   - `tests/e2e/monetization.e2e.mjs`
 
@@ -59,13 +60,13 @@ No se modificaron los precios ni los beneficios publicados. La tarjeta muestra e
 
 ## Pasos que tiene que hacer la persona dueña del proyecto
 
-1. **Base de datos.** Aplicar la migración `2026-10-21_v48_monetization.sql` en Supabase (después de la de v48 daily; el orden está en `docs/DESPLIEGUE.md`). El límite de fotos queda **apagado**.
+1. **Base de datos.** Aplicar las migraciones pendientes en el orden de `supabase/migrations` (incluida `2026-11-24_v81_mercadopago_memberships.sql`), o usar el consolidado `supabase/APLICAR_MIGRACIONES.sql`. El límite de fotos queda **apagado**.
 2. **Google Ad Manager.**
    - Crear la cuenta y obtener el código de red.
    - Crear 5 bloques de anuncios: 3 banners, 1 recompensado web y 1 intersticial web.
    - Aprobar el sitio y configurar el mensaje de consentimiento de Google (Privacy & messaging) para la UE, el Reino Unido y Suiza.
    - Publicar `ads.txt` cuando Google lo pida.
-3. **Render.** Cargar las variables de arriba, empezando por `MONETIZATION_ENABLED=true` y `ADS_PROVIDER=gam` con los identificadores reales, y `SUPABASE_SERVICE_ROLE_KEY`. Revisar en un entorno de prueba antes de producción.
+3. **Render.** Cargar primero `SUPABASE_SERVICE_ROLE_KEY` y las variables de configuración. Para probar cuotas y membresía, usar `MONETIZATION_ENABLED=true`; los anuncios requieren además `ADS_PROVIDER=gam` y sus identificadores reales. Se puede dejar `ADS_PROVIDER=none` mientras no haya bloques publicitarios. Activar `MERCADOPAGO_ENABLED=true` solo después de probar checkout y Webhooks.
 4. **Límite de fotos.** Cuando se quiera activar: `update public.monetization_settings set photo_limit_enabled = true;` (en el SQL editor de Supabase).
 5. **Plus con Google Play.** Requiere una **app de Android**: este repositorio no tiene un proyecto Android. Pasos:
    - Empaquetar la PWA como TWA (por ejemplo con Bubblewrap) y habilitar Play Billing en la TWA (Digital Goods API).
