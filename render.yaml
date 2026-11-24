@@ -20,8 +20,22 @@ services:
         value: gemini-3.8-flash
       - key: TRUST_RENDER_CLIENT_IP
         value: "true"
-      # v48 — monetización (apagada por defecto). Detalle en docs/MONETIZACION.md.
+      # Publicidad y recompensas separadas; todo queda apagado hasta configurar y probar Google Ad Manager.
       - key: ADS_ENABLED
+        value: "false"
+      - key: ADS_ANCHOR_ENABLED
+        value: "false"
+      - key: ADS_INTERSTITIAL_ENABLED
+        value: "false"
+      - key: ADS_REWARDED_ENABLED
+        value: "false"
+      - key: ADS_INTERSTITIAL_MIN_MINUTES
+        value: "7"
+      - key: ADS_SECTION_CHANGES
+        value: "4"
+      - key: AI_LIMITS_ENABLED
+        value: "false"
+      - key: AI_REWARDED_ENABLED
         value: "false"
       - key: MONETIZATION_ENABLED
         value: "false"

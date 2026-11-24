@@ -20,7 +20,7 @@ function fakeSupabase({ plus = false, membershipError = false } = {}) {
     return new Response('{}', { status: 404 });
   };
 }
-const ENV = { MONETIZATION_ENABLED: 'true', ADS_ENABLED: 'true', ADS_PROVIDER: 'test', ADS_ALLOW_TEST: 'true', SUPABASE_URL: 'https://demo.supabase.co', SUPABASE_ANON_KEY: 'anon', AI_FREE_PER_DAY: '2', ADS_MIN_REWARD_SECONDS: '10' };
+const ENV = { MONETIZATION_ENABLED: 'true', AI_LIMITS_ENABLED: 'true', AI_REWARDED_ENABLED: 'true', ADS_ENABLED: 'true', ADS_ANCHOR_ENABLED: 'true', ADS_INTERSTITIAL_ENABLED: 'true', ADS_REWARDED_ENABLED: 'true', ADS_PROVIDER: 'test', ADS_ALLOW_TEST: 'true', SUPABASE_URL: 'https://demo.supabase.co', SUPABASE_ANON_KEY: 'anon', AI_FREE_PER_DAY: '2', ADS_MIN_REWARD_SECONDS: '10' };
 
 test('monetización: reglas de intersticiales (nunca durante actividades, intervalo y Plus)', () => {
   const config = M.normalizeConfig({ enabled: true, ads: { interstitialMinMinutes: 7, sectionChangesBetweenInterstitials: 4 } });
@@ -52,16 +52,17 @@ test('monetización: cuotas de IA y fotos', () => {
 test('monetización: desactivada por defecto, sin anuncios ni límites nuevos', async () => {
   const m = createMonetization({ env: {}, fetchImpl: fakeSupabase() });
   const e = await m.entitlements(req(), '1.2.3.4');
-  assert.equal(e.enabled, false); assert.equal(e.ads.show, false); assert.equal(m.publicAdsConfig().provider, 'none');
+  assert.equal(e.enabled, false); assert.equal(e.ai.limitsEnabled, false); assert.equal(e.ads.show, false); assert.equal(e.ads.anchorAvailable, false); assert.equal(e.ads.interstitialAvailable, false); assert.equal(e.ads.aiRewardedAvailable, false); assert.equal(m.publicAdsConfig().provider, 'none');
   assert.deepEqual(await m.consumeAi(req(), 'x'), { ok: true, skipped: true });
   assert.deepEqual(adsCspAdditions(m.settings.ads).script, [], 'sin proveedor no se abre la CSP');
 });
 
 test('monetización: configuración segura (solo IDs públicos con formato válido; test explícito)', () => {
-  const s = monetizationConfigFromEnv({ MONETIZATION_ENABLED: 'true', ADS_ENABLED: 'true', ADS_PROVIDER: 'gam', GAM_NETWORK_CODE: '123456', GAM_SLOT_HOME: '/123456/fittforma/home', GAM_SLOT_NUTRITION: '/123456/fittforma_nutrition', GAM_SLOT_PROGRESS: '/123456/fittforma_progress', GAM_SLOT_REWARDED: 'javascript:alert(1)' });
-  assert.equal(s.ads.enabled, true); assert.equal(s.ads.provider, 'gam'); assert.equal(s.ads.slots.home, '/123456/fittforma/home'); assert.equal(s.ads.slots.nutrition, '/123456/fittforma_nutrition'); assert.equal(s.ads.slots.progress, '/123456/fittforma_progress'); assert.equal(s.ads.slots.rewarded, '', 'un identificador inválido se ignora');
+  const s = monetizationConfigFromEnv({ MONETIZATION_ENABLED: 'true', AI_LIMITS_ENABLED: 'true', AI_REWARDED_ENABLED: 'true', ADS_ENABLED: 'true', ADS_ANCHOR_ENABLED: 'true', ADS_INTERSTITIAL_ENABLED: 'true', ADS_REWARDED_ENABLED: 'true', ADS_PROVIDER: 'gam', GAM_NETWORK_CODE: '123456', GAM_SLOT_HOME: '/123456/fittforma/home', GAM_SLOT_ANCHOR: '/123456/fittforma_anchor', GAM_SLOT_NUTRITION: '/123456/fittforma_nutrition', GAM_SLOT_PROGRESS: '/123456/fittforma_progress', GAM_SLOT_REWARDED: 'javascript:alert(1)' });
+  assert.equal(s.ads.enabled, true); assert.equal(s.aiLimitsEnabled, true); assert.equal(s.aiRewardsEnabled, true); assert.equal(s.ads.anchorEnabled, true); assert.equal(s.ads.interstitialEnabled, true); assert.equal(s.ads.rewardedEnabled, true); assert.equal(s.ads.provider, 'gam'); assert.equal(s.ads.slots.home, '/123456/fittforma/home'); assert.equal(s.ads.slots.anchor, '/123456/fittforma_anchor'); assert.equal(s.ads.slots.nutrition, '/123456/fittforma_nutrition'); assert.equal(s.ads.slots.progress, '/123456/fittforma_progress'); assert.equal(s.ads.slots.rewarded, '', 'un identificador inválido se ignora');
   assert.ok(adsCspAdditions(s.ads).script.includes('https://securepubads.g.doubleclick.net'));
   assert.equal(monetizationConfigFromEnv({ ADS_ENABLED: 'true', ADS_PROVIDER: 'gam' }).ads.provider, 'none', 'sin network code no hay anuncios');
+  assert.equal(monetizationConfigFromEnv({ MONETIZATION_ENABLED: 'false', AI_LIMITS_ENABLED: 'true' }).config.enabled, false, 'los límites de IA no encienden la monetización general');
   assert.equal(monetizationConfigFromEnv({ ADS_ENABLED: 'true', ADS_PROVIDER: 'test' }).ads.provider, 'none', 'el proveedor de prueba requiere ADS_ALLOW_TEST');
 });
 
@@ -105,6 +106,42 @@ test('monetización: recompensa de IA solo con comprobante del servidor, una vez
   assert.equal((await m2.claimReward(req(TOKEN), 'ip', s2.body.nonce)).status, 410);
 });
 
+test('cuotas y videos de FittAI funcionan separados de MONETIZATION_ENABLED', async () => {
+  let clock = Date.parse('2026-11-24T12:00:00Z');
+  const m = createMonetization({ env: {
+    MONETIZATION_ENABLED: 'false',
+    AI_LIMITS_ENABLED: 'true',
+    AI_REWARDED_ENABLED: 'true',
+    AI_FREE_PER_DAY: '1',
+    AI_CREDITS_PER_VIDEO: '3',
+    AI_MAX_VIDEOS_PER_DAY: '3',
+    ADS_ENABLED: 'true',
+    ADS_REWARDED_ENABLED: 'true',
+    ADS_PROVIDER: 'test',
+    ADS_ALLOW_TEST: 'true',
+    ADS_MIN_REWARD_SECONDS: '10',
+    SUPABASE_URL: 'https://demo.supabase.co',
+    SUPABASE_ANON_KEY: 'anon'
+  }, fetchImpl: fakeSupabase(), now: () => clock });
+  const before = await m.entitlements(req(TOKEN), 'ip');
+  assert.equal(before.enabled, false, 'la monetización general permanece apagada');
+  assert.equal(before.ai.limitsEnabled, true, 'la cuota de IA se activa de forma independiente');
+  assert.equal(before.ads.aiRewardedAvailable, true, 'el video de IA está disponible solo con inventario y flags habilitados');
+  assert.equal((await m.consumeAi(req(TOKEN), 'ip')).ok, true);
+  const exhausted = await m.consumeAi(req(TOKEN), 'ip');
+  assert.equal(exhausted.ok, false);
+  assert.equal(exhausted.quota.limitsEnabled, true);
+  assert.equal(exhausted.quota.canOfferVideo, true);
+  const start = await m.startReward(req(TOKEN), 'ip', 'ai');
+  assert.equal(start.status, 200);
+  clock += 11000;
+  const claim = await m.claimReward(req(TOKEN), 'ip', start.body.nonce);
+  assert.equal(claim.status, 200);
+  assert.equal(claim.body.credits, 3);
+  const after = await m.entitlements(req(TOKEN), 'ip');
+  assert.equal(after.enabled, false, 'canjear el video no activa la monetización general');
+  assert.equal(after.ai.remaining, 3);
+});
 test('publicidad independiente: puede mostrarse sin activar límites de IA ni monetización general', async () => {
   const m = createMonetization({ env: {
     ADS_ENABLED: 'true', ADS_PROVIDER: 'gam', GAM_NETWORK_CODE: '123456',

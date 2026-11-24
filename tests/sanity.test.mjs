@@ -142,7 +142,7 @@ test('v40.7: los SVG generados sin verificar siguen en cuarentena: no se usan ni
 
 test('la PWA tolera recursos estáticos opcionales no disponibles durante la instalación', () => {
   assert.match(sw, /Promise\.allSettled\(ASSETS\.map\(asset=>cache\.add\(asset\)\)\)/);
-  assert.match(sw, /fittforma-ai-static-v80-0/);
+  assert.match(sw, /fittforma-ai-static-v81-0/);
 });
 
 test('los estilos móviles protegen desbordamientos y el scroll de menús/modales', () => {
@@ -254,6 +254,14 @@ test('v32 deja la publicidad desactivada hasta configurar unidades reales', asyn
   assert.match(ads, /progress: 'adSlotProgress'/);
   assert.match(ads, /sizeMapping\(\)/);
   assert.ok(ads.includes('slot.defineSizeMapping(mapping)'), 'el mapeo responsive se asigna al Slot con GPT');
+  assert.match(ads, /OutOfPageFormat\.BOTTOM_ANCHOR/);
+  assert.match(ads, /activeMsThisSession < 5 \* 60000/, 'el ancla espera cinco minutos de uso activo');
+  assert.match(ads, /cfg\.rewardedEnabled/);
+  assert.match(ads, /ent\.ads\.aiRewardedAvailable/);
+  const render = await read('render.yaml');
+  for (const [key,value] of [['ADS_ENABLED','"false"'],['ADS_PROVIDER','none'],['MONETIZATION_ENABLED','"false"'],['MERCADOPAGO_ENABLED','"false"'],['ADS_ANCHOR_ENABLED','"false"'],['ADS_INTERSTITIAL_ENABLED','"false"'],['ADS_REWARDED_ENABLED','"false"'],['AI_LIMITS_ENABLED','"false"'],['AI_REWARDED_ENABLED','"false"']]) {
+    assert.match(render, new RegExp('key: ' + key + '\\s+value: ' + value), key + ' permanece apagado');
+  }
   const nutritionToday = html.slice(html.indexOf('data-view-panel="hoy"'), html.indexOf('data-view-panel="registrar"'));
   assert.match(nutritionToday, /id="adSlotNutrition"/, 'Nutrición solo tiene banner en la pestaña Hoy');
   const progressSummary = html.slice(html.indexOf('id="progressPanelSummary"'), html.indexOf('id="progressPanelBadges"'));
@@ -329,14 +337,14 @@ test('v36.1 mantiene válidos los metadatos y las traducciones del perfil/Pro', 
   const manifest = JSON.parse(await read('manifest.json'));
   const rootPackage = JSON.parse(await read('package.json'));
   const backendPackage = JSON.parse(await read('backend/package.json'));
-  assert.equal(rootPackage.version, '0.80.0');
-  assert.equal(backendPackage.version, '0.80.0');
+  assert.equal(rootPackage.version, '0.81.0');
+  assert.equal(backendPackage.version, '0.81.0');
   assert.equal(manifest.theme_color, '#f3f6fb');
   assert.equal(manifest.background_color, '#f3f6fb');
   assert.match(i18n, /VERSION 80\.0 · ONLINE FITNESS COMMUNITY/i);
   assert.match(server, /GEMINI_MODEL\|\|'gemini-3\.8-flash'/);
   assert.match(await read('render.yaml'), /value: gemini-3\.8-flash/);
-  assert.match(sw, /const CACHE = 'fittforma-ai-static-v80-0'/);
+  assert.match(sw, /const CACHE = 'fittforma-ai-static-v81-0'/);
 });
 
 
@@ -364,7 +372,7 @@ test('v36.1 conserva identidad visual propia y perfil local editable', () => {
   assert.match(html, /identityForm/);
   assert.match(html, /displayName/);
   assert.match(html, /focusGoal/);
-  assert.match(sw, /fittforma-ai-static-v80-0/);
+  assert.match(sw, /fittforma-ai-static-v81-0/);
 });
 
 
@@ -381,7 +389,7 @@ test('v36.1 incluye preferencias completas de recordatorios y estado de permisos
   assert.match(html, /Notification\.requestPermission\(\)/);
   assert.match(html, /registration\.showNotification/);
   assert.match(sw, /notificationclick/);
-  assert.match(sw, /fittforma-ai-static-v80-0/);
+  assert.match(sw, /fittforma-ai-static-v81-0/);
 });
 
 test('v36.1 evita avisos duplicados y no marca entrenamientos como pendientes si hubo actividad', () => {

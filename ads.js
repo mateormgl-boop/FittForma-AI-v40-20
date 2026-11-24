@@ -6,8 +6,8 @@
  */
 (() => {
   const M = window.FittFormaMonetization;
-  let cfg = { provider: 'none', slots: {}, consent: 'google-cmp' }, ent = null, gptPromise = null, cmpLoaded = false;
-  let lastAdAt = 0, activeMsSinceLast = 0, sectionChanges = 0, adOpen = false, lastTick = Date.now(), entLoadedAt = 0;
+  let cfg = { provider: 'none', slots: {}, anchorEnabled: false, interstitialEnabled: false, rewardedEnabled: false, consent: 'google-cmp' }, ent = null, gptPromise = null, cmpLoaded = false;
+  let lastAdAt = 0, activeMsSinceLast = 0, activeMsThisSession = 0, sectionChanges = 0, adOpen = false, anchorRequested = false, lastTick = Date.now(), entLoadedAt = 0;
   const shownBanners = new Set();
 
   async function authHeader() { try { return (await window.FittFormaAuthHeader?.()) || {}; } catch { return {}; } }
@@ -50,7 +50,11 @@
       pubads.enableLazyLoad?.({ fetchMarginPercent: 50, renderMarginPercent: 20, mobileScaling: 2 });
       pubads.collapseEmptyDivs(true);
       pubads.setCentering?.(true);
-      pubads.addEventListener('slotRenderEnded', e => { if (e.slot.__ff === 'banner') metric(e.isEmpty ? 'ad_no_fill' : 'ad_impression_banner'); if (e.isEmpty) e.slot.__el?.closest('.ad-slot')?.classList.remove('is-visible', 'is-reserved'); });
+      pubads.addEventListener('slotRenderEnded', e => {
+        if (e.slot.__ff === 'banner') metric(e.isEmpty ? 'ad_no_fill' : 'ad_impression_banner');
+        if (e.slot.__ff === 'anchor') metric(e.isEmpty ? 'ad_no_fill' : 'ad_impression_anchor');
+        if (e.isEmpty) e.slot.__el?.closest('.ad-slot')?.classList.remove('is-visible', 'is-reserved');
+      });
       window.googletag.enableServices();
       return window.googletag;
     })();
@@ -99,15 +103,49 @@
     } catch { box.classList.remove('is-reserved', 'is-visible'); }
   }
 
-  // ---------- Intersticiales ----------
-  // Se cuenta solo el tiempo de uso activo (pestaña visible). Nunca durante entrenamiento, descanso,
-  // GPS, comidas, IA, inicio de sesión, pagos, fotos o guardado.
-  setInterval(() => { const now = Date.now(); if (document.visibilityState === 'visible' && !adOpen) activeMsSinceLast += now - lastTick; lastTick = now; }, 1000);
+  // ---------- Publicidad ancla inferior ----------
+  // Se solicita una sola vez por carga de la app, después de 5 min de uso activo y fuera de tareas sensibles.
+  // GPT crea el contenedor y el control de cierre; no se superpone un botón propio sobre el anuncio.
   function activities() { try { return (window.FittFormaActivities?.() || []).concat(adOpen ? ['ad-open'] : []); } catch { return ['unknown']; } }
+  async function maybeShowAnchor() {
+    if (anchorRequested || activeMsThisSession < 5 * 60000 || !ent || !adsOn() || isPlus() ||
+        cfg.provider !== 'gam' || !cfg.anchorEnabled || !cfg.slots?.anchor) return false;
+    const blocked = activities().some(a => M?.BLOCKING_ACTIVITIES?.includes(a));
+    if (blocked) return false;
+    anchorRequested = true;
+    try {
+      const gpt = await loadGpt();
+      return await new Promise(resolve => gpt.cmd.push(() => {
+        const slot = gpt.defineOutOfPageSlot(cfg.slots.anchor, gpt.enums.OutOfPageFormat.BOTTOM_ANCHOR);
+        if (!slot) { resolve(false); return; }
+        slot.__ff = 'anchor';
+        slot.addService(gpt.pubads());
+        gpt.display(slot);
+        resolve(true);
+      }));
+    } catch {
+      anchorRequested = false;
+      metric('ad_error');
+      return false;
+    }
+  }
+
+  // ---------- Intersticiales ----------
+  // Se cuenta solo el tiempo de uso activo (pestaña visible). La app los evalúa en cambios de sección
+  // y pausas naturales, nunca durante entrenamiento, descanso, GPS, comidas, IA, pagos o guardados.
+  setInterval(() => {
+    const now = Date.now(), elapsed = Math.max(0, Math.min(5000, now - lastTick));
+    if (document.visibilityState === 'visible' && !adOpen) {
+      activeMsSinceLast += elapsed;
+      activeMsThisSession += elapsed;
+    }
+    lastTick = now;
+    maybeShowAnchor();
+  }, 1000);
   async function maybeInterstitial(event) {
     if (event === 'section-change') sectionChanges++;
-    if (!ent || !adsOn() || !M) return { shown: false, reason: 'off' };
-    const config = M.normalizeConfig({ enabled: Boolean(ent?.ads?.show), ads: { interstitialMinMinutes: ent.ads.interstitialMinMinutes, sectionChangesBetweenInterstitials: ent.ads.sectionChangesBetweenInterstitials } });
+    if (!ent || !M || !ent.ads?.interstitialAvailable) return { shown: false, reason: 'off' };
+    const config = M.normalizeConfig({ enabled: Boolean(ent?.ads?.interstitialAvailable), ads: { interstitialMinMinutes: ent.ads.interstitialMinMinutes, sectionChangesBetweenInterstitials: ent.ads.sectionChangesBetweenInterstitials } });
     const d = M.interstitialDecision({ config, plan: ent.plan, adsAvailable: cfg.provider === 'test' || Boolean(cfg.slots?.interstitial), event, activities: activities(), activeMsSinceLast, sectionChangesSinceLast: sectionChanges, shownBefore: lastAdAt > 0 });
     if (!d.allowed) return { shown: false, reason: d.reason };
     adOpen = true;
@@ -155,6 +193,7 @@
   }
   // Devuelve 'granted' | 'closed' | 'unavailable' | 'error'.
   function playRewarded() {
+    if (!cfg.rewardedEnabled) return Promise.resolve('unavailable');
     if (cfg.provider === 'test') {
       const mode = window.__ffAdsTest || 'fill';
       if (mode === 'nofill') return Promise.resolve('unavailable');
@@ -205,13 +244,19 @@
   // ---------- IA: consultas diarias ----------
   function renderCoachUsage() {
     const text = document.getElementById('coachUsageText'), button = document.getElementById('watchRewardedAd'); if (!text || !button) return;
-    // v73: con la monetización apagada no se muestra nada (era un texto técnico); las consultas no tienen límite nuevo.
-    if (!ent || !ent.enabled) { text.textContent = ''; text.hidden = true; button.hidden = true; return; }
+    // Los límites de IA son independientes de MONETIZATION_ENABLED; solo se muestran cuando AI_LIMITS_ENABLED=true.
+    if (!ent?.ai?.limitsEnabled) { text.textContent = ''; text.hidden = true; button.hidden = true; return; }
     text.hidden = false;
     const q = ent.ai;
     if (isPlus()) { text.textContent = `${t('Plus')}: ${q.remaining} ${t('consultas disponibles hoy')} (${q.limit} ${t('por día')}).`; button.hidden = true; return; }
-    text.textContent = q.remaining > 0 ? `${t('Consultas de IA disponibles hoy')}: ${q.remaining}. ${t('Se renuevan cada día.')}` : q.canOfferVideo && ent.ads.rewardedAvailable ? t('Usaste tus consultas gratuitas de hoy. Podés esperar a que se renueven mañana o mirar un video voluntario para sumar consultas.') : t('Usaste tus consultas de hoy. Se renuevan mañana.');
-    button.hidden = !(q.remaining === 0 && q.canOfferVideo && ent.ads.rewardedAvailable);
+    text.textContent = q.remaining > 0
+      ? `${t('Consultas de IA disponibles hoy')}: ${q.remaining}. ${t('Se renuevan cada día.')}`
+      : q.canOfferVideo && ent.ads.aiRewardedAvailable
+        ? t('Usaste tus consultas gratuitas de hoy. Podés esperar a que se renueven mañana o mirar un video voluntario para sumar consultas.')
+        : q.canOfferVideo
+          ? t('Usaste tus consultas de hoy. La opción de video se habilitará cuando la publicidad esté configurada.')
+          : t('Usaste tus consultas de hoy. Se renuevan mañana.');
+    button.hidden = !(q.remaining === 0 && q.canOfferVideo && ent.ads.aiRewardedAvailable);
   }
   async function onWatchForAi() {
     if (!(await confirmReward(t('Al terminar un video corto sumás 3 consultas de IA para hoy. Tu conversación queda guardada.')))) return;
@@ -326,7 +371,7 @@
 
   // Compatibilidad con la API anterior (index.html).
   function canAskCoach() { return true; }       // la cuota la aplica el servidor
-  function recordCoachSuccess() { if (ent?.ai) { ent.ai.remaining = Math.max(0, ent.ai.remaining - 1); renderCoachUsage(); } }
+  function recordCoachSuccess() { if (ent?.ai?.limitsEnabled) { ent.ai.remaining = Math.max(0, ent.ai.remaining - 1); renderCoachUsage(); } }
   function init() {
     document.getElementById('watchRewardedAd')?.addEventListener('click', onWatchForAi);
     document.getElementById('plusBuyGooglePlay')?.addEventListener('click', buyPlusGooglePlay);

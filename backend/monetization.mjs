@@ -40,17 +40,22 @@ export function monetizationConfigFromEnv(env = process.env) {
     photos: { freePerDay: num(env.PHOTOS_FREE_PER_DAY), plusPerDay: num(env.PHOTOS_PLUS_PER_DAY), maxExtraPerDay: num(env.PHOTOS_MAX_EXTRA_PER_DAY) },
     ads: { interstitialMinMinutes: num(env.ADS_INTERSTITIAL_MIN_MINUTES), sectionChangesBetweenInterstitials: num(env.ADS_SECTION_CHANGES), minRewardWatchSeconds: num(env.ADS_MIN_REWARD_SECONDS) }
   });
+  const aiLimitsEnabled = bool(env.AI_LIMITS_ENABLED);
+  const aiRewardsEnabled = bool(env.AI_REWARDED_ENABLED);
   // Anuncios: solo identificadores públicos de Google Ad Manager. Un identificador con formato inválido se ignora.
   const provider = ['gam', 'test'].includes(String(env.ADS_PROVIDER || '').trim()) ? String(env.ADS_PROVIDER).trim() : 'none';
   const networkCode = /^\d{2,20}$/.test(String(env.GAM_NETWORK_CODE || '').trim()) ? String(env.GAM_NETWORK_CODE).trim() : '';
   const slot = k => (SLOT_PATH.test(String(env[k] || '').trim()) ? String(env[k]).trim() : '');
   const ads = {
     enabled: bool(env.ADS_ENABLED),
+    anchorEnabled: bool(env.ADS_ANCHOR_ENABLED),
+    interstitialEnabled: bool(env.ADS_INTERSTITIAL_ENABLED),
+    rewardedEnabled: bool(env.ADS_REWARDED_ENABLED),
     provider: provider === 'gam' && !networkCode ? 'none' : provider,
     // El proveedor de prueba solo existe si se habilita explícitamente; nunca genera ingresos.
     testMode: provider === 'test' ? bool(env.ADS_ALLOW_TEST) : false,
     networkCode,
-    slots: { home: slot('GAM_SLOT_HOME'), community: slot('GAM_SLOT_COMMUNITY'), explore: slot('GAM_SLOT_EXPLORE'), nutrition: slot('GAM_SLOT_NUTRITION'), progress: slot('GAM_SLOT_PROGRESS'), rewarded: slot('GAM_SLOT_REWARDED'), interstitial: slot('GAM_SLOT_INTERSTITIAL') },
+    slots: { home: slot('GAM_SLOT_HOME'), community: slot('GAM_SLOT_COMMUNITY'), explore: slot('GAM_SLOT_EXPLORE'), nutrition: slot('GAM_SLOT_NUTRITION'), progress: slot('GAM_SLOT_PROGRESS'), anchor: slot('GAM_SLOT_ANCHOR'), rewarded: slot('GAM_SLOT_REWARDED'), interstitial: slot('GAM_SLOT_INTERSTITIAL') },
     consent: String(env.ADS_CONSENT || 'google-cmp').trim() === 'none' ? 'none' : 'google-cmp'
   };
   if (ads.provider === 'test' && !ads.testMode) ads.provider = 'none';
@@ -72,7 +77,7 @@ export function monetizationConfigFromEnv(env = process.env) {
     serviceAccount: String(env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON || '').trim(),
     rtdnToken: String(env.GOOGLE_PLAY_RTDN_TOKEN || '').trim()
   };
-  return { config, ads, play, mp, metricsToken: String(env.ADMIN_METRICS_TOKEN || '').trim() };
+  return { config, ads, aiLimitsEnabled, aiRewardsEnabled, play, mp, metricsToken: String(env.ADMIN_METRICS_TOKEN || '').trim() };
 }
 
 // Los anuncios solo agregan dominios a la CSP cuando hay un proveedor real configurado.
@@ -122,7 +127,7 @@ export class SupabaseStore {
   }
 }
 
-const METRIC_NAMES = new Set(['ad_impression_banner', 'ad_impression_interstitial', 'ad_impression_rewarded', 'ad_no_fill', 'ad_error', 'rewarded_completed', 'rewarded_closed_early', 'reward_granted_ai', 'reward_granted_photo', 'ai_bonus_used', 'photo_after_reward', 'plus_purchase_verified', 'app_open']);
+const METRIC_NAMES = new Set(['ad_impression_banner', 'ad_impression_anchor', 'ad_impression_interstitial', 'ad_impression_rewarded', 'ad_no_fill', 'ad_error', 'rewarded_completed', 'rewarded_closed_early', 'reward_granted_ai', 'reward_granted_photo', 'ai_bonus_used', 'photo_after_reward', 'plus_purchase_verified', 'app_open']);
 
 export function createMonetization({ env = process.env, fetchImpl = globalThis.fetch, now = () => Date.now(), supabase = null } = {}) {
   const settings = monetizationConfigFromEnv(env);
@@ -132,6 +137,10 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
   const store = serviceKey && sb.url ? new SupabaseStore({ url: sb.url, serviceKey, fetchImpl }) : new MemoryStore();
   const metrics = new Map();
   const userCache = new Map(), planCache = new Map();
+  const rewardedInventoryAvailable = () => settings.ads.enabled && settings.ads.rewardedEnabled &&
+    settings.ads.provider !== 'none' &&
+    (settings.ads.provider === 'test' ? settings.ads.testMode : Boolean(settings.ads.slots.rewarded));
+  const aiRewardAvailable = () => settings.aiLimitsEnabled && settings.aiRewardsEnabled && rewardedInventoryAvailable();
 
   async function resolveUser(req) {
     const auth = String(req.headers.authorization || '');
@@ -196,16 +205,25 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
       store.get(subject, day, 'ai_used'), store.get(subject, day, 'ai_bonus'), store.get(subject, day, 'ai_videos'),
       user ? photoPosted(user.id, day) : 0, user ? store.get(`u:${user.id}`, day, 'photo_extra') : 0
     ]);
-    const ai = M.aiQuota({ config, plan: plan.plan, used: aiUsed, bonus: aiBonus, rewardedVideos: aiVideos });
+    const rawAi = M.aiQuota({ config, plan: plan.plan, used: aiUsed, bonus: aiBonus, rewardedVideos: aiVideos });
+    const ai = { ...rawAi, limitsEnabled: settings.aiLimitsEnabled, canOfferVideo: rawAi.canOfferVideo && aiRewardAvailable() };
     const pc = await photoConfig();
     const photos = { ...M.photoQuota({ config: pc.config, plan: plan.plan, posted: photosPosted, extra: photoExtra }), limitEnabled: pc.limitEnabled };
     if (!pc.limitEnabled) { photos.needsReward = false; photos.extraLeft = 0; }
     const adsOn = settings.ads.enabled && plan.plan !== 'plus' && settings.ads.provider !== 'none';
+    const rewardedAvailable = adsOn && rewardedInventoryAvailable();
+    const anchorAvailable = adsOn && settings.ads.anchorEnabled && settings.ads.provider === 'gam' && Boolean(settings.ads.slots.anchor);
+    const interstitialAvailable = adsOn && settings.ads.interstitialEnabled && (settings.ads.provider === 'test' || Boolean(settings.ads.slots.interstitial));
     return {
       enabled: config.enabled, day, signedIn: Boolean(user), plan: plan.plan, planVerified: plan.verified, planSource: plan.source, planPeriodEnd: plan.periodEnd,
       ai, photos, store: store.kind,
       timezone: TZ,
-      ads: { show: adsOn, provider: adsOn ? settings.ads.provider : 'none', testMode: adsOn && settings.ads.testMode, interstitialMinMinutes: config.ads.interstitialMinMinutes, sectionChangesBetweenInterstitials: config.ads.sectionChangesBetweenInterstitials, rewardedAvailable: adsOn && config.enabled && (settings.ads.provider === 'test' || Boolean(settings.ads.slots.rewarded)) },
+      ads: {
+        show: adsOn, provider: adsOn ? settings.ads.provider : 'none', testMode: adsOn && settings.ads.testMode,
+        anchorAvailable, interstitialAvailable, interstitialMinMinutes: config.ads.interstitialMinMinutes,
+        sectionChangesBetweenInterstitials: config.ads.sectionChangesBetweenInterstitials,
+        rewardedAvailable, aiRewardedAvailable: rewardedAvailable && aiRewardAvailable()
+      },
       payments: {
         googlePlay: Boolean(settings.play.packageName && settings.play.productIds.length && settings.play.serviceAccount && serviceKey),
         mercadoPago: Boolean(config.enabled && settings.mp.enabled && store.kind === 'supabase'),
@@ -217,19 +235,25 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
   function publicAdsConfig() {
     const a = settings.ads;
     const slots = a.enabled ? a.slots : Object.fromEntries(Object.keys(a.slots).map(key => [key, '']));
-    return { provider: a.enabled ? a.provider : 'none', testMode: a.enabled && a.testMode, networkCode: a.enabled ? a.networkCode : '', slots, consent: a.consent };
+    return {
+      provider: a.enabled ? a.provider : 'none', testMode: a.enabled && a.testMode,
+      anchorEnabled: a.enabled && a.anchorEnabled, interstitialEnabled: a.enabled && a.interstitialEnabled,
+      rewardedEnabled: a.enabled && a.rewardedEnabled,
+      networkCode: a.enabled ? a.networkCode : '', slots, consent: a.consent
+    };
   }
 
   // Consume una consulta de IA antes de llamar al modelo; si el modelo falla, se devuelve (refund).
   async function consumeAi(req, clientKey) {
-    if (!config.enabled) return { ok: true, skipped: true };
+    if (!settings.aiLimitsEnabled) return { ok: true, skipped: true };
     const user = await resolveUser(req), plan = await planFor(user), subject = subjectFor(user, clientKey), day = dayFor(req);
     const bonus = await store.get(subject, day, 'ai_bonus');
     const limit = (plan.plan === 'plus' ? config.ai.plusPerDay : config.ai.freePerDay) + bonus;
     const used = await store.bump(subject, day, 'ai_used', 1, limit);
     if (used < 0) {
-      const q = M.aiQuota({ config, plan: plan.plan, used: limit, bonus, rewardedVideos: await store.get(subject, day, 'ai_videos') });
-      return { ok: false, quota: q, plan: plan.plan };
+      const rawQuota = M.aiQuota({ config, plan: plan.plan, used: limit, bonus, rewardedVideos: await store.get(subject, day, 'ai_videos') });
+      const quota = { ...rawQuota, limitsEnabled: true, canOfferVideo: rawQuota.canOfferVideo && aiRewardAvailable() };
+      return { ok: false, quota, plan: plan.plan };
     }
     if (used > (plan.plan === 'plus' ? config.ai.plusPerDay : config.ai.freePerDay)) metric('ai_bonus_used');
     return { ok: true, refund: () => store.bump(subject, day, 'ai_used', -1) };
@@ -237,8 +261,9 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
 
   // Recompensas: el servidor emite un nonce antes del video y lo canjea una sola vez.
   async function startReward(req, clientKey, type) {
-    if (!config.enabled) return { status: 409, body: { error: 'La monetización no está activa.' } };
     if (!['ai', 'photo'].includes(type)) return { status: 400, body: { error: 'Tipo de recompensa inválido.' } };
+    if (type === 'ai' && !aiRewardAvailable()) return { status: 409, body: { error: 'Las recompensas de FittAI todavía no están habilitadas.' } };
+    if (type === 'photo' && !config.enabled) return { status: 409, body: { error: 'La monetización general no está activa.' } };
     const user = await resolveUser(req), plan = await planFor(user);
     if (plan.plan === 'plus') return { status: 409, body: { error: 'Con Plus no hace falta mirar anuncios.' } };
     if (type === 'photo' && !user) return { status: 401, body: { error: 'Iniciá sesión para publicar fotos.' } };
@@ -260,10 +285,12 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     return { status: 200, body: { nonce, expiresInSeconds: config.ads.rewardNonceTtlSeconds, minWatchSeconds: config.ads.minRewardWatchSeconds } };
   }
   async function claimReward(req, clientKey, nonce) {
-    if (!config.enabled) return { status: 409, body: { error: 'La monetización no está activa.' } };
     if (typeof nonce !== 'string' || !/^[A-Za-z0-9_-]{20,40}$/.test(nonce)) return { status: 400, body: { error: 'Comprobante inválido.' } };
     const user = await resolveUser(req), subject = subjectFor(user, clientKey), r = await store.getReward(nonce);
     if (!r || r.subject !== subject) return { status: 404, body: { error: 'No se encontró esa recompensa.' } };
+    if (r.type === 'ai' && !aiRewardAvailable()) return { status: 409, body: { error: 'Las recompensas de FittAI todavía no están habilitadas.' } };
+    if (r.type === 'photo' && !config.enabled) return { status: 409, body: { error: 'La monetización general no está activa.' } };
+    if (!['ai', 'photo'].includes(r.type)) return { status: 400, body: { error: 'Tipo de recompensa inválido.' } };
     if (r.claimedAt) return { status: 409, body: { error: 'Esta recompensa ya se otorgó.', duplicate: true } };
     const elapsed = (now() - r.startedAt) / 1000;
     if (elapsed > config.ads.rewardNonceTtlSeconds) return { status: 410, body: { error: 'El comprobante venció. Volvé a intentarlo.' } };
