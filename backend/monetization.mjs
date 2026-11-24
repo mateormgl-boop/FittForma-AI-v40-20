@@ -207,9 +207,9 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
       ads: { show: adsOn, provider: adsOn ? settings.ads.provider : 'none', testMode: settings.ads.testMode, interstitialMinMinutes: config.ads.interstitialMinMinutes, sectionChangesBetweenInterstitials: config.ads.sectionChangesBetweenInterstitials, rewardedAvailable: adsOn && (settings.ads.provider === 'test' || Boolean(settings.ads.slots.rewarded)) },
       payments: {
         googlePlay: Boolean(settings.play.packageName && settings.play.productIds.length && settings.play.serviceAccount && serviceKey),
-        mercadoPago: Boolean(settings.mp.enabled && store.kind === 'supabase'),
-        mercadoPagoPrice: settings.mp.enabled ? { amount: settings.mp.amount, currency: settings.mp.currency, interval: 'month' } : null,
-        web: Boolean(settings.mp.enabled && store.kind === 'supabase')
+        mercadoPago: Boolean(config.enabled && settings.mp.enabled && store.kind === 'supabase'),
+        mercadoPagoPrice: config.enabled && settings.mp.enabled && store.kind === 'supabase' ? { amount: settings.mp.amount, currency: settings.mp.currency, interval: 'month' } : null,
+        web: Boolean(config.enabled && settings.mp.enabled && store.kind === 'supabase')
       }
     };
   }
@@ -314,7 +314,7 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     return { ok: response.ok, status: response.status, data: payload };
   }
   async function syncMercadoPagoSubscription(subscriptionId, expectedReference = null) {
-    if (!settings.mp.enabled || store.kind !== 'supabase') return { status: 503, body: { error: 'Mercado Pago todavía no está configurado con almacenamiento seguro.' } };
+    if (!config.enabled || !settings.mp.enabled || store.kind !== 'supabase') return { status: 503, body: { error: 'La monetización o Mercado Pago todavía no están habilitados con almacenamiento seguro.' } };
     const linked = await store.mercadoPagoSubscription(subscriptionId);
     if (!linked || (expectedReference && linked.externalReference !== expectedReference)) return { status: 404, body: { error: 'No se encontró la suscripción asociada a esta cuenta.' } };
     const remote = await mercadoPagoApi(`/preapproval/${encodeURIComponent(subscriptionId)}`);
@@ -326,7 +326,7 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     return { status: 200, body: { plan: membership.status === 'active' ? 'plus' : 'free', status: membership.status, periodEnd: membership.periodEnd } };
   }
   async function createMercadoPagoSubscription(req) {
-    if (!settings.mp.enabled || store.kind !== 'supabase') return { status: 503, body: { error: 'La suscripción web todavía no está configurada. No se realizó ningún cobro.' } };
+    if (!config.enabled || !settings.mp.enabled || store.kind !== 'supabase') return { status: 503, body: { error: 'La monetización o Mercado Pago todavía no están habilitados. No se realizó ningún cobro.' } };
     const user = await resolveUser(req);
     if (!user || !user.email) return { status: 401, body: { error: 'Iniciá sesión con una cuenta que tenga correo electrónico para continuar.' } };
     const plan = await planFor(user);
@@ -347,7 +347,7 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     return { status: 201, body: { checkoutUrl: checkout.toString() } };
   }
   async function verifyMercadoPagoSubscription(req, body) {
-    if (!settings.mp.enabled || store.kind !== 'supabase') return { status: 503, body: { error: 'Mercado Pago no está configurado.' } };
+    if (!config.enabled || !settings.mp.enabled || store.kind !== 'supabase') return { status: 503, body: { error: 'La monetización o Mercado Pago no están habilitados.' } };
     const user = await resolveUser(req);
     if (!user) return { status: 401, body: { error: 'Iniciá sesión para verificar la membresía.' } };
     const id = String(body?.subscriptionId || '');
@@ -357,7 +357,7 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     return syncMercadoPagoSubscription(id, linked.externalReference);
   }
   async function mercadoPagoWebhook(req, dataId, topic) {
-    if (!settings.mp.enabled || store.kind !== 'supabase') return { status: 503, body: { error: 'Webhook no configurado.' } };
+    if (!config.enabled || !settings.mp.enabled || store.kind !== 'supabase') return { status: 503, body: { error: 'Webhook no habilitado.' } };
     if (!mercadoPagoSignatureValid(req.headers['x-signature'], req.headers['x-request-id'], dataId)) return { status: 401, body: { error: 'Firma de webhook inválida.' } };
     if (topic && topic !== 'subscription_preapproval') return { status: 200, body: { ignored: true } };
     const id = String(dataId || '');
