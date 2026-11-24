@@ -116,15 +116,28 @@ const PUBLIC_ROOT_FILES=new Set([
   // v72: normas de la comunidad (las pide Google Play para el contenido de usuarios).
   '/normas.html'
 ]);
+// Hashes dinámicos de los scripts inline que realmente usa index.html. Así se puede quitar
+// unsafe-inline de script-src sin extraer a ciegas el monolito ni cambiar el comportamiento de la app.
+const cspIndexHtml=await readFile(path.join(root,'index.html'),'utf8').catch(()=> '');
+const cspHash=source=>`'sha256-${createHash('sha256').update(source).digest('base64')}'`;
+const inlineScriptHashes=[...cspIndexHtml.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script>/gi)]
+  .filter(([,attrs,body])=>!/\\bsrc\\s*=/.test(attrs)&&body.trim()&&!/application\\/(?:ld\\+)?json/i.test(attrs))
+  .map(([,attrs,body])=>cspHash(body));
+const inlineEventHandlerSources=[
+  "this.onerror=null;this.src='./assets/exercises/jogging.webp'",
+  "this.nextElementSibling.hidden=false;this.remove();",
+  "this.onerror=null;this.closest('.exercise-photo').classList.add('exercise-photo-unavailable');this.remove();"
+];
+const inlineEventHandlerHashes=[...new Set(inlineEventHandlerSources)].map(cspHash);
 const CSP=[
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  // Solo las versiones exactas de supabase-js y Leaflet que usa la app (además con integridad SRI en el HTML).
-  // v48: los dominios de Google Ad Manager se agregan solo si ADS_PROVIDER=gam está configurado.
-  ["script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/ https://unpkg.com/@supabase/supabase-js@2.45.4/ https://unpkg.com/leaflet@1.9.4/",...adsCsp.script].join(' '),
+  // Solo las versiones exactas de supabase-js y Leaflet usadas por la app (además con SRI).
+  // Los eventos inline restantes se autorizan por hash exacto, nunca mediante unsafe-inline.
+  ["script-src 'self' 'unsafe-hashes'",...inlineScriptHashes,...inlineEventHandlerHashes,"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/","https://unpkg.com/@supabase/supabase-js@2.45.4/","https://unpkg.com/leaflet@1.9.4/",...adsCsp.script].join(' '),
   "style-src 'self' 'unsafe-inline' https://unpkg.com/leaflet@1.9.4/",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https:",
