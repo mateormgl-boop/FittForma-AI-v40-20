@@ -63,7 +63,7 @@ test('monetización mantiene anuncios y pagos desactivados mientras no haya prov
   const member=await read('membership-config.js');
   assert.match(ads,/enabled:\s*false/);
   assert.match(member,/paymentsEnabled:\s*false/);
-  assert.match(html,/Todavía no hay proveedor de pagos conectado ni suscripciones verificadas/);
+  assert.match(html,/La membresía se activa únicamente después de que el servidor verifica la suscripción/);
 });
 
 test('la exportación GPX solicita confirmación porque contiene coordenadas precisas',()=>{
