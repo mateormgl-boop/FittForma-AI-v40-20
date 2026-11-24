@@ -300,7 +300,7 @@
       const r = await api('/api/billing/mercadopago/checkout', {});
       if (!r.ok) { toast(r.data?.error || t('No se pudo iniciar el checkout de Mercado Pago.')); return; }
       const target = new URL(String(r.data?.checkoutUrl || ''));
-      if (target.protocol !== 'https:' || !/^(?:[a-z0-9-]+\\.)*mercadopago\\.com(?:\\.[a-z]{2})?$/.test(target.hostname)) {
+      if (target.protocol !== 'https:' || !/^(?:[a-z0-9-]+\.)*mercadopago\.com(?:\.[a-z]{2})?$/.test(target.hostname)) {
         toast(t('La dirección de pago no es válida. No se realizó ningún cobro.'));
         return;
       }
