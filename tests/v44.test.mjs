@@ -41,7 +41,7 @@ test('v44: librerías externas con versión exacta e integridad (SRI) y CSP acot
 test('v44: el servidor exige mismo origen, limita el uso diario y filtra el contexto de FittAI', () => {
   assert.match(server, /function sameOriginPost\(req\)/);
   assert.match(server, /if\(req\.method==='POST'&&!isPlayRtdn&&!sameOriginPost\(req\)\)/);
-  assert.match(server, /function overDailyBudget\(req\)/);
+  assert.match(server, /function overDailyBudget\(req(?:,accountId=null)?\)/);
   assert.match(server, /profile:sanitizeCoachProfile\(body\.profile\)/);
   assert.doesNotMatch(server.match(/function sanitizeCoachProfile[\s\S]*?\n\}/)[0], /avatar/);
   assert.match(html, /profile:\(\(\{avatar,\.\.\.rest\}\)=>rest\)\(state\.profile\|\|\{\}\)/, 'la foto de perfil no viaja a la IA');

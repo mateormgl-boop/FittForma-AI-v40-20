@@ -79,7 +79,7 @@ test('pruebas de integración HTTP del backend', async t => {
       assert.match(home.headers.get('content-type') || '', /text\/html/);
       const html = await home.text();
       assert.match(html, /FittForma AI/);
-      assert.match(html, /Versión 79\.0/);
+      assert.match(html, /Versión 80\.0/);
       assert.match(html, /workoutAutosaveStatus/);
 
       const status = await fetch(`${base}/api/status`);

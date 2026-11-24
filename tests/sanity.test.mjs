@@ -67,7 +67,7 @@ test('todos los botones estáticos y de plantillas declaran su tipo para no envi
 });
 
 test('versiones visibles del pie de página y traducciones están alineadas', () => {
-  assert.match(html, /Versión 79\.0/);
+  assert.match(html, /Versión 80\.0/);
   assert.match(i18n, /VERSION 79\.0 · ONLINE FITNESS COMMUNITY/);
   assert.doesNotMatch(html, /Versión 26\.0|Versión 25\.0|Versión 24\.0|Versión 23\.0/);
   assert.doesNotMatch(i18n, /Version 23\.0|Versão 23\.0|Versione 23\.0/);
