@@ -53,7 +53,7 @@ export function monetizationConfigFromEnv(env = process.env) {
     currency: ['UYU', 'USD'].includes(mpCurrency) ? mpCurrency : '',
     backUrl: mpReturnUrl
   };
-  mp.enabled = Boolean(mp.accessToken && mp.webhookSecret && mp.amount > 0 && mp.currency && mp.backUrl);
+  mp.enabled = Boolean(bool(env.MERCADOPAGO_ENABLED) && mp.accessToken && mp.webhookSecret && mp.amount > 0 && mp.currency && mp.backUrl);
   const play = {
     packageName: /^[a-zA-Z][\w.]{2,150}$/.test(String(env.GOOGLE_PLAY_PACKAGE_NAME || '').trim()) ? String(env.GOOGLE_PLAY_PACKAGE_NAME).trim() : '',
     productIds: String(env.GOOGLE_PLAY_PLUS_PRODUCT_IDS || '').split(',').map(s => s.trim()).filter(s => /^[a-z0-9._]{1,100}$/.test(s)),
