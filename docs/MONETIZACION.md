@@ -8,7 +8,7 @@ No hay identificadores de anuncios, precios ni credenciales reales en el reposit
 
 | Parte | Comportamiento | Quién decide |
 |---|---|---|
-| Banners | Un banner pequeño en Inicio, en Comunidad (después de la 3.ª publicación) y en Explorar. El alto queda reservado, así la pantalla no salta, y el banner se pide solo cuando se ve. | El servidor (`/api/entitlements`) |
+| Banners | Un banner bajo en Inicio, Biblioteca de ejercicios, Comunidad, Nutrición (solo «Hoy») y Progreso (solo «Resumen»). Se carga al acercarse a la pantalla, queda un único espacio por vista y se oculta si Google no tiene inventario. | El servidor (`/api/entitlements`) |
 | Intersticiales | Solo en pausas naturales: entrenamiento guardado, carrera guardada, volver al menú o cambiar de sección. Hacen falta 5–10 min de uso activo (7 por defecto) y al menos 4 cambios de sección. **Nunca** durante un entrenamiento, el descanso, el GPS, el registro de comidas, el chat de IA, el inicio de sesión, un pago, la subida de una foto o un guardado. | `monetization-core.js` (`interstitialDecision`) |
 | IA | 6 consultas gratis por día (40 con Plus). Al agotarlas: esperar a mañana o mirar un video voluntario para sumar +3 consultas, hasta 3 videos por día. | **Servidor**: la consulta se descuenta antes de llamar a Gemini y se devuelve si Gemini falla. |
 | Fotos en Comunidad | 2 fotos gratis por día (10 con Plus). Después, 1 foto extra por video, hasta 3 por día. El borrador nunca se borra y la foto **no se publica sola**: la persona toca «Publicar». | **Base de datos** (trigger `monetization_guard_photo_post`) y servidor |
@@ -37,10 +37,11 @@ La tarjeta de Plus ya no fija un precio orientativo en el código: muestra el mo
 
 | Variable | Ejemplo | Notas |
 |---|---|---|
-| `MONETIZATION_ENABLED` | `true` | Interruptor general. Por defecto `false`. |
+| `ADS_ENABLED` | `true` | Activa banners e intersticiales de Google Ad Manager de forma independiente. Requiere `ADS_PROVIDER=gam`, código de red y los bloques configurados. Por defecto `false`. |
+| `MONETIZATION_ENABLED` | `true` | Activa límites/cuotas de IA y funciones generales de monetización y membresía web. No hace falta para publicar banners o intersticiales. Por defecto `false`. |
 | `ADS_PROVIDER` | `gam` | `none` (por defecto), `gam` o `test`. `test` solo funciona con `ADS_ALLOW_TEST=true`, muestra «Anuncio de prueba» y **nunca** genera ingresos. **No usar `test` en producción.** |
 | `GAM_NETWORK_CODE` | *(tu código de red)* | Número público de Google Ad Manager. Sin este dato, `gam` queda en `none`. |
-| `GAM_SLOT_HOME`, `GAM_SLOT_COMMUNITY`, `GAM_SLOT_EXPLORE` | `/<red>/fittforma_home` | Rutas de bloques de anuncios de banner. |
+| `GAM_SLOT_HOME`, `GAM_SLOT_EXPLORE`, `GAM_SLOT_COMMUNITY`, `GAM_SLOT_NUTRITION`, `GAM_SLOT_PROGRESS` | `/<red>/fittforma_home` (y los códigos correspondientes) | Cinco bloques de banner: Inicio, Biblioteca, Comunidad, Nutrición y Progreso. |
 | `GAM_SLOT_REWARDED` | `/<red>/fittforma_rewarded` | Bloque de anuncios recompensado (web). |
 | `GAM_SLOT_INTERSTITIAL` | `/<red>/fittforma_interstitial` | Bloque de anuncios intersticial (web). |
 | `ADS_CONSENT` | `google-cmp` | Mientras no haya un consentimiento confirmado, se piden anuncios no personalizados. |
@@ -63,10 +64,11 @@ La tarjeta de Plus ya no fija un precio orientativo en el código: muestra el mo
 1. **Base de datos.** Aplicar las migraciones pendientes en el orden de `supabase/migrations` (incluida `2026-11-24_v81_mercadopago_memberships.sql`), o usar el consolidado `supabase/APLICAR_MIGRACIONES.sql`. El límite de fotos queda **apagado**.
 2. **Google Ad Manager.**
    - Crear la cuenta y obtener el código de red.
-   - Crear 5 bloques de anuncios: 3 banners, 1 recompensado web y 1 intersticial web.
+   - Crear 7 bloques: 5 banners (`fittforma_home`, `fittforma_explore`, `fittforma_community`, `fittforma_nutrition`, `fittforma_progress`), 1 recompensado web (`fittforma_rewarded`) y 1 intersticial web (`fittforma_interstitial`).
+   - Configurar tamaños de banner de 728×90 / 468×60 en pantallas grandes y 320×100 / 320×50 en móviles; no se solicita 300×250 para evitar saltos altos de diseño.
    - Aprobar el sitio y configurar el mensaje de consentimiento de Google (Privacy & messaging) para la UE, el Reino Unido y Suiza.
    - El repositorio publica `ads.txt` en la raíz con la línea de autorización de AdSense configurada; si Google Ad Manager solicita otro identificador de vendedor, agregar su línea sin borrar la existente.
-3. **Render.** Cargar primero `SUPABASE_SERVICE_ROLE_KEY` y las variables de configuración. Para probar cuotas y membresía, usar `MONETIZATION_ENABLED=true`; los anuncios requieren además `ADS_PROVIDER=gam` y sus identificadores reales. Se puede dejar `ADS_PROVIDER=none` mientras no haya bloques publicitarios. Activar `MERCADOPAGO_ENABLED=true` solo después de probar checkout y Webhooks.
+3. **Render.** Cargar primero `SUPABASE_SERVICE_ROLE_KEY` y las variables de configuración. Para activar solo banners/intersticiales, usar `ADS_ENABLED=true`, `ADS_PROVIDER=gam`, el código de red y los cinco bloques display; se puede dejar `MONETIZATION_ENABLED=false` para no activar nuevas cuotas de IA. `ADS_ENABLED=false` y `ADS_PROVIDER=none` son los valores iniciales. Activar `MONETIZATION_ENABLED=true` o `MERCADOPAGO_ENABLED=true` solo cuando se decida habilitar esas funciones y se hayan probado.
 4. **Límite de fotos.** Cuando se quiera activar: `update public.monetization_settings set photo_limit_enabled = true;` (en el SQL editor de Supabase).
 5. **Plus con Google Play.** Requiere una **app de Android**: este repositorio no tiene un proyecto Android. Pasos:
    - Empaquetar la PWA como TWA (por ejemplo con Bubblewrap) y habilitar Play Billing en la TWA (Digital Goods API).
