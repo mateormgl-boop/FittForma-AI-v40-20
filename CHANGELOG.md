@@ -1,5 +1,16 @@
 # FittForma AI — Registro de cambios
 
+## v80.0 — Esfuerzo por serie y progresión más cuidadosa (23 de noviembre de 2026)
+
+- Se suma un campo opcional RIR (0–5) en las series de fuerza. Queda guardado en el borrador y en el historial; los datos anteriores siguen siendo válidos y no se alteran.
+- Las sugerencias de próxima serie tienen en cuenta RIR 0–1 y priorizan mantener la carga antes que aumentarla. Si no hay RIR cargado, se conserva el comportamiento anterior.
+- FittAI recibe el RIR dentro del contexto de entrenamientos solo cuando la persona permite compartir sus registros; el servidor valida los valores y el prompt prohíbe inventarlos.
+- FittAI compara exposiciones registradas y solo marca una posible meseta con cuatro registros a lo largo de al menos tres semanas; las señales no son diagnóstico.
+- Las estimaciones por foto informan la porción visual supuesta y una confianza orientativa, y requieren revisión manual.
+- Límites de IA por IP y por cuenta verificada, manteniendo el uso sin cuenta. CSP: `script-src` con hashes SHA-256; `style-src` aún permite estilos inline.
+- Sin cambios de base de datos ni migraciones. Versión 0.80.0 y caché PWA v80-0.
+
+
 ## v79.0 — Todo lo que faltaba de la revisión: menos scroll, compartir, gasto real, base más rápida y etapa nueva (16 de noviembre de 2026)
 
 Pedido de la persona dueña: «hacé todo lo faltante que le falta a la app y pasame el archivo». Junta las etapas v75 a v78 de `docs/REVISION_PRODUCTO_v73.md` y una etapa nueva (v79).

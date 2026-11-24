@@ -1,0 +1,26 @@
+name: Tests
+on:
+  push:
+    branches:
+      - main
+      - improve/fittforma-foundation-coach
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    name: Node 20 · npm test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Obtener el repositorio
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Ejecutar pruebas automáticas
+        run: npm test

@@ -1,6 +1,6 @@
-# Despliegue de FittForma AI v79.0
+# Despliegue de FittForma AI v80.0
 
-Esta guía es la lista de pasos para publicar v79.0. **No se desplegó a producción**: el despliegue lo
+Esta guía actualiza el código de la rama a v80.0. La publicación en Render sigue requiriendo desplegar la rama aprobada y completar las comprobaciones del entorno real. **No se desplegó a producción**: el despliegue lo
 hace la persona dueña del proyecto, después de revisar y aprobar el PR.
 
 ## Base de datos: aplicar todas las migraciones de una vez
@@ -17,6 +17,16 @@ Detalles del archivo:
 - Al final recarga la caché de la API de Supabase.
 - Se regenera con `node tools/build-migrations-bundle.mjs`.
 - `tests/migrations-bundle.test.mjs` comprueba que esté al día.
+
+## Qué cambia en v80.0
+
+- No hay migraciones nuevas de Supabase. El RIR opcional se guarda en las entradas de series existentes, sin alterar los registros anteriores.
+- FittAI recibe señales de progresión calculadas a partir de series completadas y solo puede sugerir una meseta con cuatro exposiciones durante al menos tres semanas; el RIR 0–1 prioriza mantener la carga.
+- Las fotos de comidas devuelven una porción visual asumida y una confianza orientativa; el formulario sigue siendo editable y no guarda automáticamente.
+- Los endpoints de IA aplican límites por IP y un límite adicional por cuenta cuando el token de Supabase es válido. Los invitados siguen habilitados. Sin migraciones SQL.
+- `script-src` usa hashes SHA-256 y deja de permitir `unsafe-inline`; `style-src` todavía requiere ese permiso hasta migrar estilos inline.
+- El backend y los paquetes informan `0.80.0`; el service worker usa `fittforma-ai-static-v80-0`.
+- Los pasos de v79 que siguen debajo mantienen validez para funciones y migraciones de versiones anteriores que puedan faltar en el proyecto real.
 
 ## Qué cambia en v79.0
 

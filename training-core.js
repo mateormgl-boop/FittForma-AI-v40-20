@@ -715,7 +715,12 @@
   // v71: sugerencia para la PRÓXIMA serie en la sesión en curso. Usa la misma serie de la última vez y lo que hiciste hoy;
   // si hoy te costó (quedaste por debajo del rango), no sube la carga. Sin datos registrados devuelve null.
   function nextSetHint(prev, today, spec, measure = 'reps', setIndex = 0) {
-    const pick = x => (x ? { r: num(x.reps), w: num(x.weight) } : null);
+    const rirOf = x => {
+      if (!x || x.rir === '' || x.rir === null || x.rir === undefined) return null;
+      const value = Number(x.rir);
+      return Number.isInteger(value) && value >= 0 && value <= 5 ? value : null;
+    };
+    const pick = x => (x ? { r: num(x.reps), w: num(x.weight), rir: rirOf(x) } : null);
     const before = pick((prev || [])[setIndex]);
     const doneToday = (today || []).slice(0, setIndex).filter(x => x && x.done).map(pick).filter(x => x.r > 0);
     const last = doneToday.length ? doneToday[doneToday.length - 1] : null;
@@ -724,10 +729,17 @@
     if (!base) return null;
     const lo = m ? Number(m[1]) : one ? Number(one[0]) : base.r, hi = m ? Number(m[2]) : lo;
     const w0 = base.w > 0 ? base.w : 0;
-    const out = (kind, weight, reps) => ({ kind, weight, reps, unit: measure === 'seconds' ? 's' : 'reps', from: before && before.r > 0 ? { weight: before.w > 0 ? before.w : 0, reps: before.r } : null, today: last ? { weight: last.w > 0 ? last.w : 0, reps: last.r } : null });
-    if (last && last.r < lo) return out('hold', last.w > 0 ? last.w : w0, lo);
+    const out = (kind, weight, reps, reason = '', rir = null) => ({
+      kind, weight, reps, unit: measure === 'seconds' ? 's' : 'reps', reason, rir,
+      from: before && before.r > 0 ? { weight: before.w > 0 ? before.w : 0, reps: before.r, rir: before.rir } : null,
+      today: last ? { weight: last.w > 0 ? last.w : 0, reps: last.r, rir: last.rir } : null
+    });
+    if (last && last.r < lo) return out('hold', last.w > 0 ? last.w : w0, lo, 'below-range', last.rir);
+    // RIR 0–1 means the previous set was very close to failure. Hold the load before progressing.
+    if (measure === 'reps' && last && last.rir !== null && last.rir <= 1) return out('hold', last.w > 0 ? last.w : w0, last.r, 'high-effort', last.rir);
     if (!(before && before.r > 0)) return out('repeat', w0, last.r);
     if (measure === 'seconds') return out(before.r >= hi ? 'time' : 'repeat', w0, before.r >= hi ? before.r + 5 : Math.min(hi, before.r + 5));
+    if (before.rir !== null && before.rir <= 1) return out('hold', w0, Math.min(hi, before.r), 'high-effort', before.rir);
     if (last && last.w > w0 && last.r >= lo) return out('repeat', last.w, last.r);
     if (before.r >= hi) return w0 > 0 ? out('load', Math.round((w0 + loadStep(w0)) * 2) / 2, lo) : out('reps', 0, before.r + 1);
     if (before.r >= lo) return out('reps', w0, Math.min(hi, before.r + 1));

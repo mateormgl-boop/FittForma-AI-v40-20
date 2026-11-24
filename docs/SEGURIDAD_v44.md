@@ -35,9 +35,8 @@ service worker sin cachear `/api` ni Supabase, enlaces externos con `noopener`.
 
 ## Pendiente (no se pudo resolver sin decisiones o servicios externos)
 
-- La CSP mantiene `'unsafe-inline'` porque la app es un único HTML con scripts en línea; el riesgo se reduce
-  escapando todo dato externo. Quitarlo implica separar el JavaScript en archivos.
-- Los endpoints de IA no exigen iniciar sesión (la app permite usar FittAI sin cuenta); se limitan por origen y por cuota diaria.
+- `script-src` ya no usa `'unsafe-inline'`: al iniciar el backend calcula hashes SHA-256 de los bloques inline exactos y de los tres manejadores `onerror` que conserva la interfaz. `style-src` mantiene `'unsafe-inline'` porque aún hay estilos en línea; quitarlo requiere migrar esos estilos sin cambiar la apariencia.
+- Los endpoints de IA siguen permitiendo uso sin cuenta. Se aplica un límite por IP y, cuando se valida una sesión de Supabase, un límite diario y por minuto adicional por cuenta. Los contadores en memoria se reinician al reiniciar el backend.
 - Perfiles creados antes de v44 conservan el nombre de usuario derivado del correo; cada persona puede cambiarlo.
 - Fotos de cuentas eliminadas antes de v44 pueden haber quedado en Storage: revisarlas desde el panel de Supabase.
 - Nada de esto se probó contra el Supabase real ni Render.

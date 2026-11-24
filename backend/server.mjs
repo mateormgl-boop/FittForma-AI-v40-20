@@ -7,6 +7,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createMonetization, adsCspAdditions } from './monetization.mjs';
+import { deriveTrainingInsights } from './ai-insights.mjs';
 const here=path.dirname(fileURLToPath(import.meta.url));
 // Detect the web root defensively. This works both when files are at repo root
 // and when a ZIP was accidentally uploaded with its forma-prototipo folder intact.
@@ -21,7 +22,7 @@ const root=rootCandidates.find(candidate=>existsSync(path.join(candidate,'index.
 const rawPort=String(process.env.PORT||'8787');
 const port=Number(rawPort);
 if(!Number.isInteger(port)||port<0||port>65535)throw new Error(`PORT debe ser un entero entre 0 y 65535; se recibió ${JSON.stringify(rawPort)}.`);
-const appVersion='0.79.0';
+const appVersion='0.80.0';
 const apiKey=String(process.env.GEMINI_API_KEY||'').trim(), model=String(process.env.GEMINI_MODEL||'gemini-3.8-flash').trim()||'gemini-3.8-flash';
 const trustRenderClientIp=String(process.env.TRUST_RENDER_CLIENT_IP||'').toLowerCase()==='true';
 // If the primary model temporarily returns 503, try a lighter official model automatically.
@@ -115,15 +116,28 @@ const PUBLIC_ROOT_FILES=new Set([
   // v72: normas de la comunidad (las pide Google Play para el contenido de usuarios).
   '/normas.html'
 ]);
+// Hashes dinámicos de los scripts inline que realmente usa index.html. Así se puede quitar
+// unsafe-inline de script-src sin extraer a ciegas el monolito ni cambiar el comportamiento de la app.
+const cspIndexHtml=await readFile(path.join(root,'index.html'),'utf8').catch(()=> '');
+const cspHash=source=>`'sha256-${createHash('sha256').update(source).digest('base64')}'`;
+const inlineScriptHashes=[...cspIndexHtml.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
+  .filter(([,attrs,body])=>!/\bsrc\s*=/.test(attrs)&&body.trim()&&!/application\/(?:ld\+)?json/i.test(attrs))
+  .map(([,attrs,body])=>cspHash(body));
+const inlineEventHandlerSources=[
+  "this.onerror=null;this.src='./assets/exercises/jogging.webp'",
+  "this.nextElementSibling.hidden=false;this.remove();",
+  "this.onerror=null;this.closest('.exercise-photo').classList.add('exercise-photo-unavailable');this.remove();"
+];
+const inlineEventHandlerHashes=[...new Set(inlineEventHandlerSources)].map(cspHash);
 const CSP=[
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  // Solo las versiones exactas de supabase-js y Leaflet que usa la app (además con integridad SRI en el HTML).
-  // v48: los dominios de Google Ad Manager se agregan solo si ADS_PROVIDER=gam está configurado.
-  ["script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/ https://unpkg.com/@supabase/supabase-js@2.45.4/ https://unpkg.com/leaflet@1.9.4/",...adsCsp.script].join(' '),
+  // Solo las versiones exactas de supabase-js y Leaflet usadas por la app (además con SRI).
+  // Los eventos inline restantes se autorizan por hash exacto, nunca mediante unsafe-inline.
+  ["script-src 'self' 'unsafe-hashes'",...inlineScriptHashes,...inlineEventHandlerHashes,"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/","https://unpkg.com/@supabase/supabase-js@2.45.4/","https://unpkg.com/leaflet@1.9.4/",...adsCsp.script].join(' '),
   "style-src 'self' 'unsafe-inline' https://unpkg.com/leaflet@1.9.4/",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https:",
@@ -195,8 +209,8 @@ function rateLimitClientKey(req){
   return `socket:${req.socket.remoteAddress||'unknown'}`;
 }
 // v48: cubos separados para que las métricas de anuncios no bloqueen una consulta de IA ni el canje de un video ya visto.
-function rateLimited(req,bucket='api',max=12){
-  const key=bucket+':'+rateLimitClientKey(req),now=Date.now();
+function rateLimitedKey(clientKey,bucket='api',max=12){
+  const key=bucket+':'+clientKey,now=Date.now();
   if(limits.size>1000){for(const [ip,item] of limits){if(now-item.start>120000)limits.delete(ip);}}
   let old=limits.get(key);
   if(!old||now-old.start>60000){
@@ -205,6 +219,29 @@ function rateLimited(req,bucket='api',max=12){
   }
   old.count++;
   return old.count>max;
+}
+function rateLimited(req,bucket='api',max=12){return rateLimitedKey(rateLimitClientKey(req),bucket,max);}
+
+// Only validated Supabase accounts receive their own AI quota. Guest access remains available through the IP limit.
+const aiAuthCache=new Map();
+async function aiAccountId(req){
+  const auth=String(req.headers.authorization||''),token=auth.startsWith('Bearer ')?auth.slice(7):'';
+  if(token.length<20||token.length>4096)return null;
+  for(const ch of token){const code=ch.charCodeAt(0);if(!((code>=48&&code<=57)||(code>=65&&code<=90)||(code>=97&&code<=122)||ch==='_'||ch==='.'||ch==='-'))return null;}
+  const tokenHash=createHash('sha256').update(token).digest('hex'),cached=aiAuthCache.get(tokenHash);
+  if(cached&&cached.expires>Date.now())return cached.id;
+  const project=String(process.env.SUPABASE_URL||'').trim().replace(/\/$/,'');
+  const publicKey=String(process.env.SUPABASE_ANON_KEY||process.env.SUPABASE_PUBLISHABLE_KEY||'').trim();
+  if(!project||!publicKey)return null;
+  try{
+    const response=await fetch(`${project}/auth/v1/user`,{headers:{apikey:publicKey,Authorization:`Bearer ${token}`},signal:AbortSignal.timeout(3500)});
+    if(!response.ok)return null;
+    const user=await response.json();
+    if(!user||typeof user.id!=='string'||!/^[0-9a-f-]{36}$/i.test(user.id))return null;
+    aiAuthCache.set(tokenHash,{id:user.id,expires:Date.now()+5*60_000});
+    if(aiAuthCache.size>5000)aiAuthCache.delete(aiAuthCache.keys().next().value);
+    return user.id;
+  }catch{return null;}
 }
 function isJsonObject(value){return value!==null&&typeof value==='object'&&!Array.isArray(value);}
 
@@ -247,7 +284,7 @@ async function readBody(req,maxBytes=12000){
   try{return JSON.parse(Buffer.concat(chunks,total).toString('utf8')||'{}');}
   catch{throw new Error('invalid_json');}
 }
-const prompt=`Sos el entrenador de FittForma AI. Respondé en el idioma seleccionado por la persona, con un estilo claro, cercano y práctico. Usá el perfil, equipamiento, plan, rutinas propias, objetivos nutricionales, el resumen nutricional y de agua (los días sin registro no significan consumo cero), las insignias y el resumen reciente de entrenamientos/actividades/peso cuando estén disponibles. Personalizá cada respuesta con esos datos concretos; no inventes registros ausentes. Si el historial muestra constancia, reconocela brevemente; si muestra pausas, poca actividad o cargas/repeticiones estancadas, proponé un paso pequeño y realista, sin culpabilizar. Diferenciá los datos registrados de las inferencias. Adaptá recomendaciones a nivel y tiempo. Para fuerza, sugerí técnica controlada, calentamiento y progresión gradual; no prescribas cargas máximas ni diagnostiques. No sugieras aumentar carga si no hay registros suficientes o si la técnica/dolor es una preocupación. Ante dolor, lesión, mareo o síntomas preocupantes, no recomiendes entrenar a través del síntoma y sugerí orientación profesional. No inventes exactitud nutricional ni prometas resultados físicos. Nunca cambies datos: solo proponé cambios para que la persona los apruebe. Las propuestas deben ser concretas y explicar qué cambiaría y por qué. Devolvé ÚNICAMENTE JSON válido: {"reply":"respuesta útil","actions":[] o hasta 3 {"label":"Ir a …","target":"destino de la guía"},"proposal":null o {"title":"...","description":"...","kind":"routine|nutrition|recovery|general","days":2|3|4|5 opcional,"duration":20|30|45|60 opcional}}. Solo incluí days/duration si el usuario los pide o si son necesarios para una propuesta de rutina. Si no pide ningún cambio concreto, proposal=null.`;
+const prompt=`Sos el entrenador de FittForma AI. Respondé en el idioma seleccionado por la persona, con un estilo claro, cercano y práctico. Usá el perfil, equipamiento, plan, rutinas propias, objetivos nutricionales, el resumen nutricional y de agua (los días sin registro no significan consumo cero), las insignias y el resumen reciente de entrenamientos/actividades/peso cuando estén disponibles. También podés usar trainingInsights, que resume exposiciones registradas por ejercicio; tratá sus tendencias como señales orientativas, nunca como diagnóstico. Solo mencioná un estancamiento cuando plateau=true y aclará que se basa en al menos cuatro registros durante tres semanas; con pocos datos, pedí más registros antes de concluir. Personalizá cada respuesta con esos datos concretos; no inventes registros ausentes. Si el historial muestra constancia, reconocela brevemente; si muestra pausas, poca actividad o cargas/repeticiones estancadas, proponé un paso pequeño y realista, sin culpabilizar. Diferenciá los datos registrados de las inferencias. Adaptá recomendaciones a nivel y tiempo. Para fuerza, sugerí técnica controlada, calentamiento y progresión gradual; no prescribas cargas máximas ni diagnostiques. No sugieras aumentar carga si no hay registros suficientes o si la técnica/dolor es una preocupación. Si recibís RIR, interpretalo como repeticiones en reserva (0 = ninguna, 1 = una, 2 = dos y así sucesivamente): usalo solo cuando esté registrado y nunca lo inventes. Si highEffort=true en las últimas exposiciones, priorizá mantener la carga, revisar descanso o volumen antes que aumentar peso; no recomiendes llegar al fallo en todas las series. Si el mismo ejercicio acumula RIR 0–1, priorizá mantener la carga o sugerir menos volumen/recuperación antes que progresar; no recomiendes llegar al fallo en todas las series. Las propuestas siguen siendo opcionales y requieren aprobación de la persona. Ante dolor, lesión, mareo o síntomas preocupantes, no recomiendes entrenar a través del síntoma y sugerí orientación profesional. No inventes exactitud nutricional ni prometas resultados físicos. Nunca cambies datos: solo proponé cambios para que la persona los apruebe. Las propuestas deben ser concretas y explicar qué cambiaría y por qué. Devolvé ÚNICAMENTE JSON válido: {"reply":"respuesta útil","actions":[] o hasta 3 {"label":"Ir a …","target":"destino de la guía"},"proposal":null o {"title":"...","description":"...","kind":"routine|nutrition|recovery|general","days":2|3|4|5 opcional,"duration":20|30|45|60 opcional}}. Solo incluí days/duration si el usuario los pide o si son necesarios para una propuesta de rutina. Si no pide ningún cambio concreto, proposal=null.`;
 const APP_TARGETS=new Set(['home','train','train:free','routines','routines:new','exercises','running','coach','nutrition','nutrition:registrar','nutrition:plan','nutrition:historial','progress','progress:badges','progress:history','progress:body','community','community:publish','community:messages','community:explore','profile','profile:goals','profile:reminders','profile:account']);
 const APP_GUIDE=`GUÍA DE FITTFORMA AI (usala para explicar dónde está cada cosa y ofrecer botones de navegación):
 - Inicio [home]: saludo, progreso semanal, entrenamiento de hoy, próxima insignia, accesos rápidos (entrenar, comida, +1 vaso de agua, correr, insignias, FittAI), resumen de calorías/proteína/agua, hábitos del día, campana de notificaciones. Botón + flotante para registrar rápido.
@@ -265,7 +302,7 @@ function sanitizeActions(list){return Array.isArray(list)?list.filter(a=>a&&APP_
 function sanitizeProposal(x){if(!x||typeof x!=='object')return null;const kinds=['routine','nutrition','recovery','general'],days=Number(x.days),duration=Number(x.duration);return {title:String(x.title||'Propuesta del entrenador').slice(0,100),description:String(x.description||'Revisá esta propuesta antes de aplicarla.').slice(0,1200),kind:kinds.includes(x.kind)?x.kind:'general',...( [2,3,4,5].includes(days)?{days}:{} ),...( [20,30,45,60,75,90,120].includes(duration)?{duration}:{} )};}
 function cleanText(value,max=100){return typeof value==='string'?value.replace(/[<>]/g,'').trim().slice(0,max):'';}
 function sanitizeTrainingContext(body){
-  const sessions=Array.isArray(body.sessions)?body.sessions.slice(0,5).map(s=>({date:cleanText(s?.date,10),title:cleanText(s?.title,80),minutes:Math.max(0,Math.min(600,Number(s?.minutes)||0)),notes:cleanText(s?.notes,180),exercises:Array.isArray(s?.exercises)?s.exercises.slice(0,8).map(e=>({name:cleanText(e?.name,70),entries:Array.isArray(e?.entries)?e.entries.slice(0,6).map(x=>({reps:cleanText(String(x?.reps??''),8),weight:cleanText(String(x?.weight??''),10),done:Boolean(x?.done)})):[]})):[]})):[];
+  const sessions=Array.isArray(body.sessions)?body.sessions.slice(0,5).map(s=>({date:cleanText(s?.date,10),title:cleanText(s?.title,80),minutes:Math.max(0,Math.min(600,Number(s?.minutes)||0)),notes:cleanText(s?.notes,180),exercises:Array.isArray(s?.exercises)?s.exercises.slice(0,8).map(e=>({name:cleanText(e?.name,70),kind:cleanText(String(e?.kind||'strength'),24),entries:Array.isArray(e?.entries)?e.entries.slice(0,6).map(x=>({reps:cleanText(String(x?.reps??''),8),weight:cleanText(String(x?.weight??''),10),rir:['0','1','2','3','4','5'].includes(String(x?.rir??''))?String(x.rir):'',done:Boolean(x?.done)})):[]})):[]})):[];
   const activities=Array.isArray(body.activities)?body.activities.slice(0,5).map(a=>({date:cleanText(a?.date,10),type:cleanText(a?.type,30),distance:Math.max(0,Math.min(1000,Number(a?.distance)||0)),minutes:Math.max(0,Math.min(1440,Number(a?.minutes)||0)),pace:cleanText(a?.pace,20)})):[];
   const weights=Array.isArray(body.weights)?body.weights.slice(0,5).map(w=>({date:cleanText(w?.date,10),kg:Math.max(0,Math.min(350,Number(w?.kg??w?.weight)||0))})).filter(w=>w.kg>0):[];
   const num=(v,max)=>{const n=Number(v);return Number.isFinite(n)&&n>=0?Math.min(max,Math.round(n)):null;};
@@ -273,8 +310,9 @@ function sanitizeTrainingContext(body){
   const nutrition={today:{calories:num(today.calories,20000),protein:num(today.protein,1000),carbs:num(today.carbs,2000),fat:num(today.fat,1000),meals:num(today.meals,50),waterGlasses:num(today.water,40)},last7:{daysWithRecords:num(last7.daysWithRecords,7),avgCalories:num(last7.avgCalories,20000),avgProtein:num(last7.avgProtein,1000)}};
   const routines=Array.isArray(body.routines)?body.routines.slice(0,5).map(r=>({name:cleanText(r?.name,60),exercises:Array.isArray(r?.exercises)?r.exercises.slice(0,10).map(e=>({name:cleanText(e?.name,72),sets:num(e?.sets,10),reps:cleanText(String(e?.reps??''),12)})):[]})):[];
   const badges=Array.isArray(body.badges)?body.badges.slice(0,10).map(b=>({name:cleanText(b?.name,72),rank:cleanText(b?.rank,40)})):[];
-  return {recentSessions:sessions,recentActivities:activities,recentWeights:weights,nutrition,ownRoutines:routines,badges};
+  return {recentSessions:sessions,recentActivities:activities,recentWeights:weights,nutrition,ownRoutines:routines,badges,trainingInsights:deriveTrainingInsights(sessions)};
 }
+
 // Solo los campos del perfil y del plan que el entrenador necesita (nunca la foto de perfil u otros datos).
 function sanitizeCoachProfile(p){
   if(!isJsonObject(p))return {};
@@ -296,15 +334,19 @@ function sanitizeCoachPlan(plan){
 }
 // Presupuesto diario de consultas a Gemini (por cliente y total) para que el endpoint no sea un LLM gratuito abierto.
 const DAILY_PER_CLIENT=Math.max(1,Number(process.env.GEMINI_DAILY_PER_CLIENT)||150);
+const DAILY_PER_ACCOUNT=Math.max(1,Number(process.env.GEMINI_DAILY_PER_ACCOUNT)||150);
 const DAILY_TOTAL=Math.max(1,Number(process.env.GEMINI_DAILY_LIMIT)||2000);
 let dailyBudget={day:'',total:0,clients:new Map()};
-function overDailyBudget(req){
+function overDailyBudget(req,accountId=null){
   const day=new Date().toISOString().slice(0,10);
   if(dailyBudget.day!==day)dailyBudget={day,total:0,clients:new Map()};
-  const key=rateLimitClientKey(req),used=dailyBudget.clients.get(key)||0;
-  if(dailyBudget.total>=DAILY_TOTAL||used>=DAILY_PER_CLIENT)return true;
+  const keys=[rateLimitClientKey(req),...(accountId?[`account:${accountId}`]:[])];
+  const checks=keys.map(key=>({key,limit:key.startsWith('account:')?DAILY_PER_ACCOUNT:DAILY_PER_CLIENT,used:dailyBudget.clients.get(key)||0}));
+  if(dailyBudget.total>=DAILY_TOTAL||checks.some(item=>item.used>=item.limit))return true;
   if(dailyBudget.clients.size>=MAX_TRACKED_CLIENTS*4)dailyBudget.clients.delete(dailyBudget.clients.keys().next().value);
-  dailyBudget.clients.set(key,used+1);dailyBudget.total++;return false;
+  for(const item of checks)dailyBudget.clients.set(item.key,item.used+1);
+  dailyBudget.total++;
+  return false;
 }
 // Los navegadores envían Origin (o al menos Sec-Fetch-Site) en un POST; sin ninguno de los dos se rechaza.
 // v60: a una persona (navegador que pide HTML) se le muestra la página 404 propia; a la app y a las APIs, JSON.
@@ -360,20 +402,22 @@ const server=http.createServer(async(req,res)=>{try{
   if(req.method==='GET'&&url.pathname==='/healthz')return send(req,res,200,{ok:true,service:'fittforma-ai',version:appVersion});
   if(req.method==='POST'&&url.pathname==='/api/meal-photo'){
     if(rateLimited(req)){res.setHeader('Retry-After','60');return send(req,res,429,{error:'Demasiadas solicitudes. Esperá un minuto.'});}
+    const accountId=await aiAccountId(req);if(accountId&&rateLimitedKey('account:'+accountId,'meal-photo',12)){res.setHeader('Retry-After','60');return send(req,res,429,{error:'Esta cuenta hizo demasiadas consultas de fotos. Esperá un minuto.'});}
     let body;try{body=await readBody(req,4_000_000);}catch(e){return send(req,res,e.message==='too_large'?413:400,{error:e.message==='too_large'?'La imagen es demasiado grande. Elegí una foto más liviana.':'Solicitud de imagen inválida.'});}
     if(!isJsonObject(body))return send(req,res,400,{error:'La solicitud de imagen debe ser un objeto JSON.'});
     if(!apiKey)return send(req,res,503,{error:'La estimación por foto necesita configurar GEMINI_API_KEY en el servidor.'});
-    if(overDailyBudget(req))return send(req,res,429,{error:'Se alcanzó el límite diario de consultas a la IA. Probá mañana.'});
+    if(overDailyBudget(req,accountId))return send(req,res,429,{error:'Se alcanzó el límite diario de consultas a la IA. Probá mañana.'});
     if(typeof body.image!=='string'||body.image.length>3_600_000||!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(body.image))return send(req,res,400,{error:'La imagen debe ser JPG, PNG o WebP y pesar menos de aproximadamente 2,5 MB después de comprimir.'});
     const localeNames={es:'español',en:'English',pt:'portugués',fr:'francés',it:'italiano',de:'alemán'};
     const responseLanguage=localeNames[['es','en','pt','fr','it','de'].includes(body.language)?body.language:'es'];
-    const photoPrompt=`Analizá esta foto de una comida para una app de registro nutricional. Estimá el plato visible, ingredientes probables, porción comestible, calorías totales, gramos de proteína, carbohidratos y grasas totales. Los campos textuales name y notes deben estar en ${responseLanguage}. No afirmes precisión: si no se puede inferir una porción, elegí una estimación prudente y explicá la incertidumbre. No des consejos médicos. Devolvé únicamente JSON válido con este formato: {"name":"nombre breve del plato y porción estimada","calories":número entero,"protein":número decimal,"carbs":número decimal,"fat":número decimal,"notes":"una frase corta con incertidumbres y factores como aceite/salsas"}. Los números deben ser finitos y no negativos.`;
+    const photoPrompt=`Analizá esta foto de una comida para una app de registro nutricional. Estimá el plato visible, ingredientes probables, porción comestible, calorías totales, gramos de proteína, carbohidratos y grasas totales. Los campos textuales name, notes y portionAssumption deben estar en ${responseLanguage}. No afirmes precisión: la confianza es una valoración visual orientativa, no una probabilidad ni una medida de exactitud. Usá low si la porción o los ingredientes no se distinguen bien, medium si hay indicios parciales y high solo si plato y porción están claramente visibles. Indicá la porción visual asumida y qué ingredientes o aceites no se pueden verificar. Si no se puede inferir una porción, elegí una estimación prudente y explicá la incertidumbre. No des consejos médicos. Devolvé únicamente JSON válido con este formato: {"name":"nombre breve del plato y porción estimada","calories":número entero,"protein":número decimal,"carbs":número decimal,"fat":número decimal,"confidence":"low|medium|high","portionAssumption":"porción visual asumida y dudas","notes":"una frase corta sobre incertidumbres y factores como aceite/salsas"}. Los números deben ser finitos y no negativos.`;
     let result;try{result=await askGemini({system:photoPrompt,user:`Estimá los valores de la comida de esta imagen. No guardes nada; solo devolvé una estimación. Idioma de salida: ${responseLanguage}.`,imageDataUrl:body.image,maxTokens:450});}catch(e){console.error('[Gemini meal-photo] Falló la solicitud:',e.status||'',e.message||'error',e.details||'');if(e.message==='invalid_image')return send(req,res,400,{error:'Formato de imagen inválido.'});return send(req,res,e.status===429?429:502,{error:e.status===429?'Gemini alcanzó su límite gratuito o de solicitudes. Probá más tarde.':'Gemini no pudo analizar la foto. Revisá los Logs de Render para conocer la causa.'});}
     const calories=Number(result.calories),protein=Number(result.protein),carbs=Number(result.carbs),fat=Number(result.fat);if(typeof result.name!=='string'||!Number.isFinite(calories)||!Number.isFinite(protein)||calories<0||calories>5000||protein<0||protein>300||!Number.isFinite(carbs)||carbs<0||carbs>1000||!Number.isFinite(fat)||fat<0||fat>500)return send(req,res,502,{error:'La estimación de la IA no pasó la validación. Probá otra foto o cargá los datos manualmente.'});
-    return send(req,res,200,{name:result.name.slice(0,80),calories:Math.round(calories),protein:Number(protein.toFixed(1)),carbs:Number(carbs.toFixed(1)),fat:Number(fat.toFixed(1)),notes:typeof result.notes==='string'?result.notes.slice(0,350):'Valores aproximados; pueden variar según porción e ingredientes.'});
+    return send(req,res,200,{name:result.name.slice(0,80),calories:Math.round(calories),protein:Number(protein.toFixed(1)),carbs:Number(carbs.toFixed(1)),fat:Number(fat.toFixed(1)),confidence:['low','medium','high'].includes(String(result.confidence||'').toLowerCase())?String(result.confidence).toLowerCase():'low',portionAssumption:typeof result.portionAssumption==='string'?result.portionAssumption.slice(0,180):'Porción visual aproximada; revisá tamaño e ingredientes.',notes:typeof result.notes==='string'?result.notes.slice(0,350):'Valores aproximados; pueden variar según porción e ingredientes.'});
   }
   if(req.method==='POST'&&url.pathname==='/api/coach'){
     if(rateLimited(req)){res.setHeader('Retry-After','60');return send(req,res,429,{error:'Demasiadas solicitudes. Esperá un minuto.'});}
+    const accountId=await aiAccountId(req);if(accountId&&rateLimitedKey('account:'+accountId,'coach',12)){res.setHeader('Retry-After','60');return send(req,res,429,{error:'Esta cuenta hizo demasiadas consultas. Esperá un minuto.'});}
     let body;try{body=await readBody(req,32000);}catch(e){return send(req,res,e.message==='too_large'?413:400,{error:e.message==='too_large'?'Solicitud demasiado grande.':'JSON inválido.'});}
     if(!isJsonObject(body))return send(req,res,400,{error:'La solicitud debe ser un objeto JSON.'});
     if(typeof body.message!=='string'||!body.message.trim()||body.message.length>500)return send(req,res,400,{error:'El mensaje debe tener entre 1 y 500 caracteres.'});
@@ -381,7 +425,7 @@ const server=http.createServer(async(req,res)=>{try{
     // v48: cuota por cuenta (o por dispositivo sin cuenta) aplicada en el servidor; se devuelve si Gemini falla.
     const aiQuota=await monetization.consumeAi(req,rateLimitClientKey(req));
     if(!aiQuota.ok)return send(req,res,429,{error:aiQuota.quota.canOfferVideo?'Usaste tus consultas gratuitas de hoy. Podés esperar a que se renueven o mirar un video voluntario para sumar consultas.':'Usaste tus consultas de hoy. Se renuevan mañana.',code:'ai_quota',quota:aiQuota.quota,plan:aiQuota.plan});
-    if(overDailyBudget(req)){await aiQuota.refund?.();return send(req,res,429,{error:'Se alcanzó el límite diario de consultas a la IA. Probá mañana.'});}
+    if(overDailyBudget(req,accountId)){await aiQuota.refund?.();return send(req,res,429,{error:'Se alcanzó el límite diario de consultas a la IA. Probá mañana.'});}
     const shareData=body.shareData!==false;
     const training=shareData?sanitizeTrainingContext(body):{};
     const context=!shareData?{note:'La persona eligió no compartir sus registros. No asumas datos personales; si hacen falta, pedíselos.'}:{profile:sanitizeCoachProfile(body.profile),goals:sanitizeCoachGoals(body.goals),plan:sanitizeCoachPlan(body.plan),...training,availableEquipment:cleanText(String(body.profile?.equipment||'gym'),24),note:'La rutina se genera desde una biblioteca local curada; proponé cambios realistas y respetá el equipamiento indicado. El historial recibido es solo contexto enviado por el usuario; no lo guardes ni asumas que está completo.'};
