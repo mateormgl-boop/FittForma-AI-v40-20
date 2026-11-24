@@ -253,7 +253,7 @@ test('v32 deja la publicidad desactivada hasta configurar unidades reales', asyn
   assert.match(ads, /nutrition: 'adSlotNutrition'/);
   assert.match(ads, /progress: 'adSlotProgress'/);
   assert.match(ads, /sizeMapping\(\)/);
-  assert.match(ads, /slot\\.defineSizeMapping\\(mapping\\)/, 'el mapeo responsive se asigna al Slot con GPT');
+  assert.ok(ads.includes('slot.defineSizeMapping(mapping)'), 'el mapeo responsive se asigna al Slot con GPT');
   const nutritionToday = html.slice(html.indexOf('data-view-panel="hoy"'), html.indexOf('data-view-panel="registrar"'));
   assert.match(nutritionToday, /id="adSlotNutrition"/, 'Nutrición solo tiene banner en la pestaña Hoy');
   const progressSummary = html.slice(html.indexOf('id="progressPanelSummary"'), html.indexOf('id="progressPanelBadges"'));
