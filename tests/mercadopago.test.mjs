@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
-import { monetizationConfigFromEnv, verifyMercadoPagoWebhookSignature } from '../backend/monetization.mjs';
+import { createMonetization, monetizationConfigFromEnv, verifyMercadoPagoWebhookSignature } from '../backend/monetization.mjs';
 
 const SECRET = 'unit-test-secret';
 const CONFIG = {
