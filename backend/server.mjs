@@ -112,7 +112,7 @@ const PUBLIC_ROOT_FILES=new Set([
   '/manifest.json','/icon.svg','/icon-180.png','/icon-192.png','/icon-512.png',
   '/supabase-config.js','/achievements.js','/sw.js',
   // v60: página 404 propia, robots.txt, política de privacidad e imagen para compartir.
-  '/404.html','/robots.txt','/privacidad.html','/legal-config.js','/og-image.png',
+  '/404.html','/robots.txt','/ads.txt','/privacidad.html','/legal-config.js','/og-image.png',
   // v72: normas de la comunidad (las pide Google Play para el contenido de usuarios).
   '/normas.html'
 ]);
