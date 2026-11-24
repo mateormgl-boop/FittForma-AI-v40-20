@@ -289,7 +289,7 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     const secret = settings.mp.webhookSecret;
     if (!secret || typeof signature !== 'string' || typeof requestId !== 'string' || !requestId || typeof dataId !== 'string' || !dataId) return false;
     const fields = Object.fromEntries(signature.split(',').map(part => part.trim().split('=', 2)).filter(pair => pair.length === 2));
-    if (!/^\\d{1,20}$/.test(fields.ts || '') || !/^[a-f0-9]{64}$/i.test(fields.v1 || '')) return false;
+    if (!/^\d{1,20}$/.test(fields.ts || '') || !/^[a-f0-9]{64}$/i.test(fields.v1 || '')) return false;
     const manifest = `id:${dataId};request-id:${requestId};ts:${fields.ts};`;
     const expected = crypto.createHmac('sha256', secret).update(manifest).digest();
     const received = Buffer.from(fields.v1, 'hex');
@@ -336,7 +336,7 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     const checkoutUrl = String(created.data?.init_point || '');
     let checkout;
     try { checkout = new URL(checkoutUrl); } catch {}
-    const trustedHost = checkout && /^(?:[a-z0-9-]+\\.)*mercadopago\\.com(?:\\.[a-z]{2})?$/.test(checkout.hostname);
+    const trustedHost = checkout && /^(?:[a-z0-9-]+\.)*mercadopago\.com(?:\.[a-z]{2})?$/.test(checkout.hostname);
     if (!created.ok || !created.data?.id || !checkout || checkout.protocol !== 'https:' || !trustedHost) return { status: 502, body: { error: 'Mercado Pago no pudo preparar el checkout. No se activó Plus.' } };
     const saved = await store.linkMercadoPagoSubscription({ subscriptionId: String(created.data.id), userId: user.id, externalReference });
     if (!saved) return { status: 503, body: { error: 'No se pudo guardar de forma segura la suscripción. No continúes con el pago; contactá al soporte.' } };
