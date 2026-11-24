@@ -13,7 +13,7 @@ No hay identificadores de anuncios, precios ni credenciales reales en el reposit
 | IA | 6 consultas gratis por día (40 con Plus). Al agotarlas: esperar a mañana o mirar un video voluntario para sumar +3 consultas, hasta 3 videos por día. | **Servidor**: la consulta se descuenta antes de llamar a Gemini y se devuelve si Gemini falla. |
 | Fotos en Comunidad | 2 fotos gratis por día (10 con Plus). Después, 1 foto extra por video, hasta 3 por día. El borrador nunca se borra y la foto **no se publica sola**: la persona toca «Publicar». | **Base de datos** (trigger `monetization_guard_photo_post`) y servidor |
 | Videos recompensados | Primero se explica y se pide aceptar. El servidor emite un comprobante de un solo uso; se canjea una sola vez y solo si pasó el tiempo mínimo del video. Cerrar el video, no tener inventario o un error no suma nada. | Servidor (`/api/rewards/start`, `/api/rewards/claim`) |
-| Plus | Sin anuncios, más IA y más fotos. Se activa **solo** con una compra verificada en el servidor contra Google Play. En la web no hay cobro. | Servidor + tabla `community_memberships` |
+| Plus | Sin anuncios, más IA y más fotos. Se activa solo con una compra verificada en el servidor: Google Play en Android o Mercado Pago en la web. | Servidor + tabla `community_memberships` |
 | Métricas | Contadores agregados, sin datos personales. Solo se cuentan impresiones que el proveedor confirma (`slotRenderEnded` con anuncio, `rewardedSlotReady`). Las recompensas las cuenta el servidor al canjear. | `/api/metrics`, `/api/metrics/summary` |
 
 No se modificaron los precios ni los beneficios publicados. La tarjeta muestra el mismo precio **orientativo** de antes (US$ 5,99/mes, «aún no definitivo»). Solo cambió el nombre de «Pro» a «FittForma AI Plus», y la tarjeta ahora explica que se activa con Google Play.
@@ -25,6 +25,7 @@ No se modificaron los precios ni los beneficios publicados. La tarjeta muestra e
 - `backend/monetization.mjs`: plan verificado, cuotas, comprobantes, Google Play (subscriptionsv2 + acknowledge + RTDN) y métricas.
 - `backend/server.mjs`: rutas `/api/entitlements`, `/api/rewards/*`, `/api/metrics`, `/api/metrics/summary`, `/api/billing/play/verify` y `/api/billing/play/rtdn`; cuota de IA en `/api/coach`; la CSP suma los dominios de Google **solo** con `ADS_PROVIDER=gam`.
 - `supabase/migrations/2026-10-21_v48_monetization.sql`: tablas de contadores, comprobantes y compras; trigger del límite de fotos (desactivado); `my_photo_quota()`. Es aditiva y re-ejecutable.
+- `supabase/migrations/2026-11-24_v81_mercadopago_memberships.sql`: referencias privadas de suscripciones Mercado Pago. Es aditiva y re-ejecutable.
 - `community.js`: aviso de fotos, video voluntario y borrador conservado.
 - Pruebas:
   - `tests/monetization.test.mjs`
@@ -87,7 +88,7 @@ No se modificaron los precios ni los beneficios publicados. La tarjeta muestra e
   - Cambiar de red reinicia el contador. Con cuenta, se cuenta por usuario.
 - **Contadores en memoria:** sin `SUPABASE_SERVICE_ROLE_KEY`, los contadores se reinician con cada despliegue.
 - **Resumen de métricas:** `/api/metrics/summary` muestra lo acumulado desde el último reinicio del servidor. Con Supabase, además se guardan por día en `monetization_usage` (sujeto `metrics`).
-- **Ingresos:** esta app no calcula ingresos. La fuente es el informe de Google Ad Manager o Play Console.
+- **Ingresos:** esta app no calcula ingresos. La fuente es el informe de Google Ad Manager, Mercado Pago o Play Console.
 
 ## Costos y riesgos
 
@@ -108,3 +109,39 @@ SUPABASE_UMD=... node tests/e2e/monetization.e2e.mjs   # levanta su propio backe
 ```
 
 El E2E de monetización necesita PostgREST con la base `ff_e2e`, con todas las migraciones aplicadas. El rol `authenticator` debe poder asumir `service_role`: en la base local, `grant service_role to authenticator`. El detalle está en `docs/PRUEBAS.md`.
+
+## Membresía web con Mercado Pago (v81)
+
+La web ya cuenta con un flujo opcional de suscripción mensual mediante Mercado Pago. Está **apagado por defecto** y no genera cobros hasta que se configure explícitamente.
+
+- El checkout se crea desde el servidor para una cuenta autenticada y el correo asociado a Supabase. La referencia externa vincula la suscripción con una sola cuenta.
+- La app redirige al checkout alojado por Mercado Pago. El retorno del navegador **no** activa Plus por sí solo: el servidor consulta el estado directamente a Mercado Pago.
+- Los Webhooks se aceptan solo con firma HMAC-SHA256 válida (`x-signature`, `x-request-id` y `data.id`) y se vuelve a consultar el estado remoto antes de modificar la membresía.
+- La tabla `monetization_mp_subscriptions` está protegida por RLS; solo el backend con `SUPABASE_SERVICE_ROLE_KEY` puede asociar y consultar suscripciones.
+- Google Play sigue disponible para Android. Mercado Pago agrega el camino web. Ambos escriben la membresía desde el servidor.
+
+### Variables nuevas en Render → Environment
+
+| Variable | Ejemplo | Notas |
+|---|---|---|
+| `MERCADOPAGO_ENABLED` | `true` | Interruptor explícito; por defecto apagado. |
+| `MERCADOPAGO_ACCESS_TOKEN` | *(credencial privada)* | Token de producción o pruebas. Solo en el servidor. |
+| `MERCADOPAGO_WEBHOOK_SECRET` | *(firma secreta)* | Firma secreta configurada en Webhooks. Solo en el servidor. |
+| `MERCADOPAGO_PLUS_AMOUNT` | `199` | Monto mensual que decida el responsable; no se fija un precio en el código. |
+| `MERCADOPAGO_CURRENCY_ID` | `UYU` | Se admite `UYU` o `USD`. |
+| `PUBLIC_SITE_URL` | `https://tu-dominio` | Origen HTTPS real de la app y URL de retorno. |
+
+También se requieren `SUPABASE_URL`, `SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`, y `SUPABASE_SERVICE_ROLE_KEY` (esta última **solo** en el servidor). Aplicá primero `supabase/migrations/2026-11-24_v81_mercadopago_memberships.sql` o el consolidado `supabase/APLICAR_MIGRACIONES.sql`.
+
+### Configuración en Mercado Pago
+
+1. Crear o seleccionar la aplicación en Mercado Pago Developers y copiar el Access Token del entorno de pruebas.
+2. En Webhooks, configurar `https://tu-dominio/api/billing/mercadopago/webhook` y el evento de suscripción/preapproval (`subscription_preapproval`).
+3. Copiar la firma secreta de Webhooks a `MERCADOPAGO_WEBHOOK_SECRET`.
+4. Configurar importe, moneda y `PUBLIC_SITE_URL` con el precio y dominio aprobados.
+5. Probar alta, renovación/estado, webhook con firma incorrecta y asociación con una cuenta diferente.
+6. Recién después de validar, cargar las credenciales de producción y poner `MERCADOPAGO_ENABLED=true`.
+
+El precio de la tarjeta se obtiene de Render; no queda un precio orientativo hardcodeado. El botón de compra permanece oculto mientras falte configuración. Una suscripción pendiente nunca concede Plus.
+
+**Límite actual:** el sistema sincroniza el estado autorizado y los cambios recibidos por Webhook, pero todavía no incluye un panel propio para pausar, cancelar o reanudar. Hasta agregar autogestión, esas acciones se realizan desde Mercado Pago.
