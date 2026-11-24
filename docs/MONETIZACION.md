@@ -65,7 +65,7 @@ La tarjeta de Plus ya no fija un precio orientativo en el código: muestra el mo
 2. **Google Ad Manager.**
    - Crear la cuenta y obtener el código de red.
    - Crear 7 bloques: 5 banners (`fittforma_home`, `fittforma_explore`, `fittforma_community`, `fittforma_nutrition`, `fittforma_progress`), 1 recompensado web (`fittforma_rewarded`) y 1 intersticial web (`fittforma_interstitial`).
-   - Configurar tamaños de banner de 728×90 / 468×60 en pantallas grandes y 320×100 / 320×50 en móviles; no se solicita 300×250 para evitar saltos altos de diseño.
+   - Configurar tamaños de banner de 728×90 en pantallas grandes, 468×60 en tablets y 320×50 en móviles; no se solicita 300×250 para evitar saltos altos de diseño.
    - Aprobar el sitio y configurar el mensaje de consentimiento de Google (Privacy & messaging) para la UE, el Reino Unido y Suiza.
    - El repositorio publica `ads.txt` en la raíz con la línea de autorización de AdSense configurada; si Google Ad Manager solicita otro identificador de vendedor, agregar su línea sin borrar la existente.
 3. **Render.** Cargar primero `SUPABASE_SERVICE_ROLE_KEY` y las variables de configuración. Para activar solo banners/intersticiales, usar `ADS_ENABLED=true`, `ADS_PROVIDER=gam`, el código de red y los cinco bloques display; se puede dejar `MONETIZATION_ENABLED=false` para no activar nuevas cuotas de IA. `ADS_ENABLED=false` y `ADS_PROVIDER=none` son los valores iniciales. Activar `MONETIZATION_ENABLED=true` o `MERCADOPAGO_ENABLED=true` solo cuando se decida habilitar esas funciones y se hayan probado.
