@@ -249,6 +249,14 @@ test('v32 deja la publicidad desactivada hasta configurar unidades reales', asyn
   assert.doesNotMatch(ads, /credits\s*\+=/);
   assert.match(html, /id="adSlotHome"/);
   assert.match(html, /id="adSlotNutrition"/);
+  assert.match(html, /id="adSlotProgress"/);
+  assert.match(ads, /nutrition: 'adSlotNutrition'/);
+  assert.match(ads, /progress: 'adSlotProgress'/);
+  assert.match(ads, /sizeMapping\(\)/);
+  const nutritionToday = html.slice(html.indexOf('data-view-panel="hoy"'), html.indexOf('data-view-panel="registrar"'));
+  assert.match(nutritionToday, /id="adSlotNutrition"/, 'Nutrición solo tiene banner en la pestaña Hoy');
+  const progressSummary = html.slice(html.indexOf('id="progressPanelSummary"'), html.indexOf('id="progressPanelBadges"'));
+  assert.match(progressSummary, /id="adSlotProgress"/, 'Progreso solo tiene banner en Resumen');
   assert.match(html, /Ver anuncio y obtener 3 consultas/);
   assert.match(html, /canAskCoach\(\)/);
 });
