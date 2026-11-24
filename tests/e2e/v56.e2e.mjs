@@ -114,6 +114,13 @@ step('En la sesión: sugerencia concreta para «Jalón al pecho» (45 kg × 10 �
 const ph = await page.locator('.workout-exercise:visible input[data-k="weight"]').first().getAttribute('placeholder');
 const val = await page.locator('.workout-exercise:visible input[data-k="weight"]').first().inputValue();
 step('El peso sugerido es solo una guía (placeholder), no un valor cargado', ph === '47.5' && val === '', `${ph} / «${val}»`);
+const priorSet = page.locator('[data-ex-card]').filter({ has: page.getByRole('heading', { name: 'Jalón al pecho', exact: true }) }).locator('[data-set-row]').first();
+const repeat = priorSet.locator('[data-repeat-set]');
+await repeat.click();
+step('Repetir copia 45 kg × 10 y marca solo la serie elegida', await priorSet.locator('[data-k="weight"]').inputValue() === '45' && await priorSet.locator('[data-k="reps"]').inputValue() === '10' && await priorSet.locator('[data-done]').isChecked() && await repeat.isDisabled());
+await page.reload();
+await page.click('.mobile-nav-item[data-mobile-view="train"]');
+step('La serie repetida se conserva al volver a la sesión', await priorSet.locator('[data-done]').isChecked());
 await page.click('#cancelWorkout'); await page.waitForTimeout(300);
 
 // Progreso
