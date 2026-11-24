@@ -225,11 +225,11 @@ function rateLimited(req,bucket='api',max=12){return rateLimitedKey(rateLimitCli
 // Only validated Supabase accounts receive their own AI quota. Guest access remains available through the IP limit.
 const aiAuthCache=new Map();
 async function aiAccountId(req){
-  const auth=String(req.headers.authorization||''),match=/^Bearer ([A-Za-z0-9_\\-.]{20,4096})$/.exec(auth);
+  const auth=String(req.headers.authorization||''),match=/^Bearer ([A-Za-z0-9._-]{20,4096})$/.exec(auth);
   if(!match)return null;
   const token=match[1],tokenHash=createHash('sha256').update(token).digest('hex'),cached=aiAuthCache.get(tokenHash);
   if(cached&&cached.expires>Date.now())return cached.id;
-  const project=String(process.env.SUPABASE_URL||'').trim().replace(/\\/$/,'');
+  const project=String(process.env.SUPABASE_URL||'').trim().replace(/\/$/,'');
   const publicKey=String(process.env.SUPABASE_ANON_KEY||process.env.SUPABASE_PUBLISHABLE_KEY||'').trim();
   if(!project||!publicKey)return null;
   try{
