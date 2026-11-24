@@ -22,6 +22,17 @@ const bool = v => ['1', 'true', 'yes', 'on'].includes(String(v || '').trim().toL
 const num = v => (v === undefined || v === null || String(v).trim() === '' ? undefined : Number(v));
 const SLOT_PATH = /^\/\d{2,20}(\/[A-Za-z0-9_.\-]{1,100}){1,6}$/;
 
+// Validación HMAC de Webhooks de Mercado Pago (manifest documentado por el proveedor).
+export function verifyMercadoPagoWebhookSignature({ signature, requestId, dataId, secret }) {
+  if (!secret || typeof signature !== 'string' || typeof requestId !== 'string' || !requestId || typeof dataId !== 'string' || !dataId) return false;
+  const fields = Object.fromEntries(signature.split(',').map(part => part.trim().split('=', 2)).filter(pair => pair.length === 2));
+  if (!/^\d{1,20}$/.test(fields.ts || '') || !/^[a-f0-9]{64}$/i.test(fields.v1 || '')) return false;
+  const manifest = 'id:' + dataId + ';request-id:' + requestId + ';ts:' + fields.ts + ';';
+  const expected = crypto.createHmac('sha256', secret).update(manifest).digest();
+  const received = Buffer.from(fields.v1, 'hex');
+  return received.length === expected.length && crypto.timingSafeEqual(received, expected);
+}
+
 export function monetizationConfigFromEnv(env = process.env) {
   const config = M.normalizeConfig({
     enabled: bool(env.MONETIZATION_ENABLED),
@@ -286,14 +297,7 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
 
   // ---------- Mercado Pago (suscripción recurrente web) ----------
   function mercadoPagoSignatureValid(signature, requestId, dataId) {
-    const secret = settings.mp.webhookSecret;
-    if (!secret || typeof signature !== 'string' || typeof requestId !== 'string' || !requestId || typeof dataId !== 'string' || !dataId) return false;
-    const fields = Object.fromEntries(signature.split(',').map(part => part.trim().split('=', 2)).filter(pair => pair.length === 2));
-    if (!/^\d{1,20}$/.test(fields.ts || '') || !/^[a-f0-9]{64}$/i.test(fields.v1 || '')) return false;
-    const manifest = `id:${dataId};request-id:${requestId};ts:${fields.ts};`;
-    const expected = crypto.createHmac('sha256', secret).update(manifest).digest();
-    const received = Buffer.from(fields.v1, 'hex');
-    return received.length === expected.length && crypto.timingSafeEqual(received, expected);
+    return verifyMercadoPagoWebhookSignature({ signature, requestId, dataId, secret: settings.mp.webhookSecret });
   }
   function mercadoPagoStatus(subscription) {
     const raw = String(subscription?.status || '').toLowerCase();
