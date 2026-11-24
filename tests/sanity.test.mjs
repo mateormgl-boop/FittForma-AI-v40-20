@@ -254,6 +254,14 @@ test('v32 deja la publicidad desactivada hasta configurar unidades reales', asyn
   assert.match(ads, /progress: 'adSlotProgress'/);
   assert.match(ads, /sizeMapping\(\)/);
   assert.ok(ads.includes('slot.defineSizeMapping(mapping)'), 'el mapeo responsive se asigna al Slot con GPT');
+  assert.match(ads, /OutOfPageFormat\.BOTTOM_ANCHOR/);
+  assert.match(ads, /activeMsThisSession < 5 \* 60000/, 'el ancla espera cinco minutos de uso activo');
+  assert.match(ads, /cfg\.rewardedEnabled/);
+  assert.match(ads, /ent\.ads\.aiRewardedAvailable/);
+  const render = await read('render.yaml');
+  for (const [key,value] of [['ADS_ENABLED','"false"'],['ADS_PROVIDER','none'],['MONETIZATION_ENABLED','"false"'],['MERCADOPAGO_ENABLED','"false"'],['ADS_ANCHOR_ENABLED','"false"'],['ADS_INTERSTITIAL_ENABLED','"false"'],['ADS_REWARDED_ENABLED','"false"'],['AI_LIMITS_ENABLED','"false"'],['AI_REWARDED_ENABLED','"false"']]) {
+    assert.match(render, new RegExp('key: ' + key + '\\s+value: ' + value), key + ' permanece apagado');
+  }
   const nutritionToday = html.slice(html.indexOf('data-view-panel="hoy"'), html.indexOf('data-view-panel="registrar"'));
   assert.match(nutritionToday, /id="adSlotNutrition"/, 'Nutrición solo tiene banner en la pestaña Hoy');
   const progressSummary = html.slice(html.indexOf('id="progressPanelSummary"'), html.indexOf('id="progressPanelBadges"'));
