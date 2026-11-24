@@ -1689,3 +1689,19 @@ window.FittFormaI18nDynamic = [
   [/^Ver (.+) a pantalla completa$/, (m,i,t) => [`View ${t(m[1])} in full screen`,`Ver ${t(m[1])} em tela cheia`,`Voir ${t(m[1])} en plein écran`,`Visualizza ${t(m[1])} a schermo intero`,`${t(m[1])} im Vollbild anzeigen`][i]],
   [/^Repetir y marcar serie (\d+)$/, (m,i) => [`Repeat and complete set ${m[1]}`,`Repetir e concluir série ${m[1]}`,`Répéter et terminer la série ${m[1]}`,`Ripeti e completa la serie ${m[1]}`,`Satz ${m[1]} wiederholen und abschließen`][i]]
 ].concat(window.FittFormaI18nDynamic || []);
+
+/* v80: esfuerzo opcional por serie y aviso de progresión conservadora. */
+(window.FittFormaI18nExtra = window.FittFormaI18nExtra || []).push(
+  ["Esfuerzo (RIR)", "Effort (RIR)", "Esforço (RIR)", "Effort (RIR)", "Sforzo (RIR)", "Anstrengung (RIR)"],
+  ["Repeticiones en reserva", "Reps in reserve", "Repetições em reserva", "Répétitions en réserve", "Ripetizioni in riserva", "Wiederholungen in Reserve"]
+);
+(window.FittFormaI18nDynamic = window.FittFormaI18nDynamic || []).push(
+  [/^Serie (\\d+): la anterior fue muy exigente \\(RIR (\\d)\\)\\. Mantené (.+), sin subir la carga\\.$/,
+    (m, i) => [
+      `Set ${m[1]}: the previous set was very hard (RIR ${m[2]}). Keep ${m[3]}, without increasing the load.`,
+      `Série ${m[1]}: a série anterior foi muito exigente (RIR ${m[2]}). Mantenha ${m[3]}, sem aumentar a carga.`,
+      `Série ${m[1]} : la série précédente était très exigeante (RIR ${m[2]}). Garde ${m[3]}, sans augmenter la charge.`,
+      `Serie ${m[1]}: la serie precedente è stata molto impegnativa (RIR ${m[2]}). Mantieni ${m[3]}, senza aumentare il carico.`,
+      `Satz ${m[1]}: Der vorherige Satz war sehr anstrengend (RIR ${m[2]}). Behalte ${m[3]} bei und erhöhe das Gewicht nicht.`
+    ][i]]
+);
