@@ -76,6 +76,13 @@ test('pruebas de integración HTTP del backend', async t => {
 
       const home = await fetch(`${base}/`);
       assert.equal(home.status, 200);
+      const csp = home.headers.get('content-security-policy') || '';
+      const scriptPolicy = csp.split(';').map(part => part.trim()).find(part => part.startsWith('script-src')) || '';
+      const stylePolicy = csp.split(';').map(part => part.trim()).find(part => part.startsWith('style-src')) || '';
+      assert.match(scriptPolicy, /'unsafe-hashes'/);
+      assert.match(scriptPolicy, /'sha256-/);
+      assert.doesNotMatch(scriptPolicy, /'unsafe-inline'/);
+      assert.match(stylePolicy, /'unsafe-inline'/);
       assert.match(home.headers.get('content-type') || '', /text\/html/);
       const html = await home.text();
       assert.match(html, /FittForma AI/);
