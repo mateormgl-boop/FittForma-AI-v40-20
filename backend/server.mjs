@@ -120,8 +120,8 @@ const PUBLIC_ROOT_FILES=new Set([
 // unsafe-inline de script-src sin extraer a ciegas el monolito ni cambiar el comportamiento de la app.
 const cspIndexHtml=await readFile(path.join(root,'index.html'),'utf8').catch(()=> '');
 const cspHash=source=>`'sha256-${createHash('sha256').update(source).digest('base64')}'`;
-const inlineScriptHashes=[...cspIndexHtml.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script>/gi)]
-  .filter(([,attrs,body])=>!/\\bsrc\\s*=/.test(attrs)&&body.trim()&&!/application\\/(?:ld\\+)?json/i.test(attrs))
+const inlineScriptHashes=[...cspIndexHtml.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
+  .filter(([,attrs,body])=>!/\bsrc\s*=/.test(attrs)&&body.trim()&&!/application\/(?:ld\+)?json/i.test(attrs))
   .map(([,attrs,body])=>cspHash(body));
 const inlineEventHandlerSources=[
   "this.onerror=null;this.src='./assets/exercises/jogging.webp'",
