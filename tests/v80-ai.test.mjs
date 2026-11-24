@@ -43,3 +43,32 @@ test('sin RIR se conserva el análisis de progreso y los registros incompletos s
   assert.equal(deriveTrainingInsights([a,b]).length,1);
   assert.equal(deriveTrainingInsights([b])[0].highEffort,false);
 });
+
+test('v80: FittAI recibe señales de progreso calculadas y cuotas por cuenta validada', async()=>{
+  const server=await readFile(path.join(root,'backend/server.mjs'),'utf8');
+  assert.match(server,/trainingInsights:deriveTrainingInsights/);
+  assert.match(server,/async function aiAccountId\(req\)/);
+  assert.match(server,/\/auth\/v1\/user/);
+  assert.match(server,/GEMINI_DAILY_PER_ACCOUNT/);
+  assert.match(server,/rateLimitedKey\('account:'\+accountId/);
+  assert.match(server,/overDailyBudget\(req,accountId\)/);
+});
+
+test('v80: las fotos muestran porción asumida y confianza visual sin prometer precisión', async()=>{
+  const server=await readFile(path.join(root,'backend/server.mjs'),'utf8');
+  const html=await readFile(path.join(root,'index.html'),'utf8');
+  assert.match(server,/confidence:\['low','medium','high'\]/);
+  assert.match(server,/portionAssumption/);
+  assert.match(html,/Confianza visual baja/);
+  assert.match(html,/Porción estimada:/);
+  assert.match(html,/Revisá y corregí porciones antes de guardar/);
+});
+
+test('v80: la política CSP limita scripts inline por hash y mantiene los estilos heredados', async()=>{
+  const server=await readFile(path.join(root,'backend/server.mjs'),'utf8');
+  assert.match(server,/inlineScriptHashes/);
+  assert.match(server,/inlineEventHandlerHashes/);
+  assert.match(server,/unsafe-hashes/);
+  assert.doesNotMatch(server,/script-src[^\\n]*unsafe-inline/);
+  assert.match(server,/style-src 'self' 'unsafe-inline'/);
+});
