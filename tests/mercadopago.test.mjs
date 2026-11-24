@@ -5,6 +5,7 @@ import { createMonetization, monetizationConfigFromEnv, verifyMercadoPagoWebhook
 
 const SECRET = 'unit-test-secret';
 const CONFIG = {
+  MONETIZATION_ENABLED: 'true',
   MERCADOPAGO_ENABLED: 'true',
   MERCADOPAGO_ACCESS_TOKEN: 'mock_access_token',
   MERCADOPAGO_WEBHOOK_SECRET: SECRET,
