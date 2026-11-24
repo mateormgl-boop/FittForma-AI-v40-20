@@ -68,7 +68,7 @@ test('todos los botones estáticos y de plantillas declaran su tipo para no envi
 
 test('versiones visibles del pie de página y traducciones están alineadas', () => {
   assert.match(html, /Versión 80\.0/);
-  assert.match(i18n, /VERSION 79\.0 · ONLINE FITNESS COMMUNITY/);
+  assert.match(i18n, /VERSION 80\.0 · ONLINE FITNESS COMMUNITY/);
   assert.doesNotMatch(html, /Versión 26\.0|Versión 25\.0|Versión 24\.0|Versión 23\.0/);
   assert.doesNotMatch(i18n, /Version 23\.0|Versão 23\.0|Versione 23\.0/);
 });
@@ -324,7 +324,7 @@ test('v36.1 mantiene válidos los metadatos y las traducciones del perfil/Pro', 
   assert.equal(backendPackage.version, '0.80.0');
   assert.equal(manifest.theme_color, '#f3f6fb');
   assert.equal(manifest.background_color, '#f3f6fb');
-  assert.match(i18n, /VERSION 79\.0 · ONLINE FITNESS COMMUNITY/i);
+  assert.match(i18n, /VERSION 80\.0 · ONLINE FITNESS COMMUNITY/i);
   assert.match(server, /GEMINI_MODEL\|\|'gemini-3\.8-flash'/);
   assert.match(await read('render.yaml'), /value: gemini-3\.8-flash/);
   assert.match(sw, /const CACHE = 'fittforma-ai-static-v80-0'/);
