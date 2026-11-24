@@ -117,6 +117,12 @@ test('publicidad independiente: puede mostrarse sin activar límites de IA ni mo
   assert.equal(e.ads.provider, 'gam');
   assert.equal(m.publicAdsConfig().provider, 'gam');
   assert.ok(adsCspAdditions(m.settings.ads).script.includes('https://securepubads.g.doubleclick.net'));
+  const mpDisabled = monetizationConfigFromEnv({
+    MERCADOPAGO_ENABLED: 'false', MERCADOPAGO_ACCESS_TOKEN: 'test-token',
+    MERCADOPAGO_WEBHOOK_SECRET: 'test-secret', MERCADOPAGO_PLUS_AMOUNT: '100',
+    MERCADOPAGO_CURRENCY_ID: 'UYU', PUBLIC_SITE_URL: 'https://fittforma.example'
+  });
+  assert.equal(mpDisabled.mp.enabled, false, 'Mercado Pago permanece desactivado aunque existan credenciales');
 });
 test('monetización: Plus verificado sin anuncios ni videos; error de estado no concede Plus', async () => {
   const plus = createMonetization({ env: ENV, fetchImpl: fakeSupabase({ plus: true }) });
