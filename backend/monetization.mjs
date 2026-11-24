@@ -22,6 +22,17 @@ const bool = v => ['1', 'true', 'yes', 'on'].includes(String(v || '').trim().toL
 const num = v => (v === undefined || v === null || String(v).trim() === '' ? undefined : Number(v));
 const SLOT_PATH = /^\/\d{2,20}(\/[A-Za-z0-9_.\-]{1,100}){1,6}$/;
 
+// Validación HMAC de Webhooks de Mercado Pago (manifest documentado por el proveedor).
+export function verifyMercadoPagoWebhookSignature({ signature, requestId, dataId, secret }) {
+  if (!secret || typeof signature !== 'string' || typeof requestId !== 'string' || !requestId || typeof dataId !== 'string' || !dataId) return false;
+  const fields = Object.fromEntries(signature.split(',').map(part => part.trim().split('=', 2)).filter(pair => pair.length === 2));
+  if (!/^\d{1,20}$/.test(fields.ts || '') || !/^[a-f0-9]{64}$/i.test(fields.v1 || '')) return false;
+  const manifest = 'id:' + dataId + ';request-id:' + requestId + ';ts:' + fields.ts + ';';
+  const expected = crypto.createHmac('sha256', secret).update(manifest).digest();
+  const received = Buffer.from(fields.v1, 'hex');
+  return received.length === expected.length && crypto.timingSafeEqual(received, expected);
+}
+
 export function monetizationConfigFromEnv(env = process.env) {
   const config = M.normalizeConfig({
     enabled: bool(env.MONETIZATION_ENABLED),
@@ -42,13 +53,25 @@ export function monetizationConfigFromEnv(env = process.env) {
     consent: String(env.ADS_CONSENT || 'google-cmp').trim() === 'none' ? 'none' : 'google-cmp'
   };
   if (ads.provider === 'test' && !ads.testMode) ads.provider = 'none';
+  const mpAmount = num(env.MERCADOPAGO_PLUS_AMOUNT);
+  let mpReturnUrl = '';
+  try { const u = new URL(String(env.PUBLIC_SITE_URL || env.MERCADOPAGO_RETURN_URL || '').trim()); if (u.protocol === 'https:' && !u.username && !u.password) mpReturnUrl = u.origin + '/?billing=mercadopago'; } catch {}
+  const mpCurrency = String(env.MERCADOPAGO_CURRENCY_ID || 'UYU').trim().toUpperCase();
+  const mp = {
+    accessToken: String(env.MERCADOPAGO_ACCESS_TOKEN || '').trim(),
+    webhookSecret: String(env.MERCADOPAGO_WEBHOOK_SECRET || '').trim(),
+    amount: Number.isFinite(mpAmount) && mpAmount > 0 && mpAmount <= 100000 ? Math.round(mpAmount * 100) / 100 : 0,
+    currency: ['UYU', 'USD'].includes(mpCurrency) ? mpCurrency : '',
+    backUrl: mpReturnUrl
+  };
+  mp.enabled = Boolean(bool(env.MERCADOPAGO_ENABLED) && mp.accessToken && mp.webhookSecret && mp.amount > 0 && mp.currency && mp.backUrl);
   const play = {
     packageName: /^[a-zA-Z][\w.]{2,150}$/.test(String(env.GOOGLE_PLAY_PACKAGE_NAME || '').trim()) ? String(env.GOOGLE_PLAY_PACKAGE_NAME).trim() : '',
     productIds: String(env.GOOGLE_PLAY_PLUS_PRODUCT_IDS || '').split(',').map(s => s.trim()).filter(s => /^[a-z0-9._]{1,100}$/.test(s)),
     serviceAccount: String(env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON || '').trim(),
     rtdnToken: String(env.GOOGLE_PLAY_RTDN_TOKEN || '').trim()
   };
-  return { config, ads, play, metricsToken: String(env.ADMIN_METRICS_TOKEN || '').trim() };
+  return { config, ads, play, mp, metricsToken: String(env.ADMIN_METRICS_TOKEN || '').trim() };
 }
 
 // Los anuncios solo agregan dominios a la CSP cuando hay un proveedor real configurado.
@@ -90,6 +113,12 @@ export class SupabaseStore {
   async claimReward(nonce, claimedAt) { return Boolean(await this._rpc('monetization_reward_claim', { p_nonce: nonce, p_claimed_at: new Date(claimedAt).toISOString() })); }
   async setMembership(m) { return this._rpc('monetization_set_membership', { p_user_id: m.userId, p_status: m.status, p_period_end: m.periodEnd, p_source: m.source, p_purchase_token: m.purchaseToken || null, p_product_id: m.productId || null }); }
   async userForPurchase(token) { const r = await this._rpc('monetization_user_for_purchase', { p_purchase_token: token }); return typeof r === 'string' ? r : null; }
+  async linkMercadoPagoSubscription(s) { return Boolean(await this._rpc('monetization_mp_link_subscription', { p_subscription_id: s.subscriptionId, p_user_id: s.userId, p_external_reference: s.externalReference })); }
+  async mercadoPagoSubscription(subscriptionId) {
+    const rows = await this._rpc('monetization_mp_get_subscription', { p_subscription_id: subscriptionId });
+    const row = Array.isArray(rows) ? rows[0] : rows;
+    return row?.user_id && row?.external_reference ? { userId: row.user_id, externalReference: row.external_reference } : null;
+  }
 }
 
 const METRIC_NAMES = new Set(['ad_impression_banner', 'ad_impression_interstitial', 'ad_impression_rewarded', 'ad_no_fill', 'ad_error', 'rewarded_completed', 'rewarded_closed_early', 'reward_granted_ai', 'reward_granted_photo', 'ai_bonus_used', 'photo_after_reward', 'plus_purchase_verified', 'app_open']);
@@ -114,7 +143,7 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
       if (!r.ok) return null;
       const j = await r.json();
       if (!j || typeof j.id !== 'string' || !/^[0-9a-f-]{36}$/i.test(j.id)) return null;
-      const user = { id: j.id, token };
+      const user = { id: j.id, token, email: typeof j.email === 'string' ? j.email : '' };
       userCache.set(token, { user, exp: now() + 5 * 60000 }); if (userCache.size > 5000) userCache.delete(userCache.keys().next().value);
       return user;
     } catch { return null; }
@@ -176,7 +205,12 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
       ai, photos, store: store.kind,
       timezone: TZ,
       ads: { show: adsOn, provider: adsOn ? settings.ads.provider : 'none', testMode: settings.ads.testMode, interstitialMinMinutes: config.ads.interstitialMinMinutes, sectionChangesBetweenInterstitials: config.ads.sectionChangesBetweenInterstitials, rewardedAvailable: adsOn && (settings.ads.provider === 'test' || Boolean(settings.ads.slots.rewarded)) },
-      payments: { googlePlay: Boolean(settings.play.packageName && settings.play.productIds.length && settings.play.serviceAccount && serviceKey), web: false }
+      payments: {
+        googlePlay: Boolean(settings.play.packageName && settings.play.productIds.length && settings.play.serviceAccount && serviceKey),
+        mercadoPago: Boolean(config.enabled && settings.mp.enabled && store.kind === 'supabase'),
+        mercadoPagoPrice: config.enabled && settings.mp.enabled && store.kind === 'supabase' ? { amount: settings.mp.amount, currency: settings.mp.currency, interval: 'month' } : null,
+        web: Boolean(config.enabled && settings.mp.enabled && store.kind === 'supabase')
+      }
     };
   }
   function publicAdsConfig() {
@@ -261,6 +295,79 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     return { note: 'Impresiones solo cuando el proveedor confirma el anuncio renderizado. Ingresos: consultá el informe de Google Ad Manager.', store: store.kind, days: out };
   }
 
+  // ---------- Mercado Pago (suscripción recurrente web) ----------
+  function mercadoPagoSignatureValid(signature, requestId, dataId) {
+    return verifyMercadoPagoWebhookSignature({ signature, requestId, dataId, secret: settings.mp.webhookSecret });
+  }
+  function mercadoPagoStatus(subscription) {
+    const raw = String(subscription?.status || '').toLowerCase();
+    const status = raw === 'authorized' ? 'active' : raw === 'cancelled' ? 'cancelled' : raw === 'paused' ? 'past_due' : 'inactive';
+    const next = Date.parse(subscription?.next_payment_date || '');
+    return { status, periodEnd: status === 'active' && Number.isFinite(next) ? new Date(next).toISOString() : null };
+  }
+  async function mercadoPagoApi(path, init = {}) {
+    const response = await fetchImpl(`https://api.mercadopago.com${path}`, {
+      ...init,
+      headers: { Authorization: `Bearer ${settings.mp.accessToken}`, Accept: 'application/json', ...(init.body ? { 'Content-Type': 'application/json' } : {}), ...(init.headers || {}) }
+    });
+    const payload = await response.json().catch(() => ({}));
+    return { ok: response.ok, status: response.status, data: payload };
+  }
+  async function syncMercadoPagoSubscription(subscriptionId, expectedReference = null) {
+    if (!config.enabled || !settings.mp.enabled || store.kind !== 'supabase') return { status: 503, body: { error: 'La monetización o Mercado Pago todavía no están habilitados con almacenamiento seguro.' } };
+    const linked = await store.mercadoPagoSubscription(subscriptionId);
+    if (!linked || (expectedReference && linked.externalReference !== expectedReference)) return { status: 404, body: { error: 'No se encontró la suscripción asociada a esta cuenta.' } };
+    const remote = await mercadoPagoApi(`/preapproval/${encodeURIComponent(subscriptionId)}`);
+    if (!remote.ok || String(remote.data.id) !== subscriptionId || remote.data.external_reference !== linked.externalReference) return { status: 502, body: { error: 'No se pudo validar la suscripción con Mercado Pago.' } };
+    const membership = mercadoPagoStatus(remote.data);
+    await store.setMembership({ userId: linked.userId, status: membership.status, periodEnd: membership.periodEnd, source: 'mercadopago', productId: 'fittforma_plus_monthly' });
+    planCache.delete(linked.userId);
+    if (membership.status === 'active') metric('plus_purchase_verified');
+    return { status: 200, body: { plan: membership.status === 'active' ? 'plus' : 'free', status: membership.status, periodEnd: membership.periodEnd } };
+  }
+  async function createMercadoPagoSubscription(req) {
+    if (!config.enabled || !settings.mp.enabled || store.kind !== 'supabase') return { status: 503, body: { error: 'La monetización o Mercado Pago todavía no están habilitados. No se realizó ningún cobro.' } };
+    const user = await resolveUser(req);
+    if (!user || !user.email) return { status: 401, body: { error: 'Iniciá sesión con una cuenta que tenga correo electrónico para continuar.' } };
+    const plan = await planFor(user);
+    if (plan.plan === 'plus') return { status: 409, body: { error: 'Tu membresía Plus ya está activa.' } };
+    const externalReference = `fittforma-plus:${user.id}:${crypto.randomUUID()}`;
+    const created = await mercadoPagoApi('/preapproval', { method: 'POST', body: JSON.stringify({
+      reason: 'FittForma AI Plus', external_reference: externalReference, payer_email: user.email,
+      auto_recurring: { frequency: 1, frequency_type: 'months', transaction_amount: settings.mp.amount, currency_id: settings.mp.currency },
+      back_url: settings.mp.backUrl
+    }) });
+    const checkoutUrl = String(created.data?.init_point || '');
+    let checkout;
+    try { checkout = new URL(checkoutUrl); } catch {}
+    const trustedHost = checkout && /^(?:[a-z0-9-]+\.)*mercadopago\.com(?:\.[a-z]{2})?$/.test(checkout.hostname);
+    if (!created.ok || !created.data?.id || !checkout || checkout.protocol !== 'https:' || !trustedHost) return { status: 502, body: { error: 'Mercado Pago no pudo preparar el checkout. No se activó Plus.' } };
+    const saved = await store.linkMercadoPagoSubscription({ subscriptionId: String(created.data.id), userId: user.id, externalReference });
+    if (!saved) return { status: 503, body: { error: 'No se pudo guardar de forma segura la suscripción. No continúes con el pago; contactá al soporte.' } };
+    return { status: 201, body: { checkoutUrl: checkout.toString() } };
+  }
+  async function verifyMercadoPagoSubscription(req, body) {
+    if (!config.enabled || !settings.mp.enabled || store.kind !== 'supabase') return { status: 503, body: { error: 'La monetización o Mercado Pago no están habilitados.' } };
+    const user = await resolveUser(req);
+    if (!user) return { status: 401, body: { error: 'Iniciá sesión para verificar la membresía.' } };
+    const id = String(body?.subscriptionId || '');
+    if (!/^[A-Za-z0-9_-]{6,80}$/.test(id)) return { status: 400, body: { error: 'Identificador de suscripción inválido.' } };
+    const linked = await store.mercadoPagoSubscription(id);
+    if (!linked || linked.userId !== user.id) return { status: 404, body: { error: 'La suscripción no está asociada a esta cuenta.' } };
+    return syncMercadoPagoSubscription(id, linked.externalReference);
+  }
+  async function mercadoPagoWebhook(req, dataId, topic) {
+    if (!config.enabled || !settings.mp.enabled || store.kind !== 'supabase') return { status: 503, body: { error: 'Webhook no habilitado.' } };
+    if (!mercadoPagoSignatureValid(req.headers['x-signature'], req.headers['x-request-id'], dataId)) return { status: 401, body: { error: 'Firma de webhook inválida.' } };
+    if (topic && topic !== 'subscription_preapproval') return { status: 200, body: { ignored: true } };
+    const id = String(dataId || '');
+    if (!/^[A-Za-z0-9_-]{6,80}$/.test(id)) return { status: 400, body: { error: 'Identificador inválido.' } };
+    const linked = await store.mercadoPagoSubscription(id);
+    if (!linked) return { status: 200, body: { ignored: true, reason: 'unknown_subscription' } };
+    const synced = await syncMercadoPagoSubscription(id, linked.externalReference);
+    return synced.status === 404 ? { status: 200, body: { ignored: true } } : synced;
+  }
+
   // ---------- Google Play Billing (TWA con Digital Goods API) ----------
   let playToken = null;
   async function googleAccessToken() {
@@ -330,5 +437,7 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     return { status: 200, body: { updated: true, status: m.status } };
   }
 
-  return { settings, store, entitlements, publicAdsConfig, consumeAi, startReward, claimReward, metric, metricsSummary, verifyPlayPurchase, playNotification, membershipFromPlay, resolveUser, planFor };
+  return { settings, store, entitlements, publicAdsConfig, consumeAi, startReward, claimReward, metric, metricsSummary,
+    verifyPlayPurchase, playNotification, createMercadoPagoSubscription, verifyMercadoPagoSubscription, mercadoPagoWebhook,
+    membershipFromPlay, resolveUser, planFor };
 }

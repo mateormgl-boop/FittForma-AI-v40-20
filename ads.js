@@ -238,7 +238,7 @@
     chip.hidden = !ent; text.textContent = label; chip.classList.toggle('is-plus', plus);
     chip.setAttribute('aria-label', plus ? `${t('Tu plan: FittForma AI Plus')}. ${t('Ver membresía')}` : `${t('Membresía')}: ${t('hacete miembro')}`);
     // Mientras no se pueda pagar desde la app, la tarjeta lo dice en vez de mostrar un botón que no existe.
-    const soon = document.getElementById('membershipSoon'); if (soon) soon.hidden = plus || Boolean(ent?.payments?.googlePlay && 'getDigitalGoodsService' in window);
+    const soon = document.getElementById('membershipSoon'); if (soon) soon.hidden = plus || Boolean((ent?.payments?.googlePlay && 'getDigitalGoodsService' in window) || ent?.payments?.mercadoPago);
   }
   function openMembership() {
     window.FittFormaGo?.('settings');
@@ -257,6 +257,18 @@
     const spr = document.getElementById('showPlusRow'); if (spr) spr.hidden = !(isPlus() && signed);
     const buy = document.getElementById('plusBuyGooglePlay'); if (buy) buy.hidden = !(ent?.payments?.googlePlay && 'getDigitalGoodsService' in window && signed && !isPlus());
     const restore = document.getElementById('plusRestore'); if (restore) restore.hidden = !(ent?.payments?.googlePlay && 'getDigitalGoodsService' in window && signed);
+    const webBuy = document.getElementById('plusBuyMercadoPago'); if (webBuy) webBuy.hidden = !(ent?.payments?.mercadoPago && signed && !isPlus());
+    const price = document.getElementById('membershipPriceValue'), detail = document.getElementById('membershipPriceDetail');
+    const offer = ent?.payments?.mercadoPagoPrice;
+    if (price && detail) {
+      if (offer && Number.isFinite(Number(offer.amount)) && ['UYU', 'USD'].includes(offer.currency)) {
+        price.textContent = new Intl.NumberFormat('es-UY', { style: 'currency', currency: offer.currency, maximumFractionDigits: 2 }).format(Number(offer.amount));
+        detail.textContent = '/ mes · cobro recurrente por Mercado Pago';
+      } else {
+        price.textContent = 'Precio a confirmar';
+        detail.textContent = '/ mes · se publica al configurar la membresía';
+      }
+    }
   }
   // Google Play (app de Android como TWA): Digital Goods API + Payment Request; el servidor verifica.
   async function buyPlusGooglePlay() {
@@ -283,16 +295,43 @@
     } catch { toast(t('No se pudo consultar Google Play.')); }
   }
 
+  async function buyPlusMercadoPago() {
+    try {
+      const r = await api('/api/billing/mercadopago/checkout', {});
+      if (!r.ok) { toast(r.data?.error || t('No se pudo iniciar el checkout de Mercado Pago.')); return; }
+      const target = new URL(String(r.data?.checkoutUrl || ''));
+      if (target.protocol !== 'https:' || !/^(?:[a-z0-9-]+\.)*mercadopago\.com(?:\.[a-z]{2})?$/.test(target.hostname)) {
+        toast(t('La dirección de pago no es válida. No se realizó ningún cobro.'));
+        return;
+      }
+      window.location.assign(target.toString());
+    } catch { toast(t('No se pudo conectar con Mercado Pago. No se realizó ningún cobro.')); }
+  }
+  async function completeMercadoPagoReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('preapproval_id');
+    if (!id || params.get('billing') !== 'mercadopago') return;
+    params.delete('preapproval_id'); params.delete('billing');
+    const query = params.toString();
+    window.history.replaceState({}, '', window.location.pathname + (query ? '?' + query : '') + window.location.hash);
+    const result = await api('/api/billing/mercadopago/verify', { subscriptionId: id });
+    await refresh(true);
+    toast(result.ok && result.data?.plan === 'plus'
+      ? t('¡Plus activo! Mercado Pago confirmó tu suscripción.')
+      : result.data?.error || t('La suscripción todavía no está autorizada. El plan no cambió.'));
+  }
+
   // Compatibilidad con la API anterior (index.html).
   function canAskCoach() { return true; }       // la cuota la aplica el servidor
   function recordCoachSuccess() { if (ent?.ai) { ent.ai.remaining = Math.max(0, ent.ai.remaining - 1); renderCoachUsage(); } }
   function init() {
     document.getElementById('watchRewardedAd')?.addEventListener('click', onWatchForAi);
     document.getElementById('plusBuyGooglePlay')?.addEventListener('click', buyPlusGooglePlay);
+    document.getElementById('plusBuyMercadoPago')?.addEventListener('click', buyPlusMercadoPago);
     document.getElementById('plusRestore')?.addEventListener('click', restorePlus);
     document.getElementById('membershipInfoButton')?.addEventListener('click', () => refresh(true));
     document.getElementById('planChip')?.addEventListener('click', openMembership);
-    refresh(true); metric('app_open');
+    refresh(true).then(completeMercadoPagoReturn); metric('app_open');
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refresh(); });
   }
   window.FittFormaAds = Object.freeze({ init, refresh, canAskCoach, recordCoachSuccess, renderCoachUsage, showAiQuota, earnPhoto, maybeInterstitial, isPlus, entitlements: () => ent, showRewarded: () => earnReward('ai') });

@@ -269,9 +269,9 @@ test('v33 presenta Free/Pro sin simular pagos ni activar membresías desde el cl
   assert.match(html, /id="membershipPill">Plan gratuito</);
   assert.equal((html.match(/id="membershipStatus"/g) || []).length, 1, 'el estado del plan tiene un solo elemento');
   assert.match(html, /id="planChip"[^>]*hidden/, 'la insignia del plan solo aparece cuando responde el servidor');
-  assert.match(html, /precio orientativo, aún no definitivo/);
-  assert.match(html, /No se hará ningún cobro desde esta pantalla/);
-  assert.match(html, /no se hace ningún cobro/);
+  assert.match(html, /membershipPriceValue/);
+  assert.match(html, /La membresía se activa únicamente después de que el servidor verifica la suscripción/);
+  assert.match(html, /plusBuyMercadoPago/);
   assert.match(html, /membership-config\.js/);
   assert.match(sw, /"\.\/membership-config\.js"/);
   assert.match(config, /Nunca conceder Pro por una bandera local/);

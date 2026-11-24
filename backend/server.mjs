@@ -112,7 +112,7 @@ const PUBLIC_ROOT_FILES=new Set([
   '/manifest.json','/icon.svg','/icon-180.png','/icon-192.png','/icon-512.png',
   '/supabase-config.js','/achievements.js','/sw.js',
   // v60: página 404 propia, robots.txt, política de privacidad e imagen para compartir.
-  '/404.html','/robots.txt','/privacidad.html','/legal-config.js','/og-image.png',
+  '/404.html','/robots.txt','/ads.txt','/privacidad.html','/legal-config.js','/og-image.png',
   // v72: normas de la comunidad (las pide Google Play para el contenido de usuarios).
   '/normas.html'
 ]);
@@ -363,7 +363,8 @@ function sameOriginPost(req){
 const server=http.createServer(async(req,res)=>{try{
   const url=new URL(req.url,'http://localhost');
   const isPlayRtdn=req.method==='POST'&&url.pathname==='/api/billing/play/rtdn';
-  if(req.method==='POST'&&!isPlayRtdn&&!sameOriginPost(req))return send(req,res,403,{error:'Origen no permitido.'});
+  const isMercadoPagoWebhook=req.method==='POST'&&url.pathname==='/api/billing/mercadopago/webhook';
+  if(req.method==='POST'&&!isPlayRtdn&&!isMercadoPagoWebhook&&!sameOriginPost(req))return send(req,res,403,{error:'Origen no permitido.'});
   if(!['GET','POST','HEAD'].includes(req.method))return send(req,res,405,{error:'Método no permitido.'});
   if(req.method==='POST'&&String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase()!=='application/json')return send(req,res,415,{error:'El servidor espera JSON.'});
   if(req.method==='GET'&&url.pathname==='/api/public-config'){
@@ -382,7 +383,7 @@ const server=http.createServer(async(req,res)=>{try{
   if(req.method==='GET'&&url.pathname==='/api/status')return send(req,res,200,{service:'FittForma AI Coach',version:appVersion,provider:'Gemini',configured:Boolean(apiKey),model:apiKey?model:null,fallbackModels:apiKey?fallbackModels:[],mode:apiKey?'ai':'demo',supabaseConfigured:Boolean(validSupabasePublicConfig(process.env.SUPABASE_URL,process.env.SUPABASE_ANON_KEY)||validSupabasePublicConfig(process.env.SUPABASE_URL,process.env.SUPABASE_PUBLISHABLE_KEY)),frontendAvailable:existsSync(path.join(root,'index.html'))});
   // v48: monetización. El servidor decide Plus, cuotas y recompensas; el navegador solo muestra el estado.
   if(req.method==='GET'&&url.pathname==='/api/entitlements')return send(req,res,200,await monetization.entitlements(req,rateLimitClientKey(req)));
-  if(req.method==='POST'&&['/api/rewards/start','/api/rewards/claim','/api/metrics','/api/billing/play/verify','/api/billing/play/rtdn'].includes(url.pathname)){
+  if(req.method==='POST'&&['/api/rewards/start','/api/rewards/claim','/api/metrics','/api/billing/play/verify','/api/billing/play/rtdn','/api/billing/mercadopago/checkout','/api/billing/mercadopago/verify','/api/billing/mercadopago/webhook'].includes(url.pathname)){
     const bucket=url.pathname==='/api/metrics'?'metrics':url.pathname.startsWith('/api/rewards/')?'rewards':'billing';
     if(rateLimited(req,bucket,bucket==='metrics'?60:20)){res.setHeader('Retry-After','60');return send(req,res,429,{error:'Demasiadas solicitudes. Esperá un minuto.'});}
     let body;try{body=await readBody(req,8000);}catch(e){return send(req,res,400,{error:'Solicitud inválida.'});}
@@ -392,6 +393,9 @@ const server=http.createServer(async(req,res)=>{try{
     else if(url.pathname==='/api/rewards/claim')out=await monetization.claimReward(req,key,body.nonce);
     else if(url.pathname==='/api/metrics')out={status:monetization.metric(String(body.name||''))?204:400,body:{}};
     else if(url.pathname==='/api/billing/play/verify')out=await monetization.verifyPlayPurchase(req,body);
+    else if(url.pathname==='/api/billing/mercadopago/checkout')out=await monetization.createMercadoPagoSubscription(req);
+    else if(url.pathname==='/api/billing/mercadopago/verify')out=await monetization.verifyMercadoPagoSubscription(req,body);
+    else if(url.pathname==='/api/billing/mercadopago/webhook')out=await monetization.mercadoPagoWebhook(req,url.searchParams.get('data.id')||body?.data?.id||'',url.searchParams.get('type')||body?.type||body?.topic||'');
     else out=await monetization.playNotification(url.searchParams.get('token')||'',body);
     if(out.status===204){applySecurityHeaders(req,res);res.writeHead(204,{'Cache-Control':'no-store'});return res.end();}
     return send(req,res,out.status,out.body);
