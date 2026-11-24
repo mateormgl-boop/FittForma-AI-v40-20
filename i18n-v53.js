@@ -1705,3 +1705,11 @@ window.FittFormaI18nDynamic = [
       `Satz ${m[1]}: Der vorherige Satz war sehr anstrengend (RIR ${m[2]}). Behalte ${m[3]} bei und erhöhe das Gewicht nicht.`
     ][i]]
 );
+
+/* v80: transparencia de las estimaciones nutricionales hechas desde una foto. */
+(window.FittFormaI18nExtra = window.FittFormaI18nExtra || []).push(
+  ["Confianza visual baja", "Low visual confidence", "Baixa confiança visual", "Faible confiance visuelle", "Bassa affidabilità visiva", "Geringe visuelle Sicherheit"],
+  ["Confianza visual media", "Medium visual confidence", "Confiança visual média", "Confiance visuelle moyenne", "Affidabilità visiva media", "Mittlere visuelle Sicherheit"],
+  ["Confianza visual alta", "High visual confidence", "Alta confiança visual", "Confiance visuelle élevée", "Alta affidabilità visiva", "Hohe visuelle Sicherheit"],
+  ["Porción estimada:", "Estimated portion:", "Porção estimada:", "Portion estimée :", "Porzione stimata:", "Geschätzte Portion:"]
+);
