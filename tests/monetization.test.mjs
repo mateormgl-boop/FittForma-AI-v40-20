@@ -20,7 +20,7 @@ function fakeSupabase({ plus = false, membershipError = false } = {}) {
     return new Response('{}', { status: 404 });
   };
 }
-const ENV = { MONETIZATION_ENABLED: 'true', ADS_PROVIDER: 'test', ADS_ALLOW_TEST: 'true', SUPABASE_URL: 'https://demo.supabase.co', SUPABASE_ANON_KEY: 'anon', AI_FREE_PER_DAY: '2', ADS_MIN_REWARD_SECONDS: '10' };
+const ENV = { MONETIZATION_ENABLED: 'true', ADS_ENABLED: 'true', ADS_PROVIDER: 'test', ADS_ALLOW_TEST: 'true', SUPABASE_URL: 'https://demo.supabase.co', SUPABASE_ANON_KEY: 'anon', AI_FREE_PER_DAY: '2', ADS_MIN_REWARD_SECONDS: '10' };
 
 test('monetización: reglas de intersticiales (nunca durante actividades, intervalo y Plus)', () => {
   const config = M.normalizeConfig({ enabled: true, ads: { interstitialMinMinutes: 7, sectionChangesBetweenInterstitials: 4 } });
@@ -58,11 +58,11 @@ test('monetización: desactivada por defecto, sin anuncios ni límites nuevos', 
 });
 
 test('monetización: configuración segura (solo IDs públicos con formato válido; test explícito)', () => {
-  const s = monetizationConfigFromEnv({ MONETIZATION_ENABLED: 'true', ADS_PROVIDER: 'gam', GAM_NETWORK_CODE: '123456', GAM_SLOT_HOME: '/123456/fittforma/home', GAM_SLOT_REWARDED: 'javascript:alert(1)' });
-  assert.equal(s.ads.provider, 'gam'); assert.equal(s.ads.slots.home, '/123456/fittforma/home'); assert.equal(s.ads.slots.rewarded, '', 'un identificador inválido se ignora');
+  const s = monetizationConfigFromEnv({ MONETIZATION_ENABLED: 'true', ADS_ENABLED: 'true', ADS_PROVIDER: 'gam', GAM_NETWORK_CODE: '123456', GAM_SLOT_HOME: '/123456/fittforma/home', GAM_SLOT_NUTRITION: '/123456/fittforma_nutrition', GAM_SLOT_PROGRESS: '/123456/fittforma_progress', GAM_SLOT_REWARDED: 'javascript:alert(1)' });
+  assert.equal(s.ads.enabled, true); assert.equal(s.ads.provider, 'gam'); assert.equal(s.ads.slots.home, '/123456/fittforma/home'); assert.equal(s.ads.slots.nutrition, '/123456/fittforma_nutrition'); assert.equal(s.ads.slots.progress, '/123456/fittforma_progress'); assert.equal(s.ads.slots.rewarded, '', 'un identificador inválido se ignora');
   assert.ok(adsCspAdditions(s.ads).script.includes('https://securepubads.g.doubleclick.net'));
-  assert.equal(monetizationConfigFromEnv({ ADS_PROVIDER: 'gam' }).ads.provider, 'none', 'sin network code no hay anuncios');
-  assert.equal(monetizationConfigFromEnv({ ADS_PROVIDER: 'test' }).ads.provider, 'none', 'el proveedor de prueba requiere ADS_ALLOW_TEST');
+  assert.equal(monetizationConfigFromEnv({ ADS_ENABLED: 'true', ADS_PROVIDER: 'gam' }).ads.provider, 'none', 'sin network code no hay anuncios');
+  assert.equal(monetizationConfigFromEnv({ ADS_ENABLED: 'true', ADS_PROVIDER: 'test' }).ads.provider, 'none', 'el proveedor de prueba requiere ADS_ALLOW_TEST');
 });
 
 test('monetización: la IA se limita en el servidor y se devuelve si el modelo falla', async () => {
@@ -105,6 +105,25 @@ test('monetización: recompensa de IA solo con comprobante del servidor, una vez
   assert.equal((await m2.claimReward(req(TOKEN), 'ip', s2.body.nonce)).status, 410);
 });
 
+test('publicidad independiente: puede mostrarse sin activar límites de IA ni monetización general', async () => {
+  const m = createMonetization({ env: {
+    ADS_ENABLED: 'true', ADS_PROVIDER: 'gam', GAM_NETWORK_CODE: '123456',
+    GAM_SLOT_HOME: '/123456/fittforma_home', GAM_SLOT_NUTRITION: '/123456/fittforma_nutrition',
+    GAM_SLOT_PROGRESS: '/123456/fittforma_progress'
+  } });
+  const e = await m.entitlements(req(null));
+  assert.equal(e.enabled, false, 'los límites generales siguen apagados');
+  assert.equal(e.ads.show, true, 'los banners pueden habilitarse de forma independiente');
+  assert.equal(e.ads.provider, 'gam');
+  assert.equal(m.publicAdsConfig().provider, 'gam');
+  assert.ok(adsCspAdditions(m.settings.ads).script.includes('https://securepubads.g.doubleclick.net'));
+  const mpDisabled = monetizationConfigFromEnv({
+    MERCADOPAGO_ENABLED: 'false', MERCADOPAGO_ACCESS_TOKEN: 'test-token',
+    MERCADOPAGO_WEBHOOK_SECRET: 'test-secret', MERCADOPAGO_PLUS_AMOUNT: '100',
+    MERCADOPAGO_CURRENCY_ID: 'UYU', PUBLIC_SITE_URL: 'https://fittforma.example'
+  });
+  assert.equal(mpDisabled.mp.enabled, false, 'Mercado Pago permanece desactivado aunque existan credenciales');
+});
 test('monetización: Plus verificado sin anuncios ni videos; error de estado no concede Plus', async () => {
   const plus = createMonetization({ env: ENV, fetchImpl: fakeSupabase({ plus: true }) });
   const e = await plus.entitlements(req(TOKEN), 'ip');

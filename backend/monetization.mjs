@@ -45,11 +45,12 @@ export function monetizationConfigFromEnv(env = process.env) {
   const networkCode = /^\d{2,20}$/.test(String(env.GAM_NETWORK_CODE || '').trim()) ? String(env.GAM_NETWORK_CODE).trim() : '';
   const slot = k => (SLOT_PATH.test(String(env[k] || '').trim()) ? String(env[k]).trim() : '');
   const ads = {
+    enabled: bool(env.ADS_ENABLED),
     provider: provider === 'gam' && !networkCode ? 'none' : provider,
     // El proveedor de prueba solo existe si se habilita explícitamente; nunca genera ingresos.
     testMode: provider === 'test' ? bool(env.ADS_ALLOW_TEST) : false,
     networkCode,
-    slots: { home: slot('GAM_SLOT_HOME'), community: slot('GAM_SLOT_COMMUNITY'), explore: slot('GAM_SLOT_EXPLORE'), rewarded: slot('GAM_SLOT_REWARDED'), interstitial: slot('GAM_SLOT_INTERSTITIAL') },
+    slots: { home: slot('GAM_SLOT_HOME'), community: slot('GAM_SLOT_COMMUNITY'), explore: slot('GAM_SLOT_EXPLORE'), nutrition: slot('GAM_SLOT_NUTRITION'), progress: slot('GAM_SLOT_PROGRESS'), rewarded: slot('GAM_SLOT_REWARDED'), interstitial: slot('GAM_SLOT_INTERSTITIAL') },
     consent: String(env.ADS_CONSENT || 'google-cmp').trim() === 'none' ? 'none' : 'google-cmp'
   };
   if (ads.provider === 'test' && !ads.testMode) ads.provider = 'none';
@@ -76,7 +77,7 @@ export function monetizationConfigFromEnv(env = process.env) {
 
 // Los anuncios solo agregan dominios a la CSP cuando hay un proveedor real configurado.
 export function adsCspAdditions(ads) {
-  if (!ads || ads.provider !== 'gam') return { script: [], frame: [], connect: [], img: [] };
+  if (!ads || !ads.enabled || ads.provider !== 'gam') return { script: [], frame: [], connect: [], img: [] };
   const g = ['https://securepubads.g.doubleclick.net', 'https://pagead2.googlesyndication.com', 'https://tpc.googlesyndication.com', 'https://www.googletagservices.com'];
   const cmp = ads.consent === 'google-cmp' ? ['https://fundingchoicesmessages.google.com'] : [];
   return { script: [...g, ...cmp], frame: ['https://securepubads.g.doubleclick.net', 'https://tpc.googlesyndication.com', 'https://googleads.g.doubleclick.net', ...cmp], connect: ['https://securepubads.g.doubleclick.net', 'https://pagead2.googlesyndication.com', ...cmp], img: [] };
@@ -199,12 +200,12 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     const pc = await photoConfig();
     const photos = { ...M.photoQuota({ config: pc.config, plan: plan.plan, posted: photosPosted, extra: photoExtra }), limitEnabled: pc.limitEnabled };
     if (!pc.limitEnabled) { photos.needsReward = false; photos.extraLeft = 0; }
-    const adsOn = config.enabled && plan.plan !== 'plus' && settings.ads.provider !== 'none';
+    const adsOn = settings.ads.enabled && plan.plan !== 'plus' && settings.ads.provider !== 'none';
     return {
       enabled: config.enabled, day, signedIn: Boolean(user), plan: plan.plan, planVerified: plan.verified, planSource: plan.source, planPeriodEnd: plan.periodEnd,
       ai, photos, store: store.kind,
       timezone: TZ,
-      ads: { show: adsOn, provider: adsOn ? settings.ads.provider : 'none', testMode: settings.ads.testMode, interstitialMinMinutes: config.ads.interstitialMinMinutes, sectionChangesBetweenInterstitials: config.ads.sectionChangesBetweenInterstitials, rewardedAvailable: adsOn && (settings.ads.provider === 'test' || Boolean(settings.ads.slots.rewarded)) },
+      ads: { show: adsOn, provider: adsOn ? settings.ads.provider : 'none', testMode: adsOn && settings.ads.testMode, interstitialMinMinutes: config.ads.interstitialMinMinutes, sectionChangesBetweenInterstitials: config.ads.sectionChangesBetweenInterstitials, rewardedAvailable: adsOn && config.enabled && (settings.ads.provider === 'test' || Boolean(settings.ads.slots.rewarded)) },
       payments: {
         googlePlay: Boolean(settings.play.packageName && settings.play.productIds.length && settings.play.serviceAccount && serviceKey),
         mercadoPago: Boolean(config.enabled && settings.mp.enabled && store.kind === 'supabase'),
@@ -215,7 +216,8 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
   }
   function publicAdsConfig() {
     const a = settings.ads;
-    return { provider: config.enabled ? a.provider : 'none', testMode: a.testMode, networkCode: a.networkCode, slots: a.slots, consent: a.consent };
+    const slots = a.enabled ? a.slots : Object.fromEntries(Object.keys(a.slots).map(key => [key, '']));
+    return { provider: a.enabled ? a.provider : 'none', testMode: a.enabled && a.testMode, networkCode: a.enabled ? a.networkCode : '', slots, consent: a.consent };
   }
 
   // Consume una consulta de IA antes de llamar al modelo; si el modelo falla, se devuelve (refund).

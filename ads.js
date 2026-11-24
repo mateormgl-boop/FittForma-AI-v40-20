@@ -9,7 +9,6 @@
   let cfg = { provider: 'none', slots: {}, consent: 'google-cmp' }, ent = null, gptPromise = null, cmpLoaded = false;
   let lastAdAt = 0, activeMsSinceLast = 0, sectionChanges = 0, adOpen = false, lastTick = Date.now(), entLoadedAt = 0;
   const shownBanners = new Set();
-  let communitySlot = null;
 
   async function authHeader() { try { return (await window.FittFormaAuthHeader?.()) || {}; } catch { return {}; } }
   async function api(path, body) {
@@ -34,7 +33,7 @@
     renderPlan(); renderCoachUsage(); syncBanners();
     return ent;
   }
-  const adsOn = () => Boolean(ent?.enabled && ent?.ads?.show && ent?.plan !== 'plus' && cfg.provider !== 'none');
+  const adsOn = () => Boolean(ent?.ads?.show && ent?.plan !== 'plus' && cfg.provider !== 'none');
   const isPlus = () => ent?.plan === 'plus' && ent?.planVerified === true;
 
   // ---------- Proveedor: Google Ad Manager (GPT) ----------
@@ -50,7 +49,8 @@
       if (cfg.consent !== 'none' && !cmpLoaded) pubads.setPrivacySettings?.({ nonPersonalizedAds: true });
       pubads.enableLazyLoad?.({ fetchMarginPercent: 50, renderMarginPercent: 20, mobileScaling: 2 });
       pubads.collapseEmptyDivs(true);
-      pubads.addEventListener('slotRenderEnded', e => { if (e.slot.__ff === 'banner') metric(e.isEmpty ? 'ad_no_fill' : 'ad_impression_banner'); if (e.isEmpty) e.slot.__el?.closest('.ad-slot')?.classList.remove('is-visible'); });
+      pubads.setCentering?.(true);
+      pubads.addEventListener('slotRenderEnded', e => { if (e.slot.__ff === 'banner') metric(e.isEmpty ? 'ad_no_fill' : 'ad_impression_banner'); if (e.isEmpty) e.slot.__el?.closest('.ad-slot')?.classList.remove('is-visible', 'is-reserved'); });
       window.googletag.enableServices();
       return window.googletag;
     })();
@@ -58,9 +58,9 @@
     return gptPromise;
   }
 
-  // ---------- Banners (Inicio, Comunidad, Explorar) ----------
-  // Uno por pantalla, con alto reservado (sin saltos), solo cuando el contenedor se ve.
-  const BANNER_PLACES = { home: 'adSlotHome', community: 'adSlotCommunity', explore: 'adSlotExplore' };
+  // ---------- Banners (Inicio, Biblioteca, Comunidad, Nutrición y Progreso) ----------
+  // Máximo un espacio por vista; se solicita recién cuando está cerca de entrar en pantalla.
+  const BANNER_PLACES = { home: 'adSlotHome', community: 'adSlotCommunity', explore: 'adSlotExplore', nutrition: 'adSlotNutrition', progress: 'adSlotProgress' };
   function syncBanners() {
     for (const [place, id] of Object.entries(BANNER_PLACES)) {
       const box = document.getElementById(id); if (!box) continue;
@@ -84,17 +84,20 @@
     }
     try {
       const gpt = await loadGpt(); const id = content.id || `adContent-${place}`; content.id = id;
-      gpt.cmd.push(() => { const slot = gpt.defineSlot(cfg.slots[place], [[320, 100], [320, 50], [300, 250], [728, 90]], id); if (!slot) return; slot.__ff = 'banner'; slot.__el = content; slot.addService(gpt.pubads()); box.classList.add('is-visible'); gpt.display(id); });
+      gpt.cmd.push(() => {
+        // Formatos bajos para reservar solo ~118 px y evitar saltos por rectángulos 300×250.
+        const mapping = gpt.sizeMapping()
+          .addSize([900, 0], [[728, 90], [468, 60]])
+          .addSize([600, 0], [[468, 60]])
+          .addSize([0, 0], [[320, 50]])
+          .build();
+        const slot = gpt.defineSlot(cfg.slots[place], [[728, 90], [468, 60], [320, 50]], id);
+        if (!slot) { box.classList.remove('is-reserved', 'is-visible'); return; }
+        slot.defineSizeMapping(mapping);
+        slot.__ff = 'banner'; slot.__el = content; slot.addService(gpt.pubads()); box.classList.add('is-visible'); gpt.display(id);
+      });
     } catch { box.classList.remove('is-reserved', 'is-visible'); }
   }
-
-  // En Comunidad el anuncio va entre publicaciones (después de la tercera), nunca encima de una.
-  window.addEventListener('fittforma:feedrendered', () => {
-    // Se guarda la referencia: si el feed se vuelve a dibujar, el mismo anuncio se reubica (no se pide otro).
-    const slot = (communitySlot ||= document.getElementById('adSlotCommunity')), feed = document.getElementById('communityFeed'); if (!slot || !feed) return;
-    const posts = [...feed.children].filter(el => el !== slot);
-    if (posts.length >= 3) posts[2].after(slot); else feed.after(slot);
-  });
 
   // ---------- Intersticiales ----------
   // Se cuenta solo el tiempo de uso activo (pestaña visible). Nunca durante entrenamiento, descanso,
@@ -104,7 +107,7 @@
   async function maybeInterstitial(event) {
     if (event === 'section-change') sectionChanges++;
     if (!ent || !adsOn() || !M) return { shown: false, reason: 'off' };
-    const config = M.normalizeConfig({ enabled: ent.enabled, ads: { interstitialMinMinutes: ent.ads.interstitialMinMinutes, sectionChangesBetweenInterstitials: ent.ads.sectionChangesBetweenInterstitials } });
+    const config = M.normalizeConfig({ enabled: Boolean(ent?.ads?.show), ads: { interstitialMinMinutes: ent.ads.interstitialMinMinutes, sectionChangesBetweenInterstitials: ent.ads.sectionChangesBetweenInterstitials } });
     const d = M.interstitialDecision({ config, plan: ent.plan, adsAvailable: cfg.provider === 'test' || Boolean(cfg.slots?.interstitial), event, activities: activities(), activeMsSinceLast, sectionChangesSinceLast: sectionChanges, shownBefore: lastAdAt > 0 });
     if (!d.allowed) return { shown: false, reason: d.reason };
     adOpen = true;

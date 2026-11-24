@@ -21,7 +21,11 @@ services:
       - key: TRUST_RENDER_CLIENT_IP
         value: "true"
       # v48 — monetización (apagada por defecto). Detalle en docs/MONETIZACION.md.
+      - key: ADS_ENABLED
+        value: "false"
       - key: MONETIZATION_ENABLED
+        value: "false"
+      - key: MERCADOPAGO_ENABLED
         value: "false"
       - key: ADS_PROVIDER
         value: none
