@@ -65,7 +65,7 @@ La tarjeta de Plus ya no fija un precio orientativo en el código: muestra el mo
    - Crear la cuenta y obtener el código de red.
    - Crear 5 bloques de anuncios: 3 banners, 1 recompensado web y 1 intersticial web.
    - Aprobar el sitio y configurar el mensaje de consentimiento de Google (Privacy & messaging) para la UE, el Reino Unido y Suiza.
-   - Publicar `ads.txt` cuando Google lo pida.
+   - El repositorio publica `ads.txt` en la raíz con la línea de autorización de AdSense configurada; si Google Ad Manager solicita otro identificador de vendedor, agregar su línea sin borrar la existente.
 3. **Render.** Cargar primero `SUPABASE_SERVICE_ROLE_KEY` y las variables de configuración. Para probar cuotas y membresía, usar `MONETIZATION_ENABLED=true`; los anuncios requieren además `ADS_PROVIDER=gam` y sus identificadores reales. Se puede dejar `ADS_PROVIDER=none` mientras no haya bloques publicitarios. Activar `MERCADOPAGO_ENABLED=true` solo después de probar checkout y Webhooks.
 4. **Límite de fotos.** Cuando se quiera activar: `update public.monetization_settings set photo_limit_enabled = true;` (en el SQL editor de Supabase).
 5. **Plus con Google Play.** Requiere una **app de Android**: este repositorio no tiene un proyecto Android. Pasos:
