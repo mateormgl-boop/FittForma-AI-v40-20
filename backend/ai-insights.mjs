@@ -24,8 +24,8 @@ export function deriveTrainingInsights(sessions) {
       const score = weighted.length
         ? Math.max(...weighted.map(entry => Number(entry.weight) * (1 + Math.min(Number(entry.reps), 15) / 30)))
         : entries.reduce((sum, entry) => sum + Number(entry.reps), 0) / entries.length;
-      const rir = entries.map(entry => Number(entry.rir))
-        .filter(value => Number.isInteger(value) && value >= 0 && value <= 5);
+      const rir = entries.map(entry => entry.rir === '' || entry.rir === null || entry.rir === undefined ? null : Number(entry.rir))
+        .filter(value => value !== null && Number.isInteger(value) && value >= 0 && value <= 5);
       const key = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
       if (!byExercise.has(key)) byExercise.set(key, { name, records: [] });
       byExercise.get(key).records.push({

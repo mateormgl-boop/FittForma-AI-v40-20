@@ -33,7 +33,7 @@ test('validación de fotos y fechas se realiza antes de publicar',async()=>{
 
 test('las versiones visibles, traducciones y paquetes coinciden en 41.0',async()=>{
   const a=JSON.parse(await read('package.json')),b=JSON.parse(await read('backend/package.json'));assert.equal(a.version,'0.80.0');assert.equal(b.version,'0.80.0');
-  const html=await read('index.html');assert.match(html,/Versión 80\.0/);assert.match(html,/V80\.0/);const i18n=await read('i18n.js');assert.match(i18n,/VERSION 79\.0 · ONLINE FITNESS COMMUNITY/);assert.match(i18n,/VERSION 79\.0 · ONLINE FITNESS COMMUNITY/);
+  const html=await read('index.html');assert.match(html,/Versión 80\.0/);assert.match(html,/V80\.0/);const i18n=await read('i18n.js');assert.match(i18n,/VERSION 80\.0 · ONLINE FITNESS COMMUNITY/);assert.match(i18n,/VERSION 80\.0 · ONLINE FITNESS COMMUNITY/);
 });
 
 test('la búsqueda pública limita la información de perfiles privados y el seguimiento pasa por aprobación',async()=>{
