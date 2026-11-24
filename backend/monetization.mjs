@@ -251,8 +251,9 @@ export function createMonetization({ env = process.env, fetchImpl = globalThis.f
     const limit = (plan.plan === 'plus' ? config.ai.plusPerDay : config.ai.freePerDay) + bonus;
     const used = await store.bump(subject, day, 'ai_used', 1, limit);
     if (used < 0) {
-      const q = M.aiQuota({ config, plan: plan.plan, used: limit, bonus, rewardedVideos: await store.get(subject, day, 'ai_videos') });
-      return { ok: false, quota: q, plan: plan.plan };
+      const rawQuota = M.aiQuota({ config, plan: plan.plan, used: limit, bonus, rewardedVideos: await store.get(subject, day, 'ai_videos') });
+      const quota = { ...rawQuota, limitsEnabled: true, canOfferVideo: rawQuota.canOfferVideo && aiRewardAvailable() };
+      return { ok: false, quota, plan: plan.plan };
     }
     if (used > (plan.plan === 'plus' ? config.ai.plusPerDay : config.ai.freePerDay)) metric('ai_bonus_used');
     return { ok: true, refund: () => store.bump(subject, day, 'ai_used', -1) };
